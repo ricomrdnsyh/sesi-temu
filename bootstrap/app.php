@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\PastikanAdmin;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,7 +13,21 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'admin' => PastikanAdmin::class,
+        ]);
+
+        $middleware->redirectGuestsTo(fn (): string => route('login'));
+
+        $middleware->redirectUsersTo(function (Request $request): string {
+            $pengguna = $request->user();
+
+            if ($pengguna !== null && method_exists($pengguna, 'adalahAdmin') && $pengguna->adalahAdmin()) {
+                return '/admin';
+            }
+
+            return '/dasbor';
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
