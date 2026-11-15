@@ -39,7 +39,13 @@
                         <p>Link Undangan: <span class="font-mono font-semibold text-sage">sesitemu.id/{{ $slugTerpilih }}</span></p>
                     @endif
                     @if ($temaTerpilih)
-                        <p>Tema Pilihan: <span class="font-semibold text-sage">{{ $temaTerpilih->nama_tema }}</span></p>
+                        <p>
+                            Tema Pilihan:
+                            <span class="font-semibold text-sage">{{ $temaTerpilih->nama_tema }}</span>
+                            <span class="ml-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold {{ $temaTerpilih->infoTier()['chip_class'] }}">
+                                {{ $temaTerpilih->tierLabel() }} — {{ $temaTerpilih->hargaFormatted() }}
+                            </span>
+                        </p>
                     @endif
                 </div>
             @endif

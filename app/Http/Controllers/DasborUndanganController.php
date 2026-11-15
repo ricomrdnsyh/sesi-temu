@@ -193,6 +193,8 @@ class DasborUndanganController extends Controller
                 'nama_ayah_wanita' => ['nullable', 'string', 'max:150'],
                 'nama_ibu_wanita' => ['nullable', 'string', 'max:150'],
                 'foto_wanita' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'foto_sampul' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'hapus_foto_sampul' => ['nullable', 'boolean'],
                 'kutipan_ayat' => ['nullable', 'string', 'max:2000'],
             ]);
 
@@ -223,6 +225,21 @@ class DasborUndanganController extends Controller
                     $request->file('foto_wanita'),
                     $undangan->id,
                     'mempelai-wanita'
+                );
+            }
+
+            $fotoSampulLama = data_get($pengaturan, 'foto_sampul');
+            if ($request->boolean('hapus_foto_sampul') && is_string($fotoSampulLama) && $fotoSampulLama !== '') {
+                $pengolahGambar->hapusBerkasJikaAda($fotoSampulLama);
+                $pengaturan['foto_sampul'] = null;
+            }
+
+            if ($request->hasFile('foto_sampul')) {
+                $pengolahGambar->hapusBerkasJikaAda(is_string($fotoSampulLama) ? $fotoSampulLama : null);
+                $pengaturan['foto_sampul'] = $pengolahGambar->simpanGambarUndangan(
+                    $request->file('foto_sampul'),
+                    $undangan->id,
+                    'foto-sampul'
                 );
             }
         }

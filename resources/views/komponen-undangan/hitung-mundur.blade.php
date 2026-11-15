@@ -2,6 +2,10 @@
     $acaraPertama = $undangan->daftarAcara->first();
     $isoTarget = null;
     $googleCalUrl = null;
+    $sudutTajam = !empty($sudutEditorial);
+    $kelasRadiusBox = $sudutTajam ? 'rounded-none' : 'rounded-2xl';
+    $kelasRadiusTombol = $sudutTajam ? 'rounded-none' : 'rounded-full';
+    $ekstraKartu = $kelasEkstraKartu ?? '';
 
     if ($acaraPertama) {
         $offset = match ($acaraPertama->zona_waktu) {
@@ -67,7 +71,7 @@
 
     <div class="mt-7 max-w-md mx-auto grid grid-cols-4 gap-2 sm:gap-3">
         @foreach (['hari' => 'Hari', 'jam' => 'Jam', 'menit' => 'Menit', 'detik' => 'Detik'] as $var => $label)
-            <div class="rounded-2xl p-3 sm:p-4 shadow-sm {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
+            <div class="{{ $kelasRadiusBox }} p-3 sm:p-4 shadow-sm transition hover:-translate-y-0.5 {{ $ekstraKartu }} {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
                 <div class="font-serif text-2xl sm:text-3xl font-bold" x-text="{{ $var }}">00</div>
                 <div class="mt-1 text-[10px] uppercase tracking-widest opacity-70">{{ $label }}</div>
             </div>
@@ -80,7 +84,7 @@
                 href="{{ $googleCalUrl }}"
                 target="_blank"
                 rel="noopener"
-                class="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold shadow-sm transition {{ $kelasTombol ?? 'bg-sage text-white hover:bg-sage/90' }}"
+                class="inline-flex items-center gap-2 {{ $kelasRadiusTombol }} px-6 py-3 text-sm font-semibold shadow-sm transition {{ $kelasTombol ?? 'bg-sage text-white hover:bg-sage/90' }}"
             >
                 <span>Simpan ke Kalender</span>
             </a>

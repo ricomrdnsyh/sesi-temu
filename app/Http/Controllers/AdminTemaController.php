@@ -24,41 +24,28 @@ class AdminTemaController extends Controller
     public function create(): View
     {
         return view('admin.tema.form', [
-            'tema' => new Tema(['kategori' => 'modern', 'aktif' => true]),
+            'tema' => new Tema([
+                'kategori' => 'modern',
+                'tier' => 'basic',
+                'harga' => Tema::HARGA_BAWAAN_TIER['basic'],
+                'aktif' => true,
+            ]),
             'modeEdit' => false,
         ]);
     }
 
     public function store(Request $request, PengolahGambarService $pengolahGambar): RedirectResponse
     {
-        $tervalidasi = $request->validate([
-            'nama_tema' => ['required', 'string', 'max:120'],
-            'slug' => ['nullable', 'string', 'max:120'],
-            'kategori' => ['required', Rule::in(array_keys(Tema::KATEGORI_TERSEDIA))],
-            'lokasi_view' => ['required', 'string', 'max:150'],
-            'gambar_pratinjau' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
-        ]);
-
-        $slug = Str::slug((string) ($tervalidasi['slug'] ?: $tervalidasi['nama_tema']));
-        $request->merge(['slug_normalisasi' => $slug]);
-        $request->validate([
-            'slug_normalisasi' => ['required', Rule::unique('tema', 'slug')],
-        ], [
-            'slug_normalisasi.unique' => "Slug tema {$slug} sudah terdaftar.",
-        ]);
+        $data = $this->validasiDataTema($request);
 
         $pathGambar = null;
         if ($request->hasFile('gambar_pratinjau')) {
-            $pathGambar = $pengolahGambar->simpanGambarTema($request->file('gambar_pratinjau'), $slug);
+            $pathGambar = $pengolahGambar->simpanGambarTema($request->file('gambar_pratinjau'), $data['slug']);
         }
 
         Tema::create([
-            'nama_tema' => $tervalidasi['nama_tema'],
-            'slug' => $slug,
-            'kategori' => $tervalidasi['kategori'],
-            'lokasi_view' => $tervalidasi['lokasi_view'],
+            ...$data,
             'gambar_pratinjau' => $pathGambar,
-            'aktif' => $request->boolean('aktif'),
         ]);
 
         return redirect()
@@ -76,10 +63,45 @@ class AdminTemaController extends Controller
 
     public function update(Request $request, Tema $tema, PengolahGambarService $pengolahGambar): RedirectResponse
     {
+        $data = $this->validasiDataTema($request, $tema);
+
+        $pathGambar = $tema->gambar_pratinjau;
+        if ($request->hasFile('gambar_pratinjau')) {
+            $pengolahGambar->hapusBerkasJikaAda($tema->gambar_pratinjau);
+            $pathGambar = $pengolahGambar->simpanGambarTema($request->file('gambar_pratinjau'), $data['slug']);
+        }
+
+        $tema->update([
+            ...$data,
+            'gambar_pratinjau' => $pathGambar,
+        ]);
+
+        return redirect()
+            ->route('admin.tema.index')
+            ->with('sukses', "Tema {$tema->nama_tema} berhasil diperbarui.");
+    }
+
+    /**
+     * Memvalidasi input tema sekaligus menormalkan slug, tier, dan harga.
+     *
+     * @return array{
+     *     nama_tema: string,
+     *     slug: string,
+     *     kategori: string,
+     *     tier: string,
+     *     harga: int,
+     *     lokasi_view: string,
+     *     aktif: bool
+     * }
+     */
+    private function validasiDataTema(Request $request, ?Tema $tema = null): array
+    {
         $tervalidasi = $request->validate([
             'nama_tema' => ['required', 'string', 'max:120'],
             'slug' => ['nullable', 'string', 'max:120'],
             'kategori' => ['required', Rule::in(array_keys(Tema::KATEGORI_TERSEDIA))],
+            'tier' => ['nullable', Rule::in(array_keys(Tema::TIER_TERSEDIA))],
+            'harga' => ['nullable', 'integer', 'min:0', 'max:100000000'],
             'lokasi_view' => ['required', 'string', 'max:150'],
             'gambar_pratinjau' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
@@ -87,29 +109,25 @@ class AdminTemaController extends Controller
         $slug = Str::slug((string) ($tervalidasi['slug'] ?: $tervalidasi['nama_tema']));
         $request->merge(['slug_normalisasi' => $slug]);
         $request->validate([
-            'slug_normalisasi' => ['required', Rule::unique('tema', 'slug')->ignore($tema->id)],
+            'slug_normalisasi' => ['required', Rule::unique('tema', 'slug')->ignore($tema?->id)],
         ], [
             'slug_normalisasi.unique' => "Slug tema {$slug} sudah terdaftar.",
         ]);
 
-        $pathGambar = $tema->gambar_pratinjau;
-        if ($request->hasFile('gambar_pratinjau')) {
-            $pengolahGambar->hapusBerkasJikaAda($tema->gambar_pratinjau);
-            $pathGambar = $pengolahGambar->simpanGambarTema($request->file('gambar_pratinjau'), $slug);
-        }
+        $tier = $tervalidasi['tier'] ?? ($tema?->tierKode() ?? 'basic');
+        $harga = array_key_exists('harga', $tervalidasi) && $tervalidasi['harga'] !== null
+            ? (int) $tervalidasi['harga']
+            : ($tema ? $tema->hargaNominal() : Tema::hargaBawaanTier($tier));
 
-        $tema->update([
+        return [
             'nama_tema' => $tervalidasi['nama_tema'],
             'slug' => $slug,
             'kategori' => $tervalidasi['kategori'],
+            'tier' => $tier,
+            'harga' => $harga,
             'lokasi_view' => $tervalidasi['lokasi_view'],
-            'gambar_pratinjau' => $pathGambar,
             'aktif' => $request->boolean('aktif'),
-        ]);
-
-        return redirect()
-            ->route('admin.tema.index')
-            ->with('sukses', "Tema {$tema->nama_tema} berhasil diperbarui.");
+        ];
     }
 
     public function destroy(Tema $tema, PengolahGambarService $pengolahGambar): RedirectResponse

@@ -7,6 +7,15 @@
             galeriModalTerbuka: false,
             galeriAktifUrl: '',
             galeriAktifKeterangan: '',
+            scrollPersen: 0,
+            init() {
+                const perbaruiScroll = () => {
+                    const total = document.documentElement.scrollHeight - window.innerHeight;
+                    this.scrollPersen = total > 0 ? Math.min(100, Math.round((window.scrollY / total) * 100)) : 0;
+                };
+                window.addEventListener('scroll', perbaruiScroll, { passive: true });
+                perbaruiScroll();
+            },
             bukaUndangan() {
                 this.undanganTerbuka = true;
                 if (this.$refs.pemutarAudio) {

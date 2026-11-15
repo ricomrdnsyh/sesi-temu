@@ -15,6 +15,11 @@
                 <span class="hidden md:inline-block rounded-full bg-white/10 px-2.5 py-0.5 text-[11px] text-champagne">
                     {{ $undangan->tema?->kategoriLabel() }}
                 </span>
+                @if ($undangan->tema)
+                    <span class="hidden sm:inline-block rounded-full bg-champagne/20 px-2.5 py-0.5 text-[11px] font-semibold text-champagne">
+                        {{ $undangan->tema->tierLabel() }} • {{ $undangan->tema->hargaFormatted() }}
+                    </span>
+                @endif
             </div>
 
             <form method="GET" action="{{ url()->current() }}" class="flex flex-wrap items-center gap-2">

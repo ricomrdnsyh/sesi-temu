@@ -93,6 +93,9 @@
                                 @endif
                                 <span class="rounded-full bg-ivory px-3 py-1 text-xs font-medium text-charcoal/75 ring-1 ring-charcoal/10">
                                     Tema: {{ $undangan->tema?->nama_tema ?? '-' }}
+                                    @if ($undangan->tema)
+                                        ({{ $undangan->tema->tierLabel() }} • {{ $undangan->tema->hargaFormatted() }})
+                                    @endif
                                 </span>
                             </div>
 
@@ -191,7 +194,7 @@
                     <label for="tema_id" class="block text-sm font-medium text-charcoal">Pilih Tema</label>
                     <select id="tema_id" name="tema_id" required class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none">
                         @foreach ($daftarTema as $tema)
-                            <option value="{{ $tema->id }}">{{ $tema->nama_tema }} ({{ ucfirst($tema->kategori) }})</option>
+                            <option value="{{ $tema->id }}">{{ $tema->nama_tema }} ({{ $tema->kategoriLabel() }} • {{ $tema->tierLabel() }} — {{ $tema->hargaFormatted() }})</option>
                         @endforeach
                     </select>
                 </div>

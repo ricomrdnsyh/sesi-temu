@@ -2,16 +2,22 @@
     $pengaturan = $undangan->pengaturan ?? [];
     $alamatKado = trim((string) ($pengaturan['alamat_kado_fisik'] ?? ''));
     $live = $pengaturan['live_streaming'] ?? [];
+    $sudutTajam = !empty($sudutEditorial);
+    $kelasRadiusBesar = $sudutTajam ? 'rounded-none' : 'rounded-3xl';
+    $kelasRadiusSedang = $sudutTajam ? 'rounded-none' : 'rounded-2xl';
+    $kelasRadiusKecil = $sudutTajam ? 'rounded-none' : 'rounded-xl';
+    $kelasRadiusPill = $sudutTajam ? 'rounded-none' : 'rounded-full';
+    $ekstraKartu = $kelasEkstraKartu ?? '';
 @endphp
 
 {{-- Live Streaming --}}
 @if (!empty($live['aktif']) && !empty($live['link']))
 <section data-aos="fade-up" data-aos-duration="1000" class="py-12 px-4">
-    <div class="max-w-2xl mx-auto rounded-3xl p-7 text-center {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
+    <div class="max-w-2xl mx-auto {{ $kelasRadiusBesar }} p-7 text-center {{ $ekstraKartu }} {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
         <p class="text-xs font-semibold uppercase tracking-[0.25em] {{ $kelasAksen ?? 'text-champagne' }}">Siaran Langsung</p>
         <h2 class="mt-2 font-serif text-3xl font-bold">Live Streaming ({{ $live['platform'] ?? 'Online' }})</h2>
         <p class="mt-2 text-sm opacity-75">Bagi kerabat yang berhalangan hadir langsung, silakan menyaksikan momen sakral kami secara virtual.</p>
-        <a href="{{ $live['link'] }}" target="_blank" rel="noopener" class="mt-5 inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-semibold transition {{ $kelasTombol ?? 'bg-sage text-white hover:bg-sage/90' }}">
+        <a href="{{ $live['link'] }}" target="_blank" rel="noopener" class="mt-5 inline-flex items-center gap-2 {{ $kelasRadiusPill }} px-6 py-2.5 text-sm font-semibold transition {{ $kelasTombol ?? 'bg-sage text-white hover:bg-sage/90' }}">
             Saksikan Siaran Langsung
         </a>
     </div>
@@ -30,7 +36,7 @@
             @foreach ($undangan->daftarAmplop as $amplop)
                 <div
                     x-data="{ tersalin: false }"
-                    class="rounded-2xl p-5 shadow-sm flex flex-col justify-between gap-4 {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}"
+                    class="{{ $kelasRadiusSedang }} p-5 shadow-sm flex flex-col justify-between gap-4 {{ $ekstraKartu }} {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}"
                 >
                     <div>
                         <p class="text-xs font-bold uppercase tracking-wider {{ $kelasAksen ?? 'text-champagne' }}">{{ $amplop->nama_bank }}</p>
@@ -40,7 +46,7 @@
                     <button
                         type="button"
                         @click="navigator.clipboard?.writeText(@js($amplop->nomor_rekening)); tersalin = true; setTimeout(() => tersalin = false, 2500)"
-                        class="w-full rounded-xl px-4 py-2 text-xs font-semibold transition cursor-pointer {{ $kelasTombol ?? 'bg-sage text-white hover:bg-sage/90' }}"
+                        class="w-full {{ $kelasRadiusKecil }} px-4 py-2 text-xs font-semibold transition cursor-pointer {{ $kelasTombol ?? 'bg-sage text-white hover:bg-sage/90' }}"
                     >
                         <span x-show="!tersalin">Salin Nomor Rekening</span>
                         <span x-show="tersalin" x-cloak>Berhasil Disalin!</span>
@@ -50,7 +56,7 @@
         </div>
 
         @if ($alamatKado !== '')
-            <div class="mt-6 rounded-2xl p-5 text-center {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
+            <div class="mt-6 {{ $kelasRadiusSedang }} p-5 text-center {{ $ekstraKartu }} {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
                 <p class="text-xs font-bold uppercase tracking-wider {{ $kelasAksen ?? 'text-champagne' }}">Alamat Pengiriman Kado Fisik</p>
                 <p class="mt-1.5 text-sm opacity-85">{{ $alamatKado }}</p>
             </div>
@@ -68,7 +74,7 @@
             <h2 class="mt-2 font-serif text-3xl sm:text-4xl font-bold">Buku Tamu &amp; RSVP</h2>
         </div>
 
-        <div class="mt-8 rounded-3xl p-6 sm:p-8 shadow-sm {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
+        <div class="mt-8 {{ $kelasRadiusBesar }} p-6 sm:p-8 shadow-sm {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
             @if (session('sukses_ucapan'))
                 <div class="mb-5 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-800">
                     {{ session('sukses_ucapan') }}
@@ -101,7 +107,7 @@
                             <input type="number" min="1" max="10" value="1" class="rounded-xl border border-current/20 bg-transparent px-3.5 py-2.5 text-sm">
                         </div>
                         <textarea rows="3" class="w-full rounded-xl border border-current/20 bg-transparent px-4 py-2.5 text-sm" placeholder="Tulis doa terbaik untuk kedua mempelai..."></textarea>
-                        <button type="submit" class="w-full rounded-xl px-6 py-3 text-sm font-semibold cursor-pointer {{ $kelasTombol ?? 'bg-sage text-white' }}">
+                        <button type="submit" class="w-full {{ $kelasRadiusKecil }} px-6 py-3 text-sm font-semibold cursor-pointer {{ $kelasTombol ?? 'bg-sage text-white' }}">
                             Kirim Ucapan (Simulasi)
                         </button>
                         <p x-show="demoTerkirim" x-cloak class="text-xs text-emerald-600 font-semibold">Simulasi ucapan berhasil ditampilkan pada mode demo!</p>
@@ -135,7 +141,7 @@
                         <textarea name="ucapan_doa" rows="3" required placeholder="Tuliskan doa terbaik untuk kedua mempelai..." class="mt-1.5 w-full rounded-xl border border-current/20 bg-transparent px-4 py-2.5 text-sm">{{ old('ucapan_doa') }}</textarea>
                     </div>
 
-                    <button type="submit" class="w-full rounded-xl px-6 py-3 text-sm font-semibold transition cursor-pointer {{ $kelasTombol ?? 'bg-sage text-white hover:bg-sage/90' }}">
+                    <button type="submit" class="w-full {{ $kelasRadiusKecil }} px-6 py-3 text-sm font-semibold transition cursor-pointer {{ $kelasTombol ?? 'bg-sage text-white hover:bg-sage/90' }}">
                         Kirim Konfirmasi &amp; Doa
                     </button>
                 </form>
@@ -145,7 +151,7 @@
             <div class="mt-8 pt-6 border-t border-current/10 space-y-4">
                 <h3 class="font-serif text-xl font-bold">Doa &amp; Ucapan ({{ $undangan->bukuTamu->count() }})</h3>
                 @forelse ($undangan->bukuTamu as $ucapan)
-                    <div class="rounded-2xl p-4 border border-current/10 space-y-1.5">
+                    <div class="{{ $kelasRadiusSedang }} p-4 border border-current/10 space-y-1.5">
                         <div class="flex items-center justify-between gap-2">
                             <p class="font-semibold text-sm">{{ $ucapan->nama_tamu }}</p>
                             <span class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold bg-current/10">

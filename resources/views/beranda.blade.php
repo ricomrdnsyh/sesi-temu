@@ -3,23 +3,43 @@
 @section('judul', 'SesiTemu — Abadikan Setiap Sesi Bahagia Menuju Hari Pertemuan')
 
 @section('konten')
+@php
+    $daftarFilterJson = $daftarTema->map(fn ($t) => [
+        'kategori' => $t->kategori,
+        'tier' => $t->tierKode(),
+    ])->values();
+@endphp
 <div x-data="{
     kategoriAktif: 'semua',
+    tierAktif: 'semua',
+    daftarFilter: @js($daftarFilterJson),
     modalDemoTerbuka: false,
     temaDemoSlug: '',
     temaDemoNama: '',
+    temaDemoInfo: '',
     namaTamuDemo: 'Budi Santoso & Partner',
     tanpaFotoDemo: false,
     fontDemo: 'bawaan',
-    bukaModalDemo(slug, nama) {
+    temaCocok(kategori, tier) {
+        return (this.kategoriAktif === 'semua' || this.kategoriAktif === kategori)
+            && (this.tierAktif === 'semua' || this.tierAktif === tier);
+    },
+    get adaHasilFilter() {
+        return this.daftarFilter.some(item => this.temaCocok(item.kategori, item.tier));
+    },
+    resetFilter() {
+        this.kategoriAktif = 'semua';
+        this.tierAktif = 'semua';
+    },
+    bukaModalDemo(slug, nama, info = '') {
         this.temaDemoSlug = slug;
         this.temaDemoNama = nama;
+        this.temaDemoInfo = info;
         this.tanpaFotoDemo = false;
         this.fontDemo = 'bawaan';
         this.modalDemoTerbuka = true;
     },
     bukaUrlDemo() {
-        const nama = encodeURIComponent(this.namaTamuDemo.trim() || 'Budi Santoso & Partner');
         const params = new URLSearchParams({
             to: this.namaTamuDemo.trim() || 'Budi Santoso & Partner',
             tf: this.tanpaFotoDemo ? '1' : '0',
@@ -162,7 +182,7 @@
         </div>
     </section>
 
-    {{-- Katalog Tema dengan Filter Kategori & Modal Simulasi Nama Tamu --}}
+    {{-- Katalog Tema dengan Filter Kategori, Tingkatan Tier & Modal Simulasi Nama Tamu --}}
     <section id="katalog-tema" class="py-20 px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto">
             <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -173,7 +193,15 @@
 
                 {{-- Filter Tab Kategori --}}
                 <div class="flex flex-wrap gap-2">
-                    @foreach (['semua' => 'Semua', 'modern' => 'Modern', 'luxury' => 'Luxury', 'motion' => 'Motion', 'adat' => 'Adat', 'islami' => 'Islami'] as $kode => $label)
+                    <button
+                        type="button"
+                        @click="kategoriAktif = 'semua'"
+                        :class="kategoriAktif === 'semua' ? 'bg-sage text-white shadow-sm' : 'bg-white text-charcoal/80 hover:bg-champagne/10 ring-1 ring-charcoal/10'"
+                        class="rounded-xl px-4 py-2 text-sm font-semibold transition cursor-pointer"
+                    >
+                        Semua
+                    </button>
+                    @foreach (\App\Models\Tema::KATEGORI_TERSEDIA as $kode => $label)
                         <button
                             type="button"
                             @click="kategoriAktif = '{{ $kode }}'"
@@ -186,13 +214,67 @@
                 </div>
             </div>
 
-            <div class="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {{-- Pilihan Tingkatan Kualitas (Tier) Tema --}}
+            <div class="mt-7 grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <button
+                    type="button"
+                    @click="tierAktif = 'semua'"
+                    :class="tierAktif === 'semua' ? 'bg-sage/10 ring-2 ring-sage shadow-sm' : 'bg-white ring-1 ring-champagne/25 hover:ring-champagne/60'"
+                    class="rounded-2xl p-3.5 text-left transition cursor-pointer"
+                >
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-sm font-bold text-charcoal">Semua Tier</span>
+                        <span class="rounded-full bg-ivory px-2.5 py-0.5 text-[11px] font-semibold text-charcoal/70 ring-1 ring-charcoal/10">
+                            {{ $daftarTema->count() }} Tema
+                        </span>
+                    </div>
+                    <p class="mt-1 text-xs text-charcoal/65">Tampilkan seluruh koleksi</p>
+                </button>
+
+                @foreach ([
+                    'basic' => ['ikon_warna' => 'bg-sage', 'deskripsi' => 'Elegan, clean & cepat dimuat', 'active' => 'bg-sage/10 ring-2 ring-sage shadow-sm'],
+                    'premium' => ['ikon_warna' => 'bg-champagne', 'deskripsi' => 'Detail artistik & ornamen adat', 'active' => 'bg-champagne/15 ring-2 ring-champagne shadow-sm'],
+                    'eksklusif' => ['ikon_warna' => 'bg-charcoal', 'deskripsi' => 'Efek motion & nuansa luxury', 'active' => 'bg-charcoal text-ivory ring-2 ring-champagne shadow-md'],
+                ] as $kodeTier => $metaTier)
+                    @php $dataTier = $ringkasanTier[$kodeTier]; @endphp
+                    <button
+                        type="button"
+                        @click="tierAktif = '{{ $kodeTier }}'"
+                        :class="tierAktif === '{{ $kodeTier }}' ? '{{ $metaTier['active'] }}' : 'bg-white ring-1 ring-champagne/25 hover:ring-champagne/60'"
+                        class="rounded-2xl p-3.5 text-left transition cursor-pointer"
+                    >
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="inline-flex items-center gap-1.5 text-sm font-bold" :class="tierAktif === 'eksklusif' && '{{ $kodeTier }}' === 'eksklusif' ? 'text-champagne' : 'text-charcoal'">
+                                <span class="w-2 h-2 rounded-full {{ $metaTier['ikon_warna'] }}" :class="tierAktif === 'eksklusif' && '{{ $kodeTier }}' === 'eksklusif' ? 'bg-champagne' : ''"></span>
+                                {{ $dataTier['label'] }}
+                            </span>
+                            <span
+                                class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                                :class="tierAktif === 'eksklusif' && '{{ $kodeTier }}' === 'eksklusif' ? 'bg-champagne/20 text-champagne' : 'bg-ivory text-charcoal/75 ring-1 ring-charcoal/10'"
+                            >
+                                Mulai {{ \App\Models\Tema::formatRupiah($dataTier['harga_mulai']) }}
+                            </span>
+                        </div>
+                        <p
+                            class="mt-1 text-xs"
+                            :class="tierAktif === 'eksklusif' && '{{ $kodeTier }}' === 'eksklusif' ? 'text-ivory/80' : 'text-charcoal/65'"
+                        >
+                            {{ $metaTier['deskripsi'] }} ({{ $dataTier['jumlah'] }} tema)
+                        </p>
+                    </button>
+                @endforeach
+            </div>
+
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @forelse ($daftarTema as $tema)
-                    @php $infoDesain = $tema->infoDesain(); @endphp
+                    @php
+                        $infoDesain = $tema->infoDesain();
+                        $infoTier = $tema->infoTier();
+                    @endphp
                     <div
-                        x-show="kategoriAktif === 'semua' || kategoriAktif === '{{ $tema->kategori }}'"
+                        x-show="temaCocok('{{ $tema->kategori }}', '{{ $infoTier['kode'] }}')"
                         x-transition
-                        class="group rounded-2xl bg-white overflow-hidden shadow-sm ring-1 ring-champagne/20 flex flex-col"
+                        class="group rounded-2xl bg-white overflow-hidden {{ $infoTier['card_ring'] }} flex flex-col transition duration-300"
                     >
                         <div class="aspect-[4/3] bg-ivory relative overflow-hidden">
                             @if ($tema->urlGambarPratinjau())
@@ -214,22 +296,49 @@
                                     Support Tanpa Foto (TF)
                                 </span>
                             @endif
+                            <span class="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider backdrop-blur {{ $infoTier['badge_class'] }}">
+                                @if ($infoTier['kode'] === 'eksklusif')
+                                    <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path d="M2.5 14.5h15v1.75a.75.75 0 01-.75.75H3.25a.75.75 0 01-.75-.75V14.5zm0-2L1.75 6l4.75 3.25L10 4.5l3.5 4.75L18.25 6l-.75 6.5h-15z"/>
+                                    </svg>
+                                @elseif ($infoTier['kode'] === 'premium')
+                                    <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.96a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.367 2.447a1 1 0 00-.364 1.118l1.286 3.96c.3.921-.755 1.688-1.54 1.118l-3.367-2.447a1 1 0 00-1.175 0l-3.367 2.447c-.784.57-1.838-.197-1.539-1.118l1.285-3.96a1 1 0 00-.363-1.118L2.063 9.387c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.96z"/>
+                                    </svg>
+                                @else
+                                    <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M10 2a1 1 0 01.894.553l1.72 3.44 3.796.552a1 1 0 01.554 1.706l-2.747 2.677.648 3.781a1 1 0 01-1.45 1.054L10 13.978l-3.415 1.785a1 1 0 01-1.45-1.054l.648-3.781L3.036 8.25a1 1 0 01.554-1.706l3.796-.552 1.72-3.44A1 1 0 0110 2z" clip-rule="evenodd"/>
+                                    </svg>
+                                @endif
+                                <span>{{ $infoTier['label'] }}</span>
+                            </span>
                         </div>
 
                         <div class="p-6 flex-1 flex flex-col justify-between">
                             <div>
+                                <div class="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-champagne/15">
+                                    <span class="inline-flex items-center rounded-lg px-2.5 py-1 text-[11px] font-semibold {{ $infoTier['chip_class'] }}">
+                                        {{ $infoTier['ringkasan'] }}
+                                    </span>
+                                    <div class="text-right shrink-0">
+                                        <span class="text-lg font-extrabold text-charcoal">{{ $tema->hargaFormatted() }}</span>
+                                        <span class="text-[11px] text-charcoal/55">/ 3 bln</span>
+                                    </div>
+                                </div>
+
                                 <div class="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-champagne">
                                     <span class="inline-block w-2 h-2 rounded-full" style="background-color: {{ $infoDesain['warna_aksen'] }}"></span>
                                     <span>{{ $infoDesain['font_label'] }}</span>
                                 </div>
                                 <h3 class="mt-1.5 font-serif text-2xl font-bold text-charcoal">{{ $tema->nama_tema }}</h3>
                                 <p class="mt-1.5 text-sm text-charcoal/65 leading-relaxed">{{ $infoDesain['deskripsi'] }}</p>
+                                <p class="mt-2.5 text-[11px] font-medium text-sage">{{ $infoTier['fitur_singkat'] }}</p>
                             </div>
 
                             <div class="mt-6 flex items-center gap-3">
                                 <button
                                     type="button"
-                                    @click="bukaModalDemo('{{ $tema->slug }}', '{{ e($tema->nama_tema) }}')"
+                                    @click="bukaModalDemo('{{ $tema->slug }}', '{{ e($tema->nama_tema) }}', '{{ $infoTier['label'] }} • {{ $tema->hargaFormatted() }}')"
                                     class="flex-1 rounded-xl border border-champagne px-4 py-2.5 text-sm font-semibold text-charcoal hover:bg-champagne/10 transition cursor-pointer"
                                 >
                                     Lihat Demo
@@ -248,6 +357,23 @@
                         <p class="text-charcoal/70">Belum ada tema aktif tersedia saat ini.</p>
                     </div>
                 @endforelse
+
+                @if ($daftarTema->isNotEmpty())
+                    <div
+                        x-show="!adaHasilFilter"
+                        x-cloak
+                        class="col-span-full text-center py-12 bg-white rounded-2xl ring-1 ring-champagne/25 px-6"
+                    >
+                        <p class="text-charcoal/75 font-medium">Tidak ada tema pada kombinasi kategori dan tingkatan yang dipilih.</p>
+                        <button
+                            type="button"
+                            @click="resetFilter()"
+                            class="mt-4 rounded-xl bg-sage px-5 py-2 text-sm font-semibold text-white hover:bg-sage/90 transition cursor-pointer"
+                        >
+                            Tampilkan Semua Tema
+                        </button>
+                    </div>
+                @endif
             </div>
         </div>
     </section>
@@ -258,7 +384,7 @@
             <div class="text-center max-w-2xl mx-auto">
                 <span class="text-xs font-semibold uppercase tracking-widest text-champagne">Transparan &amp; Fleksibel</span>
                 <h2 class="mt-2 font-serif text-3xl sm:text-4xl font-bold text-charcoal">Pilih Paket Sesuai Kebutuhan Anda</h2>
-                <p class="mt-3 text-sm sm:text-base text-charcoal/70">Susun sendiri lewat dasbor interaktif atau serahkan sepenuhnya kepada tim SesiTemu.</p>
+                <p class="mt-3 text-sm sm:text-base text-charcoal/70">Harga dasar mengikuti tema pilihan Anda (Basic, Premium, atau Eksklusif). Susun sendiri lewat dasbor atau serahkan ke tim SesiTemu.</p>
             </div>
 
             <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -268,13 +394,20 @@
                         <span class="inline-block rounded-full bg-sage/10 px-3 py-1 text-xs font-semibold text-sage">Self-Service</span>
                         <h3 class="mt-4 font-serif text-3xl font-bold text-charcoal">Paket Mandiri</h3>
                         <p class="mt-2 text-sm text-charcoal/70">Client mengisi data mempelai, acara, galeri, dan amplop secara mandiri melalui dasbor SesiTemu.</p>
-                        <div class="mt-6 flex items-baseline gap-2">
-                            <span class="font-serif text-4xl font-bold text-charcoal">Rp 79.000</span>
-                            <span class="text-sm text-charcoal/60">/ 3 bulan aktif</span>
+                        <div class="mt-6">
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-sm font-semibold text-charcoal/65">Mulai</span>
+                                <span class="font-serif text-4xl font-bold text-charcoal">{{ \App\Models\Tema::formatRupiah($hargaTermurah) }}</span>
+                                <span class="text-sm text-charcoal/60">/ 3 bulan aktif</span>
+                            </div>
+                            <p class="mt-1 text-xs text-charcoal/60">
+                                Mengikuti harga tema pilihan ({{ \App\Models\Tema::formatRupiah($hargaTermurah) }} – {{ \App\Models\Tema::formatRupiah($hargaTermahal) }})
+                            </p>
                         </div>
 
                         <ul class="mt-6 space-y-3 text-sm text-charcoal/80">
-                            <li>✓ Bebas pilih &amp; ganti seluruh tema</li>
+                            <li>✓ Harga sesuai tema pilihan (Basic, Premium, atau Eksklusif)</li>
+                            <li>✓ Bebas ganti tema setara atau upgrade kapan saja</li>
                             <li>✓ Editor mandiri 6-tab real-time + pratinjau gratis</li>
                             <li>✓ Maksimal 10 foto galeri otomatis WebP</li>
                             <li>✓ Generator link tamu WhatsApp tanpa batas</li>
@@ -297,14 +430,18 @@
                         <span class="inline-block rounded-full bg-champagne/20 px-3 py-1 text-xs font-semibold text-champagne">Full Assistance</span>
                         <h3 class="mt-4 font-serif text-3xl font-bold text-white">Paket Terima Beres</h3>
                         <p class="mt-2 text-sm text-ivory/75">Client cukup mengirimkan data &amp; foto via WhatsApp, Admin SesiTemu yang menginputkan semuanya hingga siap sebar.</p>
-                        <div class="mt-6 flex items-baseline gap-2">
-                            <span class="font-serif text-4xl font-bold text-champagne">Rp 149.000</span>
-                            <span class="text-sm text-ivory/65">/ 3 bulan aktif</span>
+                        <div class="mt-6">
+                            <div class="flex flex-wrap items-baseline gap-2">
+                                <span class="font-serif text-3xl sm:text-4xl font-bold text-champagne">Harga Tema + {{ \App\Models\Tema::formatRupiah($biayaTerimaBeres) }}</span>
+                            </div>
+                            <p class="mt-1 text-xs text-ivory/65">
+                                Total mulai {{ \App\Models\Tema::formatRupiah($hargaTermurah + $biayaTerimaBeres) }} / 3 bulan aktif (sudah termasuk jasa input Admin)
+                            </p>
                         </div>
 
                         <ul class="mt-6 space-y-3 text-sm text-ivory/85">
-                            <li>✓ Semua fitur Paket Mandiri</li>
-                            <li>✓ Input &amp; tata letak dikerjakan Admin hingga rapi</li>
+                            <li>✓ Sudah termasuk harga tema pilihan Anda</li>
+                            <li>✓ Biaya jasa input &amp; tata letak Admin (+{{ \App\Models\Tema::formatRupiah($biayaTerimaBeres) }})</li>
                             <li>✓ Konsultasi pemilihan tema &amp; musik latar</li>
                             <li>✓ Bantuan revisi teks &amp; jadwal acara via WhatsApp</li>
                             <li>✓ Prioritas aktivasi instan siap sebar</li>
@@ -347,7 +484,7 @@
         <div @click.away="modalDemoTerbuka = false" class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl ring-1 ring-champagne/30">
             <h3 class="font-serif text-2xl font-bold text-charcoal">Simulasi Tamu Undangan</h3>
             <p class="mt-1 text-sm text-charcoal/70">
-                Masukkan nama tamu contoh untuk melihat tampilan sampul tema <span class="font-semibold text-sage" x-text="temaDemoNama"></span>.
+                Masukkan nama tamu contoh untuk melihat tampilan sampul tema <span class="font-semibold text-sage" x-text="temaDemoNama"></span><span x-show="temaDemoInfo" class="ml-1 inline-block rounded-full bg-champagne/15 px-2 py-0.5 text-xs font-semibold text-charcoal" x-text="temaDemoInfo"></span>.
             </p>
 
             <div class="mt-4 space-y-4">

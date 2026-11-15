@@ -156,6 +156,7 @@ class Undangan extends Model
         return [
             'gaya_font' => 'bawaan',
             'tanpa_foto' => false,
+            'foto_sampul' => null,
             'cerita_cinta' => [],
             'live_streaming' => [
                 'aktif' => false,
@@ -301,6 +302,34 @@ class Undangan extends Model
     public function urlFotoWanita(): ?string
     {
         return $this->resolveUrlMedia($this->foto_wanita);
+    }
+
+    public function urlFotoSampul(): ?string
+    {
+        if ($this->modeTanpaFoto()) {
+            return null;
+        }
+
+        $fotoSampul = data_get($this->pengaturan, 'foto_sampul');
+        if (is_string($fotoSampul) && $fotoSampul !== '') {
+            return $this->resolveUrlMedia($fotoSampul);
+        }
+
+        $galeriPertama = $this->daftarGaleri->first();
+        if ($galeriPertama) {
+            return $galeriPertama->urlFoto();
+        }
+
+        return $this->urlFotoPria() ?? $this->urlFotoWanita();
+    }
+
+    public function urlFotoSampulKhususDasbor(): ?string
+    {
+        $fotoSampul = data_get($this->pengaturan, 'foto_sampul');
+
+        return (is_string($fotoSampul) && $fotoSampul !== '')
+            ? $this->resolveUrlMedia($fotoSampul)
+            : null;
     }
 
     private function resolveUrlMedia(?string $path): ?string

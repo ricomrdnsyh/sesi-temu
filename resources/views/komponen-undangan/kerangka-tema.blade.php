@@ -4,6 +4,14 @@
     'modeDemo' => false,
     'modePratinjau' => false,
     'slugTema' => 'rustic-floral',
+    'tierBawaan' => 'basic',
+    'gayaTataLetak' => 'klasik',
+    'animasiSampul' => 'geser-atas',
+    'gayaGaleri' => 'grid',
+    'tampilMarquee' => false,
+    'tampilScrollProgress' => false,
+    'tampilTimelineCerita' => false,
+    'bismillahHeader' => false,
     'gelap' => false,
     'gelapSampul' => null,
     'kelasTeksSampul' => null,
@@ -14,6 +22,8 @@
     'kelasTombol' => 'bg-[#4B6358] text-white hover:bg-[#3A4D44]',
     'kelasBadge' => 'bg-[#BFA15F]/15 text-[#BFA15F] border border-[#BFA15F]/30',
     'kelasBatas' => 'border-[#BFA15F]/35',
+    'kelasTirai' => null,
+    'kelasProgres' => 'bg-gradient-to-r from-[#BFA15F] via-[#F3E5AB] to-[#BFA15F]',
     'subjudulPanggung' => 'The Wedding Of',
     'taglineSampul' => 'Undangan Pernikahan',
     'sapaanSampul' => 'Kepada Yth. Bapak/Ibu/Saudara/i',
@@ -38,9 +48,22 @@
 @php
     $latarUtamaUrl = asset("aset-tema/{$slugTema}/latar-utama.webp");
     $acaraPertama = $undangan->daftarAcara->first();
-    $tanggalTitik = $acaraPertama?->tanggal_acara?->format('d . m . Y') ?? now()->format('d . m . Y');
+    $tanggalTitik = $acaraPertama?->tanggal_acara?->format('d . m . y') ?? now()->format('d . m . y');
+    $tanggalLengkap = $acaraPertama?->tanggal_acara
+        ? $acaraPertama->tanggal_acara->locale('id')->translatedFormat('l, d F Y')
+        : now()->locale('id')->translatedFormat('l, d F Y');
     $hashtagPasangan = '#' . \Illuminate\Support\Str::studly($undangan->nama_panggilan_pria . $undangan->nama_panggilan_wanita) . 'Together';
     $tanpaFoto = $undangan->modeTanpaFoto();
+    $urlFotoSampul = $tanpaFoto ? null : $undangan->urlFotoSampul();
+    $pakaiFotoSampul = ! $tanpaFoto && ! empty($urlFotoSampul);
+
+    $tierAktif = $undangan->tema?->tierKode() ?? $tierBawaan;
+    $isEksklusif = $tierBawaan === 'eksklusif' || $tierAktif === 'eksklusif';
+    $sudutEditorial = $gayaTataLetak === 'editorial';
+    $radiusKartuBesar = $sudutEditorial ? 'rounded-none' : 'rounded-3xl';
+    $radiusKartuSedang = $sudutEditorial ? 'rounded-none' : 'rounded-2xl';
+    $radiusTombol = $sudutEditorial ? 'rounded-none' : 'rounded-full';
+    $ekstraKartu = $isEksklusif ? 'efek-shimmer-kartu' : '';
 
     $polaDataUri = match ($polaTekstur) {
         'batik' => "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23BFA15F' stroke-opacity='0.14' stroke-width='1'%3E%3Ccircle cx='32' cy='32' r='22'/%3E%3Ccircle cx='0' cy='0' r='22'/%3E%3Ccircle cx='64' cy='0' r='22'/%3E%3Ccircle cx='0' cy='64' r='22'/%3E%3Ccircle cx='64' cy='64' r='22'/%3E%3Ccircle cx='32' cy='32' r='4'/%3E%3C/g%3E%3C/svg%3E",
@@ -52,14 +75,40 @@
 
     $sampulGelap = $gelapSampul ?? $gelap;
     $teksSampul = $kelasTeksSampul ?? ($sampulGelap ? 'text-white drop-shadow-md' : 'text-current');
+    $tiraiPanel = $kelasTirai ?? ($sampulGelap ? 'bg-[#0C0C10]/95 border-[#D4AF37]/50' : 'bg-[#FAF5EB]/95 border-[#BFA15F]/50');
 
     $overlayPanggung = $sampulGelap
-        ? 'bg-gradient-to-t from-black/90 via-black/35 to-black/25'
-        : 'bg-gradient-to-t from-black/80 via-black/20 to-transparent';
+        ? 'bg-gradient-to-b from-black/45 via-black/45 to-black/80'
+        : 'bg-gradient-to-b from-black/35 via-black/30 to-black/65';
 
     $overlaySampul = $sampulGelap
-        ? 'bg-gradient-to-b from-black/65 via-black/35 to-black/85'
-        : 'bg-gradient-to-b from-[#FFFDF8]/75 via-[#FFFDF8]/20 to-black/50';
+        ? 'bg-gradient-to-b from-black/70 via-black/35 to-black/85'
+        : 'bg-gradient-to-b from-[#FFFDF8]/78 via-[#FFFDF8]/22 to-black/55';
+
+    $sampulPakaiModeGelap = $pakaiFotoSampul || $sampulGelap;
+    $gambarSampul = $pakaiFotoSampul ? $urlFotoSampul : $latarUtamaUrl;
+    $altSampul = $pakaiFotoSampul
+        ? "Foto Sampul {$undangan->nama_panggilan_pria} & {$undangan->nama_panggilan_wanita}"
+        : "Sampul {$undangan->tema?->nama_tema}";
+    $kelasImgSampul = $pakaiFotoSampul ? 'object-cover object-top' : 'object-cover object-center';
+    $overlaySampulAktif = $pakaiFotoSampul
+        ? 'bg-gradient-to-b from-black/80 via-black/15 to-black/85'
+        : $overlaySampul;
+    $teksGerbangSampul = $pakaiFotoSampul ? 'text-white drop-shadow-md' : $teksSampul;
+
+    $heroBingkaiClass = match ($gayaTataLetak) {
+        'editorial' => 'rounded-none border',
+        'mihrab', 'celestial' => 'rounded-t-[13rem] rounded-b-3xl border-2',
+        'katedral' => 'rounded-t-[13rem] rounded-b-3xl border-2 ring-4 ring-offset-4 ring-offset-transparent ring-[#9E7B4F]/25',
+        'artdeco' => 'rounded-2xl border-2 ring-1 ring-inset ring-[#D4AF37]/45',
+        'taman' => 'rounded-t-[11rem] rounded-b-3xl border-2 ring-1 ring-[#C8A464]/35',
+        'keraton', 'priangan' => 'rounded-t-[9rem] rounded-b-3xl border-2 ring-1 ring-inset ring-[#D4AF37]/30',
+        default => 'rounded-t-[10rem] rounded-b-3xl border-2',
+    };
+
+    $haloMempelaiClass = $bingkaiFoto === 'katedral'
+        ? 'rounded-t-full rounded-b-3xl border border-dashed border-[#D4AF37]/50 animasi-kilau'
+        : 'rounded-full border border-dashed border-[#D4AF37]/50 animasi-orbit';
 @endphp
 
 <!DOCTYPE html>
@@ -75,48 +124,56 @@
     @include('komponen-undangan.bar-pratinjau-demo')
 
     <div class="min-h-screen w-full lg:flex">
-        {{-- PANGGUNG VISUAL DESKTOP KIRI (FIXED / STICKY SEPERTI TEMUWAKTU.ID) --}}
+        {{-- PANGGUNG VISUAL DESKTOP KIRI --}}
         <aside class="hidden lg:flex lg:flex-1 lg:sticky lg:top-0 lg:h-screen relative overflow-hidden select-none">
             <img
                 src="{{ $latarUtamaUrl }}"
                 alt="Ilustrasi {{ $undangan->tema?->nama_tema }}"
-                class="absolute inset-0 w-full h-full object-cover object-center animasi-nafas"
+                class="absolute inset-0 w-full h-full object-cover object-center animasi-nafas {{ $modeMonokrom ? 'grayscale' : '' }}"
             >
             <div class="absolute inset-0 {{ $overlayPanggung }}"></div>
 
             @if ($ornamenUrl)
-                <img src="{{ $ornamenUrl }}" alt="" class="pointer-events-none absolute top-0 left-0 w-36 opacity-50 animasi-goyang">
-                <img src="{{ $ornamenUrl }}" alt="" class="pointer-events-none absolute top-0 right-0 w-36 opacity-50 -scale-x-100 animasi-goyang">
+                <img src="{{ $ornamenUrl }}" alt="" class="pointer-events-none absolute top-0 left-0 w-36 opacity-55 animasi-goyang">
+                <img src="{{ $ornamenUrl }}" alt="" class="pointer-events-none absolute top-0 right-0 w-36 opacity-55 -scale-x-100 animasi-goyang">
             @endif
 
-            {{-- Efek Motion Partikel --}}
-            @if ($efekMotion === 'bintang')
-                <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
-                    <span class="absolute top-[16%] left-[18%] w-2 h-2 rounded-full bg-[#F3E5AB] animasi-bintang"></span>
-                    <span class="absolute top-[25%] right-[22%] w-2.5 h-2.5 rounded-full bg-[#D9B664] animasi-bintang" style="animation-delay: 0.9s;"></span>
-                    <span class="absolute top-[42%] left-[44%] w-1.5 h-1.5 rounded-full bg-white/90 animasi-bintang" style="animation-delay: 1.7s;"></span>
-                    <span class="absolute top-[30%] left-[65%] w-2 h-2 rounded-full bg-[#D9B664] animasi-bintang" style="animation-delay: 2.3s;"></span>
+            @if ($sudutEditorial)
+                <div aria-hidden="true" class="pointer-events-none absolute inset-7 border border-white/30"></div>
+                <div class="pointer-events-none absolute top-11 left-12 right-12 flex items-center justify-between text-[10px] uppercase tracking-[0.35em] text-white/80">
+                    <span>Vol. 01 &bull; Monochrome</span>
+                    <span>{{ $editionHeader ?? 'The Wedding Edition' }}</span>
                 </div>
-            @elseif ($efekMotion === 'kelopak')
-                <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
-                    <span class="absolute top-[18%] left-[16%] w-3 h-3 rounded-full bg-[#EEDAD4]/55 blur-[1px] animasi-melayang"></span>
-                    <span class="absolute top-[35%] right-[24%] w-3.5 h-3.5 rounded-full bg-[#C8A464]/55 blur-[1px] animasi-melayang" style="animation-delay: 1.3s;"></span>
-                    <span class="absolute top-[52%] left-[32%] w-2.5 h-2.5 rounded-full bg-[#EEDAD4]/60 animasi-melayang" style="animation-delay: 2.1s;"></span>
+            @elseif ($isEksklusif)
+                <div aria-hidden="true" class="pointer-events-none absolute inset-6 border border-[#F3E5AB]/25 rounded-3xl"></div>
+                <div aria-hidden="true" class="pointer-events-none absolute top-12 right-12 w-24 h-24 flex items-center justify-center">
+                    <div class="absolute inset-0 rounded-full border border-dashed border-[#F3E5AB]/45 animasi-orbit"></div>
+                    <div class="absolute inset-2 rounded-full border border-[#D4AF37]/50 animasi-orbit-balik"></div>
+                    <span class="font-serif text-sm font-bold tracking-widest text-[#F3E5AB]">{{ $undangan->inisialPria() }}&amp;{{ $undangan->inisialWanita() }}</span>
                 </div>
+            @elseif ($gayaTataLetak === 'katedral' || $gayaTataLetak === 'keraton' || $gayaTataLetak === 'priangan')
+                <div aria-hidden="true" class="pointer-events-none absolute inset-6 border border-[#F3E5AB]/25 rounded-2xl"></div>
             @endif
 
-            <div class="relative z-10 w-full flex flex-col justify-end p-10 xl:p-14 text-white">
-                <div class="max-w-xl space-y-2.5">
-                    <p class="text-xs font-semibold uppercase tracking-[0.4em] text-[#F3E5AB]">
+            @include('komponen-undangan.lapisan-motion', ['efekMotion' => $efekMotion, 'konteks' => 'panggung'])
+
+            <div class="relative z-10 w-full flex flex-col items-center justify-center text-center px-10 pb-20 xl:px-14 text-white">
+                <div class="max-w-xl space-y-3">
+                    @if ($bismillahHeader)
+                        <p class="text-base sm:text-lg text-[#F3E5AB]/95 tracking-wide drop-shadow" style="font-family: 'Amiri', serif;">
+                            بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
+                        </p>
+                    @endif
+                    <p class="text-xs font-semibold uppercase tracking-[0.42em] text-[#F3E5AB] drop-shadow">
                         {{ $subjudulPanggung }}
                     </p>
-                    <h2 class="font-serif text-5xl xl:text-6xl font-bold leading-tight drop-shadow-lg">
+                    <h2 class="font-serif text-5xl xl:text-6xl font-bold leading-tight drop-shadow-xl">
                         {{ $undangan->nama_panggilan_pria }}
                         <span class="font-kaligrafi font-normal text-[#F3E5AB]">&amp;</span>
                         {{ $undangan->nama_panggilan_wanita }}
                     </h2>
-                    <div class="flex flex-wrap items-center gap-4 pt-1 text-xs uppercase tracking-[0.25em] text-white/85">
-                        <span>{{ $tanggalTitik }}</span>
+                    <div class="flex flex-wrap items-center justify-center gap-3 pt-1 text-xs font-medium uppercase tracking-[0.28em] text-white/90 drop-shadow">
+                        <span>{{ $tanggalLengkap }}</span>
                         <span class="w-1 h-1 rounded-full bg-[#F3E5AB]"></span>
                         <span>{{ $hashtagPasangan }}</span>
                     </div>
@@ -124,9 +181,15 @@
             </div>
         </aside>
 
-        {{-- KOLOM UNDANGAN MOBILE-FIRST PORTRAIT (KANAN PADA DESKTOP, FULLSCREEN PADA HP) --}}
+        {{-- KOLOM UNDANGAN MOBILE-FIRST PORTRAIT --}}
         <div class="w-full lg:w-[445px] xl:w-[475px] shrink-0 min-h-screen relative overflow-x-clip shadow-2xl border-l {{ $kelasBatas }}">
-            {{-- Lapisan Tekstur Budaya/Botani Di Balik Konten Scroll --}}
+            @if ($tampilScrollProgress)
+                <div aria-hidden="true" x-show="undanganTerbuka" x-cloak class="fixed top-0 lg:left-auto lg:w-[445px] xl:w-[475px] left-0 right-0 z-[60] h-[3px] bg-black/15">
+                    <div class="h-full transition-all duration-150 {{ $kelasProgres }}" :style="'width: ' + scrollPersen + '%'"></div>
+                </div>
+            @endif
+
+            {{-- Tekstur Budaya / Botani --}}
             <div
                 aria-hidden="true"
                 class="pointer-events-none fixed top-0 bottom-0 right-0 w-full lg:w-[445px] xl:w-[475px] z-0"
@@ -136,100 +199,144 @@
                 src="{{ $latarUtamaUrl }}"
                 alt=""
                 aria-hidden="true"
-                class="pointer-events-none fixed top-0 bottom-0 right-0 w-full lg:w-[445px] xl:w-[475px] h-full object-cover {{ $gelap ? 'opacity-15' : 'opacity-10' }} z-0"
+                class="pointer-events-none fixed top-0 bottom-0 right-0 w-full lg:w-[445px] xl:w-[475px] h-full object-cover {{ $gelap ? 'opacity-15' : 'opacity-10' }} {{ $modeMonokrom ? 'grayscale' : '' }} z-0"
             >
 
-            {{-- Ornamen Sudut Bergerak --}}
             @if ($ornamenUrl)
                 <img src="{{ $ornamenUrl }}" alt="" class="pointer-events-none fixed top-10 lg:left-auto lg:right-[325px] xl:right-[355px] left-0 w-24 sm:w-28 opacity-45 z-20 animasi-goyang">
                 <img src="{{ $ornamenUrl }}" alt="" class="pointer-events-none fixed bottom-0 right-0 w-24 sm:w-28 opacity-45 z-20 rotate-180 animasi-goyang">
             @endif
 
-            {{-- COVER GATE TERILUSTRASI (MENUTUPI KOLOM UNDANGAN HINGGA TOMBOL DIKLIK) --}}
+            {{-- COVER GATE DENGAN ANIMASI BUKA SESUAI TIER & TEMA --}}
             <section
-                class="fixed inset-0 lg:left-auto lg:w-[445px] xl:w-[475px] z-40 flex flex-col justify-between overflow-hidden transition-transform duration-1000 ease-in-out {{ !empty($modeDemo) ? 'pt-14' : '' }}"
-                :style="undanganTerbuka ? 'transform: translateY(-100%); pointer-events: none;' : 'transform: translateY(0);'"
+                class="fixed inset-0 lg:left-auto lg:w-[445px] xl:w-[475px] z-40 flex flex-col justify-between overflow-hidden {{ !empty($modeDemo) ? 'pt-14' : '' }} {{ $animasiSampul === 'geser-atas' || $animasiSampul === 'editorial-tirai' ? 'transition-transform duration-1000 ease-in-out' : 'transition-all duration-1000 ease-in-out' }}"
+                :class="undanganTerbuka ? 'pointer-events-none' : ''"
+                :style="undanganTerbuka ? '{{
+                    match ($animasiSampul) {
+                        'zoom-elegan' => 'transform: scale(1.08); opacity: 0;',
+                        'belah-pintu', 'tirai-mewah' => 'opacity: 0; transition-delay: 0.35s;',
+                        default => 'transform: translateY(-100%);',
+                    }
+                }}' : 'transform: translateY(0) scale(1); opacity: 1;'"
             >
                 <img
-                    src="{{ $latarUtamaUrl }}"
-                    alt="Sampul {{ $undangan->tema?->nama_tema }}"
-                    class="absolute inset-0 w-full h-full object-cover object-center"
+                    src="{{ $gambarSampul }}"
+                    alt="{{ $altSampul }}"
+                    class="absolute inset-0 w-full h-full {{ $kelasImgSampul }} {{ $modeMonokrom ? 'grayscale' : '' }}"
                 >
-                <div class="absolute inset-0 {{ $overlaySampul }}"></div>
+                <div class="absolute inset-0 {{ $overlaySampulAktif }}"></div>
 
-                @if ($efekMotion === 'bintang')
-                    <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
-                        <span class="absolute top-[14%] left-[18%] w-2 h-2 rounded-full bg-[#D9B664] animasi-bintang"></span>
-                        <span class="absolute top-[24%] right-[16%] w-2.5 h-2.5 rounded-full bg-[#F3E5AB] animasi-bintang" style="animation-delay: 0.9s;"></span>
-                        <span class="absolute bottom-[32%] left-[12%] w-1.5 h-1.5 rounded-full bg-[#D9B664] animasi-bintang" style="animation-delay: 1.8s;"></span>
-                    </div>
-                @elseif ($efekMotion === 'kelopak')
-                    <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
-                        <span class="absolute top-[16%] left-[14%] w-2.5 h-2.5 rounded-full bg-[#EEDAD4]/60 blur-[1px] animasi-melayang"></span>
-                        <span class="absolute top-[30%] right-[16%] w-3 h-3 rounded-full bg-[#C8A464]/55 blur-[1px] animasi-melayang" style="animation-delay: 1.2s;"></span>
-                    </div>
+                @if ($animasiSampul === 'belah-pintu' || $animasiSampul === 'tirai-mewah')
+                    <div
+                        aria-hidden="true"
+                        class="pointer-events-none absolute inset-y-0 left-0 w-1/2 z-10 border-r transition-transform duration-1000 ease-in-out {{ $tiraiPanel }}"
+                        :style="undanganTerbuka ? 'transform: translateX(-100%);' : 'transform: translateX(0);'"
+                    ></div>
+                    <div
+                        aria-hidden="true"
+                        class="pointer-events-none absolute inset-y-0 right-0 w-1/2 z-10 border-l transition-transform duration-1000 ease-in-out {{ $tiraiPanel }}"
+                        :style="undanganTerbuka ? 'transform: translateX(100%);' : 'transform: translateX(0);'"
+                    ></div>
                 @endif
 
-                {{-- Bagian Atas Cover: Judul & Nama Mempelai di Area Langit Ilustrasi --}}
-                <div class="relative z-10 px-6 pt-8 sm:pt-10 text-center space-y-2.5">
+                @include('komponen-undangan.lapisan-motion', ['efekMotion' => $efekMotion, 'konteks' => 'sampul'])
+
+                <div
+                    class="relative z-20 px-6 {{ $pakaiFotoSampul ? 'pt-6 sm:pt-8 space-y-1.5' : 'pt-8 sm:pt-10 space-y-2.5' }} text-center transition-all duration-700"
+                    :style="undanganTerbuka && ('{{ $animasiSampul }}' === 'belah-pintu' || '{{ $animasiSampul }}' === 'tirai-mewah') ? 'opacity: 0; transform: scale(0.94);' : ''"
+                >
                     @if ($editionHeader)
-                        <div class="flex items-center justify-between text-[10px] uppercase tracking-[0.28em] opacity-75 border-b {{ $kelasBatas }} pb-2 mb-3">
+                        <div class="flex items-center justify-between text-[10px] uppercase tracking-[0.28em] opacity-80 border-b {{ $sampulPakaiModeGelap ? 'border-white/25 text-white/85' : $kelasBatas }} pb-2 mb-3">
                             <span>Vol. 01</span>
                             <span>{{ $editionHeader }}</span>
                             <span>{{ $acaraPertama?->tanggal_acara?->format('Y') ?? now()->format('Y') }}</span>
                         </div>
                     @endif
 
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.35em] {{ $sampulGelap ? 'text-[#F3E5AB]' : $kelasSubAksen }}">
+                    @if ($bismillahHeader)
+                        <p class="text-base sm:text-lg {{ $sampulPakaiModeGelap ? 'text-[#F3E5AB]' : $kelasSubAksen }}" style="font-family: 'Amiri', serif;">
+                            بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
+                        </p>
+                    @endif
+
+                    @if ($isEksklusif && ! $pakaiFotoSampul)
+                        <div class="mx-auto w-16 h-16 relative flex items-center justify-center mb-1">
+                            <span class="absolute inset-0 rounded-full border border-dashed border-[#F3E5AB]/55 animasi-orbit"></span>
+                            <span class="absolute inset-1.5 rounded-full border border-[#D4AF37]/60 animasi-orbit-balik"></span>
+                            <span class="font-serif text-sm font-bold tracking-widest {{ $sampulPakaiModeGelap ? 'text-[#F3E5AB]' : $kelasAksen }}">
+                                {{ $undangan->inisialPria() }}&amp;{{ $undangan->inisialWanita() }}
+                            </span>
+                        </div>
+                    @endif
+
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.35em] {{ $sampulPakaiModeGelap ? 'text-[#F3E5AB]' : $kelasSubAksen }}">
                         {{ $taglineSampul }}
                     </p>
 
-                    <h1 class="font-serif text-4xl sm:text-5xl font-bold leading-tight {{ $teksSampul }}">
+                    <h1 class="font-serif {{ $pakaiFotoSampul ? 'text-3xl sm:text-[2.5rem]' : 'text-4xl sm:text-5xl' }} font-bold leading-tight {{ $teksGerbangSampul }}">
                         {{ $undangan->nama_panggilan_pria }}
-                        <span class="block font-kaligrafi text-3xl sm:text-4xl font-normal my-0.5 {{ $sampulGelap ? 'text-[#F3E5AB]' : $kelasAksen }}">&amp;</span>
+                        <span class="{{ $pakaiFotoSampul ? 'inline font-kaligrafi font-normal mx-1' : 'block font-kaligrafi text-3xl sm:text-4xl font-normal my-0.5' }} {{ $sampulPakaiModeGelap ? 'text-[#F3E5AB]' : $kelasAksen }}">&amp;</span>
                         {{ $undangan->nama_panggilan_wanita }}
                     </h1>
 
-                    <p class="text-[11px] uppercase tracking-[0.28em] {{ $sampulGelap ? 'text-white/80' : $teksSampul.' opacity-80' }}">
-                        {{ $hashtagPasangan }} &bull; {{ $tanggalTitik }}
+                    <p class="text-[11px] uppercase tracking-[0.25em] {{ $sampulPakaiModeGelap ? 'text-white/90' : $teksGerbangSampul.' opacity-80' }}">
+                        {{ $tanggalLengkap }}
+                        @if (! $pakaiFotoSampul)
+                            &bull; {{ $hashtagPasangan }}
+                        @endif
                     </p>
                 </div>
 
-                {{-- Bagian Bawah Cover: Kotak Tamu Frosted + Tombol Buka Undangan --}}
-                <div class="relative z-10 px-6 pb-8 sm:pb-10">
-                    <div class="rounded-3xl p-5 sm:p-6 text-center backdrop-blur-md shadow-2xl border {{ $sampulGelap ? 'bg-black/60 border-[#D4AF37]/45 text-white' : 'bg-white/88 border-[#BFA15F]/45 text-[#1F2937]' }} space-y-3">
-                        <p class="text-[10px] font-semibold uppercase tracking-[0.28em] opacity-70">{{ $sapaanSampul }}</p>
-                        <p class="font-serif text-xl sm:text-2xl font-bold {{ $sampulGelap ? 'text-[#F3E5AB]' : $kelasSubAksen }}">
+                <div
+                    class="relative z-20 px-6 {{ $pakaiFotoSampul ? 'pb-6 sm:pb-8' : 'pb-8 sm:pb-10' }} transition-all duration-700"
+                    :style="undanganTerbuka && ('{{ $animasiSampul }}' === 'belah-pintu' || '{{ $animasiSampul }}' === 'tirai-mewah') ? 'opacity: 0; transform: translateY(18px);' : ''"
+                >
+                    <div class="{{ $radiusKartuBesar }} {{ $pakaiFotoSampul ? 'p-4 sm:p-5 bg-black/50 border-[#F3E5AB]/40 text-white' : 'p-5 sm:p-6 '.($sampulPakaiModeGelap ? 'bg-black/60 border-[#D4AF37]/45 text-white' : 'bg-white/88 border-[#BFA15F]/45 text-[#1F2937]') }} text-center backdrop-blur-md shadow-2xl border {{ $ekstraKartu }} space-y-2.5">
+                        <p class="text-[10px] font-semibold uppercase tracking-[0.28em] opacity-80">{{ $sapaanSampul }}</p>
+                        <p class="font-serif text-xl sm:text-2xl font-bold {{ $sampulPakaiModeGelap ? 'text-[#F3E5AB]' : $kelasSubAksen }}">
                             Kepada Yth. {{ $namaTamu }}
                         </p>
-                        <p class="text-[11px] opacity-75">Tanpa mengurangi rasa hormat, kami mengundang Anda untuk hadir di hari bahagia kami.</p>
+                        @if (! $pakaiFotoSampul)
+                            <p class="text-[11px] opacity-75">Tanpa mengurangi rasa hormat, kami mengundang Anda untuk hadir di hari bahagia kami.</p>
+                        @endif
 
                         <div class="pt-1">
                             <button
                                 type="button"
                                 @click="bukaUndangan()"
-                                class="w-full sm:w-auto rounded-full px-8 py-3 text-xs sm:text-sm font-bold uppercase tracking-[0.18em] shadow-lg transition cursor-pointer {{ $kelasTombol }}"
+                                class="w-full sm:w-auto {{ $radiusTombol }} px-8 py-3 text-xs sm:text-sm font-bold uppercase tracking-[0.18em] shadow-lg transition cursor-pointer {{ $kelasTombol }} {{ $animasiSampul === 'zoom-elegan' || $isEksklusif ? 'animasi-segel' : '' }}"
                             >
                                 Buka Undangan
                             </button>
                         </div>
+
+                        <p class="text-[10px] italic opacity-75">
+                            *Mohon maaf jika ada kesalahan dalam penulisan nama / gelar.
+                        </p>
                     </div>
                 </div>
             </section>
 
-            {{-- KONTEN UTAMA UNDANGAN (SCROLLABLE DALAM BINGKAI PORTRAIT) --}}
+            {{-- KONTEN UTAMA UNDANGAN --}}
             <main class="relative z-10 {{ !empty($modeDemo) ? 'pt-14' : '' }}">
-                {{-- Hero Pembuka dengan Jendela Lengkung Ilustrasi Tema --}}
-                <section data-aos="fade-up" data-aos-duration="1000" class="px-5 pt-6 pb-10">
-                    <div class="relative h-[28rem] sm:h-[31rem] rounded-t-[10rem] rounded-b-3xl overflow-hidden border-2 {{ $kelasBatas }} shadow-2xl">
+                <section data-aos="fade-up" data-aos-duration="1000" class="px-5 pt-6 pb-8">
+                    <div class="relative h-[28rem] sm:h-[31rem] {{ $heroBingkaiClass }} {{ $kelasBatas }} overflow-hidden shadow-2xl {{ $ekstraKartu }}">
                         <img
                             src="{{ $latarUtamaUrl }}"
                             alt="Hero {{ $undangan->tema?->nama_tema }}"
-                            class="absolute inset-0 w-full h-full object-cover object-center"
+                            class="absolute inset-0 w-full h-full object-cover object-center animasi-nafas {{ $modeMonokrom ? 'grayscale' : '' }}"
                         >
                         <div class="absolute inset-0 {{ $overlaySampul }}"></div>
+
+                        @include('komponen-undangan.lapisan-motion', ['efekMotion' => $efekMotion, 'konteks' => 'utama'])
+
                         <div class="relative z-10 h-full flex flex-col justify-between p-6 text-center">
-                            <div class="pt-8 space-y-1.5">
+                            <div class="{{ $sudutEditorial ? 'pt-3 text-left border-b border-current/20 pb-3' : 'pt-8' }} space-y-1.5">
+                                @if ($bismillahHeader)
+                                    <p class="text-sm {{ $sampulGelap ? 'text-[#F3E5AB]' : $kelasSubAksen }}" style="font-family: 'Amiri', serif;">
+                                        بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
+                                    </p>
+                                @endif
                                 <p class="text-[11px] font-semibold uppercase tracking-[0.3em] {{ $sampulGelap ? 'text-[#F3E5AB]' : $kelasSubAksen }}">
                                     {{ $sapaanHero }}
                                 </p>
@@ -239,40 +346,96 @@
                                 <p class="text-xs uppercase tracking-[0.25em] {{ $sampulGelap ? 'text-white/80' : $teksSampul.' opacity-80' }}">
                                     {{ $tanggalTitik }}
                                 </p>
+                                @if (! $sudutEditorial)
+                                    <p class="text-[11px] font-medium tracking-[0.18em] {{ $sampulGelap ? 'text-[#F3E5AB]/90' : $kelasSubAksen }}">
+                                        {{ $hashtagPasangan }}
+                                    </p>
+                                @endif
                             </div>
 
-                            <div class="mx-auto w-14 h-14 rounded-full backdrop-blur-md border {{ $kelasBatas }} {{ $sampulGelap ? 'bg-black/45 text-[#F3E5AB]' : 'bg-white/85 text-[#1F2937]' }} flex items-center justify-center animasi-kilau">
-                                <span class="font-serif text-sm font-bold tracking-widest">{{ $undangan->inisialPria() }}&amp;{{ $undangan->inisialWanita() }}</span>
+                            <div class="space-y-3">
+                                <div aria-hidden="true" class="mx-auto w-5 h-8 rounded-full border {{ $sampulGelap ? 'border-white/55' : 'border-current/40' }} flex justify-center pt-1.5 opacity-80">
+                                    <span class="w-1 h-1.5 rounded-full {{ $sampulGelap ? 'bg-[#F3E5AB]' : 'bg-current' }} animasi-gulir-roda"></span>
+                                </div>
+
+                            @if ($sudutEditorial)
+                                <div class="flex items-center justify-between border-t border-current/25 pt-3 text-[10px] uppercase tracking-[0.3em] {{ $teksSampul }}">
+                                    <span>Issue 01</span>
+                                    <span class="font-serif font-bold text-sm px-2.5 py-1 border border-current/40">{{ $undangan->inisialPria() }}&amp;{{ $undangan->inisialWanita() }}</span>
+                                    <span>{{ $hashtagPasangan }}</span>
+                                </div>
+                            @elseif ($isEksklusif)
+                                <div class="mx-auto w-16 h-16 relative flex items-center justify-center">
+                                    <span class="absolute inset-0 rounded-full border border-dashed border-[#F3E5AB]/60 animasi-orbit"></span>
+                                    <span class="w-12 h-12 rounded-full backdrop-blur-md border {{ $kelasBatas }} {{ $sampulGelap ? 'bg-black/55 text-[#F3E5AB]' : 'bg-white/90 text-[#1F2937]' }} flex items-center justify-center animasi-kilau">
+                                        <span class="font-serif text-sm font-bold tracking-widest">{{ $undangan->inisialPria() }}&amp;{{ $undangan->inisialWanita() }}</span>
+                                    </span>
+                                </div>
+                            @else
+                                <div class="mx-auto w-14 h-14 rounded-full backdrop-blur-md border {{ $kelasBatas }} {{ $sampulGelap ? 'bg-black/45 text-[#F3E5AB]' : 'bg-white/85 text-[#1F2937]' }} flex items-center justify-center animasi-kilau">
+                                    <span class="font-serif text-sm font-bold tracking-widest">{{ $undangan->inisialPria() }}&amp;{{ $undangan->inisialWanita() }}</span>
+                                </div>
+                            @endif
                             </div>
                         </div>
                     </div>
 
                     @if ($undangan->kutipan_ayat)
-                        <blockquote class="mt-6 rounded-2xl p-6 shadow-md text-center italic text-xs sm:text-sm leading-relaxed {{ $kelasKartu }}">
+                        <blockquote class="mt-6 {{ $radiusKartuSedang }} p-6 shadow-md text-center italic text-xs sm:text-sm leading-relaxed {{ $ekstraKartu }} {{ $kelasKartu }}">
                             "{{ $undangan->kutipan_ayat }}"
                         </blockquote>
                     @endif
                 </section>
 
-                {{-- Divider Ornamen --}}
-                <div class="flex items-center justify-center gap-3 px-10 opacity-70">
-                    <span class="h-px flex-1 border-t {{ $kelasBatas }}"></span>
-                    <span class="text-xs font-serif {{ $kelasAksen }}">&#10022; &bull; &#10022;</span>
-                    <span class="h-px flex-1 border-t {{ $kelasBatas }}"></span>
-                </div>
+                @if ($tampilMarquee)
+                    <div class="my-2 py-2.5 border-y {{ $kelasBatas }} overflow-hidden bg-black/5">
+                        <div class="animasi-marquee flex items-center gap-6 text-[11px] font-semibold uppercase tracking-[0.3em] {{ $kelasAksen }}">
+                            @for ($i = 0; $i < 4; $i++)
+                                <span>{{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}</span>
+                                <span>&#10022;</span>
+                                <span>{{ $tanggalTitik }}</span>
+                                <span>&#10022;</span>
+                                <span>{{ $hashtagPasangan }}</span>
+                                <span>&#10022;</span>
+                            @endfor
+                        </div>
+                    </div>
+                @endif
 
-                {{-- Profil Kedua Mempelai (Ditata Vertikal Anggun Dalam Viewport Portrait) --}}
+                @include('komponen-undangan.divider-tema', [
+                    'gayaTataLetak' => $gayaTataLetak,
+                    'kelasAksen' => $kelasAksen,
+                    'kelasBatas' => $kelasBatas,
+                ])
+
+                {{-- Profil Kedua Mempelai --}}
                 <section data-aos="fade-up" data-aos-duration="1000" class="py-10 px-5 space-y-6">
                     {{-- Mempelai Pria --}}
-                    <div data-aos="fade-up" data-aos-duration="1000" class="rounded-3xl p-6 sm:p-7 text-center shadow-lg {{ $kelasKartu }}">
+                    <div
+                        data-aos="fade-up"
+                        data-aos-duration="1000"
+                        class="{{ $radiusKartuBesar }} p-6 sm:p-7 {{ $sudutEditorial ? 'text-left' : 'text-center' }} shadow-lg {{ $ekstraKartu }} {{ $kelasKartu }}"
+                    >
+                        @if ($sudutEditorial)
+                            <p class="text-[10px] font-semibold uppercase tracking-[0.3em] opacity-60 mb-4">01 / The Groom</p>
+                        @endif
+
                         @if (! $tanpaFoto && $undangan->urlFotoPria())
-                            <img
-                                src="{{ $undangan->urlFotoPria() }}"
-                                alt="{{ $undangan->nama_lengkap_pria }}"
-                                class="mx-auto object-cover ring-4 {{ $kelasBatas }} {{ $bingkaiFoto === 'katedral' ? 'w-36 h-44 rounded-t-full rounded-b-2xl' : ($bingkaiFoto === 'kotak-editorial' ? 'w-40 h-48 grayscale hover:grayscale-0 transition duration-700' : 'w-36 h-36 rounded-full') }}"
-                            >
+                            <div class="{{ $sudutEditorial ? '' : 'mx-auto' }} w-fit relative">
+                                @if ($isEksklusif)
+                                    <span aria-hidden="true" class="pointer-events-none absolute -inset-2 {{ $haloMempelaiClass }}"></span>
+                                @endif
+                                <img
+                                    src="{{ $undangan->urlFotoPria() }}"
+                                    alt="{{ $undangan->nama_lengkap_pria }}"
+                                    class="{{ $sudutEditorial ? '' : 'mx-auto' }} object-cover ring-4 {{ $kelasBatas }} {{ $bingkaiFoto === 'katedral' ? 'w-36 h-44 rounded-t-full rounded-b-2xl' : ($bingkaiFoto === 'kotak-editorial' ? 'w-44 h-52 grayscale hover:grayscale-0 transition duration-700' : 'w-36 h-36 rounded-full') }}"
+                                >
+                            </div>
                         @else
-                            <div class="mx-auto flex items-center justify-center border-2 {{ $kelasBatas }} {{ $bingkaiFoto === 'katedral' ? 'w-28 h-32 rounded-t-full rounded-b-2xl' : ($bingkaiFoto === 'kotak-editorial' ? 'w-28 h-32' : 'w-28 h-28 rounded-full') }} {{ $gelap ? 'bg-black/35' : 'bg-white/60' }}">
+                            <div class="{{ $sudutEditorial ? '' : 'mx-auto' }} relative flex items-center justify-center border-2 {{ $kelasBatas }} {{ $bingkaiFoto === 'katedral' ? 'w-28 h-32 rounded-t-full rounded-b-2xl' : ($bingkaiFoto === 'kotak-editorial' ? 'w-28 h-32' : 'w-28 h-28 rounded-full') }} {{ $gelap ? 'bg-black/35' : 'bg-white/60' }}">
+                                @if ($isEksklusif)
+                                    <span aria-hidden="true" class="pointer-events-none absolute -inset-2 {{ $haloMempelaiClass }}"></span>
+                                @endif
                                 <span class="font-serif text-4xl font-bold {{ $kelasAksen }}">{{ $undangan->inisialPria() }}</span>
                             </div>
                         @endif
@@ -289,15 +452,31 @@
                     </div>
 
                     {{-- Mempelai Wanita --}}
-                    <div data-aos="fade-up" data-aos-duration="1000" class="rounded-3xl p-6 sm:p-7 text-center shadow-lg {{ $kelasKartu }}">
+                    <div
+                        data-aos="fade-up"
+                        data-aos-duration="1000"
+                        class="{{ $radiusKartuBesar }} p-6 sm:p-7 {{ $sudutEditorial ? 'text-right' : 'text-center' }} shadow-lg {{ $ekstraKartu }} {{ $kelasKartu }}"
+                    >
+                        @if ($sudutEditorial)
+                            <p class="text-[10px] font-semibold uppercase tracking-[0.3em] opacity-60 mb-4">02 / The Bride</p>
+                        @endif
+
                         @if (! $tanpaFoto && $undangan->urlFotoWanita())
-                            <img
-                                src="{{ $undangan->urlFotoWanita() }}"
-                                alt="{{ $undangan->nama_lengkap_wanita }}"
-                                class="mx-auto object-cover ring-4 {{ $kelasBatas }} {{ $bingkaiFoto === 'katedral' ? 'w-36 h-44 rounded-t-full rounded-b-2xl' : ($bingkaiFoto === 'kotak-editorial' ? 'w-40 h-48 grayscale hover:grayscale-0 transition duration-700' : 'w-36 h-36 rounded-full') }}"
-                            >
+                            <div class="{{ $sudutEditorial ? 'ml-auto' : 'mx-auto' }} w-fit relative">
+                                @if ($isEksklusif)
+                                    <span aria-hidden="true" class="pointer-events-none absolute -inset-2 {{ $haloMempelaiClass }}"></span>
+                                @endif
+                                <img
+                                    src="{{ $undangan->urlFotoWanita() }}"
+                                    alt="{{ $undangan->nama_lengkap_wanita }}"
+                                    class="{{ $sudutEditorial ? 'ml-auto' : 'mx-auto' }} object-cover ring-4 {{ $kelasBatas }} {{ $bingkaiFoto === 'katedral' ? 'w-36 h-44 rounded-t-full rounded-b-2xl' : ($bingkaiFoto === 'kotak-editorial' ? 'w-44 h-52 grayscale hover:grayscale-0 transition duration-700' : 'w-36 h-36 rounded-full') }}"
+                                >
+                            </div>
                         @else
-                            <div class="mx-auto flex items-center justify-center border-2 {{ $kelasBatas }} {{ $bingkaiFoto === 'katedral' ? 'w-28 h-32 rounded-t-full rounded-b-2xl' : ($bingkaiFoto === 'kotak-editorial' ? 'w-28 h-32' : 'w-28 h-28 rounded-full') }} {{ $gelap ? 'bg-black/35' : 'bg-white/60' }}">
+                            <div class="{{ $sudutEditorial ? 'ml-auto' : 'mx-auto' }} relative flex items-center justify-center border-2 {{ $kelasBatas }} {{ $bingkaiFoto === 'katedral' ? 'w-28 h-32 rounded-t-full rounded-b-2xl' : ($bingkaiFoto === 'kotak-editorial' ? 'w-28 h-32' : 'w-28 h-28 rounded-full') }} {{ $gelap ? 'bg-black/35' : 'bg-white/60' }}">
+                                @if ($isEksklusif)
+                                    <span aria-hidden="true" class="pointer-events-none absolute -inset-2 {{ $haloMempelaiClass }}"></span>
+                                @endif
                                 <span class="font-serif text-4xl font-bold {{ $kelasAksen }}">{{ $undangan->inisialWanita() }}</span>
                             </div>
                         @endif
@@ -315,6 +494,8 @@
                     'kelasAksen' => $kelasAksen,
                     'kelasKartu' => $kelasKartu,
                     'kelasTombol' => $kelasTombol,
+                    'sudutEditorial' => $sudutEditorial,
+                    'kelasEkstraKartu' => $ekstraKartu,
                 ])
 
                 {{-- Rangkaian Acara --}}
@@ -327,7 +508,7 @@
 
                     <div class="space-y-5">
                         @foreach ($undangan->daftarAcara as $acara)
-                            <div data-aos="zoom-in" data-aos-duration="1000" class="rounded-3xl p-6 text-center shadow-lg space-y-2.5 {{ $kelasKartu }}">
+                            <div data-aos="zoom-in" data-aos-duration="1000" class="{{ $radiusKartuBesar }} p-6 text-center shadow-lg space-y-2.5 {{ $ekstraKartu }} {{ $kelasKartu }}">
                                 <h3 class="font-serif text-2xl font-bold {{ $kelasAksen }}">{{ $acara->nama_acara }}</h3>
                                 <p class="text-sm font-semibold">{{ $acara->tanggal_acara->translatedFormat('l, d F Y') }}</p>
                                 <p class="text-xs font-semibold {{ $kelasAksen }}">
@@ -340,7 +521,7 @@
                                     <p class="text-xs opacity-75 mt-1">{{ $acara->alamat_lengkap }}</p>
                                 </div>
                                 @if ($acara->link_maps)
-                                    <a href="{{ $acara->link_maps }}" target="_blank" rel="noopener" class="inline-block mt-2 rounded-full px-6 py-2 text-xs font-semibold transition {{ $kelasTombol }}">
+                                    <a href="{{ $acara->link_maps }}" target="_blank" rel="noopener" class="inline-block mt-2 {{ $radiusTombol }} px-6 py-2 text-xs font-semibold transition {{ $kelasTombol }}">
                                         Buka Google Maps
                                     </a>
                                 @endif
@@ -359,17 +540,34 @@
                         <h2 class="mt-1.5 font-serif text-3xl font-bold">{{ $labelCerita }}</h2>
                     </div>
 
-                    <div class="space-y-4">
-                        @foreach ($ceritaList as $cerita)
-                            <div data-aos="fade-up" data-aos-duration="1000" class="rounded-2xl p-5 shadow-md {{ $kelasKartu }}">
-                                <div class="flex items-center justify-between gap-2">
-                                    <h3 class="font-serif text-lg font-bold">{{ $cerita['judul'] ?? '' }}</h3>
-                                    <span class="rounded-full px-3 py-0.5 text-[11px] font-semibold {{ $kelasBadge }}">{{ $cerita['tanggal'] ?? '' }}</span>
+                    @if ($tampilTimelineCerita)
+                        <div class="relative pl-6 space-y-5 border-l-2 {{ $kelasBatas }} ml-2">
+                            @foreach ($ceritaList as $cerita)
+                                <div data-aos="fade-left" data-aos-duration="900" class="relative">
+                                    <span aria-hidden="true" class="absolute -left-[31px] top-5 w-3.5 h-3.5 rounded-full border-2 {{ $kelasBatas }} {{ $gelap ? 'bg-[#D4AF37]' : 'bg-[#4B6358]' }} shadow-[0_0_0_4px_rgba(191,161,95,0.2)]"></span>
+                                    <div class="{{ $radiusKartuSedang }} p-5 shadow-md {{ $ekstraKartu }} {{ $kelasKartu }}">
+                                        <div class="flex items-center justify-between gap-2">
+                                            <h3 class="font-serif text-lg font-bold">{{ $cerita['judul'] ?? '' }}</h3>
+                                            <span class="{{ $sudutEditorial ? 'rounded-none' : 'rounded-full' }} px-3 py-0.5 text-[11px] font-semibold {{ $kelasBadge }}">{{ $cerita['tanggal'] ?? '' }}</span>
+                                        </div>
+                                        <p class="mt-2 text-xs sm:text-sm opacity-80 leading-relaxed">{{ $cerita['cerita'] ?? '' }}</p>
+                                    </div>
                                 </div>
-                                <p class="mt-2 text-xs sm:text-sm opacity-80 leading-relaxed">{{ $cerita['cerita'] ?? '' }}</p>
-                            </div>
-                        @endforeach
-                    </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="space-y-4">
+                            @foreach ($ceritaList as $cerita)
+                                <div data-aos="fade-up" data-aos-duration="1000" class="{{ $radiusKartuSedang }} p-5 shadow-md {{ $kelasKartu }}">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <h3 class="font-serif text-lg font-bold">{{ $cerita['judul'] ?? '' }}</h3>
+                                        <span class="rounded-full px-3 py-0.5 text-[11px] font-semibold {{ $kelasBadge }}">{{ $cerita['tanggal'] ?? '' }}</span>
+                                    </div>
+                                    <p class="mt-2 text-xs sm:text-sm opacity-80 leading-relaxed">{{ $cerita['cerita'] ?? '' }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </section>
                 @endif
 
@@ -383,18 +581,31 @@
 
                     <div class="grid grid-cols-2 gap-3.5">
                         @foreach ($undangan->daftarGaleri as $galeri)
+                            @php
+                                $adalahUnggulan = $gayaGaleri === 'unggulan' && $loop->first;
+                                $bentukGaleri = $adalahUnggulan
+                                    ? 'col-span-2 aspect-[16/10] rounded-3xl'
+                                    : ($gayaGaleri === 'editorial'
+                                        ? ($loop->odd ? 'aspect-[3/4] rounded-none' : 'aspect-square rounded-none')
+                                        : ($bingkaiFoto === 'katedral' ? 'aspect-[4/5] rounded-t-[3rem] rounded-b-2xl' : 'aspect-square rounded-2xl'));
+                            @endphp
                             <button
                                 type="button"
                                 data-aos="zoom-in"
                                 data-aos-duration="1000"
                                 @click="bukaGaleri(@js($galeri->urlFoto()), @js($galeri->keterangan))"
-                                class="group overflow-hidden border {{ $kelasBatas }} cursor-pointer {{ $bingkaiFoto === 'katedral' ? 'aspect-[4/5] rounded-t-[3rem] rounded-b-2xl' : 'aspect-square rounded-2xl' }}"
+                                class="group relative overflow-hidden border {{ $kelasBatas }} cursor-pointer {{ $bentukGaleri }}"
                             >
                                 <img
                                     src="{{ $galeri->urlFoto() }}"
                                     alt="{{ $galeri->keterangan ?? 'Galeri' }}"
                                     class="w-full h-full object-cover group-hover:scale-105 transition duration-700 {{ $modeMonokrom ? 'grayscale group-hover:grayscale-0' : '' }}"
                                 >
+                                @if ($isEksklusif && $galeri->keterangan)
+                                    <span class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 py-2 text-left text-[11px] font-medium text-white/90 opacity-0 group-hover:opacity-100 transition duration-300">
+                                        {{ $galeri->keterangan }}
+                                    </span>
+                                @endif
                             </button>
                         @endforeach
                     </div>
@@ -406,6 +617,8 @@
                     'kelasAksen' => $kelasAksen,
                     'kelasKartu' => $kelasKartu,
                     'kelasTombol' => $kelasTombol,
+                    'sudutEditorial' => $sudutEditorial,
+                    'kelasEkstraKartu' => $ekstraKartu,
                 ])
 
                 <footer class="py-8 px-4 text-center text-xs opacity-80">

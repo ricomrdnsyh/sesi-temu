@@ -146,7 +146,7 @@
                         <select id="tema_id" name="tema_id" class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none">
                             @foreach ($daftarTema as $tema)
                                 <option value="{{ $tema->id }}" @selected($undangan->tema_id === $tema->id)>
-                                    {{ $tema->nama_tema }} ({{ $tema->kategoriLabel() }})
+                                    {{ $tema->nama_tema }} ({{ $tema->kategoriLabel() }} • {{ $tema->tierLabel() }} — {{ $tema->hargaFormatted() }})
                                 </option>
                             @endforeach
                         </select>
@@ -322,6 +322,30 @@
                                 <input type="text" name="nama_ibu_wanita" value="{{ old('nama_ibu_wanita', $undangan->nama_ibu_wanita) }}" class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-white px-4 py-2 text-sm">
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div class="rounded-2xl bg-ivory p-5 ring-1 ring-champagne/25 space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h3 class="font-serif text-lg font-bold text-charcoal">Foto Sampul Gerbang Undangan (Opsional)</h3>
+                            <p class="text-xs text-charcoal/65 mt-0.5">
+                                Foto potret pasangan yang tampil di gerbang awal saat mode foto aktif. Jika kosong, sistem otomatis mengambil foto pertama dari Galeri atau foto mempelai.
+                            </p>
+                        </div>
+                        @if ($undangan->urlFotoSampulKhususDasbor())
+                            <img src="{{ $undangan->urlFotoSampulKhususDasbor() }}" alt="Pratinjau Foto Sampul" class="w-16 h-24 rounded-xl object-cover ring-2 ring-champagne/40 shrink-0">
+                        @endif
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                        <input type="file" name="foto_sampul" accept="image/*" class="block w-full text-sm text-charcoal file:mr-3 file:rounded-lg file:border-0 file:bg-sage/10 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-sage">
+                        @if ($undangan->urlFotoSampulKhususDasbor())
+                            <label class="inline-flex items-center gap-2 text-xs text-rose-700 font-medium shrink-0 cursor-pointer">
+                                <input type="checkbox" name="hapus_foto_sampul" value="1" class="rounded border-rose-300 text-rose-600 focus:ring-rose-500">
+                                <span>Hapus foto sampul khusus</span>
+                            </label>
+                        @endif
                     </div>
                 </div>
 

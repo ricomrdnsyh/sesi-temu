@@ -15,6 +15,7 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     @foreach ($daftarTema as $tema)
+        @php $infoTier = $tema->infoTier(); @endphp
         <div class="rounded-2xl bg-white overflow-hidden shadow-sm ring-1 ring-champagne/20 flex flex-col">
             <div class="aspect-[4/3] bg-ivory relative overflow-hidden">
                 @if ($tema->urlGambarPratinjau())
@@ -24,6 +25,9 @@
                         {{ $tema->nama_tema }}
                     </div>
                 @endif
+                <span class="absolute top-3 left-3 rounded-full px-3 py-1 text-xs font-semibold {{ $infoTier['badge_class'] }}">
+                    {{ $infoTier['label'] }}
+                </span>
                 <span class="absolute top-3 right-3 rounded-full px-3 py-1 text-xs font-semibold {{ $tema->aktif ? 'bg-sage text-white' : 'bg-charcoal/80 text-white' }}">
                     {{ $tema->aktif ? 'Aktif' : 'Nonaktif' }}
                 </span>
@@ -31,7 +35,10 @@
 
             <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
                 <div>
-                    <p class="text-xs font-semibold uppercase tracking-wider text-champagne">{{ ucfirst($tema->kategori) }}</p>
+                    <div class="flex items-center justify-between gap-2">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-champagne">{{ $tema->kategoriLabel() }}</p>
+                        <span class="text-sm font-bold text-charcoal">{{ $tema->hargaFormatted() }}</span>
+                    </div>
                     <h2 class="mt-1 font-serif text-2xl font-bold text-charcoal">{{ $tema->nama_tema }}</h2>
                     <p class="mt-1 text-xs font-mono text-charcoal/60">Slug: {{ $tema->slug }}</p>
                     <p class="text-xs font-mono text-charcoal/60">View: {{ $tema->lokasi_view }}</p>

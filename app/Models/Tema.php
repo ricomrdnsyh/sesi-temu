@@ -25,12 +25,41 @@ class Tema extends Model
     ];
 
     /**
+     * Daftar tingkatan kualitas (tier) tema yang tersedia pada katalog.
+     *
+     * @var array<string, string>
+     */
+    public const TIER_TERSEDIA = [
+        'basic' => 'Basic',
+        'premium' => 'Premium',
+        'eksklusif' => 'Eksklusif',
+    ];
+
+    /**
+     * Harga saran bawaan (Rupiah) untuk masing-masing tier tema.
+     *
+     * @var array<string, int>
+     */
+    public const HARGA_BAWAAN_TIER = [
+        'basic' => 59000,
+        'premium' => 89000,
+        'eksklusif' => 119000,
+    ];
+
+    /**
+     * Biaya tambahan jasa bantu input & tata letak Admin untuk Paket Terima Beres.
+     */
+    public const BIAYA_JASA_TERIMA_BERES = 50000;
+
+    /**
      * @var list<string>
      */
     protected $fillable = [
         'nama_tema',
         'slug',
         'kategori',
+        'tier',
+        'harga',
         'lokasi_view',
         'gambar_pratinjau',
         'aktif',
@@ -42,6 +71,7 @@ class Tema extends Model
     protected function casts(): array
     {
         return [
+            'harga' => 'integer',
             'aktif' => 'boolean',
         ];
     }
@@ -54,6 +84,93 @@ class Tema extends Model
     public function kategoriLabel(): string
     {
         return self::KATEGORI_TERSEDIA[$this->kategori] ?? ucfirst($this->kategori);
+    }
+
+    public function tierKode(): string
+    {
+        $tier = (string) ($this->tier ?: 'basic');
+
+        return array_key_exists($tier, self::TIER_TERSEDIA) ? $tier : 'basic';
+    }
+
+    public function tierLabel(): string
+    {
+        return self::TIER_TERSEDIA[$this->tierKode()];
+    }
+
+    public function hargaNominal(): int
+    {
+        return (int) ($this->harga ?? self::hargaBawaanTier($this->tierKode()));
+    }
+
+    public function hargaFormatted(): string
+    {
+        return self::formatRupiah($this->hargaNominal());
+    }
+
+    public function hargaTerimaBeresFormatted(): string
+    {
+        return self::formatRupiah($this->hargaNominal() + self::BIAYA_JASA_TERIMA_BERES);
+    }
+
+    public static function formatRupiah(int $nominal): string
+    {
+        return 'Rp '.number_format($nominal, 0, ',', '.');
+    }
+
+    public static function hargaBawaanTier(?string $tier): int
+    {
+        return self::HARGA_BAWAAN_TIER[$tier ?? 'basic'] ?? self::HARGA_BAWAAN_TIER['basic'];
+    }
+
+    /**
+     * Metadata tampilan badge dan ringkasan kualitas per tier tema.
+     *
+     * @return array{
+     *     kode: string,
+     *     label: string,
+     *     ringkasan: string,
+     *     fitur_singkat: string,
+     *     badge_class: string,
+     *     chip_class: string,
+     *     card_ring: string
+     * }
+     */
+    public function infoTier(): array
+    {
+        $kode = $this->tierKode();
+
+        $daftar = [
+            'basic' => [
+                'kode' => 'basic',
+                'label' => 'Basic',
+                'ringkasan' => 'Desain Elegan & Ringan',
+                'fitur_singkat' => 'Layout klasik rapi • Animasi lembut',
+                'badge_class' => 'bg-sage/95 text-white ring-1 ring-white/30',
+                'chip_class' => 'bg-sage/10 text-sage ring-1 ring-sage/25',
+                'card_ring' => 'ring-1 ring-champagne/25',
+            ],
+            'premium' => [
+                'kode' => 'premium',
+                'label' => 'Premium',
+                'ringkasan' => 'Detail Artistik & Adat',
+                'fitur_singkat' => 'Cover spesial • Timeline & marquee',
+                'badge_class' => 'bg-champagne text-charcoal ring-1 ring-white/40 shadow-sm',
+                'chip_class' => 'bg-champagne/15 text-charcoal ring-1 ring-champagne/40',
+                'card_ring' => 'ring-1 ring-champagne/50 shadow-sm',
+            ],
+            'eksklusif' => [
+                'kode' => 'eksklusif',
+                'label' => 'Eksklusif',
+                'ringkasan' => 'Motion & Luxury',
+                'fitur_singkat' => 'Tirai sinematik • Efek partikel & kilau',
+                'badge_class' => 'bg-charcoal text-champagne ring-1 ring-champagne/60 shadow-md',
+                'chip_class' => 'bg-charcoal text-champagne ring-1 ring-champagne/50',
+                'card_ring' => 'ring-2 ring-champagne/75 shadow-md',
+            ],
+        ];
+
+        return $daftar[$kode];
     }
 
     /**
