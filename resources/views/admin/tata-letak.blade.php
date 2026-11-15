@@ -5,9 +5,16 @@
     <header class="bg-charcoal text-ivory border-b border-champagne/30 sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
             <div class="flex items-center gap-6">
-                <a href="{{ route('admin.ringkasan') }}" class="font-serif text-2xl font-bold text-white">
-                    Sesi<span class="text-champagne">Temu</span>
-                    <span class="ml-1.5 text-xs font-sans font-semibold uppercase tracking-wider text-champagne">Admin</span>
+                <a href="{{ route('admin.ringkasan') }}" class="flex items-center gap-2.5 font-serif text-2xl font-bold text-white">
+                    <span class="inline-flex items-center justify-center rounded-xl bg-[#FBF3E6] p-1 shadow-sm">
+                        <img
+                            src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}"
+                            alt="Logo SesiTemu"
+                            class="h-7 w-7 object-contain"
+                        >
+                    </span>
+                    <span>Sesi<span class="text-champagne">Temu</span></span>
+                    <span class="ml-0.5 text-xs font-sans font-semibold uppercase tracking-wider text-champagne">Admin</span>
                 </a>
 
                 <nav class="hidden md:flex items-center gap-2 text-sm">

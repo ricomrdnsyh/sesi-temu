@@ -318,4 +318,57 @@ class Tahap4DasborAdminWebpTest extends TestCase
         $this->assertNull($kedaluwarsa->fresh()->foto_pria);
         $this->assertDatabaseCount('galeri_undangan', 0);
     }
+
+    public function test_client_dapat_mengubah_gaya_font_dan_mode_tanpa_foto_dan_admin_tambah_kategori_luxury(): void
+    {
+        $admin = Pengguna::factory()->admin()->create();
+        $client = Pengguna::factory()->create();
+        $tema = $this->buatTema();
+
+        $undangan = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $tema->id,
+            'slug' => 'bagas-tiara',
+            'nama_panggilan_pria' => 'Bagas',
+            'nama_lengkap_pria' => 'Bagas Prakoso',
+            'nama_panggilan_wanita' => 'Tiara',
+            'nama_lengkap_wanita' => 'Tiara Dewi',
+            'pengaturan' => Undangan::pengaturanBawaan(),
+        ]);
+
+        $this->actingAs($client)
+            ->put("/dasbor/undangan/{$undangan->id}", [
+                'bagian' => 'tema',
+                'tema_id' => $tema->id,
+                'slug' => 'bagas-tiara',
+                'gaya_font' => 'editorial_gilda',
+                'tanpa_foto' => '1',
+                'fitur_hitung_mundur' => '1',
+                'fitur_cerita_cinta' => '1',
+                'fitur_galeri' => '1',
+                'fitur_amplop_digital' => '1',
+                'fitur_buku_tamu' => '1',
+            ])
+            ->assertRedirect();
+
+        $undangan->refresh();
+        $this->assertSame('editorial_gilda', $undangan->kodeGayaFontTerpilih());
+        $this->assertTrue($undangan->modeTanpaFoto());
+        $this->assertStringContainsString('Gilda+Display', $undangan->resolusiGayaFont()['google_fonts_url']);
+
+        $this->actingAs($admin)
+            ->post('/admin/tema', [
+                'nama_tema' => 'Starry Ballroom',
+                'slug' => 'starry-ballroom',
+                'kategori' => 'luxury',
+                'lokasi_view' => 'tema.luxury-noir.index',
+                'aktif' => '1',
+            ])
+            ->assertRedirect('/admin/tema');
+
+        $this->assertDatabaseHas('tema', [
+            'slug' => 'starry-ballroom',
+            'kategori' => 'luxury',
+        ]);
+    }
 }

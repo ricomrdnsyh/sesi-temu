@@ -111,6 +111,7 @@ class DasborUndanganController extends Controller
             'undangan' => $undangan,
             'daftarTema' => $daftarTema,
             'daftarMusik' => $daftarMusik,
+            'daftarGayaFont' => Undangan::GAYA_FONT_TERSEDIA,
             'rekapRsvp' => $rekapRsvp,
             'tabAktif' => $tabAktif,
         ]);
@@ -131,6 +132,7 @@ class DasborUndanganController extends Controller
                 'tema_id' => ['required', 'exists:tema,id'],
                 'slug' => ['nullable', 'string', 'max:100'],
                 'musik_latar' => ['nullable', 'string', 'max:255'],
+                'gaya_font' => ['nullable', Rule::in(array_keys(Undangan::GAYA_FONT_TERSEDIA))],
             ]);
 
             if ($request->filled('slug')) {
@@ -167,6 +169,8 @@ class DasborUndanganController extends Controller
             }
 
             if ($bagian === 'tema') {
+                $pengaturan['gaya_font'] = $tervalidasi['gaya_font'] ?? 'bawaan';
+                $pengaturan['tanpa_foto'] = $request->boolean('tanpa_foto');
                 $pengaturan['fitur_aktif'] = [
                     'hitung_mundur' => $request->boolean('fitur_hitung_mundur'),
                     'cerita_cinta' => $request->boolean('fitur_cerita_cinta'),

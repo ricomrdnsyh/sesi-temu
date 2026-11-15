@@ -8,10 +8,15 @@
     <div class="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-sage/10 blur-3xl pointer-events-none"></div>
 
     <div class="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        <a href="{{ route('beranda') }}" class="flex items-center justify-center gap-2 text-charcoal">
-            <span class="font-serif text-3xl font-bold tracking-tight">Sesi<span class="text-champagne">Temu</span></span>
+        <a href="{{ route('beranda') }}" class="flex flex-col items-center justify-center text-charcoal">
+            <img
+                src="{{ asset('aset-demo/logo-sesi-temu-lengkap.webp') }}"
+                alt="Logo SesiTemu"
+                class="h-24 w-auto object-contain"
+            >
+            <span class="sr-only">SesiTemu</span>
         </a>
-        <h1 class="mt-4 text-center font-serif text-3xl font-semibold text-charcoal">
+        <h1 class="mt-3 text-center font-serif text-3xl font-semibold text-charcoal">
             Masuk ke Akun Anda
         </h1>
         <p class="mt-2 text-center text-sm text-charcoal/70">

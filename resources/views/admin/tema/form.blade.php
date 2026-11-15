@@ -34,7 +34,7 @@
             <div>
                 <label for="kategori" class="block text-sm font-medium text-charcoal">Kategori</label>
                 <select id="kategori" name="kategori" class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm">
-                    @foreach (['modern' => 'Modern', 'adat' => 'Adat', 'islami' => 'Islami'] as $val => $label)
+                    @foreach (\App\Models\Tema::KATEGORI_TERSEDIA as $val => $label)
                         <option value="{{ $val }}" @selected(old('kategori', $tema->kategori) === $val)>{{ $label }}</option>
                     @endforeach
                 </select>

@@ -13,6 +13,93 @@ class Undangan extends Model
     protected $table = 'undangan';
 
     /**
+     * Daftar pilihan kombinasi desain font untuk halaman undangan.
+     *
+     * @var array<string, array{
+     *     label: string,
+     *     judul_css: string,
+     *     isi_css: string,
+     *     aksen_css: string,
+     *     google_families: list<string>
+     * }>
+     */
+    public const GAYA_FONT_TERSEDIA = [
+        'bawaan' => [
+            'label' => 'Bawaan Tema (Direkomendasikan)',
+            'judul_css' => "'Cormorant Garamond', Georgia, serif",
+            'isi_css' => "'Poppins', ui-sans-serif, system-ui, sans-serif",
+            'aksen_css' => "'Great Vibes', cursive",
+            'google_families' => ['Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400', 'Great+Vibes', 'Poppins:wght@300;400;500;600;700'],
+        ],
+        'berkshire_adat' => [
+            'label' => 'Berkshire Swash & Marcellus (Etnik Klasik TemuWaktu)',
+            'judul_css' => "'Berkshire Swash', 'Marcellus', Georgia, serif",
+            'isi_css' => "'Plus Jakarta Sans', 'Poppins', ui-sans-serif, system-ui, sans-serif",
+            'aksen_css' => "'Berkshire Swash', cursive",
+            'google_families' => ['Berkshire+Swash', 'Marcellus', 'Plus+Jakarta+Sans:wght@400;500;600;700', 'Poppins:wght@400;500;600'],
+        ],
+        'editorial_gilda' => [
+            'label' => 'Gilda Display & Inter (Editorial TemuWaktu)',
+            'judul_css' => "'Gilda Display', Georgia, serif",
+            'isi_css' => "'Inter', 'Poppins', ui-sans-serif, system-ui, sans-serif",
+            'aksen_css' => "'Great Vibes', cursive",
+            'google_families' => ['Gilda+Display', 'Inter:wght@300;400;500;600;700', 'Great+Vibes', 'Poppins:wght@400;500;600'],
+        ],
+        'kaligrafi_vibes' => [
+            'label' => 'Cormorant Garamond & Great Vibes (Kaligrafi Romantis)',
+            'judul_css' => "'Cormorant Garamond', Georgia, serif",
+            'isi_css' => "'Poppins', ui-sans-serif, system-ui, sans-serif",
+            'aksen_css' => "'Great Vibes', cursive",
+            'google_families' => ['Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400', 'Great+Vibes', 'Poppins:wght@300;400;500;600;700'],
+        ],
+        'ningrat_cinzel' => [
+            'label' => 'Cinzel Decorative & Cormorant (Mewah & Ballroom)',
+            'judul_css' => "'Cinzel Decorative', 'Cinzel', 'Cormorant Garamond', Georgia, serif",
+            'isi_css' => "'Plus Jakarta Sans', 'Poppins', ui-sans-serif, system-ui, sans-serif",
+            'aksen_css' => "'Cormorant Garamond', Georgia, serif",
+            'google_families' => ['Cinzel+Decorative:wght@700', 'Cinzel:wght@500;600;700', 'Cormorant+Garamond:ital,wght@0,500;0,600;1,400', 'Plus+Jakarta+Sans:wght@400;500;600;700', 'Poppins:wght@400;500;600'],
+        ],
+        'royal_playfair' => [
+            'label' => 'Playfair Display & Alex Brush (Klasik Elegan)',
+            'judul_css' => "'Playfair Display', Georgia, serif",
+            'isi_css' => "'Poppins', ui-sans-serif, system-ui, sans-serif",
+            'aksen_css' => "'Alex Brush', 'Great Vibes', cursive",
+            'google_families' => ['Playfair+Display:ital,wght@0,500;0,600;0,700;1,400', 'Alex+Brush', 'Great+Vibes', 'Poppins:wght@300;400;500;600;700'],
+        ],
+        'arabesque_amiri' => [
+            'label' => 'Amiri & Aref Ruqaa (Anggun Islami)',
+            'judul_css' => "'Amiri', 'Cormorant Garamond', Georgia, serif",
+            'isi_css' => "'Plus Jakarta Sans', 'Poppins', ui-sans-serif, system-ui, sans-serif",
+            'aksen_css' => "'Aref Ruqaa', 'Amiri', Georgia, serif",
+            'google_families' => ['Amiri:ital,wght@0,400;0,700;1,400', 'Aref+Ruqaa:wght@400;700', 'Cormorant+Garamond:wght@500;600;700', 'Plus+Jakarta+Sans:wght@400;500;600;700', 'Poppins:wght@400;500;600'],
+        ],
+        'modern_poppins' => [
+            'label' => 'Poppins Clean (Minimalis Modern)',
+            'judul_css' => "'Poppins', ui-sans-serif, system-ui, sans-serif",
+            'isi_css' => "'Poppins', ui-sans-serif, system-ui, sans-serif",
+            'aksen_css' => "'Poppins', ui-sans-serif, system-ui, sans-serif",
+            'google_families' => ['Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400'],
+        ],
+    ];
+
+    /**
+     * Pemetaan font bawaan yang paling serasi untuk setiap tema.
+     *
+     * @var array<string, string>
+     */
+    public const FONT_BAWAAN_TEMA = [
+        'rustic-floral' => 'kaligrafi_vibes',
+        'editorial-monokrom' => 'editorial_gilda',
+        'luxury-noir' => 'ningrat_cinzel',
+        'royal-ivory' => 'royal_playfair',
+        'velvet-garden' => 'editorial_gilda',
+        'adat-jawa' => 'berkshire_adat',
+        'sunda-heritage' => 'berkshire_adat',
+        'islami-syari' => 'arabesque_amiri',
+        'islamic-heavenly' => 'arabesque_amiri',
+    ];
+
+    /**
      * @var list<string>
      */
     protected $fillable = [
@@ -50,6 +137,8 @@ class Undangan extends Model
 
     /**
      * @return array{
+     *     gaya_font: string,
+     *     tanpa_foto: bool,
      *     cerita_cinta: list<array{judul: string, tanggal: string, cerita: string}>,
      *     live_streaming: array{aktif: bool, platform: string, link: string},
      *     alamat_kado_fisik: string,
@@ -65,6 +154,8 @@ class Undangan extends Model
     public static function pengaturanBawaan(): array
     {
         return [
+            'gaya_font' => 'bawaan',
+            'tanpa_foto' => false,
             'cerita_cinta' => [],
             'live_streaming' => [
                 'aktif' => false,
@@ -126,6 +217,80 @@ class Undangan extends Model
         $fiturAktif = $this->pengaturan['fitur_aktif'] ?? [];
 
         return (bool) ($fiturAktif[$fitur] ?? true);
+    }
+
+    public function modeTanpaFoto(): bool
+    {
+        return (bool) ($this->pengaturan['tanpa_foto'] ?? false);
+    }
+
+    public function kodeGayaFontTerpilih(): string
+    {
+        $kode = (string) ($this->pengaturan['gaya_font'] ?? 'bawaan');
+
+        if (! array_key_exists($kode, self::GAYA_FONT_TERSEDIA)) {
+            return 'bawaan';
+        }
+
+        return $kode;
+    }
+
+    /**
+     * Resolusi kombinasi tipografi aktif untuk halaman undangan (preset khusus atau bawaan tema).
+     *
+     * @return array{
+     *     kode: string,
+     *     label: string,
+     *     judul_css: string,
+     *     isi_css: string,
+     *     aksen_css: string,
+     *     google_fonts_url: string
+     * }
+     */
+    public function resolusiGayaFont(?string $kodeOverride = null): array
+    {
+        $kodeDipilih = $kodeOverride ?: $this->kodeGayaFontTerpilih();
+
+        if ($kodeDipilih === 'bawaan' || ! array_key_exists($kodeDipilih, self::GAYA_FONT_TERSEDIA)) {
+            $slugTema = $this->tema?->slug ?? 'rustic-floral';
+            $kodeEfektif = self::FONT_BAWAAN_TEMA[$slugTema] ?? 'kaligrafi_vibes';
+        } else {
+            $kodeEfektif = $kodeDipilih;
+        }
+
+        $preset = self::GAYA_FONT_TERSEDIA[$kodeEfektif] ?? self::GAYA_FONT_TERSEDIA['kaligrafi_vibes'];
+        $queryKeluarga = collect($preset['google_families'])
+            ->unique()
+            ->map(static fn (string $family): string => 'family='.$family)
+            ->implode('&');
+
+        return [
+            'kode' => $kodeEfektif,
+            'label' => $preset['label'],
+            'judul_css' => $preset['judul_css'],
+            'isi_css' => $preset['isi_css'],
+            'aksen_css' => $preset['aksen_css'],
+            'google_fonts_url' => 'https://fonts.googleapis.com/css2?'.$queryKeluarga.'&display=swap',
+        ];
+    }
+
+    public function inisialPria(): string
+    {
+        $nama = trim((string) $this->nama_panggilan_pria);
+
+        return $nama !== '' ? Str::upper(Str::substr($nama, 0, 1)) : 'P';
+    }
+
+    public function inisialWanita(): string
+    {
+        $nama = trim((string) $this->nama_panggilan_wanita);
+
+        return $nama !== '' ? Str::upper(Str::substr($nama, 0, 1)) : 'W';
+    }
+
+    public function inisialMempelai(): string
+    {
+        return $this->inisialPria().' & '.$this->inisialWanita();
     }
 
     public function urlFotoPria(): ?string

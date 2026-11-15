@@ -5,12 +5,19 @@
 @source '../views/**/*.blade.php';
 
 @theme {
-    --font-sans: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
-    --font-serif: 'Cormorant Garamond', 'Playfair Display', ui-serif, Georgia, serif;
+    --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+    --font-serif: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'Poppins', ui-sans-serif, system-ui, sans-serif;
     --color-ivory: #FDFBF7;
     --color-champagne: #BFA15F;
     --color-charcoal: #1F2937;
     --color-sage: #4B6358;
+}
+
+@layer base {
+    body {
+        font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+    }
 }
 
 [x-cloak] {

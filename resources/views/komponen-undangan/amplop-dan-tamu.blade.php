@@ -26,7 +26,7 @@
         <h2 class="mt-2 font-serif text-3xl sm:text-4xl font-bold">Amplop Digital</h2>
         <p class="mt-2 text-sm opacity-75 max-w-xl mx-auto">Doa restu Anda merupakan karunia terindah bagi kami. Apabila hendak mengirimkan tanda kasih, dapat melalui rekening berikut:</p>
 
-        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+        <div class="mt-7 grid grid-cols-1 gap-4 text-left">
             @foreach ($undangan->daftarAmplop as $amplop)
                 <div
                     x-data="{ tersalin: false }"
@@ -93,7 +93,7 @@
                     <form @submit.prevent="demoTerkirim = true" class="space-y-4">
                         <input type="text" value="{{ $namaTamu }}" class="w-full rounded-xl border border-current/20 bg-transparent px-4 py-2.5 text-sm" placeholder="Nama Tamu">
                         <div class="grid grid-cols-2 gap-3">
-                            <select class="rounded-xl border border-current/20 bg-transparent px-3.5 py-2.5 text-sm">
+                            <select class="rounded-xl border border-current/20 bg-transparent px-3.5 py-2.5 text-sm [&>option]:bg-white [&>option]:text-charcoal">
                                 <option value="hadir">InsyaAllah Hadir</option>
                                 <option value="ragu">Masih Ragu</option>
                                 <option value="tidak_hadir">Berhalangan Hadir</option>
@@ -118,7 +118,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold uppercase tracking-wider opacity-75">Konfirmasi Kehadiran</label>
-                            <select name="status_kehadiran" class="mt-1.5 w-full rounded-xl border border-current/20 bg-transparent px-3.5 py-2.5 text-sm">
+                            <select name="status_kehadiran" class="mt-1.5 w-full rounded-xl border border-current/20 bg-transparent px-3.5 py-2.5 text-sm [&>option]:bg-white [&>option]:text-charcoal">
                                 <option value="hadir" @selected(old('status_kehadiran') === 'hadir')>InsyaAllah Hadir</option>
                                 <option value="ragu" @selected(old('status_kehadiran') === 'ragu')>Masih Ragu</option>
                                 <option value="tidak_hadir" @selected(old('status_kehadiran') === 'tidak_hadir')>Tidak Dapat Hadir</option>

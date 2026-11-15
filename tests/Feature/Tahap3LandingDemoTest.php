@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Pengguna;
 use App\Models\Tema;
 use App\Models\Undangan;
+use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -115,5 +116,26 @@ class Tahap3LandingDemoTest extends TestCase
         $this->get('/demo/tema-tidak-ada')->assertNotFound();
 
         $this->assertDatabaseCount('undangan', 0);
+    }
+
+    public function test_demo_tema_mendukung_katalog_lengkap_variasi_font_dan_mode_tanpa_foto(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        $this->get('/demo/editorial-monokrom?to=Ibu+Maya&font=editorial_gilda')
+            ->assertOk()
+            ->assertSee('Ibu Maya')
+            ->assertSee('Gilda+Display', false)
+            ->assertSee('Editorial Monokrom');
+
+        $this->get('/demo/luxury-noir?tf=1')
+            ->assertOk()
+            ->assertSee('Mode: Tanpa Foto (TF)')
+            ->assertDontSee('mempelai-pria.webp')
+            ->assertDontSee('galeri-1.webp');
+
+        $this->get('/demo/velvet-garden')->assertOk()->assertSee('animasi-melayang');
+        $this->get('/demo/sunda-heritage')->assertOk()->assertSee('Sampurasun');
+        $this->get('/demo/islamic-heavenly')->assertOk()->assertSee('animasi-bintang');
     }
 }

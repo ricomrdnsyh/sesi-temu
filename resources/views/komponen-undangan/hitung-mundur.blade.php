@@ -65,11 +65,11 @@
     <p class="text-xs font-semibold uppercase tracking-[0.25em] {{ $kelasAksen ?? 'text-champagne' }}">Menuju Hari Bahagia</p>
     <h2 class="mt-2 font-serif text-3xl sm:text-4xl font-bold">Hitung Mundur Acara</h2>
 
-    <div class="mt-7 max-w-xl mx-auto grid grid-cols-4 gap-3 sm:gap-4">
+    <div class="mt-7 max-w-md mx-auto grid grid-cols-4 gap-2 sm:gap-3">
         @foreach (['hari' => 'Hari', 'jam' => 'Jam', 'menit' => 'Menit', 'detik' => 'Detik'] as $var => $label)
-            <div class="rounded-2xl p-4 shadow-sm {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
-                <div class="font-serif text-3xl sm:text-4xl font-bold" x-text="{{ $var }}">00</div>
-                <div class="mt-1 text-[11px] uppercase tracking-widest opacity-70">{{ $label }}</div>
+            <div class="rounded-2xl p-3 sm:p-4 shadow-sm {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
+                <div class="font-serif text-2xl sm:text-3xl font-bold" x-text="{{ $var }}">00</div>
+                <div class="mt-1 text-[10px] uppercase tracking-widest opacity-70">{{ $label }}</div>
             </div>
         @endforeach
     </div>

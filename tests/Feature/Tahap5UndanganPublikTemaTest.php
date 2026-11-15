@@ -27,14 +27,28 @@ class Tahap5UndanganPublikTemaTest extends TestCase
         $lokasiView = match ($slugTema) {
             'adat-jawa' => 'tema.adat-jawa.index',
             'islami-syari' => 'tema.islami-syari.index',
+            'editorial-monokrom' => 'tema.editorial-monokrom.index',
+            'luxury-noir' => 'tema.luxury-noir.index',
+            'royal-ivory' => 'tema.royal-ivory.index',
+            'velvet-garden' => 'tema.velvet-garden.index',
+            'sunda-heritage' => 'tema.sunda-heritage.index',
+            'islamic-heavenly' => 'tema.islamic-heavenly.index',
             default => 'tema.rustic-floral.index',
+        };
+
+        $kategori = match ($slugTema) {
+            'adat-jawa', 'sunda-heritage' => 'adat',
+            'islami-syari', 'islamic-heavenly' => 'islami',
+            'luxury-noir', 'royal-ivory' => 'luxury',
+            'velvet-garden' => 'motion',
+            default => 'modern',
         };
 
         $tema = Tema::firstOrCreate(
             ['slug' => $slugTema],
             [
                 'nama_tema' => ucwords(str_replace('-', ' ', $slugTema)),
-                'kategori' => $slugTema === 'adat-jawa' ? 'adat' : ($slugTema === 'islami-syari' ? 'islami' : 'modern'),
+                'kategori' => $kategori,
                 'lokasi_view' => $lokasiView,
                 'gambar_pratinjau' => "aset-demo/tema-{$slugTema}.webp",
                 'aktif' => true,
@@ -139,6 +153,35 @@ class Tahap5UndanganPublikTemaTest extends TestCase
         $this->get('/pasangan-rustic')->assertOk()->assertSee('Dimas')->assertSee('Rani');
         $this->get('/pasangan-jawa')->assertOk()->assertSee('Dimas')->assertSee('Rani');
         $this->get('/pasangan-islami')->assertOk()->assertSee('Dimas')->assertSee('Rani');
+    }
+
+    public function test_semua_tema_baru_tipografi_custom_dan_mode_tanpa_foto_merender_sempurna(): void
+    {
+        $this->buatUndanganLengkap('editorial-monokrom', 'pasangan-editorial', true);
+        $this->buatUndanganLengkap('luxury-noir', 'pasangan-luxury', true);
+        $this->buatUndanganLengkap('royal-ivory', 'pasangan-royal', true);
+        $this->buatUndanganLengkap('velvet-garden', 'pasangan-velvet', true);
+        $this->buatUndanganLengkap('sunda-heritage', 'pasangan-sunda', true);
+        $this->buatUndanganLengkap('islamic-heavenly', 'pasangan-heavenly', true);
+
+        $this->get('/pasangan-editorial')->assertOk()->assertSee('Gilda+Display', false)->assertSee('The Wedding Edition');
+        $this->get('/pasangan-luxury')->assertOk()->assertSee('Cinzel', false)->assertSee('The Grand Celebration');
+        $this->get('/pasangan-royal')->assertOk()->assertSee('Playfair+Display', false)->assertSee('The Royal Wedding');
+        $this->get('/pasangan-velvet')->assertOk()->assertSee('Velvet Garden Motion')->assertSee('animasi-melayang');
+        $this->get('/pasangan-sunda')->assertOk()->assertSee('Sampurasun')->assertSee('Wilujeng Sumping');
+        $this->get('/pasangan-heavenly')->assertOk()->assertSee('Amiri', false)->assertSee('Celestial Night');
+
+        $undanganPrivasi = Undangan::where('slug', 'pasangan-royal')->firstOrFail();
+        $pengaturan = $undanganPrivasi->pengaturan ?? [];
+        $pengaturan['tanpa_foto'] = true;
+        $pengaturan['gaya_font'] = 'editorial_gilda';
+        $undanganPrivasi->update(['pengaturan' => $pengaturan]);
+
+        $this->get('/pasangan-royal')
+            ->assertOk()
+            ->assertSee('Gilda+Display', false)
+            ->assertDontSee('mempelai-pria.webp')
+            ->assertDontSee('galeri-1.webp');
     }
 
     public function test_undangan_draft_menampilkan_banner_pratinjau_dan_expired_menampilkan_halaman_kedaluwarsa(): void

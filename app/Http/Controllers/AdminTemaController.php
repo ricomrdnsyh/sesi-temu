@@ -34,7 +34,7 @@ class AdminTemaController extends Controller
         $tervalidasi = $request->validate([
             'nama_tema' => ['required', 'string', 'max:120'],
             'slug' => ['nullable', 'string', 'max:120'],
-            'kategori' => ['required', Rule::in(['modern', 'adat', 'islami'])],
+            'kategori' => ['required', Rule::in(array_keys(Tema::KATEGORI_TERSEDIA))],
             'lokasi_view' => ['required', 'string', 'max:150'],
             'gambar_pratinjau' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
@@ -79,7 +79,7 @@ class AdminTemaController extends Controller
         $tervalidasi = $request->validate([
             'nama_tema' => ['required', 'string', 'max:120'],
             'slug' => ['nullable', 'string', 'max:120'],
-            'kategori' => ['required', Rule::in(['modern', 'adat', 'islami'])],
+            'kategori' => ['required', Rule::in(array_keys(Tema::KATEGORI_TERSEDIA))],
             'lokasi_view' => ['required', 'string', 'max:150'],
             'gambar_pratinjau' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);

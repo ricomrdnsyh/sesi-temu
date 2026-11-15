@@ -5,9 +5,18 @@
 @section('konten')
 <div class="min-h-screen flex items-center justify-center bg-ivory px-4 py-16">
     <div class="max-w-lg w-full rounded-2xl bg-white p-8 sm:p-10 text-center shadow-sm ring-1 ring-champagne/25 space-y-5">
-        <span class="inline-block rounded-full bg-amber-100 px-3.5 py-1 text-xs font-semibold text-amber-800">
-            Undangan Nonaktif
-        </span>
+        <a href="{{ route('beranda') }}" class="inline-block">
+            <img
+                src="{{ asset('aset-demo/logo-sesi-temu-lengkap.webp') }}"
+                alt="Logo SesiTemu"
+                class="h-20 w-auto mx-auto object-contain"
+            >
+        </a>
+        <div>
+            <span class="inline-block rounded-full bg-amber-100 px-3.5 py-1 text-xs font-semibold text-amber-800">
+                Undangan Nonaktif
+            </span>
+        </div>
         <h1 class="font-serif text-3xl font-bold text-charcoal">Masa Aktif Undangan Telah Berakhir</h1>
         <p class="text-sm text-charcoal/70 leading-relaxed">
             Mohon maaf, masa aktif undangan digital untuk pasangan

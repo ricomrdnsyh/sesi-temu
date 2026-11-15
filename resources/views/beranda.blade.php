@@ -9,21 +9,35 @@
     temaDemoSlug: '',
     temaDemoNama: '',
     namaTamuDemo: 'Budi Santoso & Partner',
+    tanpaFotoDemo: false,
+    fontDemo: 'bawaan',
     bukaModalDemo(slug, nama) {
         this.temaDemoSlug = slug;
         this.temaDemoNama = nama;
+        this.tanpaFotoDemo = false;
+        this.fontDemo = 'bawaan';
         this.modalDemoTerbuka = true;
     },
     bukaUrlDemo() {
         const nama = encodeURIComponent(this.namaTamuDemo.trim() || 'Budi Santoso & Partner');
-        window.open('/demo/' + this.temaDemoSlug + '?to=' + nama, '_blank');
+        const params = new URLSearchParams({
+            to: this.namaTamuDemo.trim() || 'Budi Santoso & Partner',
+            tf: this.tanpaFotoDemo ? '1' : '0',
+            font: this.fontDemo || 'bawaan',
+        });
+        window.open('/demo/' + this.temaDemoSlug + '?' + params.toString(), '_blank');
         this.modalDemoTerbuka = false;
     }
 }">
     {{-- Header / Navbar --}}
     <header class="sticky top-0 z-40 bg-ivory/90 backdrop-blur border-b border-champagne/20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="{{ route('beranda') }}" class="flex items-center gap-2">
+            <a href="{{ route('beranda') }}" class="flex items-center gap-2.5 group">
+                <img
+                    src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}"
+                    alt="Logo SesiTemu"
+                    class="h-10 w-10 object-contain transition-transform duration-200 group-hover:scale-105"
+                >
                 <span class="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-charcoal">
                     Sesi<span class="text-champagne">Temu</span>
                 </span>
@@ -159,7 +173,7 @@
 
                 {{-- Filter Tab Kategori --}}
                 <div class="flex flex-wrap gap-2">
-                    @foreach (['semua' => 'Semua', 'modern' => 'Modern', 'adat' => 'Adat', 'islami' => 'Islami'] as $kode => $label)
+                    @foreach (['semua' => 'Semua', 'modern' => 'Modern', 'luxury' => 'Luxury', 'motion' => 'Motion', 'adat' => 'Adat', 'islami' => 'Islami'] as $kode => $label)
                         <button
                             type="button"
                             @click="kategoriAktif = '{{ $kode }}'"
@@ -174,6 +188,7 @@
 
             <div class="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @forelse ($daftarTema as $tema)
+                    @php $infoDesain = $tema->infoDesain(); @endphp
                     <div
                         x-show="kategoriAktif === 'semua' || kategoriAktif === '{{ $tema->kategori }}'"
                         x-transition
@@ -191,15 +206,24 @@
                                     {{ $tema->nama_tema }}
                                 </div>
                             @endif
-                            <span class="absolute top-3 left-3 rounded-full bg-white/90 backdrop-blur px-3 py-1 text-xs font-semibold uppercase tracking-wider text-charcoal">
-                                {{ ucfirst($tema->kategori) }}
+                            <span class="absolute top-3 left-3 rounded-full bg-white/95 backdrop-blur px-3 py-1 text-xs font-semibold uppercase tracking-wider text-charcoal shadow-sm">
+                                {{ $tema->kategoriLabel() }}
                             </span>
+                            @if ($infoDesain['dukungan_tf'])
+                                <span class="absolute top-3 right-3 rounded-full bg-charcoal/85 backdrop-blur px-2.5 py-1 text-[11px] font-medium text-ivory">
+                                    Support Tanpa Foto (TF)
+                                </span>
+                            @endif
                         </div>
 
                         <div class="p-6 flex-1 flex flex-col justify-between">
                             <div>
-                                <h3 class="font-serif text-2xl font-bold text-charcoal">{{ $tema->nama_tema }}</h3>
-                                <p class="mt-1 text-sm text-charcoal/65">Animasi sampul interaktif, musik latar, galeri lightbox, RSVP, dan amplop digital.</p>
+                                <div class="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-champagne">
+                                    <span class="inline-block w-2 h-2 rounded-full" style="background-color: {{ $infoDesain['warna_aksen'] }}"></span>
+                                    <span>{{ $infoDesain['font_label'] }}</span>
+                                </div>
+                                <h3 class="mt-1.5 font-serif text-2xl font-bold text-charcoal">{{ $tema->nama_tema }}</h3>
+                                <p class="mt-1.5 text-sm text-charcoal/65 leading-relaxed">{{ $infoDesain['deskripsi'] }}</p>
                             </div>
 
                             <div class="mt-6 flex items-center gap-3">
@@ -302,7 +326,14 @@
 
     {{-- Footer --}}
     <footer class="py-10 px-4 sm:px-6 lg:px-8 border-t border-champagne/20 bg-ivory text-center text-sm text-charcoal/65">
-        <p class="font-serif text-lg font-semibold text-charcoal">SesiTemu.id</p>
+        <a href="{{ route('beranda') }}" class="inline-flex flex-col items-center">
+            <img
+                src="{{ asset('aset-demo/logo-sesi-temu-lengkap.webp') }}"
+                alt="Logo SesiTemu"
+                class="h-20 w-auto object-contain mb-2"
+            >
+            <span class="text-xs font-semibold tracking-widest uppercase text-charcoal/70">SesiTemu.id</span>
+        </a>
         <p class="mt-1">Abadikan Setiap Sesi Bahagia Menuju Hari Pertemuan &copy; {{ now()->format('Y') }}</p>
     </footer>
 
@@ -319,14 +350,38 @@
                 Masukkan nama tamu contoh untuk melihat tampilan sampul tema <span class="font-semibold text-sage" x-text="temaDemoNama"></span>.
             </p>
 
-            <div class="mt-4">
-                <label for="nama_tamu_demo" class="block text-sm font-medium text-charcoal">Nama Tamu Undangan</label>
-                <input
-                    id="nama_tamu_demo"
-                    type="text"
-                    x-model="namaTamuDemo"
-                    class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/70 px-4 py-2.5 text-sm text-charcoal focus:border-champagne focus:bg-white focus:outline-none focus:ring-2 focus:ring-champagne/25"
-                >
+            <div class="mt-4 space-y-4">
+                <div>
+                    <label for="nama_tamu_demo" class="block text-sm font-medium text-charcoal">Nama Tamu Undangan</label>
+                    <input
+                        id="nama_tamu_demo"
+                        type="text"
+                        x-model="namaTamuDemo"
+                        class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/70 px-4 py-2.5 text-sm text-charcoal focus:border-champagne focus:bg-white focus:outline-none focus:ring-2 focus:ring-champagne/25"
+                    >
+                </div>
+
+                <div>
+                    <label for="font_demo" class="block text-sm font-medium text-charcoal">Desain Tipografi (Font)</label>
+                    <select
+                        id="font_demo"
+                        x-model="fontDemo"
+                        class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/70 px-4 py-2.5 text-sm text-charcoal focus:border-champagne focus:bg-white focus:outline-none focus:ring-2 focus:ring-champagne/25"
+                    >
+                        @foreach (\App\Models\Undangan::GAYA_FONT_TERSEDIA as $kodeFont => $infoFont)
+                            <option value="{{ $kodeFont }}">{{ $infoFont['label'] }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <label class="flex items-center gap-2.5 rounded-xl border border-champagne/30 bg-ivory/60 px-3.5 py-2.5 text-sm text-charcoal cursor-pointer">
+                    <input
+                        type="checkbox"
+                        x-model="tanpaFotoDemo"
+                        class="rounded border-charcoal/25 text-sage focus:ring-sage"
+                    >
+                    <span>Pratinjau Mode Tanpa Foto (TF / Monogram)</span>
+                </label>
             </div>
 
             <div class="mt-6 flex items-center justify-end gap-3">

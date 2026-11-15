@@ -58,6 +58,13 @@
                 <a href="{{ auth()->user()->adalahAdmin() ? route('admin.undangan.index') : route('dasbor.index') }}" class="rounded-xl border border-charcoal/15 px-3 py-1.5 text-xs font-semibold text-charcoal hover:bg-ivory transition shrink-0">
                     ← Kembali
                 </a>
+                <a href="{{ route('beranda') }}" title="Beranda SesiTemu" class="hidden sm:inline-flex items-center shrink-0">
+                    <img
+                        src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}"
+                        alt="Logo SesiTemu"
+                        class="h-8 w-8 object-contain"
+                    >
+                </a>
                 <div class="truncate">
                     <h1 class="font-serif text-lg sm:text-xl font-bold text-charcoal truncate">
                         {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}
@@ -139,7 +146,7 @@
                         <select id="tema_id" name="tema_id" class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none">
                             @foreach ($daftarTema as $tema)
                                 <option value="{{ $tema->id }}" @selected($undangan->tema_id === $tema->id)>
-                                    {{ $tema->nama_tema }} ({{ ucfirst($tema->kategori) }})
+                                    {{ $tema->nama_tema }} ({{ $tema->kategoriLabel() }})
                                 </option>
                             @endforeach
                         </select>
@@ -163,7 +170,19 @@
                         @endif
                     </div>
 
-                    <div class="md:col-span-2">
+                    <div>
+                        <label for="gaya_font" class="block text-sm font-medium text-charcoal">Desain Tipografi (Font Undangan)</label>
+                        <select id="gaya_font" name="gaya_font" class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none">
+                            @foreach ($daftarGayaFont as $kodeFont => $infoFont)
+                                <option value="{{ $kodeFont }}" @selected($undangan->kodeGayaFontTerpilih() === $kodeFont)>
+                                    {{ $infoFont['label'] }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="mt-1 text-xs text-charcoal/60">Pilih kombinasi font klasik, editorial, kaligrafi, atau bawaan tema.</p>
+                    </div>
+
+                    <div>
                         <label for="musik_latar" class="block text-sm font-medium text-charcoal">Musik Latar Undangan</label>
                         <select id="musik_latar" name="musik_latar" class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none">
                             <option value="">-- Tanpa Musik Latar --</option>
@@ -173,6 +192,22 @@
                                 </option>
                             @endforeach
                         </select>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="flex items-start gap-3 rounded-2xl border border-champagne/35 bg-ivory/80 px-4 py-3.5 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="tanpa_foto"
+                                value="1"
+                                @checked($undangan->modeTanpaFoto())
+                                class="mt-0.5 rounded border-charcoal/25 text-sage focus:ring-sage"
+                            >
+                            <span>
+                                <span class="block text-sm font-semibold text-charcoal">Mode Tanpa Foto (TF / Monogram Privasi)</span>
+                                <span class="block text-xs text-charcoal/65 mt-0.5">Sembunyikan potret kedua mempelai &amp; galeri foto; gantikan dengan inisial monogram elegan (seperti variasi TF pada katalog).</span>
+                            </span>
+                        </label>
                     </div>
                 </div>
 

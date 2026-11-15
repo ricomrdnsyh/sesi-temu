@@ -66,7 +66,13 @@ class HalamanUtamaController extends Controller
             $namaTamu = 'Budi Santoso & Partner';
         }
 
-        $undangan = $this->buatUndanganDemoInMemory($tema);
+        $tanpaFoto = $request->boolean('tf');
+        $gayaFont = (string) $request->query('font', 'bawaan');
+        if (! array_key_exists($gayaFont, Undangan::GAYA_FONT_TERSEDIA)) {
+            $gayaFont = 'bawaan';
+        }
+
+        $undangan = $this->buatUndanganDemoInMemory($tema, $tanpaFoto, $gayaFont);
 
         return view($tema->lokasi_view, [
             'undangan' => $undangan,
@@ -76,11 +82,14 @@ class HalamanUtamaController extends Controller
         ]);
     }
 
-    private function buatUndanganDemoInMemory(Tema $tema): Undangan
-    {
+    private function buatUndanganDemoInMemory(
+        Tema $tema,
+        bool $tanpaFoto = false,
+        string $gayaFont = 'bawaan'
+    ): Undangan {
         $musikBawaan = match ($tema->slug) {
-            'adat-jawa' => 'musik/gamelan-lembut.mp3',
-            'islami-syari' => 'musik/instrumen-islami.mp3',
+            'adat-jawa', 'sunda-heritage' => 'musik/gamelan-lembut.mp3',
+            'islami-syari', 'islamic-heavenly' => 'musik/instrumen-islami.mp3',
             default => 'musik/romantis-akustik.mp3',
         };
 
@@ -100,6 +109,8 @@ class HalamanUtamaController extends Controller
             'kutipan_ayat' => 'Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan hidup dari jenismu sendiri, supaya kamu merasa tenteram di sampingnya. (QS. Ar-Rum: 21)',
             'musik_latar' => $musikBawaan,
             'pengaturan' => [
+                'gaya_font' => $gayaFont,
+                'tanpa_foto' => $tanpaFoto,
                 'cerita_cinta' => [
                     [
                         'judul' => 'Pertama Bertemu',

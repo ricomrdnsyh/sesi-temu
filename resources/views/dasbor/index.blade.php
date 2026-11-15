@@ -8,8 +8,13 @@
     <header class="bg-white border-b border-champagne/20 sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-6">
-                <a href="{{ route('beranda') }}" class="font-serif text-2xl font-bold text-charcoal">
-                    Sesi<span class="text-champagne">Temu</span>
+                <a href="{{ route('beranda') }}" class="flex items-center gap-2 font-serif text-2xl font-bold text-charcoal">
+                    <img
+                        src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}"
+                        alt="Logo SesiTemu"
+                        class="h-9 w-9 object-contain"
+                    >
+                    <span>Sesi<span class="text-champagne">Temu</span></span>
                 </a>
                 <span class="hidden sm:inline-block text-xs font-semibold uppercase tracking-wider text-sage bg-sage/10 px-3 py-1 rounded-full">
                     Dasbor Undangan
