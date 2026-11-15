@@ -1,12 +1,13 @@
 <?php
 
 use App\Http\Controllers\AutentikasiController;
+use App\Http\Controllers\HalamanUtamaController;
 use Illuminate\Support\Facades\Route;
 
-// 1. Landing Page sementara (akan diganti HalamanUtamaController di Tahap 3)
-Route::get('/', function () {
-    return view('welcome');
-})->name('beranda');
+// 1. Landing Page, Cek Link, & Live Demo
+Route::get('/', [HalamanUtamaController::class, 'beranda'])->name('beranda');
+Route::post('/cek-link', [HalamanUtamaController::class, 'cekLink'])->name('cek.link');
+Route::get('/demo/{slugTema}', [HalamanUtamaController::class, 'demoTema'])->name('tema.demo');
 
 // 2. Autentikasi Pengguna (Tanpa Breeze)
 Route::middleware('guest')->group(function (): void {
