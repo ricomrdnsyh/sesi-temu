@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminTemaController;
 use App\Http\Controllers\AutentikasiController;
 use App\Http\Controllers\DasborUndanganController;
 use App\Http\Controllers\HalamanUtamaController;
+use App\Http\Controllers\UndanganPublikController;
 use App\Http\Middleware\PastikanAdmin;
 use Illuminate\Support\Facades\Route;
 
@@ -58,3 +59,12 @@ Route::middleware(['auth', PastikanAdmin::class])->prefix('admin')->name('admin.
     Route::get('/pengguna', [AdminController::class, 'daftarPengguna'])->name('pengguna.index');
     Route::patch('/pengguna/{pengguna}/reset-sandi', [AdminController::class, 'resetSandiPengguna'])->name('pengguna.reset-sandi');
 });
+
+// 5. Route Publik Undangan & Buku Tamu (WAJIB DI BARIS PALING BAWAH)
+Route::post('/{slug}/buku-tamu', [UndanganPublikController::class, 'simpanUcapan'])
+    ->middleware('throttle:5,1')
+    ->name('undangan.ucapan');
+
+Route::get('/{slug}', [UndanganPublikController::class, 'tampil'])
+    ->where('slug', '[a-z0-9-]+')
+    ->name('undangan.tampil');
