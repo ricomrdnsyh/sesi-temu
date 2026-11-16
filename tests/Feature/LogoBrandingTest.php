@@ -163,6 +163,23 @@ class LogoBrandingTest extends TestCase
     {
         $admin = Pengguna::factory()->admin()->create();
         $client = Pengguna::factory()->create(['peran' => 'client']);
+        $tema = Tema::create([
+            'nama_tema' => 'Rustic Floral',
+            'slug' => 'rustic-floral-uji',
+            'kategori' => 'modern',
+            'lokasi_view' => 'tema.rustic-floral.index',
+            'aktif' => true,
+        ]);
+        $undangan = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $tema->id,
+            'slug' => 'uji-preview-undangan',
+            'nama_panggilan_pria' => 'Dimas',
+            'nama_lengkap_pria' => 'Dimas Aditya',
+            'nama_panggilan_wanita' => 'Rani',
+            'nama_lengkap_wanita' => 'Rani Kusuma',
+            'status_publikasi' => true,
+        ]);
 
         foreach ([
             '/admin' => 'data-page-length="5"',
@@ -182,6 +199,16 @@ class LogoBrandingTest extends TestCase
                 '/<thead>\s*<tr[^>]*>\s*<th[^>]*data-no-sort[^>]*dt-center text-center[^>]*>Aksi<\/th>/s',
                 $konten
             );
+        }
+
+        foreach (['/admin', '/admin/undangan'] as $ruteUndangan) {
+            $this->actingAs($admin)
+                ->get($ruteUndangan)
+                ->assertOk()
+                ->assertSee('title="Preview Undangan"', false)
+                ->assertSee('<span>Preview</span>', false)
+                ->assertSee('<span>Edit Isian</span>', false)
+                ->assertSee($undangan->slug);
         }
 
         $this->actingAs($admin)

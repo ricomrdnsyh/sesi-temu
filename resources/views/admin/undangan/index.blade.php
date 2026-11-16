@@ -49,6 +49,19 @@
                     <td class="py-3.5 dt-center text-center whitespace-nowrap">
                         <div class="inline-flex items-center justify-center gap-1.5">
                             <a
+                                href="{{ $urlPublik }}"
+                                target="_blank"
+                                rel="noopener"
+                                title="Preview Undangan"
+                                class="inline-flex items-center gap-1.5 rounded-lg border border-charcoal/15 bg-white px-2.5 py-1.5 text-xs font-semibold text-charcoal hover:border-sage/40 hover:bg-sage/5 hover:text-sage transition"
+                            >
+                                <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                <span>Preview</span>
+                            </a>
+                            <a
                                 href="{{ route('dasbor.undangan.kelola', $undangan) }}"
                                 title="Edit Isian Client"
                                 class="inline-flex items-center gap-1.5 rounded-lg border border-champagne/50 bg-champagne/10 px-2.5 py-1.5 text-xs font-semibold text-charcoal hover:bg-champagne/25 transition"
