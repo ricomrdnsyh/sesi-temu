@@ -120,7 +120,6 @@ class LogoBrandingTest extends TestCase
                 ->assertSee('aria-label="Navigasi Panel Admin"', false)
                 ->assertSee('aria-label="Header Panel Admin"', false)
                 ->assertSee('MAIN')
-                ->assertSee('Dasbor Client')
                 ->assertSee('Administrator')
                 ->assertDontSee('flex-1 max-w-7xl', false);
 
@@ -153,6 +152,9 @@ class LogoBrandingTest extends TestCase
                 $this->assertSame(1, substr_count($cocokSidebar[0], '<span>Undangan</span>'));
                 $this->assertSame(1, substr_count($cocokSidebar[0], 'Katalog Tema'));
                 $this->assertStringNotContainsString('>Ringkasan<', $cocokSidebar[0]);
+                $this->assertStringNotContainsString('Pintasan', $cocokSidebar[0]);
+                $this->assertStringNotContainsString('Lihat Beranda', $cocokSidebar[0]);
+                $this->assertStringNotContainsString('Dasbor Client', $cocokSidebar[0]);
                 $this->assertStringNotContainsString('menuProfilTerbuka', $cocokSidebar[0]);
                 $this->assertStringContainsString('h-16 shrink-0 px-5 border-b border-champagne/25 flex items-center justify-center', $cocokSidebar[0]);
                 $this->assertStringContainsString('Keluar', $cocokSidebar[0]);
