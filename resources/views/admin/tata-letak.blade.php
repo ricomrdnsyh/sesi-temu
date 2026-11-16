@@ -10,7 +10,7 @@
         request()->routeIs('admin.undangan.*') => 'Undangan',
         request()->routeIs('admin.tema.*') => 'Katalog Tema',
         request()->routeIs('admin.pengguna.*') => 'Pengguna',
-        default => 'Ringkasan',
+        default => 'Dashboard',
     };
 
     $namaAdmin = auth()->user()?->nama ?? 'Administrator';
@@ -83,10 +83,10 @@
                     href="{{ route('admin.ringkasan') }}"
                     class="flex items-center gap-3 rounded-xl px-3.5 py-2.5 transition {{ request()->routeIs('admin.ringkasan') ? 'bg-champagne text-charcoal font-semibold shadow-sm' : 'text-ivory/80 hover:bg-white/10 hover:text-white' }}"
                 >
-                    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M3 3a2 2 0 0 1 2-2h3a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3Zm8-1a1 1 0 0 1 1-1h5a2 2 0 0 1 2 2v5a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1V2Zm-9 9a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v5a2 2 0 0 1-2 2H3a1 1 0 0 1-1-1v-6Zm10 0a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v4a2 2 0 0 1-2 2h-4a1 1 0 0 1-1-1v-5Z" />
                     </svg>
-                    <span>Ringkasan</span>
+                    <span>Dashboard</span>
                 </a>
 
                 <a

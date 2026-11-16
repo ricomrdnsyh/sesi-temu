@@ -133,6 +133,8 @@ class LogoBrandingTest extends TestCase
                 $this->assertStringContainsString($admin->nama, $cocokSidebar[0]);
                 $this->assertStringContainsString('Administrator', $cocokSidebar[0]);
                 $this->assertStringContainsString('MAIN', $cocokSidebar[0]);
+                $this->assertStringContainsString('Dashboard', $cocokSidebar[0]);
+                $this->assertStringNotContainsString('>Ringkasan<', $cocokSidebar[0]);
                 $this->assertStringContainsString('h-16 shrink-0 px-5 border-b border-champagne/25 flex items-center justify-center', $cocokSidebar[0]);
                 $this->assertStringContainsString('Keluar', $cocokSidebar[0]);
                 $this->assertStringContainsString('border-ivory/25', $cocokSidebar[0]);
@@ -142,5 +144,14 @@ class LogoBrandingTest extends TestCase
                 $this->fail('Sidebar panel admin tidak ditemukan pada '.$ruteAdmin);
             }
         }
+
+        $this->actingAs($admin)
+            ->get('/admin')
+            ->assertOk()
+            ->assertSee('Dashboard Admin — SesiTemu')
+            ->assertSee('Total Client')
+            ->assertSee('Draft Aktivasi')
+            ->assertSee('Ucapan &amp; RSVP', false)
+            ->assertSee('Pintasan Cepat');
     }
 }

@@ -261,8 +261,8 @@ class Tahap4DasborAdminWebpTest extends TestCase
         // Client ditolak masuk admin
         $this->actingAs($client)->get('/admin')->assertForbidden();
 
-        // Admin akses ringkasan, daftar undangan, tema, dan pengguna
-        $this->actingAs($admin)->get('/admin')->assertOk()->assertSee('Ringkasan');
+        // Admin akses dashboard, daftar undangan, tema, dan pengguna
+        $this->actingAs($admin)->get('/admin')->assertOk()->assertSee('Dashboard');
         $this->actingAs($admin)->get('/admin/undangan')->assertOk()->assertSee('draft-client');
         $this->actingAs($admin)->get('/admin/tema')->assertOk()->assertSee('Rustic Floral');
         $this->actingAs($admin)->get('/admin/tema/create')->assertOk()->assertSee('Tambah Tema Baru');

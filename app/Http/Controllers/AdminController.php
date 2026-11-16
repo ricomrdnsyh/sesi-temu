@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BukuTamu;
 use App\Models\Pengguna;
 use App\Models\Tema;
 use App\Models\Undangan;
@@ -31,6 +32,8 @@ class AdminController extends Controller
             ->where('berlaku_sampai', '<', now())
             ->count();
 
+        $totalUcapan = BukuTamu::count();
+
         $undanganTerbaru = Undangan::with(['pengguna', 'tema'])
             ->latest()
             ->limit(5)
@@ -42,6 +45,7 @@ class AdminController extends Controller
             'totalUndanganAktif' => $totalUndanganAktif,
             'totalDraft' => $totalDraft,
             'totalKedaluwarsa' => $totalKedaluwarsa,
+            'totalUcapan' => $totalUcapan,
             'undanganTerbaru' => $undanganTerbaru,
         ]);
     }
