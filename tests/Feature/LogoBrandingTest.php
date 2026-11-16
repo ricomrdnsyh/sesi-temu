@@ -92,4 +92,22 @@ class LogoBrandingTest extends TestCase
             ->assertSee('favicon.png', false)
             ->assertSee('logo-sesi-temu-ikon.webp', false);
     }
+
+    /**
+     * Memastikan tata letak panel admin menggunakan sidebar penuh tanpa navbar atas.
+     */
+    public function test_tampilan_admin_menggunakan_sidebar_tanpa_navbar_atas(): void
+    {
+        $admin = Pengguna::factory()->admin()->create();
+
+        foreach (['/admin', '/admin/undangan', '/admin/tema', '/admin/pengguna'] as $ruteAdmin) {
+            $this->actingAs($admin)
+                ->get($ruteAdmin)
+                ->assertOk()
+                ->assertSee('aria-label="Navigasi Panel Admin"', false)
+                ->assertSee('Menu Utama')
+                ->assertSee('Dasbor Client')
+                ->assertDontSee('<header', false);
+        }
+    }
 }
