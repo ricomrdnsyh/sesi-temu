@@ -58,7 +58,7 @@
                     alt="Logo SesiTemu"
                     class="h-10 w-10 object-contain transition-transform duration-200 group-hover:scale-105"
                 >
-                <span class="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-charcoal">
+                <span class="font-logo text-2xl sm:text-3xl font-bold tracking-tight text-[#1D3B2C] leading-none">
                     Sesi<span class="text-champagne">Temu</span>
                 </span>
             </a>

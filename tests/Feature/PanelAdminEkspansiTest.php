@@ -627,8 +627,17 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSee('data-client-bottom-nav', false)
             ->assertSee('md:hidden fixed bottom-0', false)
             ->assertSee('pb-28 md:py-8', false)
+            ->assertSee('font-logo', false)
+            ->assertSee('Pilihan Tema Favorit')
             ->assertSee('Buat Draft')
             ->assertSee('data-client-nav="profil"', false);
+
+        $clientKosong = Pengguna::factory()->create(['peran' => 'client']);
+        $this->actingAs($clientKosong)
+            ->get('/dasbor')
+            ->assertOk()
+            ->assertSee('Wujudkan Undangan Digital Impian')
+            ->assertSee('Pilih Tema Desain');
 
         $this->actingAs($client)
             ->get('/dasbor/profil')

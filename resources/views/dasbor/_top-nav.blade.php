@@ -8,13 +8,15 @@
 <header class="bg-white/95 backdrop-blur-md border-b border-champagne/20 sticky top-0 z-30">
     <div class="{{ $lebarKontainer }} mx-auto px-4 sm:px-6 lg:px-8 h-14 md:h-16 flex items-center justify-between gap-3">
         <div class="flex items-center gap-3 md:gap-6 min-w-0">
-            <a href="{{ route('beranda') }}" class="flex items-center gap-2 font-serif text-xl md:text-2xl font-bold text-charcoal shrink-0">
+            <a href="{{ route('beranda') }}" class="flex items-center gap-2 text-charcoal shrink-0 group">
                 <img
                     src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}"
                     alt="Logo SesiTemu"
-                    class="h-8 w-8 md:h-9 md:w-9 object-contain"
+                    class="h-8 w-8 md:h-9 md:w-9 object-contain transition-transform duration-200 group-hover:scale-105"
                 >
-                <span class="{{ $judulMobile ? 'hidden sm:inline' : '' }}">Sesi<span class="text-champagne">Temu</span></span>
+                <span class="{{ $judulMobile ? 'hidden sm:inline' : '' }} font-logo text-[22px] md:text-[26px] font-bold tracking-tight text-[#1D3B2C] leading-none">
+                    Sesi<span class="text-champagne">Temu</span>
+                </span>
             </a>
 
             @if ($judulMobile)

@@ -36,6 +36,10 @@
     display: none;
 }
 
+.font-logo {
+    font-family: 'Playfair Display', Georgia, serif;
+}
+
 /* SesiTemu Admin DataTables Theme */
 div.dt-container {
     --dt-header_border: 1px solid rgba(191, 161, 95, 0.22);

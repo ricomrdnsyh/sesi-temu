@@ -8,7 +8,7 @@
             <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ route('beranda') }}" title="SesiTemu" class="inline-flex items-center gap-1.5 rounded-full bg-[#FBF3E6] px-2 py-0.5 text-charcoal shrink-0">
                     <img src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}" alt="Logo SesiTemu" class="h-4 w-4 object-contain">
-                    <span class="text-[11px] font-bold tracking-tight">SesiTemu</span>
+                    <span class="font-logo text-xs font-bold tracking-tight text-[#1D3B2C]">Sesi<span class="text-champagne">Temu</span></span>
                 </a>
                 <span class="rounded-full bg-champagne px-2.5 py-0.5 text-[11px] font-bold uppercase text-charcoal">Live Demo</span>
                 <span>Tema: <strong>{{ $undangan->tema?->nama_tema }}</strong></span>
