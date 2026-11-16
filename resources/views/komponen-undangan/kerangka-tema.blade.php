@@ -146,21 +146,13 @@
             <div aria-hidden="true" class="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30rem] h-[30rem] rounded-full bg-[#F3E5AB]/10 blur-3xl"></div>
 
             @if ($ornamenUrl)
-                {{-- Layer Z-3: Ornamen Foreground Transparan 4 Sudut --}}
-                <div class="lapis-3d pointer-events-none absolute -top-2 {{ $ornamenGantung ? 'left-6' : '-left-3' }} z-20" style="--depth: 26px; --pz: 42px;">
-                    <img src="{{ $ornamenUrl }}" alt="" class="{{ $ukuranOrnamenPanggung }} opacity-90 drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] animasi-ayun-3d">
+                {{-- Layer Z-3: Ornamen Foreground Transparan di Sudut Atas Stage --}}
+                <div class="lapis-3d pointer-events-none absolute {{ $ornamenGantung ? 'top-14 left-6' : 'top-16 left-4' }} z-20" style="--depth: 26px; --pz: 42px;">
+                    <img src="{{ $ornamenUrl }}" alt="" class="{{ $ornamenGantung ? 'w-16 xl:w-20' : 'w-28 xl:w-36' }} opacity-90 drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] animasi-ayun-3d">
                 </div>
-                <div class="lapis-3d pointer-events-none absolute -top-2 {{ $ornamenGantung ? 'right-6' : '-right-3' }} z-20" style="--depth: 26px; --pz: 42px;">
-                    <img src="{{ $ornamenUrl }}" alt="" class="{{ $ukuranOrnamenPanggung }} opacity-90 drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] animasi-ayun-3d-balik">
+                <div class="lapis-3d pointer-events-none absolute {{ $ornamenGantung ? 'top-14 right-6' : 'top-16 right-4' }} z-20" style="--depth: 26px; --pz: 42px;">
+                    <img src="{{ $ornamenUrl }}" alt="" class="{{ $ornamenGantung ? 'w-16 xl:w-20' : 'w-28 xl:w-36' }} opacity-90 drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] animasi-ayun-3d-balik">
                 </div>
-                @if (! $ornamenGantung)
-                    <div class="lapis-3d pointer-events-none absolute -bottom-5 -left-4 z-20" style="--depth: 34px; --pz: 56px;">
-                        <img src="{{ $ornamenUrl }}" alt="" class="w-36 xl:w-44 opacity-80 drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] rotate-12 animasi-ayun-3d">
-                    </div>
-                    <div class="lapis-3d pointer-events-none absolute -bottom-5 -right-4 z-20" style="--depth: 34px; --pz: 56px;">
-                        <img src="{{ $ornamenUrl }}" alt="" class="w-36 xl:w-44 opacity-80 drop-shadow-[0_18px_30px_rgba(0,0,0,0.45)] -rotate-12 animasi-ayun-3d-balik">
-                    </div>
-                @endif
             @endif
 
             @if ($sudutEditorial)
@@ -185,6 +177,9 @@
             {{-- Layer Z-2: Tipografi Pasangan Mengambang --}}
             <div class="lapis-3d relative z-10 w-full flex flex-col items-center justify-center text-center px-10 pb-20 xl:px-14 text-white" style="--depth: 10px; --pz: 24px;">
                 <div class="max-w-xl space-y-3">
+                    @if ($ornamenUrl && ! $ornamenGantung)
+                        <img src="{{ $ornamenUrl }}" alt="" class="w-20 xl:w-24 mx-auto mb-1 opacity-95 drop-shadow-[0_12px_20px_rgba(0,0,0,0.45)] animasi-ayun-3d">
+                    @endif
                     @if ($bismillahHeader)
                         <p class="text-base sm:text-lg text-[#F3E5AB]/95 tracking-wide drop-shadow" style="font-family: 'Amiri', serif;">
                             بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
@@ -208,7 +203,7 @@
         </aside>
 
         {{-- KOLOM UNDANGAN MOBILE-FIRST PORTRAIT --}}
-        <div data-panggung-3d class="w-full lg:w-[445px] xl:w-[475px] shrink-0 min-h-screen relative overflow-x-clip shadow-2xl border-l {{ $kelasBatas }} panggung-3d">
+        <div class="w-full lg:w-[445px] xl:w-[475px] shrink-0 min-h-screen relative overflow-x-clip shadow-2xl border-l {{ $kelasBatas }}">
             @if ($tampilScrollProgress)
                 <div aria-hidden="true" x-show="undanganTerbuka" x-cloak class="fixed top-0 lg:left-auto lg:w-[445px] xl:w-[475px] left-0 right-0 z-[60] h-[3px] bg-black/15">
                     <div class="h-full transition-all duration-150 {{ $kelasProgres }}" :style="'width: ' + scrollPersen + '%'"></div>
@@ -229,60 +224,76 @@
             >
 
             @if ($ornamenUrl)
-                <img src="{{ $ornamenUrl }}" alt="" class="pointer-events-none fixed {{ $ornamenGantung ? 'top-8 left-3 lg:left-auto lg:right-[385px] xl:right-[410px]' : 'top-8 left-0 lg:left-auto lg:right-[335px] xl:right-[360px]' }} {{ $ukuranOrnamenMobile }} opacity-80 z-20 drop-shadow-xl animasi-ayun-3d">
-                @if (! $ornamenGantung)
-                    <img src="{{ $ornamenUrl }}" alt="" class="pointer-events-none fixed bottom-0 right-0 {{ $ukuranOrnamenMobile }} opacity-75 z-20 drop-shadow-xl animasi-ayun-3d-balik">
-                @endif
+                <img src="{{ $ornamenUrl }}" alt="" class="pointer-events-none fixed {{ !empty($modeDemo) ? 'top-16' : 'top-3' }} {{ $ornamenGantung ? 'left-3 lg:left-auto lg:right-[390px] xl:right-[418px] w-10 sm:w-12' : 'left-2 lg:left-auto lg:right-[345px] xl:right-[375px] w-16 sm:w-20' }} opacity-65 z-20 drop-shadow-lg animasi-ayun-3d">
+                <img src="{{ $ornamenUrl }}" alt="" class="pointer-events-none fixed {{ !empty($modeDemo) ? 'top-16' : 'top-3' }} {{ $ornamenGantung ? 'right-3 w-10 sm:w-12' : 'right-2 w-16 sm:w-20' }} opacity-65 z-20 drop-shadow-lg animasi-ayun-3d-balik">
             @endif
 
             {{-- COVER GATE DENGAN ANIMASI BUKA 3D SESUAI TIER & TEMA --}}
             <section
-                class="gerbang-3d fixed inset-0 lg:left-auto lg:w-[445px] xl:w-[475px] z-40 flex flex-col justify-between overflow-hidden {{ !empty($modeDemo) ? 'pt-14' : '' }} {{ $adalahLipatKatedral ? 'lipat-katedral-3d' : ($adalahHalamanEditorial ? 'halaman-editorial-3d' : 'transition-all duration-1000 ease-in-out') }}"
+                class="fixed inset-0 h-dvh lg:left-auto lg:w-[445px] xl:w-[475px] z-40 overflow-hidden {{ !empty($modeDemo) ? 'pt-14' : '' }}"
+                style="height: 100dvh;"
                 :class="undanganTerbuka ? 'pointer-events-none' : ''"
-                :style="undanganTerbuka ? '{{
-                    match (true) {
-                        $adalahLipatKatedral => 'transform: perspective(1600px) rotateX(78deg) translateY(-16%) scale(0.94); opacity: 0;',
-                        $adalahHalamanEditorial => 'transform: perspective(1800px) rotateY(-108deg); opacity: 0;',
-                        $adalahGerbangBelah => 'transform: scale(1.07) translateZ(36px); opacity: 0; transition-delay: 0.45s;',
-                        default => 'transform: perspective(1400px) translateY(-100%) rotateX(18deg); opacity: 0;',
-                    }
-                }}' : 'transform: perspective(1600px) translateY(0) scale(1) rotateX(0deg) rotateY(0deg); opacity: 1;'"
             >
-                <img
-                    src="{{ $gambarSampul }}"
-                    alt="{{ $altSampul }}"
-                    class="absolute inset-0 w-full h-full {{ $kelasImgSampul }} {{ $modeMonokrom ? 'grayscale' : '' }}"
-                >
-                <div class="absolute inset-0 {{ $overlaySampulAktif }}"></div>
-
-                @if ($ornamenUrl && ! $pakaiFotoSampul)
-                    <img src="{{ $ornamenUrl }}" alt="" class="pointer-events-none absolute -top-2 {{ $ornamenGantung ? 'left-4' : '-left-3' }} {{ $ukuranOrnamenMobile }} opacity-85 z-10 drop-shadow-xl animasi-ayun-3d">
-                    <img src="{{ $ornamenUrl }}" alt="" class="pointer-events-none absolute -top-2 {{ $ornamenGantung ? 'right-4' : '-right-3' }} {{ $ukuranOrnamenMobile }} opacity-85 z-10 drop-shadow-xl animasi-ayun-3d-balik">
-                @endif
-
-                @if ($adalahGerbangBelah)
-                    <div
-                        aria-hidden="true"
-                        class="panel-gerbang-kiri pointer-events-none absolute inset-y-0 left-0 w-1/2 z-10 border-r shadow-[10px_0_32px_rgba(0,0,0,0.45)] {{ $tiraiPanel }}"
-                        :style="undanganTerbuka ? 'transform: perspective(1800px) rotateY(-112deg); opacity: 0.1;' : 'transform: perspective(1800px) rotateY(0deg); opacity: 1;'"
-                    >
-                        <div class="absolute inset-3 border border-current/15"></div>
-                    </div>
-                    <div
-                        aria-hidden="true"
-                        class="panel-gerbang-kanan pointer-events-none absolute inset-y-0 right-0 w-1/2 z-10 border-l shadow-[-10px_0_32px_rgba(0,0,0,0.45)] {{ $tiraiPanel }}"
-                        :style="undanganTerbuka ? 'transform: perspective(1800px) rotateY(112deg); opacity: 0.1;' : 'transform: perspective(1800px) rotateY(0deg); opacity: 1;'"
-                    >
-                        <div class="absolute inset-3 border border-current/15"></div>
-                    </div>
-                @endif
-
-                @include('komponen-undangan.lapisan-motion', ['efekMotion' => $efekMotion, 'konteks' => 'sampul'])
-
                 <div
-                    class="relative z-20 px-6 {{ $pakaiFotoSampul ? 'pt-6 sm:pt-8 space-y-1.5' : 'pt-8 sm:pt-10 space-y-2.5' }} text-center transition-all duration-700"
-                    :style="undanganTerbuka && @js($adalahGerbangBelah) ? 'opacity: 0; transform: perspective(1000px) scale(0.92) translateZ(-30px);' : ''"
+                    class="gerbang-3d relative w-full h-full flex flex-col justify-between overflow-hidden {{ $adalahLipatKatedral ? 'lipat-katedral-3d' : ($adalahHalamanEditorial ? 'halaman-editorial-3d' : 'transition-all duration-1000 ease-in-out') }}"
+                    :style="undanganTerbuka ? '{{
+                        match (true) {
+                            $adalahLipatKatedral => 'transform: perspective(1600px) rotateX(78deg) translateY(-16%) scale(0.94); opacity: 0;',
+                            $adalahHalamanEditorial => 'transform: perspective(1800px) rotateY(-108deg); opacity: 0;',
+                            $adalahGerbangBelah => 'opacity: 0; transition: opacity 0.5s ease 0.65s;',
+                            default => 'transform: perspective(1400px) translateY(-100%) rotateX(18deg); opacity: 0;',
+                        }
+                    }}' : 'transform: perspective(1600px) translateY(0) scale(1) rotateX(0deg) rotateY(0deg); opacity: 1;'"
                 >
+                    @if (! $adalahGerbangBelah)
+                        <img
+                            src="{{ $gambarSampul }}"
+                            alt="{{ $altSampul }}"
+                            class="absolute inset-0 w-full h-full {{ $kelasImgSampul }} {{ $modeMonokrom ? 'grayscale' : '' }}"
+                        >
+                        <div class="absolute inset-0 {{ $overlaySampulAktif }}"></div>
+                    @endif
+
+                    @if ($adalahGerbangBelah)
+                        <div
+                            aria-hidden="true"
+                            class="panel-gerbang-kiri pointer-events-none absolute inset-y-0 left-0 w-1/2 z-10 overflow-hidden border-r border-[#F3E5AB]/40 shadow-[12px_0_32px_rgba(0,0,0,0.55)]"
+                            :style="undanganTerbuka ? 'transform: perspective(1800px) rotateY(-112deg); opacity: 0; transition: transform 1.15s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.45s ease 0.6s;' : 'transform: perspective(1800px) rotateY(0deg); opacity: 1;'"
+                        >
+                            <img
+                                src="{{ $gambarSampul }}"
+                                alt="{{ $altSampul }}"
+                                class="absolute inset-y-0 left-0 w-[200%] h-full max-w-none {{ $kelasImgSampul }} {{ $modeMonokrom ? 'grayscale' : '' }}"
+                            >
+                            <div class="absolute inset-0 {{ $overlaySampulAktif }}"></div>
+                            <div class="absolute inset-2.5 border border-[#F3E5AB]/25"></div>
+                        </div>
+                        <div
+                            aria-hidden="true"
+                            class="panel-gerbang-kanan pointer-events-none absolute inset-y-0 right-0 w-1/2 z-10 overflow-hidden border-l border-[#F3E5AB]/40 shadow-[-12px_0_32px_rgba(0,0,0,0.55)]"
+                            :style="undanganTerbuka ? 'transform: perspective(1800px) rotateY(112deg); opacity: 0; transition: transform 1.15s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.45s ease 0.6s;' : 'transform: perspective(1800px) rotateY(0deg); opacity: 1;'"
+                        >
+                            <img
+                                src="{{ $gambarSampul }}"
+                                alt=""
+                                class="absolute inset-y-0 right-0 w-[200%] h-full max-w-none {{ $kelasImgSampul }} {{ $modeMonokrom ? 'grayscale' : '' }}"
+                            >
+                            <div class="absolute inset-0 {{ $overlaySampulAktif }}"></div>
+                            <div class="absolute inset-2.5 border border-[#F3E5AB]/25"></div>
+                        </div>
+                    @endif
+
+                    @if ($ornamenUrl && ! $pakaiFotoSampul)
+                        <img src="{{ $ornamenUrl }}" alt="" class="pointer-events-none absolute top-2 {{ $ornamenGantung ? 'left-4 w-12' : 'left-1 w-20' }} opacity-85 z-10 drop-shadow-xl animasi-ayun-3d">
+                        <img src="{{ $ornamenUrl }}" alt="" class="pointer-events-none absolute top-2 {{ $ornamenGantung ? 'right-4 w-12' : 'right-1 w-20' }} opacity-85 z-10 drop-shadow-xl animasi-ayun-3d-balik">
+                    @endif
+
+                    @include('komponen-undangan.lapisan-motion', ['efekMotion' => $efekMotion, 'konteks' => 'sampul'])
+
+                    <div
+                        class="relative z-20 px-6 {{ $pakaiFotoSampul ? 'pt-5 sm:pt-7 space-y-1' : 'pt-6 sm:pt-9 space-y-2' }} text-center transition-all duration-700"
+                        :style="undanganTerbuka && @js($adalahGerbangBelah) ? 'opacity: 0; transform: perspective(1000px) scale(0.92) translateZ(-30px);' : ''"
+                    >
                     @if ($editionHeader)
                         <div class="flex items-center justify-between text-[10px] uppercase tracking-[0.28em] opacity-80 border-b {{ $sampulPakaiModeGelap ? 'border-white/25 text-white/85' : $kelasBatas }} pb-2 mb-3">
                             <span>Vol. 01</span>
@@ -326,7 +337,7 @@
                 </div>
 
                 <div
-                    class="relative z-20 px-6 {{ $pakaiFotoSampul ? 'pb-6 sm:pb-8' : 'pb-8 sm:pb-10' }} transition-all duration-700"
+                    class="relative z-20 px-6 {{ $pakaiFotoSampul ? 'pb-5 sm:pb-7' : 'pb-6 sm:pb-8' }} transition-all duration-700"
                     :style="undanganTerbuka && @js($adalahGerbangBelah) ? 'opacity: 0; transform: translateY(18px);' : ''"
                 >
                     <div class="kartu-3d {{ $radiusKartuBesar }} {{ $pakaiFotoSampul ? 'p-4 sm:p-5 bg-black/50 border-[#F3E5AB]/40 text-white' : 'p-5 sm:p-6 '.($sampulPakaiModeGelap ? 'bg-black/60 border-[#D4AF37]/45 text-white' : 'bg-white/88 border-[#BFA15F]/45 text-[#1F2937]') }} text-center backdrop-blur-md shadow-2xl border {{ $ekstraKartu }} space-y-2.5">
@@ -353,10 +364,11 @@
                         </p>
                     </div>
                 </div>
+                </div>
             </section>
 
             {{-- KONTEN UTAMA UNDANGAN --}}
-            <main class="relative z-10 {{ !empty($modeDemo) ? 'pt-14' : '' }}">
+            <main data-panggung-3d class="panggung-3d relative z-10 {{ !empty($modeDemo) ? 'pt-14' : '' }}">
                 <section data-aos="fade-up" data-aos-duration="1000" class="px-5 pt-6 pb-8">
                     <div class="relative h-[28rem] sm:h-[31rem] {{ $heroBingkaiClass }} {{ $kelasBatas }} overflow-hidden shadow-2xl kartu-3d {{ $ekstraKartu }}">
                         <img

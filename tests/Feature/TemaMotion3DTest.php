@@ -109,14 +109,22 @@ class TemaMotion3DTest extends TestCase
                 ->assertSee('kartu-3d', false)
                 ->assertSee('animasi-ayun-3d', false)
                 ->assertSee('data-panggung-3d', false)
+                ->assertSee('Buka Undangan', false)
                 ->assertSee($item['ornamen'], false)
                 ->assertSee($item['penandaGerak'], false);
 
             $konten = $respon->getContent();
+            $this->assertStringNotContainsString('&amp;bull;', $konten);
+            $this->assertStringNotContainsString('&amp;amp;', $konten);
+            if (preg_match('/<div[^>]+lg:w-\[445px\][^>]*>/', $konten, $cocokKolom)) {
+                $this->assertStringNotContainsString('panggung-3d', $cocokKolom[0]);
+            }
+
             if (in_array($item['penandaGate'], ['belah-pintu-3d', 'tirai-portal-3d'], true)) {
                 $this->assertStringContainsString('panel-gerbang-kiri', $konten);
                 $this->assertStringContainsString('panel-gerbang-kanan', $konten);
                 $this->assertStringContainsString('rotateY(-112deg)', $konten);
+                $this->assertStringContainsString('w-[200%]', $konten);
             } elseif ($item['penandaGate'] === 'lipat-katedral-3d') {
                 $this->assertStringContainsString('lipat-katedral-3d', $konten);
                 $this->assertStringContainsString('rotateX(78deg)', $konten);

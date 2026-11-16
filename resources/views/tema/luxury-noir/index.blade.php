@@ -24,7 +24,7 @@
     'subjudulPanggung' => 'The Grand Celebration',
     'taglineSampul' => 'The Grand Celebration',
     'sapaanSampul' => 'Exclusive Invitation For',
-    'sapaanHero' => 'With Joy &amp; Honor',
+    'sapaanHero' => 'With Joy & Honor',
     'labelPutra' => 'Putra tercinta dari',
     'labelPutri' => 'Putri tercinta dari',
     'labelAcara' => 'Rangkaian Acara',

@@ -24,7 +24,7 @@
     'subjudulPanggung' => 'Velvet Garden Motion',
     'taglineSampul' => 'Velvet Garden Motion',
     'sapaanSampul' => 'Tamu Kehormatan',
-    'sapaanHero' => 'Dengan Memohon Rahmat &amp; Ridho-Nya',
+    'sapaanHero' => 'Dengan Memohon Rahmat & Ridho-Nya',
     'labelPutra' => 'Putra dari',
     'labelPutri' => 'Putri dari',
     'labelAcara' => 'Rangkaian Acara',
