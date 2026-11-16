@@ -3,7 +3,7 @@
 @section('judul', ($modeEdit ? 'Edit Tema' : 'Tambah Tema').' — Admin SesiTemu')
 
 @section('isi_admin')
-<div class="w-full max-w-4xl rounded-2xl bg-white p-6 sm:p-8 shadow-sm ring-1 ring-champagne/20">
+<div class="w-full rounded-2xl bg-white p-6 sm:p-8 shadow-sm ring-1 ring-champagne/20">
     <div class="flex items-center justify-between mb-6">
         <h1 class="font-serif text-3xl font-bold text-charcoal">{{ $modeEdit ? 'Edit Tema' : 'Tambah Tema Baru' }}</h1>
         <a href="{{ route('admin.tema.index') }}" class="text-sm font-semibold text-charcoal/70 hover:underline">← Kembali</a>

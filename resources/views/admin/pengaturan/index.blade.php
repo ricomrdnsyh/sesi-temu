@@ -11,7 +11,7 @@
 <form
     action="{{ route('admin.pengaturan.update') }}"
     method="POST"
-    class="space-y-6 max-w-4xl"
+    class="w-full space-y-6"
     data-swal-loading
     data-swal-loading-title="Menyimpan Pengaturan..."
     data-swal-loading-text="Sedang menerapkan konfigurasi baru untuk Admin, Beranda, dan Client..."
