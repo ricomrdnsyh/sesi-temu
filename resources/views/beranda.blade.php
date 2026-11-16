@@ -435,7 +435,7 @@
                                 <span class="font-serif text-3xl sm:text-4xl font-bold text-champagne">Harga Tema + {{ \App\Models\Tema::formatRupiah($biayaTerimaBeres) }}</span>
                             </div>
                             <p class="mt-1 text-xs text-ivory/65">
-                                Total mulai {{ \App\Models\Tema::formatRupiah($hargaTermurah + $biayaTerimaBeres) }} / 3 bulan aktif (sudah termasuk jasa input Admin)
+                                Total mulai {{ \App\Models\Tema::formatRupiah($hargaTermurah + $biayaTerimaBeres) }} / {{ $durasiAktifBulan ?? \App\Support\PengaturanSesiTemu::masaAktifBulan() }} bulan aktif (sudah termasuk jasa input Admin)
                             </p>
                         </div>
 
@@ -449,7 +449,7 @@
                     </div>
 
                     <a
-                        href="https://wa.me/6281234567890?text={{ urlencode('Halo Admin SesiTemu, saya tertarik memesan Paket Terima Beres untuk undangan pernikahan digital.') }}"
+                        href="{{ $urlWaTerimaBeres ?? \App\Support\PengaturanSesiTemu::urlWaAdmin('Halo Admin SesiTemu, saya tertarik memesan Paket Terima Beres untuk undangan pernikahan digital.') }}"
                         target="_blank"
                         rel="noopener"
                         class="mt-8 block text-center rounded-xl bg-champagne px-6 py-3.5 text-sm font-semibold text-charcoal hover:bg-champagne/90 transition"
@@ -534,7 +534,7 @@
 
     {{-- Tombol WhatsApp Mengambang --}}
     <a
-        href="https://wa.me/6281234567890?text={{ urlencode('Halo SesiTemu, saya ingin konsultasi mengenai undangan pernikahan digital.') }}"
+        href="{{ $urlWaKonsultasi ?? \App\Support\PengaturanSesiTemu::urlWaAdmin('Halo SesiTemu, saya ingin konsultasi mengenai undangan pernikahan digital.') }}"
         target="_blank"
         rel="noopener"
         aria-label="Hubungi WhatsApp SesiTemu"

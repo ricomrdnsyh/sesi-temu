@@ -54,6 +54,11 @@ class Pengguna extends Authenticatable
         return $this->hasMany(Undangan::class, 'pengguna_id');
     }
 
+    public function transaksi(): HasMany
+    {
+        return $this->hasMany(Transaksi::class, 'pengguna_id')->latest();
+    }
+
     public function adalahAdmin(): bool
     {
         return $this->peran === 'admin';

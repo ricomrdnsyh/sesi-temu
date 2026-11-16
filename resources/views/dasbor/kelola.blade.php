@@ -80,7 +80,7 @@
 
                 @if (! $undangan->status_publikasi && ! auth()->user()->adalahAdmin())
                     <a
-                        href="https://wa.me/6281234567890?text={{ urlencode($pesanWaAktivasi) }}"
+                        href="{{ \App\Support\PengaturanSesiTemu::urlWaAdmin($pesanWaAktivasi) }}"
                         target="_blank"
                         rel="noopener"
                         class="rounded-xl bg-champagne px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-charcoal hover:bg-champagne/90 transition"
@@ -109,7 +109,7 @@
             </div>
         @endif
 
-        {{-- Navigasi 6 Tab --}}
+        {{-- Navigasi 7 Tab --}}
         <div class="flex flex-wrap gap-2 bg-white p-2 rounded-2xl shadow-sm ring-1 ring-champagne/20">
             @foreach ([
                 'tema' => '1. Tema & Link',
@@ -118,6 +118,7 @@
                 'galeri' => '4. Galeri & Cerita',
                 'amplop' => '5. Amplop Digital',
                 'tamu' => '6. Sebar Tamu & RSVP',
+                'aktivasi' => '7. Pembayaran & Aktivasi',
             ] as $kode => $label)
                 <button
                     type="button"
@@ -727,6 +728,154 @@
                             @empty
                                 <tr>
                                     <td colspan="5" class="py-6 text-center text-charcoal/60">Belum ada ucapan atau konfirmasi kehadiran dari tamu.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        {{-- TAB 7: Pembayaran & Aktivasi --}}
+        <section x-show="tab === 'aktivasi'" x-cloak class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="rounded-2xl bg-white p-6 sm:p-8 shadow-sm ring-1 ring-champagne/20">
+                    <h2 class="font-serif text-2xl font-bold text-charcoal">Ajukan Pembayaran Aktivasi</h2>
+                    <p class="mt-1 text-sm text-charcoal/65">
+                        Masa aktif standar undangan adalah <strong>{{ $durasiAktifBulan ?? 3 }} bulan</strong> sejak diverifikasi lunas oleh Admin.
+                    </p>
+
+                    <form
+                        action="{{ route('dasbor.transaksi.ajukan', $undangan) }}"
+                        method="POST"
+                        enctype="multipart/form-data"
+                        class="mt-6 space-y-4"
+                        data-swal-loading
+                        data-swal-loading-title="Membuat Invoice Pembayaran..."
+                        data-swal-loading-text="Sedang memproses pengajuan order &amp; voucher Anda..."
+                    >
+                        @csrf
+                        <div>
+                            <label class="block text-sm font-medium text-charcoal">Paket Layanan</label>
+                            <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <label class="flex items-start gap-2.5 rounded-xl border border-champagne/35 bg-ivory/60 p-3 cursor-pointer">
+                                    <input type="radio" name="paket" value="mandiri" checked class="mt-1 text-sage">
+                                    <span class="text-xs">
+                                        <span class="block font-bold text-charcoal">Paket Mandiri</span>
+                                        <span class="text-charcoal/65">{{ $undangan->tema?->hargaFormatted() }}</span>
+                                    </span>
+                                </label>
+                                <label class="flex items-start gap-2.5 rounded-xl border border-champagne/35 bg-ivory/60 p-3 cursor-pointer">
+                                    <input type="radio" name="paket" value="terima_beres" class="mt-1 text-sage">
+                                    <span class="text-xs">
+                                        <span class="block font-bold text-charcoal">Paket Terima Beres</span>
+                                        <span class="text-charcoal/65">{{ $undangan->tema?->hargaTerimaBeresFormatted() }}</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="kode_promo" class="block text-sm font-medium text-charcoal">Kode Promo / Voucher (Opsional)</label>
+                            <input
+                                id="kode_promo"
+                                type="text"
+                                name="kode_promo"
+                                value="{{ old('kode_promo') }}"
+                                placeholder="Masukkan kode voucher bila ada"
+                                class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm uppercase font-mono focus:border-champagne focus:outline-none"
+                            >
+                        </div>
+
+                        <div>
+                            <label for="bukti_pembayaran" class="block text-sm font-medium text-charcoal">Unggah Bukti Transfer (Opsional — bisa menyusul)</label>
+                            <input
+                                id="bukti_pembayaran"
+                                type="file"
+                                name="bukti_pembayaran"
+                                accept="image/*"
+                                class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3 py-2 text-xs"
+                            >
+                        </div>
+
+                        <button type="submit" class="w-full rounded-xl bg-sage px-5 py-3 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer transition">
+                            Buat Invoice &amp; Ajukan Aktivasi
+                        </button>
+                    </form>
+                </div>
+
+                <div class="rounded-2xl bg-charcoal text-ivory p-6 sm:p-8 shadow-sm space-y-5">
+                    <div>
+                        <p class="text-xs uppercase tracking-widest text-champagne font-semibold">Tujuan Pembayaran Resmi</p>
+                        <h3 class="mt-2 font-serif text-2xl font-bold text-white">{{ $infoRekening['bank'] }}</h3>
+                        <p class="mt-1 font-mono text-xl font-bold text-champagne">{{ $infoRekening['rekening'] }}</p>
+                        <p class="text-sm text-ivory/80">a.n. {{ $infoRekening['atas_nama'] }}</p>
+                    </div>
+
+                    <div class="rounded-xl bg-white/5 border border-white/10 p-4 text-xs text-ivory/80 leading-relaxed">
+                        {{ $infoRekening['catatan'] }}
+                    </div>
+
+                    <a
+                        href="{{ \App\Support\PengaturanSesiTemu::urlWaAdmin($pesanWaAktivasi) }}"
+                        target="_blank"
+                        rel="noopener"
+                        class="inline-flex w-full items-center justify-center rounded-xl bg-champagne px-5 py-3 text-sm font-semibold text-charcoal hover:bg-champagne/90 transition"
+                    >
+                        Konfirmasi Pembayaran via WhatsApp Admin
+                    </a>
+                </div>
+            </div>
+
+            <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-champagne/20">
+                <h3 class="text-base font-bold text-charcoal mb-4">Riwayat Invoice Undangan Ini</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-champagne/20 text-left text-xs uppercase text-charcoal/60">
+                                <th class="py-3 pr-4">Invoice</th>
+                                <th class="py-3 pr-4">Paket &amp; Tema</th>
+                                <th class="py-3 pr-4">Total Bayar</th>
+                                <th class="py-3 pr-4">Status</th>
+                                <th class="py-3 text-right">Bukti Pembayaran</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-champagne/15">
+                            @forelse ($undangan->transaksi as $trx)
+                                <tr>
+                                    <td class="py-3 pr-4 font-mono font-bold text-charcoal">{{ $trx->kode_invoice }}</td>
+                                    <td class="py-3 pr-4">
+                                        <p class="font-medium">{{ $trx->labelPaket() }}</p>
+                                        <p class="text-xs text-charcoal/60">{{ $trx->tema?->nama_tema }}</p>
+                                    </td>
+                                    <td class="py-3 pr-4 font-bold text-charcoal">{{ \App\Models\Tema::formatRupiah($trx->total_bayar) }}</td>
+                                    <td class="py-3 pr-4">
+                                        <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $trx->status === 'lunas' ? 'bg-sage/15 text-sage' : ($trx->status === 'ditolak' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-800') }}">
+                                            {{ $trx->labelStatus() }}
+                                        </span>
+                                        @if ($trx->catatan_admin)
+                                            <p class="mt-1 text-xs text-charcoal/60">{{ $trx->catatan_admin }}</p>
+                                        @endif
+                                    </td>
+                                    <td class="py-3 text-right">
+                                        @if ($trx->status !== 'lunas')
+                                            <form action="{{ route('dasbor.transaksi.unggah', $trx) }}" method="POST" enctype="multipart/form-data" class="inline-flex items-center gap-2">
+                                                @csrf
+                                                <input type="file" name="bukti_pembayaran" accept="image/*" required class="w-40 text-xs">
+                                                <button type="submit" class="rounded-lg bg-sage px-3 py-1.5 text-xs font-semibold text-white hover:bg-sage/90 cursor-pointer">
+                                                    Unggah Bukti
+                                                </button>
+                                            </form>
+                                        @elseif ($trx->urlBukti())
+                                            <a href="{{ $trx->urlBukti() }}" target="_blank" class="text-xs font-semibold text-sage hover:underline">Lihat Bukti</a>
+                                        @else
+                                            <span class="text-xs text-charcoal/50">Terverifikasi Admin</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="py-6 text-center text-charcoal/60">Belum ada invoice pembayaran untuk undangan ini.</td>
                                 </tr>
                             @endforelse
                         </tbody>

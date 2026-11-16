@@ -6,12 +6,17 @@ use App\Models\AcaraUndangan;
 use App\Models\AmplopDigital;
 use App\Models\BukuTamu;
 use App\Models\GaleriUndangan;
+use App\Models\MusikLatar;
 use App\Models\Tema;
+use App\Models\Transaksi;
 use App\Models\Undangan;
+use App\Services\LayananTransaksiService;
 use App\Services\PengolahGambarService;
+use App\Support\PengaturanSesiTemu;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -36,7 +41,7 @@ class DasborUndanganController extends Controller
     {
         $daftarUndangan = $request->user()
             ->undangan()
-            ->with(['tema', 'bukuTamu', 'daftarAcara'])
+            ->with(['tema', 'bukuTamu', 'daftarAcara', 'transaksi'])
             ->latest()
             ->get();
 
@@ -45,6 +50,7 @@ class DasborUndanganController extends Controller
         return view('dasbor.index', [
             'daftarUndangan' => $daftarUndangan,
             'daftarTema' => $daftarTema,
+            'durasiAktifBulan' => PengaturanSesiTemu::masaAktifBulan(),
         ]);
     }
 
@@ -93,7 +99,7 @@ class DasborUndanganController extends Controller
     {
         Gate::authorize('kelola', $undangan);
 
-        $undangan->load(['tema', 'daftarAcara', 'daftarGaleri', 'daftarAmplop', 'bukuTamu']);
+        $undangan->load(['tema', 'daftarAcara', 'daftarGaleri', 'daftarAmplop', 'bukuTamu', 'transaksi.tema', 'transaksi.promo']);
 
         $daftarTema = Tema::where('aktif', true)->orderBy('id')->get();
         $daftarMusik = $this->ambilDaftarMusik();
@@ -114,6 +120,9 @@ class DasborUndanganController extends Controller
             'daftarGayaFont' => Undangan::GAYA_FONT_TERSEDIA,
             'rekapRsvp' => $rekapRsvp,
             'tabAktif' => $tabAktif,
+            'infoRekening' => PengaturanSesiTemu::infoRekening(),
+            'biayaTerimaBeres' => PengaturanSesiTemu::biayaTerimaBeres(),
+            'durasiAktifBulan' => PengaturanSesiTemu::masaAktifBulan(),
         ]);
     }
 
@@ -481,11 +490,96 @@ class DasborUndanganController extends Controller
             ->with('sukses', 'Ucapan buku tamu berhasil dihapus.');
     }
 
+    public function ajukanTransaksi(
+        Request $request,
+        Undangan $undangan,
+        LayananTransaksiService $layanan
+    ): RedirectResponse {
+        Gate::authorize('kelola', $undangan);
+
+        $tervalidasi = $request->validate([
+            'paket' => ['required', Rule::in(['mandiri', 'terima_beres'])],
+            'tema_id' => ['nullable', 'exists:tema,id'],
+            'kode_promo' => ['nullable', 'string', 'max:40'],
+            'bukti_pembayaran' => ['nullable', 'image', 'max:4096'],
+        ], [
+            'paket.required' => 'Silakan pilih paket aktivasi undangan.',
+            'bukti_pembayaran.image' => 'Bukti pembayaran harus berupa file gambar (JPG/PNG/WebP).',
+            'bukti_pembayaran.max' => 'Ukuran gambar bukti pembayaran maksimal 4 MB.',
+        ]);
+
+        $hasilPromo = $layanan->validasiKodePromo($tervalidasi['kode_promo'] ?? null);
+        if ($hasilPromo['error'] !== null) {
+            return back()
+                ->withErrors(['kode_promo' => $hasilPromo['error']])
+                ->withInput()
+                ->with('tab_aktif', 'aktivasi');
+        }
+
+        $tema = isset($tervalidasi['tema_id'])
+            ? Tema::findOrFail((int) $tervalidasi['tema_id'])
+            : $undangan->tema;
+
+        $transaksi = $layanan->buatTransaksi(
+            $undangan,
+            $request->user(),
+            $tema,
+            $tervalidasi['paket'],
+            $hasilPromo['promo'],
+            $request->file('bukti_pembayaran')
+        );
+
+        return redirect()
+            ->route('dasbor.undangan.kelola', $undangan)
+            ->with('tab_aktif', 'aktivasi')
+            ->with('sukses', "Order {$transaksi->kode_invoice} berhasil dibuat dengan total ".Tema::formatRupiah($transaksi->total_bayar).'.');
+    }
+
+    public function unggahBuktiTransaksi(
+        Request $request,
+        Transaksi $transaksi,
+        LayananTransaksiService $layanan
+    ): RedirectResponse {
+        Gate::authorize('kelola', $transaksi->undangan);
+
+        $request->validate([
+            'bukti_pembayaran' => ['required', 'image', 'max:4096'],
+        ], [
+            'bukti_pembayaran.required' => 'Pilih file gambar bukti pembayaran terlebih dahulu.',
+            'bukti_pembayaran.image' => 'Bukti pembayaran harus berupa gambar.',
+        ]);
+
+        $layanan->unggahBukti($transaksi, $request->file('bukti_pembayaran'));
+
+        return redirect()
+            ->route('dasbor.undangan.kelola', $transaksi->undangan)
+            ->with('tab_aktif', 'aktivasi')
+            ->with('sukses', "Bukti pembayaran untuk invoice {$transaksi->kode_invoice} berhasil diunggah.");
+    }
+
     /**
      * @return list<array{path: string, label: string}>
      */
     private function ambilDaftarMusik(): array
     {
+        if (Schema::hasTable('musik_latar')) {
+            $musikDb = MusikLatar::where('aktif', true)
+                ->orderBy('urutan')
+                ->orderBy('judul')
+                ->get();
+
+            if ($musikDb->isNotEmpty()) {
+                return $musikDb->map(function (MusikLatar $musik): array {
+                    $label = $musik->artis ? "{$musik->judul} — {$musik->artis}" : $musik->judul;
+
+                    return [
+                        'path' => $musik->path_file,
+                        'label' => $label,
+                    ];
+                })->all();
+            }
+        }
+
         $direktori = public_path('musik');
         if (! is_dir($direktori)) {
             return [];

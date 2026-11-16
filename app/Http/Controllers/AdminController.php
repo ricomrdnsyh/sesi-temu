@@ -6,6 +6,7 @@ use App\Models\BukuTamu;
 use App\Models\Pengguna;
 use App\Models\Tema;
 use App\Models\Undangan;
+use App\Support\PengaturanSesiTemu;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -93,12 +94,14 @@ class AdminController extends Controller
 
     public function aktifkanUndangan(Undangan $undangan): RedirectResponse
     {
+        $durasiBulan = PengaturanSesiTemu::masaAktifBulan();
+
         $undangan->update([
             'status_publikasi' => true,
-            'berlaku_sampai' => now()->addMonths(3),
+            'berlaku_sampai' => now()->addMonths($durasiBulan),
         ]);
 
-        return back()->with('sukses', "Undangan sesitemu.id/{$undangan->slug} berhasil diaktifkan selama 3 bulan.");
+        return back()->with('sukses', "Undangan sesitemu.id/{$undangan->slug} berhasil diaktifkan selama {$durasiBulan} bulan.");
     }
 
     public function nonaktifkanUndangan(Undangan $undangan): RedirectResponse

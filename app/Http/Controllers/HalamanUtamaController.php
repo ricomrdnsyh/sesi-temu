@@ -9,6 +9,7 @@ use App\Models\GaleriUndangan;
 use App\Models\Tema;
 use App\Models\Undangan;
 use App\Support\KatalogKontenDemo;
+use App\Support\PengaturanSesiTemu;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -44,7 +45,10 @@ class HalamanUtamaController extends Controller
             'ringkasanTier' => $ringkasanTier,
             'hargaTermurah' => $hargaTermurah,
             'hargaTermahal' => $hargaTermahal,
-            'biayaTerimaBeres' => Tema::BIAYA_JASA_TERIMA_BERES,
+            'biayaTerimaBeres' => PengaturanSesiTemu::biayaTerimaBeres(),
+            'durasiAktifBulan' => PengaturanSesiTemu::masaAktifBulan(),
+            'urlWaTerimaBeres' => PengaturanSesiTemu::urlWaAdmin('Halo Admin SesiTemu, saya tertarik memesan Paket Terima Beres untuk undangan pernikahan digital.'),
+            'urlWaKonsultasi' => PengaturanSesiTemu::urlWaAdmin('Halo SesiTemu, saya ingin konsultasi mengenai undangan pernikahan digital.'),
         ]);
     }
 

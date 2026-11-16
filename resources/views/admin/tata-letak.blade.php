@@ -8,12 +8,27 @@
 @php
     $judulHeaderAdmin = match (true) {
         request()->routeIs('admin.undangan.*') => 'Undangan',
+        request()->routeIs('admin.transaksi.*') => 'Transaksi & Pembayaran',
+        request()->routeIs('admin.buku-tamu.*') => 'Buku Tamu & RSVP',
         request()->routeIs('admin.tema.*') => 'Katalog Tema',
+        request()->routeIs('admin.musik.*') => 'Musik Latar',
+        request()->routeIs('admin.promo.*') => 'Promo & Voucher',
+        request()->routeIs('admin.laporan.*') => 'Laporan & Analitik',
         request()->routeIs('admin.pengguna.*') => 'Pengguna',
+        request()->routeIs('admin.pengaturan.*') => 'Pengaturan Platform',
         default => 'Dashboard',
     };
 
     $namaAdmin = auth()->user()?->nama ?? 'Administrator';
+
+    $jumlahTransaksiPending = 0;
+    try {
+        if (\Illuminate\Support\Facades\Schema::hasTable('transaksi')) {
+            $jumlahTransaksiPending = \App\Models\Transaksi::where('status', 'menunggu_verifikasi')->count();
+        }
+    } catch (\Throwable) {
+        $jumlahTransaksiPending = 0;
+    }
 @endphp
 
 <div x-data="{ sidebarTerbuka: false }" class="min-h-screen w-full bg-ivory flex">
@@ -74,14 +89,14 @@
             </div>
 
             {{-- Navigasi Vertikal --}}
-            <nav class="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto text-sm">
-                <p class="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-ivory/45">
+            <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto text-sm">
+                <p class="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-ivory/45">
                     MAIN
                 </p>
 
                 <a
                     href="{{ route('admin.ringkasan') }}"
-                    class="flex items-center gap-3 rounded-xl px-3.5 py-2.5 transition {{ request()->routeIs('admin.ringkasan') ? 'bg-champagne text-charcoal font-semibold shadow-sm' : 'text-ivory/80 hover:bg-white/10 hover:text-white' }}"
+                    class="flex items-center gap-3 rounded-xl px-3.5 py-2 transition {{ request()->routeIs('admin.ringkasan') ? 'bg-champagne text-charcoal font-semibold shadow-sm' : 'text-ivory/80 hover:bg-white/10 hover:text-white' }}"
                 >
                     <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                         <path d="M3 3a2 2 0 0 1 2-2h3a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3Zm8-1a1 1 0 0 1 1-1h5a2 2 0 0 1 2 2v5a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1V2Zm-9 9a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v5a2 2 0 0 1-2 2H3a1 1 0 0 1-1-1v-6Zm10 0a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v4a2 2 0 0 1-2 2h-4a1 1 0 0 1-1-1v-5Z" />
@@ -89,38 +104,124 @@
                     <span>Dashboard</span>
                 </a>
 
-                <a
-                    href="{{ route('admin.undangan.index') }}"
-                    class="flex items-center gap-3 rounded-xl px-3.5 py-2.5 transition {{ request()->routeIs('admin.undangan.*') ? 'bg-champagne text-charcoal font-semibold shadow-sm' : 'text-ivory/80 hover:bg-white/10 hover:text-white' }}"
-                >
-                    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    <span>Undangan</span>
-                </a>
+                <div class="pt-3.5 mt-3.5 border-t border-white/10 space-y-1">
+                    <p class="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-ivory/45">
+                        LAYANAN
+                    </p>
 
-                <a
-                    href="{{ route('admin.tema.index') }}"
-                    class="flex items-center gap-3 rounded-xl px-3.5 py-2.5 transition {{ request()->routeIs('admin.tema.*') ? 'bg-champagne text-charcoal font-semibold shadow-sm' : 'text-ivory/80 hover:bg-white/10 hover:text-white' }}"
-                >
-                    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-                    </svg>
-                    <span>Katalog Tema</span>
-                </a>
+                    <a
+                        href="{{ route('admin.undangan.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-3.5 py-2 transition {{ request()->routeIs('admin.undangan.*') ? 'bg-champagne text-charcoal font-semibold shadow-sm' : 'text-ivory/80 hover:bg-white/10 hover:text-white' }}"
+                    >
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <span>Undangan</span>
+                    </a>
 
-                <a
-                    href="{{ route('admin.pengguna.index') }}"
-                    class="flex items-center gap-3 rounded-xl px-3.5 py-2.5 transition {{ request()->routeIs('admin.pengguna.*') ? 'bg-champagne text-charcoal font-semibold shadow-sm' : 'text-ivory/80 hover:bg-white/10 hover:text-white' }}"
-                >
-                    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    <span>Pengguna</span>
-                </a>
+                    <a
+                        href="{{ route('admin.transaksi.index') }}"
+                        class="flex items-center justify-between gap-2 rounded-xl px-3.5 py-2 transition {{ request()->routeIs('admin.transaksi.*') ? 'bg-champagne text-charcoal font-semibold shadow-sm' : 'text-ivory/80 hover:bg-white/10 hover:text-white' }}"
+                    >
+                        <span class="flex items-center gap-3 min-w-0">
+                            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                            </svg>
+                            <span class="truncate">Transaksi</span>
+                        </span>
+                        @if ($jumlahTransaksiPending > 0)
+                            <span class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[10px] font-bold text-white">
+                                {{ $jumlahTransaksiPending }}
+                            </span>
+                        @endif
+                    </a>
 
-                <div class="pt-5 mt-5 border-t border-white/10 space-y-1.5">
-                    <p class="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-ivory/45">
+                    <a
+                        href="{{ route('admin.buku-tamu.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-3.5 py-2 transition {{ request()->routeIs('admin.buku-tamu.*') ? 'bg-champagne text-charcoal font-semibold shadow-sm' : 'text-ivory/80 hover:bg-white/10 hover:text-white' }}"
+                    >
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        </svg>
+                        <span>Buku Tamu &amp; RSVP</span>
+                    </a>
+                </div>
+
+                <div class="pt-3.5 mt-3.5 border-t border-white/10 space-y-1">
+                    <p class="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-ivory/45">
+                        KATALOG &amp; ASET
+                    </p>
+
+                    <a
+                        href="{{ route('admin.tema.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-3.5 py-2 transition {{ request()->routeIs('admin.tema.*') ? 'bg-champagne text-charcoal font-semibold shadow-sm' : 'text-ivory/80 hover:bg-white/10 hover:text-white' }}"
+                    >
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                        </svg>
+                        <span>Katalog Tema</span>
+                    </a>
+
+                    <a
+                        href="{{ route('admin.musik.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-3.5 py-2 transition {{ request()->routeIs('admin.musik.*') ? 'bg-champagne text-charcoal font-semibold shadow-sm' : 'text-ivory/80 hover:bg-white/10 hover:text-white' }}"
+                    >
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                        </svg>
+                        <span>Musik Latar</span>
+                    </a>
+
+                    <a
+                        href="{{ route('admin.promo.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-3.5 py-2 transition {{ request()->routeIs('admin.promo.*') ? 'bg-champagne text-charcoal font-semibold shadow-sm' : 'text-ivory/80 hover:bg-white/10 hover:text-white' }}"
+                    >
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                        </svg>
+                        <span>Promo &amp; Voucher</span>
+                    </a>
+                </div>
+
+                <div class="pt-3.5 mt-3.5 border-t border-white/10 space-y-1">
+                    <p class="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-ivory/45">
+                        SISTEM &amp; LAPORAN
+                    </p>
+
+                    <a
+                        href="{{ route('admin.laporan.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-3.5 py-2 transition {{ request()->routeIs('admin.laporan.*') ? 'bg-champagne text-charcoal font-semibold shadow-sm' : 'text-ivory/80 hover:bg-white/10 hover:text-white' }}"
+                    >
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        <span>Laporan &amp; Analitik</span>
+                    </a>
+
+                    <a
+                        href="{{ route('admin.pengguna.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-3.5 py-2 transition {{ request()->routeIs('admin.pengguna.*') ? 'bg-champagne text-charcoal font-semibold shadow-sm' : 'text-ivory/80 hover:bg-white/10 hover:text-white' }}"
+                    >
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span>Pengguna</span>
+                    </a>
+
+                    <a
+                        href="{{ route('admin.pengaturan.index') }}"
+                        class="flex items-center gap-3 rounded-xl px-3.5 py-2 transition {{ request()->routeIs('admin.pengaturan.*') ? 'bg-champagne text-charcoal font-semibold shadow-sm' : 'text-ivory/80 hover:bg-white/10 hover:text-white' }}"
+                    >
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span>Pengaturan</span>
+                    </a>
+                </div>
+
+                <div class="pt-3.5 mt-3.5 border-t border-white/10 space-y-1">
+                    <p class="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-ivory/45">
                         Pintasan
                     </p>
 

@@ -110,7 +110,13 @@
                                 <p>Berlaku sampai</p>
                                 <p class="font-semibold text-charcoal mt-0.5">{{ $undangan->berlaku_sampai->translatedFormat('d M Y') }}</p>
                             @else
-                                <p>Belum diaktifkan</p>
+                                @php $transaksiTerakhir = $undangan->transaksi->first(); @endphp
+                                @if ($transaksiTerakhir)
+                                    <p>Invoice {{ $transaksiTerakhir->kode_invoice }}</p>
+                                    <p class="font-semibold text-sage mt-0.5">{{ $transaksiTerakhir->labelStatus() }}</p>
+                                @else
+                                    <p>Belum diaktifkan</p>
+                                @endif
                             @endif
                         </div>
                     </div>
@@ -148,12 +154,18 @@
 
                         @if (! $undangan->status_publikasi && ! auth()->user()->adalahAdmin())
                             <a
-                                href="https://wa.me/6281234567890?text={{ urlencode($pesanWaAktivasi) }}"
-                                target="_blank"
-                                rel="noopener"
+                                href="{{ route('dasbor.undangan.kelola', [$undangan, 'tab' => 'aktivasi']) }}"
                                 class="rounded-xl bg-champagne px-4 py-2.5 text-sm font-semibold text-charcoal hover:bg-champagne/90 transition"
                             >
-                                Aktifkan via WhatsApp
+                                Bayar &amp; Aktifkan
+                            </a>
+                            <a
+                                href="{{ \App\Support\PengaturanSesiTemu::urlWaAdmin($pesanWaAktivasi) }}"
+                                target="_blank"
+                                rel="noopener"
+                                class="rounded-xl border border-champagne px-4 py-2.5 text-sm font-semibold text-charcoal hover:bg-champagne/10 transition"
+                            >
+                                Chat WA Admin
                             </a>
                         @endif
                     </div>

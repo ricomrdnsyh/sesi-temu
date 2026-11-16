@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\PengaturanSesiTemu;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
@@ -81,6 +82,11 @@ class Tema extends Model
         return $this->hasMany(Undangan::class, 'tema_id');
     }
 
+    public function transaksi(): HasMany
+    {
+        return $this->hasMany(Transaksi::class, 'tema_id');
+    }
+
     public function kategoriLabel(): string
     {
         return self::KATEGORI_TERSEDIA[$this->kategori] ?? ucfirst($this->kategori);
@@ -110,7 +116,7 @@ class Tema extends Model
 
     public function hargaTerimaBeresFormatted(): string
     {
-        return self::formatRupiah($this->hargaNominal() + self::BIAYA_JASA_TERIMA_BERES);
+        return self::formatRupiah($this->hargaNominal() + PengaturanSesiTemu::biayaTerimaBeres());
     }
 
     public static function formatRupiah(int $nominal): string

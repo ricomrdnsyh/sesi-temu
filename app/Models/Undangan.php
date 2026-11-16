@@ -208,6 +208,11 @@ class Undangan extends Model
         return $this->hasMany(BukuTamu::class, 'undangan_id')->latest();
     }
 
+    public function transaksi(): HasMany
+    {
+        return $this->hasMany(Transaksi::class, 'undangan_id')->latest();
+    }
+
     public function sudahKedaluwarsa(): bool
     {
         return $this->berlaku_sampai !== null && $this->berlaku_sampai->isPast();

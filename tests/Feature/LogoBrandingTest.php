@@ -101,7 +101,20 @@ class LogoBrandingTest extends TestCase
     {
         $admin = Pengguna::factory()->admin()->create();
 
-        foreach (['/admin', '/admin/undangan', '/admin/tema', '/admin/pengguna'] as $ruteAdmin) {
+        $semuaRuteAdmin = [
+            '/admin',
+            '/admin/undangan',
+            '/admin/transaksi',
+            '/admin/buku-tamu',
+            '/admin/tema',
+            '/admin/musik',
+            '/admin/promo',
+            '/admin/laporan',
+            '/admin/pengguna',
+            '/admin/pengaturan',
+        ];
+
+        foreach ($semuaRuteAdmin as $ruteAdmin) {
             $respon = $this->actingAs($admin)->get($ruteAdmin);
             $respon->assertOk()
                 ->assertSee('aria-label="Navigasi Panel Admin"', false)

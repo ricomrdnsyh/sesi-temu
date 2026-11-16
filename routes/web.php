@@ -1,5 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminBukuTamuController;
+use App\Http\Controllers\Admin\AdminLaporanController;
+use App\Http\Controllers\Admin\AdminMusikController;
+use App\Http\Controllers\Admin\AdminPengaturanController;
+use App\Http\Controllers\Admin\AdminPromoController;
+use App\Http\Controllers\Admin\AdminTransaksiController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminTemaController;
 use App\Http\Controllers\AutentikasiController;
@@ -44,6 +50,9 @@ Route::middleware('auth')->prefix('dasbor')->name('dasbor.')->group(function ():
     Route::delete('/undangan/{undangan}/amplop/{amplop}', [DasborUndanganController::class, 'hapusAmplop'])->name('amplop.hapus');
 
     Route::delete('/undangan/{undangan}/buku-tamu/{ucapan}', [DasborUndanganController::class, 'hapusUcapan'])->name('ucapan.hapus');
+
+    Route::post('/undangan/{undangan}/transaksi', [DasborUndanganController::class, 'ajukanTransaksi'])->name('transaksi.ajukan');
+    Route::post('/transaksi/{transaksi}/unggah-bukti', [DasborUndanganController::class, 'unggahBuktiTransaksi'])->name('transaksi.unggah');
 });
 
 // 4. Area Panel Admin
@@ -54,10 +63,34 @@ Route::middleware(['auth', PastikanAdmin::class])->prefix('admin')->name('admin.
     Route::patch('/undangan/{undangan}/nonaktifkan', [AdminController::class, 'nonaktifkanUndangan'])->name('undangan.nonaktifkan');
     Route::post('/bersihkan-kedaluwarsa', [AdminController::class, 'bersihkanKedaluwarsa'])->name('undangan.bersihkan');
 
+    Route::get('/transaksi', [AdminTransaksiController::class, 'index'])->name('transaksi.index');
+    Route::post('/transaksi', [AdminTransaksiController::class, 'store'])->name('transaksi.store');
+    Route::patch('/transaksi/{transaksi}/verifikasi', [AdminTransaksiController::class, 'verifikasi'])->name('transaksi.verifikasi');
+    Route::patch('/transaksi/{transaksi}/tolak', [AdminTransaksiController::class, 'tolak'])->name('transaksi.tolak');
+
+    Route::get('/buku-tamu', [AdminBukuTamuController::class, 'index'])->name('buku-tamu.index');
+    Route::delete('/buku-tamu/{ucapan}', [AdminBukuTamuController::class, 'destroy'])->name('buku-tamu.destroy');
+
     Route::resource('/tema', AdminTemaController::class)->except(['show']);
+
+    Route::get('/musik', [AdminMusikController::class, 'index'])->name('musik.index');
+    Route::post('/musik', [AdminMusikController::class, 'store'])->name('musik.store');
+    Route::patch('/musik/{musik}/toggle', [AdminMusikController::class, 'toggle'])->name('musik.toggle');
+    Route::delete('/musik/{musik}', [AdminMusikController::class, 'destroy'])->name('musik.destroy');
+
+    Route::get('/promo', [AdminPromoController::class, 'index'])->name('promo.index');
+    Route::post('/promo', [AdminPromoController::class, 'store'])->name('promo.store');
+    Route::patch('/promo/{promo}/toggle', [AdminPromoController::class, 'toggle'])->name('promo.toggle');
+    Route::delete('/promo/{promo}', [AdminPromoController::class, 'destroy'])->name('promo.destroy');
+
+    Route::get('/laporan', [AdminLaporanController::class, 'index'])->name('laporan.index');
+    Route::get('/laporan/ekspor', [AdminLaporanController::class, 'eksporCsv'])->name('laporan.ekspor');
 
     Route::get('/pengguna', [AdminController::class, 'daftarPengguna'])->name('pengguna.index');
     Route::patch('/pengguna/{pengguna}/reset-sandi', [AdminController::class, 'resetSandiPengguna'])->name('pengguna.reset-sandi');
+
+    Route::get('/pengaturan', [AdminPengaturanController::class, 'index'])->name('pengaturan.index');
+    Route::put('/pengaturan', [AdminPengaturanController::class, 'update'])->name('pengaturan.update');
 });
 
 // 5. Route Publik Undangan & Buku Tamu (WAJIB DI BARIS PALING BAWAH)
