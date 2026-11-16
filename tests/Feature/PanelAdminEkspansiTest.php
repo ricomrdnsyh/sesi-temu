@@ -553,4 +553,55 @@ class PanelAdminEkspansiTest extends TestCase
         $this->assertSame(60000, $temaBasic->fresh()->hargaNominal());
         $this->assertSame(129000, $temaEksklusif->fresh()->hargaNominal());
     }
+
+    public function test_admin_hanya_bisa_memilih_template_blade_tema_yang_tersedia(): void
+    {
+        $admin = Pengguna::factory()->admin()->create();
+
+        $daftarView = Tema::daftarLokasiViewTersedia();
+        $this->assertArrayHasKey('tema.rustic-floral.index', $daftarView);
+        $this->assertArrayHasKey('tema.luxury-noir.index', $daftarView);
+
+        $this->actingAs($admin)
+            ->get('/admin/tema')
+            ->assertOk()
+            ->assertSee('<select', false)
+            ->assertSee('id="modal_lokasi_view"', false)
+            ->assertSee('tema.rustic-floral.index');
+
+        $this->actingAs($admin)
+            ->get('/admin/tema/create')
+            ->assertOk()
+            ->assertSee('id="lokasi_view"', false)
+            ->assertSee('tema.velvet-garden.index');
+
+        // View yang file Blade-nya belum dibuat ditolak
+        $this->actingAs($admin)
+            ->post('/admin/tema', [
+                'nama_tema' => 'Tema Fiktif',
+                'slug' => 'tema-fiktif',
+                'kategori' => 'modern',
+                'tier' => 'basic',
+                'harga' => 59000,
+                'lokasi_view' => 'tema.belum-dibuat.index',
+                'aktif' => 1,
+            ])
+            ->assertSessionHasErrors('lokasi_view');
+
+        // View di luar folder resources/views/tema/ juga ditolak
+        $this->actingAs($admin)
+            ->post('/admin/tema', [
+                'nama_tema' => 'Tema Salah Folder',
+                'slug' => 'tema-salah-folder',
+                'kategori' => 'modern',
+                'tier' => 'basic',
+                'harga' => 59000,
+                'lokasi_view' => 'beranda',
+                'aktif' => 1,
+            ])
+            ->assertSessionHasErrors('lokasi_view');
+
+        $this->assertDatabaseMissing('tema', ['slug' => 'tema-fiktif']);
+        $this->assertDatabaseMissing('tema', ['slug' => 'tema-salah-folder']);
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Support\PengaturanSesiTemu;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -335,5 +336,44 @@ class Tema extends Model
         }
 
         return Storage::disk('public')->url($this->gambar_pratinjau);
+    }
+
+    /**
+     * Memindai seluruh file Blade tema yang tersedia di resources/views/tema/.
+     *
+     * @return array<string, string>
+     */
+    public static function daftarLokasiViewTersedia(): array
+    {
+        $direktori = resource_path('views/tema');
+        if (! File::isDirectory($direktori)) {
+            return [];
+        }
+
+        $daftar = [];
+        foreach (File::allFiles($direktori) as $berkas) {
+            $relatif = str_replace(['\\', '/'], '/', $berkas->getRelativePathname());
+            if (! Str::endsWith($relatif, '.blade.php')) {
+                continue;
+            }
+
+            $tanpaEkstensi = Str::beforeLast($relatif, '.blade.php');
+            $viewDot = 'tema.'.str_replace('/', '.', $tanpaEkstensi);
+
+            $segmenLabel = Str::endsWith($tanpaEkstensi, '/index')
+                ? Str::beforeLast($tanpaEkstensi, '/index')
+                : $tanpaEkstensi;
+
+            $label = Str::of($segmenLabel)
+                ->replace(['/', '-', '_'], ' ')
+                ->title()
+                ->value();
+
+            $daftar[$viewDot] = "{$label} ({$viewDot})";
+        }
+
+        ksort($daftar);
+
+        return $daftar;
     }
 }

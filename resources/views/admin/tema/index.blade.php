@@ -9,6 +9,10 @@
     $galatDariModalTema = $adaGalat && ! $galatDariDiskonMassal;
     $modeAwalEdit = $galatDariModalTema && old('_modal_mode') === 'edit';
     $biayaTerimaBeres = \App\Support\PengaturanSesiTemu::biayaTerimaBeres();
+    $daftarLokasiView = $daftarLokasiView ?? \App\Models\Tema::daftarLokasiViewTersedia();
+    $lokasiViewBawaan = array_key_exists('tema.rustic-floral.index', $daftarLokasiView)
+        ? 'tema.rustic-floral.index'
+        : (array_key_first($daftarLokasiView) ?? 'tema.rustic-floral.index');
 
     $modalInit = [
         'modalTerbuka' => $galatDariModalTema,
@@ -19,7 +23,7 @@
             'nama_tema' => (string) ($galatDariModalTema ? old('nama_tema', '') : ''),
             'slug' => (string) ($galatDariModalTema ? old('slug', '') : ''),
             'kategori' => (string) ($galatDariModalTema ? old('kategori', 'modern') : 'modern'),
-            'lokasi_view' => (string) ($galatDariModalTema ? old('lokasi_view', 'tema.rustic-floral.index') : 'tema.rustic-floral.index'),
+            'lokasi_view' => (string) ($galatDariModalTema ? old('lokasi_view', $lokasiViewBawaan) : $lokasiViewBawaan),
             'tier' => (string) ($galatDariModalTema ? old('tier', 'basic') : 'basic'),
             'harga' => (int) ($galatDariModalTema ? old('harga', \App\Models\Tema::HARGA_BAWAAN_TIER['basic']) : \App\Models\Tema::HARGA_BAWAAN_TIER['basic']),
             'diskon_tipe' => (string) ($galatDariModalTema ? old('diskon_tipe', '') : ''),
@@ -28,6 +32,7 @@
             'gambar_url' => '',
         ],
         'hargaBawaan' => \App\Models\Tema::HARGA_BAWAAN_TIER,
+        'lokasiViewBawaan' => $lokasiViewBawaan,
         'biayaTerimaBeres' => $biayaTerimaBeres,
         'storeUrl' => route('admin.tema.store'),
         'updateBaseUrl' => url('/admin/tema'),
@@ -45,6 +50,7 @@
         namaFileDipilih: '',
         ukuranFileDipilih: '',
         biayaTerimaBeres: 50000,
+        lokasiViewBawaan: 'tema.rustic-floral.index',
         form: {
             nama_tema: '',
             slug: '',
@@ -68,6 +74,7 @@
                 this.modalDiskonMassalTerbuka = Boolean(data.modalDiskonMassalTerbuka);
                 this.modeEdit = Boolean(data.modeEdit);
                 this.editId = data.editId ?? null;
+                this.lokasiViewBawaan = data.lokasiViewBawaan ?? 'tema.rustic-floral.index';
                 this.form = { ...this.form, ...(data.form ?? {}) };
                 this.hargaBawaan = data.hargaBawaan ?? {};
                 this.biayaTerimaBeres = Number(data.biayaTerimaBeres ?? 50000);
@@ -93,7 +100,7 @@
                 nama_tema: '',
                 slug: '',
                 kategori: 'modern',
-                lokasi_view: 'tema.rustic-floral.index',
+                lokasi_view: this.lokasiViewBawaan,
                 tier: 'basic',
                 harga: this.hargaBawaan.basic ?? 59000,
                 diskon_tipe: '',
@@ -111,7 +118,7 @@
                 nama_tema: tema.nama_tema || '',
                 slug: tema.slug || '',
                 kategori: tema.kategori || 'modern',
-                lokasi_view: tema.lokasi_view || 'tema.rustic-floral.index',
+                lokasi_view: tema.lokasi_view || this.lokasiViewBawaan,
                 tier: tema.tier || 'basic',
                 harga: Number(tema.harga ?? 59000),
                 diskon_tipe: tema.diskon_tipe || '',
@@ -532,15 +539,19 @@
                             </div>
 
                             <div>
-                                <label for="modal_lokasi_view" class="block text-xs font-semibold text-charcoal/80 mb-1">Lokasi View Blade</label>
-                                <input
+                                <label for="modal_lokasi_view" class="block text-xs font-semibold text-charcoal/80 mb-1">Template View Blade</label>
+                                <select
                                     id="modal_lokasi_view"
                                     name="lokasi_view"
-                                    type="text"
                                     x-model="form.lokasi_view"
                                     required
-                                    class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm font-mono focus:border-champagne focus:bg-white focus:outline-none"
+                                    class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none"
                                 >
+                                    @foreach ($daftarLokasiView as $viewDot => $viewLabel)
+                                        <option value="{{ $viewDot }}">{{ $viewLabel }}</option>
+                                    @endforeach
+                                </select>
+                                <p class="mt-1 text-[11px] text-charcoal/55">Otomatis membaca file Blade di <code class="font-mono">resources/views/tema/</code>.</p>
                             </div>
 
                             <div>

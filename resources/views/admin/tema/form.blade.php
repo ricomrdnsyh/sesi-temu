@@ -64,8 +64,17 @@
             </div>
 
             <div>
-                <label for="lokasi_view" class="block text-sm font-medium text-charcoal">Lokasi View Blade</label>
-                <input id="lokasi_view" name="lokasi_view" type="text" value="{{ old('lokasi_view', $tema->lokasi_view ?: 'tema.rustic-floral.index') }}" required class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm font-mono">
+                <label for="lokasi_view" class="block text-sm font-medium text-charcoal">Template View Blade</label>
+                @php
+                    $daftarLokasiView = $daftarLokasiView ?? \App\Models\Tema::daftarLokasiViewTersedia();
+                    $nilaiLokasiView = old('lokasi_view', $tema->lokasi_view ?: 'tema.rustic-floral.index');
+                @endphp
+                <select id="lokasi_view" name="lokasi_view" required class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm">
+                    @foreach ($daftarLokasiView as $viewDot => $viewLabel)
+                        <option value="{{ $viewDot }}" @selected($nilaiLokasiView === $viewDot)>{{ $viewLabel }}</option>
+                    @endforeach
+                </select>
+                <p class="mt-1 text-xs text-charcoal/60">Dipindai otomatis dari folder <code class="font-mono">resources/views/tema/</code>.</p>
             </div>
         </div>
 

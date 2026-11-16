@@ -6,6 +6,7 @@ use App\Models\Tema;
 use App\Services\PengolahGambarService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View as ViewFacade;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -21,19 +22,27 @@ class AdminTemaController extends Controller
         return view('admin.tema.index', [
             'daftarTema' => $daftarTema,
             'jumlahTemaDiskon' => $jumlahTemaDiskon,
+            'daftarLokasiView' => Tema::daftarLokasiViewTersedia(),
         ]);
     }
 
     public function create(): View
     {
+        $daftarLokasiView = Tema::daftarLokasiViewTersedia();
+        $lokasiBawaan = array_key_exists('tema.rustic-floral.index', $daftarLokasiView)
+            ? 'tema.rustic-floral.index'
+            : (array_key_first($daftarLokasiView) ?? 'tema.rustic-floral.index');
+
         return view('admin.tema.form', [
             'tema' => new Tema([
                 'kategori' => 'modern',
                 'tier' => 'basic',
                 'harga' => Tema::HARGA_BAWAAN_TIER['basic'],
+                'lokasi_view' => $lokasiBawaan,
                 'aktif' => true,
             ]),
             'modeEdit' => false,
+            'daftarLokasiView' => $daftarLokasiView,
         ]);
     }
 
@@ -61,6 +70,7 @@ class AdminTemaController extends Controller
         return view('admin.tema.form', [
             'tema' => $tema,
             'modeEdit' => true,
+            'daftarLokasiView' => Tema::daftarLokasiViewTersedia(),
         ]);
     }
 
@@ -109,7 +119,17 @@ class AdminTemaController extends Controller
             'harga' => ['nullable', 'integer', 'min:0', 'max:100000000'],
             'diskon_tipe' => ['nullable', Rule::in(['nominal', 'persen'])],
             'diskon_nilai' => ['nullable', 'integer', 'min:0', 'max:100000000'],
-            'lokasi_view' => ['required', 'string', 'max:150'],
+            'lokasi_view' => [
+                'required',
+                'string',
+                'max:150',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    $namaView = trim((string) $value);
+                    if (! Str::startsWith($namaView, 'tema.') || ! ViewFacade::exists($namaView)) {
+                        $fail("Template Blade \"{$namaView}\" tidak ditemukan di folder resources/views/tema/.");
+                    }
+                },
+            ],
             'gambar_pratinjau' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
