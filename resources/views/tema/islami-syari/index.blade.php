@@ -6,7 +6,7 @@
     'slugTema' => 'islami-syari',
     'tierBawaan' => 'basic',
     'gayaTataLetak' => 'mihrab',
-    'animasiSampul' => 'geser-atas',
+    'animasiSampul' => 'lipat-katedral-3d',
     'gayaGaleri' => 'grid',
     'bismillahHeader' => true,
     'gelap' => false,
@@ -32,7 +32,7 @@
     'subLabelGaleri' => 'Galeri Kenangan',
     'footerTeks' => "Wassalamu'alaikum Warahmatullahi Wabarakatuh",
     'ornamenUrl' => asset('aset-tema/islami-syari/ornamen-arabesque.webp'),
-    'efekMotion' => 'kilau',
+    'efekMotion' => 'zaitun-kilau',
     'bingkaiFoto' => 'katedral',
     'polaTekstur' => 'arabesque',
 ])

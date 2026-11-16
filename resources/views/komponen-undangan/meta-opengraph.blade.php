@@ -327,4 +327,241 @@
         pointer-events: none;
         animation: shimmerSweep 6s ease-in-out infinite;
     }
+
+    /* === ENGINE DIORAMA & PERGERAKAN 3D === */
+    .panggung-3d {
+        perspective: 1600px;
+        transform-style: preserve-3d;
+    }
+
+    .lapis-3d {
+        transform-style: preserve-3d;
+        transform: translate3d(
+            calc(var(--px, 0) * var(--depth, 10px)),
+            calc(var(--py, 0) * var(--depth, 8px) + var(--ps, 0px)),
+            var(--pz, 0px)
+        );
+        transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform;
+    }
+
+    .kartu-3d {
+        position: relative;
+        transform-style: preserve-3d;
+        transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(0);
+        transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+        box-shadow:
+            0 18px 40px -15px rgba(0, 0, 0, 0.22),
+            0 4px 12px -4px rgba(0, 0, 0, 0.12),
+            inset 0 1px 0 0 rgba(255, 255, 255, 0.24);
+        will-change: transform;
+    }
+
+    .kartu-3d:hover {
+        box-shadow:
+            0 28px 54px -16px rgba(0, 0, 0, 0.3),
+            0 10px 24px -8px rgba(191, 161, 95, 0.22),
+            inset 0 1px 0 0 rgba(255, 255, 255, 0.36);
+    }
+
+    body.siap-3d .masuk-3d {
+        opacity: 0;
+        transform: perspective(1200px) rotateX(12deg) translate3d(0, 34px, -36px) scale(0.97);
+        transition:
+            opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.95s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    body.siap-3d .masuk-3d.terlihat {
+        opacity: 1;
+        transform: perspective(1200px) rotateX(0deg) translate3d(0, 0, 0) scale(1);
+    }
+
+    @keyframes ayun3d {
+        0%, 100% {
+            transform: perspective(900px) rotateZ(-2.5deg) rotateY(-7deg) translate3d(0, 0px, 18px);
+        }
+        50% {
+            transform: perspective(900px) rotateZ(2.5deg) rotateY(7deg) translate3d(0, -7px, 28px);
+        }
+    }
+
+    @keyframes ayun3dBalik {
+        0%, 100% {
+            transform: perspective(900px) scaleX(-1) rotateZ(-2.5deg) rotateY(-7deg) translate3d(0, 0px, 18px);
+        }
+        50% {
+            transform: perspective(900px) scaleX(-1) rotateZ(2.5deg) rotateY(7deg) translate3d(0, -7px, 28px);
+        }
+    }
+
+    @keyframes kelopak3d {
+        0% {
+            transform: perspective(700px) translate3d(0, -10%, 0) rotate3d(1, 0.8, 0.3, 0deg) scale(0.9);
+            opacity: 0;
+        }
+        15% {
+            opacity: 0.92;
+        }
+        50% {
+            transform: perspective(700px) translate3d(28px, 48vh, 45px) rotate3d(1, 0.9, 0.5, 190deg) scale(1.05);
+            opacity: 0.82;
+        }
+        85% {
+            opacity: 0.78;
+        }
+        100% {
+            transform: perspective(700px) translate3d(-20px, 104vh, 10px) rotate3d(1, 0.6, 0.4, 360deg) scale(0.85);
+            opacity: 0;
+        }
+    }
+
+    @keyframes burungTerbang {
+        0% {
+            transform: translate3d(-18%, 32px, 15px) scale(0.75);
+            opacity: 0;
+        }
+        12% {
+            opacity: 0.78;
+        }
+        55% {
+            transform: translate3d(52vw, -18px, 45px) scale(0.95);
+            opacity: 0.72;
+        }
+        88% {
+            opacity: 0.65;
+        }
+        100% {
+            transform: translate3d(115%, -48px, 25px) scale(0.82);
+            opacity: 0;
+        }
+    }
+
+    @keyframes sayapKepak {
+        0%, 100% {
+            transform: scaleY(1);
+        }
+        50% {
+            transform: scaleY(0.32);
+        }
+    }
+
+    @keyframes sinarCahaya {
+        0%, 100% {
+            opacity: 0.25;
+            transform: rotate(-18deg) scaleY(1);
+        }
+        50% {
+            opacity: 0.55;
+            transform: rotate(-14deg) scaleY(1.08);
+        }
+    }
+
+    @keyframes flipAngka3d {
+        0% {
+            transform: perspective(500px) rotateX(-68deg) scale(0.92);
+            opacity: 0.45;
+        }
+        100% {
+            transform: perspective(500px) rotateX(0deg) scale(1);
+            opacity: 1;
+        }
+    }
+
+    .animasi-ayun-3d {
+        animation: ayun3d 7s ease-in-out infinite;
+        transform-origin: top left;
+        will-change: transform;
+    }
+
+    .animasi-ayun-3d-balik {
+        animation: ayun3dBalik 7.4s ease-in-out infinite;
+        transform-origin: top center;
+        will-change: transform;
+    }
+
+    .animasi-kelopak-3d {
+        animation: kelopak3d 11.5s linear infinite;
+        will-change: transform, opacity;
+    }
+
+    .animasi-burung {
+        animation: burungTerbang 18s linear infinite;
+        will-change: transform, opacity;
+    }
+
+    .animasi-kepak {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: sayapKepak 0.55s ease-in-out infinite;
+    }
+
+    .animasi-sinar {
+        animation: sinarCahaya 9s ease-in-out infinite;
+        pointer-events: none;
+    }
+
+    .angka-flip-3d {
+        display: inline-block;
+        animation: flipAngka3d 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .gerbang-3d {
+        perspective: 1800px;
+        transform-style: preserve-3d;
+    }
+
+    .panel-gerbang-kiri {
+        transform-origin: left center;
+        backface-visibility: hidden;
+        transition: transform 1.15s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.85s ease;
+    }
+
+    .panel-gerbang-kanan {
+        transform-origin: right center;
+        backface-visibility: hidden;
+        transition: transform 1.15s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.85s ease;
+    }
+
+    .lipat-katedral-3d {
+        transform-origin: top center;
+        backface-visibility: hidden;
+        transition: transform 1.1s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.85s ease;
+    }
+
+    .halaman-editorial-3d {
+        transform-origin: left center;
+        backface-visibility: hidden;
+        transition: transform 1.15s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.8s ease;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .animasi-nafas,
+        .animasi-goyang,
+        .animasi-melayang,
+        .animasi-bintang,
+        .animasi-kilau,
+        .animasi-kelopak-jatuh,
+        .animasi-kunang,
+        .animasi-debu-emas,
+        .animasi-bintang-jatuh,
+        .animasi-orbit,
+        .animasi-orbit-balik,
+        .animasi-segel,
+        .animasi-awan,
+        .animasi-marquee,
+        .animasi-ayun-3d,
+        .animasi-ayun-3d-balik,
+        .animasi-kelopak-3d,
+        .animasi-burung,
+        .animasi-kepak,
+        .animasi-sinar,
+        .efek-shimmer-kartu::after {
+            animation: none !important;
+        }
+        body.siap-3d .masuk-3d {
+            opacity: 1 !important;
+            transform: none !important;
+        }
+    }
 </style>

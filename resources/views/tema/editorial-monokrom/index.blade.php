@@ -6,7 +6,7 @@
     'slugTema' => 'editorial-monokrom',
     'tierBawaan' => 'premium',
     'gayaTataLetak' => 'editorial',
-    'animasiSampul' => 'editorial-tirai',
+    'animasiSampul' => 'halaman-editorial-3d',
     'gayaGaleri' => 'editorial',
     'tampilMarquee' => true,
     'tampilScrollProgress' => true,

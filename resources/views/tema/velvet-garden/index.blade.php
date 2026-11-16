@@ -6,7 +6,7 @@
     'slugTema' => 'velvet-garden',
     'tierBawaan' => 'eksklusif',
     'gayaTataLetak' => 'taman',
-    'animasiSampul' => 'tirai-mewah',
+    'animasiSampul' => 'tirai-portal-3d',
     'kelasTirai' => 'bg-[#0E1E18]/95 border-[#C8A464]/65',
     'gayaGaleri' => 'unggulan',
     'tampilMarquee' => true,

@@ -6,7 +6,7 @@
     'slugTema' => 'luxury-noir',
     'tierBawaan' => 'eksklusif',
     'gayaTataLetak' => 'artdeco',
-    'animasiSampul' => 'tirai-mewah',
+    'animasiSampul' => 'tirai-portal-3d',
     'kelasTirai' => 'bg-[#09090D]/95 border-[#D4AF37]/65',
     'gayaGaleri' => 'unggulan',
     'tampilMarquee' => true,

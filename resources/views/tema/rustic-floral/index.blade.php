@@ -6,7 +6,7 @@
     'slugTema' => 'rustic-floral',
     'tierBawaan' => 'basic',
     'gayaTataLetak' => 'klasik',
-    'animasiSampul' => 'geser-atas',
+    'animasiSampul' => 'halaman-editorial-3d',
     'gayaGaleri' => 'grid',
     'gelap' => false,
     'kelasTeksSampul' => 'text-[#1F2937]',

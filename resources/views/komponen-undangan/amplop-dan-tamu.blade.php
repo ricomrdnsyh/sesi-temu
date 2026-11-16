@@ -13,7 +13,7 @@
 {{-- Live Streaming --}}
 @if (!empty($live['aktif']) && !empty($live['link']))
 <section data-aos="fade-up" data-aos-duration="1000" class="py-12 px-4">
-    <div class="max-w-2xl mx-auto {{ $kelasRadiusBesar }} p-7 text-center {{ $ekstraKartu }} {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
+    <div class="max-w-2xl mx-auto {{ $kelasRadiusBesar }} p-7 text-center kartu-3d masuk-3d {{ $ekstraKartu }} {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
         <p class="text-xs font-semibold uppercase tracking-[0.25em] {{ $kelasAksen ?? 'text-champagne' }}">Siaran Langsung</p>
         <h2 class="mt-2 font-serif text-3xl font-bold">Live Streaming ({{ $live['platform'] ?? 'Online' }})</h2>
         <p class="mt-2 text-sm opacity-75">Bagi kerabat yang berhalangan hadir langsung, silakan menyaksikan momen sakral kami secara virtual.</p>
@@ -32,11 +32,11 @@
         <h2 class="mt-2 font-serif text-3xl sm:text-4xl font-bold">Amplop Digital</h2>
         <p class="mt-2 text-sm opacity-75 max-w-xl mx-auto">Doa restu Anda merupakan karunia terindah bagi kami. Apabila hendak mengirimkan tanda kasih, dapat melalui rekening berikut:</p>
 
-        <div class="mt-7 grid grid-cols-1 gap-4 text-left">
+        <div class="mt-7 grid grid-cols-1 gap-4 text-left panggung-3d">
             @foreach ($undangan->daftarAmplop as $amplop)
                 <div
                     x-data="{ tersalin: false }"
-                    class="{{ $kelasRadiusSedang }} p-5 shadow-sm flex flex-col justify-between gap-4 {{ $ekstraKartu }} {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}"
+                    class="{{ $kelasRadiusSedang }} p-5 kartu-3d masuk-3d flex flex-col justify-between gap-4 {{ $ekstraKartu }} {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}"
                 >
                     <div>
                         <p class="text-xs font-bold uppercase tracking-wider {{ $kelasAksen ?? 'text-champagne' }}">{{ $amplop->nama_bank }}</p>
@@ -56,7 +56,7 @@
         </div>
 
         @if ($alamatKado !== '')
-            <div class="mt-6 {{ $kelasRadiusSedang }} p-5 text-center {{ $ekstraKartu }} {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
+            <div class="mt-6 {{ $kelasRadiusSedang }} p-5 text-center kartu-3d masuk-3d {{ $ekstraKartu }} {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
                 <p class="text-xs font-bold uppercase tracking-wider {{ $kelasAksen ?? 'text-champagne' }}">Alamat Pengiriman Kado Fisik</p>
                 <p class="mt-1.5 text-sm opacity-85">{{ $alamatKado }}</p>
             </div>
@@ -74,7 +74,7 @@
             <h2 class="mt-2 font-serif text-3xl sm:text-4xl font-bold">Buku Tamu &amp; RSVP</h2>
         </div>
 
-        <div class="mt-8 {{ $kelasRadiusBesar }} p-6 sm:p-8 shadow-sm {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
+        <div class="mt-8 {{ $kelasRadiusBesar }} p-6 sm:p-8 kartu-3d masuk-3d {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
             @if (session('sukses_ucapan'))
                 <div class="mb-5 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-800">
                     {{ session('sukses_ucapan') }}

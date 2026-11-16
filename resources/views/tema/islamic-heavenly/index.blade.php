@@ -6,7 +6,7 @@
     'slugTema' => 'islamic-heavenly',
     'tierBawaan' => 'eksklusif',
     'gayaTataLetak' => 'celestial',
-    'animasiSampul' => 'tirai-mewah',
+    'animasiSampul' => 'tirai-portal-3d',
     'kelasTirai' => 'bg-[#0A1523]/95 border-[#D9B664]/65',
     'gayaGaleri' => 'unggulan',
     'tampilMarquee' => true,

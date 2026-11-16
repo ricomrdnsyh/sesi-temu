@@ -173,19 +173,19 @@ class TierDanHargaTemaTest extends TestCase
 
         $this->get('/demo/adat-jawa')
             ->assertOk()
-            ->assertSee('translateX(-100%)')
+            ->assertSee('rotateY(-112deg)')
             ->assertSee('animasi-marquee');
 
         $this->get('/demo/sunda-heritage')
             ->assertOk()
-            ->assertSee('animasi-kelopak-jatuh')
+            ->assertSee('animasi-kelopak-3d')
             ->assertSee('animasi-awan')
-            ->assertSee('translateX(-100%)');
+            ->assertSee('rotateY(-112deg)');
 
         $this->get('/demo/royal-ivory')
             ->assertOk()
             ->assertSee('animasi-segel')
-            ->assertSee('scale(1.08)');
+            ->assertSee('rotateX(78deg)');
 
         // Eksklusif: tirai sinematik + partikel kaya + orbit crest + shimmer kartu + galeri unggulan
         $this->get('/demo/luxury-noir')
@@ -197,7 +197,7 @@ class TierDanHargaTemaTest extends TestCase
 
         $this->get('/demo/velvet-garden')
             ->assertOk()
-            ->assertSee('animasi-kelopak-jatuh')
+            ->assertSee('animasi-kelopak-3d')
             ->assertSee('animasi-kunang')
             ->assertSee('animasi-melayang')
             ->assertSee('efek-shimmer-kartu');

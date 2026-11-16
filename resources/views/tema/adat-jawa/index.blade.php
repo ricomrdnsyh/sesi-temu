@@ -6,7 +6,7 @@
     'slugTema' => 'adat-jawa',
     'tierBawaan' => 'premium',
     'gayaTataLetak' => 'keraton',
-    'animasiSampul' => 'belah-pintu',
+    'animasiSampul' => 'belah-pintu-3d',
     'kelasTirai' => 'bg-[#23150E]/95 border-[#D4AF37]/60',
     'gayaGaleri' => 'grid',
     'tampilMarquee' => true,
@@ -37,7 +37,7 @@
     'subLabelGaleri' => 'Galeri Foto',
     'footerTeks' => 'Undangan Adat Jawa Keraton oleh',
     'ornamenUrl' => asset('aset-tema/adat-jawa/ornamen-gunungan.webp'),
-    'efekMotion' => 'kilau',
+    'efekMotion' => 'wayang-flora',
     'bingkaiFoto' => 'bulat',
     'polaTekstur' => 'batik',
 ])

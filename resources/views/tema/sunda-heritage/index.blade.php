@@ -6,7 +6,7 @@
     'slugTema' => 'sunda-heritage',
     'tierBawaan' => 'premium',
     'gayaTataLetak' => 'priangan',
-    'animasiSampul' => 'belah-pintu',
+    'animasiSampul' => 'belah-pintu-3d',
     'kelasTirai' => 'bg-[#FAF4E8]/95 border-[#C59B43]/60',
     'gayaGaleri' => 'grid',
     'tampilMarquee' => true,
@@ -36,7 +36,7 @@
     'subLabelGaleri' => 'Galeri Momen',
     'footerTeks' => 'Adat Sunda Siger Heritage oleh',
     'ornamenUrl' => asset('aset-tema/sunda-heritage/ornamen-siger.webp'),
-    'efekMotion' => 'melati',
+    'efekMotion' => 'melati-burung',
     'bingkaiFoto' => 'bulat',
     'polaTekstur' => 'batik',
 ])

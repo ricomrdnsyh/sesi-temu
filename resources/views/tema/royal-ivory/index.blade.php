@@ -6,7 +6,7 @@
     'slugTema' => 'royal-ivory',
     'tierBawaan' => 'premium',
     'gayaTataLetak' => 'katedral',
-    'animasiSampul' => 'zoom-elegan',
+    'animasiSampul' => 'lipat-katedral-3d',
     'gayaGaleri' => 'grid',
     'tampilMarquee' => true,
     'tampilScrollProgress' => true,
@@ -35,7 +35,7 @@
     'subLabelGaleri' => 'Captured Moments',
     'footerTeks' => 'Luxury Royal Ivory oleh',
     'ornamenUrl' => asset('aset-tema/royal-ivory/ornamen-katedral.webp'),
-    'efekMotion' => 'kilau',
+    'efekMotion' => 'katedral-cahaya',
     'bingkaiFoto' => 'katedral',
     'polaTekstur' => 'floral',
 ])
