@@ -3,27 +3,27 @@
 @section('judul', 'Manajemen Undangan — Admin SesiTemu')
 
 @section('isi_admin')
-<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
     <div>
-        <h1 class="font-serif text-3xl font-bold text-charcoal">Manajemen &amp; Aktivasi Undangan</h1>
+        <h1 class="font-serif text-2xl sm:text-3xl font-bold text-charcoal">Manajemen &amp; Aktivasi Undangan</h1>
         <p class="text-sm text-charcoal/70 mt-1">Aktifkan undangan client selama 3 bulan atau bantu edit untuk Paket Terima Beres.</p>
     </div>
 
-    <form action="{{ route('admin.undangan.index') }}" method="GET" class="flex flex-wrap gap-2">
+    <form action="{{ route('admin.undangan.index') }}" method="GET" class="flex flex-col sm:flex-row flex-wrap gap-2 w-full xl:w-auto">
         <input
             type="text"
             name="q"
             value="{{ $pencarian }}"
             placeholder="Cari slug atau nama client..."
-            class="rounded-xl border border-charcoal/15 bg-white px-4 py-2 text-sm focus:border-champagne focus:outline-none"
+            class="w-full sm:w-64 lg:w-72 rounded-xl border border-charcoal/15 bg-white px-4 py-2 text-sm focus:border-champagne focus:outline-none"
         >
-        <select name="status" class="rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm">
+        <select name="status" class="w-full sm:w-auto rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm">
             <option value="semua" @selected($status === 'semua')>Semua Status</option>
             <option value="draft" @selected($status === 'draft')>Draft</option>
             <option value="aktif" @selected($status === 'aktif')>Aktif</option>
             <option value="kedaluwarsa" @selected($status === 'kedaluwarsa')>Kedaluwarsa</option>
         </select>
-        <button type="submit" class="rounded-xl bg-sage px-4 py-2 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer">
+        <button type="submit" class="rounded-xl bg-sage px-5 py-2 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer shrink-0">
             Filter
         </button>
     </form>

@@ -3,15 +3,15 @@
 @section('judul', 'Manajemen Pengguna — Admin SesiTemu')
 
 @section('isi_admin')
-<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
     <div>
-        <h1 class="font-serif text-3xl font-bold text-charcoal">Manajemen Client &amp; Follow-Up</h1>
+        <h1 class="font-serif text-2xl sm:text-3xl font-bold text-charcoal">Manajemen Client &amp; Follow-Up</h1>
         <p class="text-sm text-charcoal/70 mt-1">Hubungi client via WhatsApp atau lakukan reset kata sandi secara manual.</p>
     </div>
 
-    <form action="{{ route('admin.pengguna.index') }}" method="GET" class="flex gap-2">
-        <input type="text" name="q" value="{{ $pencarian }}" placeholder="Cari nama, email, atau WA..." class="rounded-xl border border-charcoal/15 bg-white px-4 py-2 text-sm">
-        <button type="submit" class="rounded-xl bg-sage px-4 py-2 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer">Cari</button>
+    <form action="{{ route('admin.pengguna.index') }}" method="GET" class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+        <input type="text" name="q" value="{{ $pencarian }}" placeholder="Cari nama, email, atau WA..." class="w-full sm:w-72 rounded-xl border border-charcoal/15 bg-white px-4 py-2 text-sm focus:border-champagne focus:outline-none">
+        <button type="submit" class="rounded-xl bg-sage px-5 py-2 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer shrink-0">Cari</button>
     </form>
 </div>
 

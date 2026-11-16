@@ -162,7 +162,7 @@
             aria-label="Header Panel Admin"
             class="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-champagne/25"
         >
-            <div class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+            <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-10 h-16 flex items-center justify-between gap-4">
                 <div class="flex items-center gap-3 min-w-0">
                     <button
                         type="button"
@@ -211,7 +211,7 @@
             </div>
         </header>
 
-        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        <main class="flex-1 w-full px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8 space-y-6">
             @if (session('sukses'))
                 <div class="rounded-xl bg-sage/10 border border-sage/30 px-4 py-3 text-sm text-sage">
                     {{ session('sukses') }}

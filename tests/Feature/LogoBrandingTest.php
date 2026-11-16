@@ -107,7 +107,8 @@ class LogoBrandingTest extends TestCase
                 ->assertSee('aria-label="Header Panel Admin"', false)
                 ->assertSee('Menu Utama')
                 ->assertSee('Dasbor Client')
-                ->assertSee('Administrator');
+                ->assertSee('Administrator')
+                ->assertDontSee('flex-1 max-w-7xl', false);
 
             $konten = $respon->getContent();
             if (preg_match('/<header\b[^>]*>.*?<\/header>/s', $konten, $cocokHeader)) {
