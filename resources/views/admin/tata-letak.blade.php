@@ -1,5 +1,9 @@
 @extends('layouts.aplikasi')
 
+@push('kepala')
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+@endpush
+
 @section('konten')
 @php
     $judulHeaderAdmin = match (true) {
@@ -30,21 +34,27 @@
         class="fixed inset-y-0 left-0 z-40 w-64 xl:w-72 shrink-0 bg-charcoal text-ivory border-r border-champagne/25 flex flex-col justify-between transition-transform duration-200 ease-in-out md:sticky md:top-0 md:h-screen md:translate-x-0"
     >
         <div class="flex flex-col flex-1 min-h-0">
-            {{-- Brand Sidebar (Logo Lengkap Tanpa Teks Tambahan) --}}
-            <div class="py-4 px-5 border-b border-white/10 flex items-center justify-between md:justify-center gap-3">
-                <a href="{{ route('admin.ringkasan') }}" aria-label="Beranda Admin" class="inline-flex items-center justify-center rounded-2xl bg-[#FBF3E6] px-4 py-2 shadow-sm transition hover:scale-105">
-                    <img
-                        src="{{ asset('aset-demo/logo-sesi-temu-lengkap.webp') }}"
-                        alt="Logo SesiTemu"
-                        class="h-14 w-auto object-contain"
-                    >
+            {{-- Brand Sidebar (Logo + SesiTemu Rata Tengah, Garis Sejajar Header) --}}
+            <div class="h-16 shrink-0 px-5 border-b border-champagne/25 flex items-center justify-center relative">
+                <a href="{{ route('admin.ringkasan') }}" class="inline-flex items-center justify-center gap-2.5 leading-none">
+                    <span class="inline-flex items-center justify-center rounded-xl bg-[#FBF3E6] p-1 shadow-sm shrink-0">
+                        <img
+                            src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}"
+                            alt="Logo SesiTemu"
+                            class="h-8 w-8 object-contain"
+                        >
+                    </span>
+                    <span
+                        class="text-[22px] font-bold tracking-tight text-white"
+                        style="font-family: 'Playfair Display', Georgia, serif;"
+                    >Sesi<span class="text-champagne">Temu</span></span>
                 </a>
 
                 <button
                     type="button"
                     @click="sidebarTerbuka = false"
                     aria-label="Tutup menu admin"
-                    class="md:hidden rounded-lg p-1.5 text-ivory/70 hover:bg-white/10 hover:text-white cursor-pointer"
+                    class="md:hidden absolute right-3 rounded-lg p-1.5 text-ivory/70 hover:bg-white/10 hover:text-white cursor-pointer"
                 >
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -147,9 +157,9 @@
     <div class="flex-1 min-w-0 flex flex-col">
         <header
             aria-label="Header Panel Admin"
-            class="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-champagne/25"
+            class="sticky top-0 z-20 h-16 shrink-0 bg-white/95 backdrop-blur-md border-b border-champagne/25"
         >
-            <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-10 h-16 flex items-center justify-between gap-4">
+            <div class="w-full h-full px-4 sm:px-6 lg:px-8 xl:px-10 flex items-center justify-between gap-4">
                 <div class="flex items-center gap-3 min-w-0">
                     <button
                         type="button"
