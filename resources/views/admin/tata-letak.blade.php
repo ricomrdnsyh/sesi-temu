@@ -89,7 +89,7 @@
             </div>
 
             {{-- Navigasi Vertikal --}}
-            <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto text-sm">
+            <nav class="admin-sidebar-scroll flex-1 px-4 py-3 space-y-1 overflow-y-auto text-sm">
                 <p class="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-ivory/45">
                     MAIN
                 </p>
