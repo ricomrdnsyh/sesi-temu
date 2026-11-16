@@ -15,19 +15,19 @@
     </form>
 </div>
 
-<div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-champagne/20 overflow-x-auto">
-    <table class="min-w-full text-sm">
+<div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-champagne/20">
+    <table data-datatable data-page-length="10" data-empty-message="Belum ada pengguna client terdaftar." class="w-full text-sm">
         <thead>
             <tr class="border-b border-champagne/20 text-left text-xs uppercase text-charcoal/60">
                 <th class="py-3 pr-4">Nama Client</th>
                 <th class="py-3 pr-4">Email</th>
                 <th class="py-3 pr-4">WhatsApp</th>
-                <th class="py-3 pr-4">Jumlah Undangan</th>
+                <th class="py-3 pr-4 dt-left">Jumlah Undangan</th>
                 <th class="py-3 text-right">Reset Kata Sandi Manual</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-champagne/15">
-            @forelse ($daftarPengguna as $pengguna)
+            @foreach ($daftarPengguna as $pengguna)
                 @php
                     $waBersih = preg_replace('/[^0-9]/', '', (string) $pengguna->nomor_wa);
                     if ($waBersih && str_starts_with($waBersih, '0')) {
@@ -51,7 +51,7 @@
                             <span class="text-xs text-charcoal/50">-</span>
                         @endif
                     </td>
-                    <td class="py-3.5 pr-4 font-semibold">{{ $pengguna->undangan_count }}</td>
+                    <td class="py-3.5 pr-4 font-semibold dt-left">{{ $pengguna->undangan_count }}</td>
                     <td class="py-3.5 text-right">
                         <form action="{{ route('admin.pengguna.reset-sandi', $pengguna) }}" method="POST" class="inline-flex items-center gap-2">
                             @csrf
@@ -63,16 +63,8 @@
                         </form>
                     </td>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="5" class="py-8 text-center text-charcoal/60">Belum ada pengguna client terdaftar.</td>
-                </tr>
-            @endforelse
+            @endforeach
         </tbody>
     </table>
-
-    <div class="mt-4">
-        {{ $daftarPengguna->links() }}
-    </div>
 </div>
 @endsection

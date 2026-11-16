@@ -29,8 +29,8 @@
     </form>
 </div>
 
-<div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-champagne/20 overflow-x-auto">
-    <table class="min-w-full text-sm">
+<div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-champagne/20">
+    <table data-datatable data-page-length="10" data-empty-message="Tidak ada undangan yang cocok dengan filter." class="w-full text-sm">
         <thead>
             <tr class="border-b border-champagne/20 text-left text-xs uppercase text-charcoal/60">
                 <th class="py-3 pr-4">Undangan &amp; Slug</th>
@@ -41,7 +41,7 @@
             </tr>
         </thead>
         <tbody class="divide-y divide-champagne/15">
-            @forelse ($daftarUndangan as $undangan)
+            @foreach ($daftarUndangan as $undangan)
                 @php
                     $urlPublik = Route::has('undangan.tampil') ? route('undangan.tampil', $undangan->slug) : url('/'.$undangan->slug);
                 @endphp
@@ -94,16 +94,8 @@
                         </div>
                     </td>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="5" class="py-8 text-center text-charcoal/60">Tidak ada undangan yang cocok dengan filter.</td>
-                </tr>
-            @endforelse
+            @endforeach
         </tbody>
     </table>
-
-    <div class="mt-4">
-        {{ $daftarUndangan->links() }}
-    </div>
 </div>
 @endsection

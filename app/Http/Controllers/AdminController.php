@@ -36,7 +36,7 @@ class AdminController extends Controller
 
         $undanganTerbaru = Undangan::with(['pengguna', 'tema'])
             ->latest()
-            ->limit(5)
+            ->limit(25)
             ->get();
 
         return view('admin.ringkasan', [
@@ -82,7 +82,7 @@ class AdminController extends Controller
                 ->where('berlaku_sampai', '<', now());
         }
 
-        $daftarUndangan = $query->paginate(15)->withQueryString();
+        $daftarUndangan = $query->get();
 
         return view('admin.undangan.index', [
             'daftarUndangan' => $daftarUndangan,
@@ -134,7 +134,7 @@ class AdminController extends Controller
             });
         }
 
-        $daftarPengguna = $query->paginate(15)->withQueryString();
+        $daftarPengguna = $query->get();
 
         return view('admin.pengguna.index', [
             'daftarPengguna' => $daftarPengguna,

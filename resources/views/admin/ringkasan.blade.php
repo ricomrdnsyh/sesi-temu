@@ -201,8 +201,8 @@
         <a href="{{ route('admin.undangan.index') }}" class="text-xs sm:text-sm font-semibold text-sage hover:underline">Lihat Semua →</a>
     </div>
 
-    <div class="overflow-x-auto">
-        <table class="min-w-full text-sm">
+    <div>
+        <table data-datatable data-page-length="5" data-empty-message="Belum ada data undangan." class="w-full text-sm">
             <thead>
                 <tr class="border-b border-champagne/20 text-left text-xs uppercase text-charcoal/60">
                     <th class="py-3 pr-4">Pasangan &amp; Link</th>
@@ -213,7 +213,7 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-champagne/15">
-                @forelse ($undanganTerbaru as $item)
+                @foreach ($undanganTerbaru as $item)
                     <tr>
                         <td class="py-3 pr-4">
                             <p class="font-semibold text-charcoal">{{ $item->nama_panggilan_pria }} &amp; {{ $item->nama_panggilan_wanita }}</p>
@@ -234,11 +234,7 @@
                             <a href="{{ route('dasbor.undangan.kelola', $item) }}" class="text-xs font-semibold text-sage hover:underline">Edit Isian Client</a>
                         </td>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="py-6 text-center text-charcoal/60">Belum ada data undangan.</td>
-                    </tr>
-                @endforelse
+                @endforeach
             </tbody>
         </table>
     </div>

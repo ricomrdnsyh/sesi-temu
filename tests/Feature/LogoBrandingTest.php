@@ -155,4 +155,33 @@ class LogoBrandingTest extends TestCase
             ->assertSee('Ucapan &amp; RSVP', false)
             ->assertSee('Pintasan Cepat');
     }
+
+    /**
+     * Memastikan seluruh tabel utama pada panel admin siap diinisialisasi oleh DataTables.
+     */
+    public function test_tabel_panel_admin_menggunakan_datatables(): void
+    {
+        $admin = Pengguna::factory()->admin()->create();
+        $client = Pengguna::factory()->create(['peran' => 'client']);
+
+        foreach ([
+            '/admin' => 'data-page-length="5"',
+            '/admin/undangan' => 'data-page-length="10"',
+            '/admin/pengguna' => 'data-page-length="10"',
+        ] as $rute => $pageLengthAttr) {
+            $this->actingAs($admin)
+                ->get($rute)
+                ->assertOk()
+                ->assertSee('data-datatable', false)
+                ->assertSee($pageLengthAttr, false)
+                ->assertSee('data-empty-message', false)
+                ->assertDontSee('colspan="5"', false);
+        }
+
+        $this->actingAs($admin)
+            ->get('/admin/pengguna')
+            ->assertOk()
+            ->assertSee($client->email)
+            ->assertSee('Reset Sandi');
+    }
 }
