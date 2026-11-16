@@ -13,6 +13,9 @@
     @stack('kepala')
 </head>
 <body class="bg-ivory text-charcoal antialiased min-h-screen flex flex-col">
+    @if (session('sukses'))
+        <div data-swal-success="{{ session('sukses') }}" hidden aria-hidden="true"></div>
+    @endif
     @yield('konten')
     @stack('skrip')
 </body>

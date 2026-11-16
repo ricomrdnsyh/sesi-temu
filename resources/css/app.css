@@ -208,3 +208,28 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
     background: #FDFBF7 !important;
     border-color: rgba(31, 41, 55, 0.08) !important;
 }
+
+/* SesiTemu SweetAlert2 Theme */
+.swal2-popup {
+    font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif !important;
+    border-radius: 1rem !important;
+    color: #1F2937 !important;
+}
+
+.swal2-title {
+    font-size: 1.2rem !important;
+    font-weight: 700 !important;
+    color: #1F2937 !important;
+}
+
+.swal2-html-container {
+    font-size: 0.875rem !important;
+    color: rgba(31, 41, 55, 0.78) !important;
+}
+
+.swal2-actions button {
+    border-radius: 0.75rem !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+    padding: 0.55rem 1.15rem !important;
+}

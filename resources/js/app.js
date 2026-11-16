@@ -1,11 +1,28 @@
 import Alpine from 'alpinejs';
 import DataTable from 'datatables.net-dt';
+import Swal from 'sweetalert2';
 
 window.Alpine = Alpine;
+window.Swal = Swal;
 
 Alpine.start();
 
 document.addEventListener('DOMContentLoaded', () => {
+    const flashSuccess = document.querySelector('[data-swal-success]');
+    const pesanSukses = flashSuccess?.dataset.swalSuccess?.trim();
+
+    if (pesanSukses) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: pesanSukses,
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#4B6358',
+            timer: 3500,
+            timerProgressBar: true,
+        });
+    }
+
     const tables = document.querySelectorAll('table[data-datatable]');
 
     tables.forEach((table) => {
@@ -59,5 +76,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
             },
         });
+    });
+});
+
+document.addEventListener('submit', (event) => {
+    const form = event.target.closest('form[data-swal-confirm]');
+    if (!form || form.dataset.swalConfirmed === 'true') {
+        return;
+    }
+
+    event.preventDefault();
+
+    Swal.fire({
+        title: form.dataset.swalTitle ?? 'Konfirmasi Tindakan',
+        text: form.dataset.swalConfirm ?? 'Apakah Anda yakin ingin melanjutkan?',
+        icon: form.dataset.swalIcon ?? 'question',
+        showCancelButton: true,
+        confirmButtonText: form.dataset.swalConfirmButton ?? 'Ya, Lanjutkan',
+        cancelButtonText: form.dataset.swalCancelButton ?? 'Batal',
+        confirmButtonColor: form.dataset.swalConfirmColor ?? '#4B6358',
+        cancelButtonColor: '#6B7280',
+        reverseButtons: true,
+        focusCancel: true,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            form.dataset.swalConfirmed = 'true';
+            HTMLFormElement.prototype.submit.call(form);
+        }
     });
 });

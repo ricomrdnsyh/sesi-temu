@@ -255,12 +255,6 @@
         </header>
 
         <main class="flex-1 w-full px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8 space-y-6">
-            @if (session('sukses'))
-                <div class="rounded-xl bg-sage/10 border border-sage/30 px-4 py-3 text-sm text-sage">
-                    {{ session('sukses') }}
-                </div>
-            @endif
-
             @if ($errors->any())
                 <div class="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
                     <ul class="list-disc list-inside space-y-1">

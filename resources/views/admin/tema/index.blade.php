@@ -49,7 +49,15 @@
                     <a href="{{ route('admin.tema.edit', $tema) }}" class="flex-1 text-center rounded-xl border border-champagne px-3.5 py-2 text-xs font-semibold text-charcoal hover:bg-champagne/10">
                         Edit Tema
                     </a>
-                    <form action="{{ route('admin.tema.destroy', $tema) }}" method="POST" onsubmit="return confirm('Hapus tema ini?')">
+                    <form
+                        action="{{ route('admin.tema.destroy', $tema) }}"
+                        method="POST"
+                        data-swal-title="Hapus Tema?"
+                        data-swal-confirm="Yakin ingin menghapus tema {{ $tema->nama_tema }}?"
+                        data-swal-icon="warning"
+                        data-swal-confirm-button="Ya, Hapus"
+                        data-swal-confirm-color="#DC2626"
+                    >
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="rounded-xl border border-red-200 px-3.5 py-2 text-xs font-semibold text-red-700 hover:bg-red-50 cursor-pointer">

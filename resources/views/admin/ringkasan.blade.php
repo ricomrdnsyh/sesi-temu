@@ -38,7 +38,15 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-3 shrink-0">
-            <form action="{{ route('admin.undangan.bersihkan') }}" method="POST" onsubmit="return confirm('Jalankan pembersihan foto untuk seluruh undangan yang sudah kedaluwarsa?')">
+            <form
+                action="{{ route('admin.undangan.bersihkan') }}"
+                method="POST"
+                data-swal-title="Bersihkan Storage Kedaluwarsa?"
+                data-swal-confirm="Jalankan pembersihan foto untuk seluruh undangan yang sudah kedaluwarsa?"
+                data-swal-icon="warning"
+                data-swal-confirm-button="Ya, Bersihkan"
+                data-swal-confirm-color="#BFA15F"
+            >
                 @csrf
                 <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-champagne px-4 py-2.5 text-xs sm:text-sm font-semibold text-charcoal hover:brightness-105 transition shadow-sm cursor-pointer">
                     <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

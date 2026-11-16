@@ -74,7 +74,15 @@
                             </a>
 
                             @if ($undangan->status_publikasi && ! $undangan->sudahKedaluwarsa())
-                                <form action="{{ route('admin.undangan.nonaktifkan', $undangan) }}" method="POST">
+                                <form
+                                    action="{{ route('admin.undangan.nonaktifkan', $undangan) }}"
+                                    method="POST"
+                                    data-swal-title="Nonaktifkan Undangan?"
+                                    data-swal-confirm="Undangan {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }} (sesitemu.id/{{ $undangan->slug }}) akan dikembalikan ke mode Draft."
+                                    data-swal-icon="warning"
+                                    data-swal-confirm-button="Ya, Nonaktifkan"
+                                    data-swal-confirm-color="#D97706"
+                                >
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" title="Nonaktifkan Undangan" class="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50/70 px-2.5 py-1.5 text-xs font-semibold text-amber-800 hover:bg-amber-100/80 cursor-pointer transition">
@@ -87,7 +95,15 @@
                                     </button>
                                 </form>
                             @else
-                                <form action="{{ route('admin.undangan.aktifkan', $undangan) }}" method="POST">
+                                <form
+                                    action="{{ route('admin.undangan.aktifkan', $undangan) }}"
+                                    method="POST"
+                                    data-swal-title="Aktifkan Undangan?"
+                                    data-swal-confirm="Undangan {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }} (sesitemu.id/{{ $undangan->slug }}) akan dipublikasikan dan aktif selama 3 bulan."
+                                    data-swal-icon="question"
+                                    data-swal-confirm-button="Ya, Aktifkan"
+                                    data-swal-confirm-color="#4B6358"
+                                >
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" title="Aktifkan Undangan (3 Bulan)" class="inline-flex items-center gap-1.5 rounded-lg bg-sage px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-sage/90 cursor-pointer shadow-xs transition">

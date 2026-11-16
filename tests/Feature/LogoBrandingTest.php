@@ -217,5 +217,19 @@ class LogoBrandingTest extends TestCase
             ->assertSee($client->email)
             ->assertSee('Reset Sandi')
             ->assertSee('<svg', false);
+
+        $this->actingAs($admin)
+            ->get('/admin/undangan')
+            ->assertOk()
+            ->assertSee('data-swal-confirm', false)
+            ->assertSee('Nonaktifkan Undangan?');
+
+        $this->actingAs($admin)
+            ->from('/admin/undangan')
+            ->followingRedirects()
+            ->patch("/admin/undangan/{$undangan->id}/nonaktifkan")
+            ->assertOk()
+            ->assertSee('data-swal-success', false)
+            ->assertSee('Aktifkan Undangan?');
     }
 }
