@@ -61,16 +61,66 @@
                 </button>
             </div>
 
-            {{-- Kartu Profil Pengguna Sidebar --}}
-            <div class="mx-4 mt-4 rounded-xl bg-white/[0.04] border border-white/10 px-4 py-4 text-center shrink-0">
-                <div class="relative mx-auto w-14 h-14 rounded-full bg-white/15 flex items-center justify-center text-ivory/80">
-                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z" />
-                    </svg>
-                    <span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-charcoal" title="Online"></span>
+            {{-- Kartu Profil Pengguna Sidebar (Dapat Diklik) --}}
+            <div
+                x-data="{ profilSidebarTerbuka: false }"
+                @click.outside="profilSidebarTerbuka = false"
+                @keydown.escape.window="profilSidebarTerbuka = false"
+                class="mx-4 mt-4 shrink-0 relative"
+            >
+                <button
+                    type="button"
+                    @click="profilSidebarTerbuka = !profilSidebarTerbuka"
+                    :aria-expanded="profilSidebarTerbuka.toString()"
+                    aria-label="Menu akun admin"
+                    class="w-full rounded-xl bg-white/[0.04] border border-white/10 px-4 py-4 text-center hover:bg-white/[0.08] hover:border-champagne/40 focus:outline-none focus:ring-2 focus:ring-champagne/40 transition cursor-pointer"
+                >
+                    <div class="relative mx-auto w-14 h-14 rounded-full bg-white/15 flex items-center justify-center text-ivory/80">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z" />
+                        </svg>
+                        <span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-charcoal" title="Online"></span>
+                    </div>
+                    <p class="mt-3 text-sm font-semibold text-white truncate">{{ $namaAdmin }}</p>
+                    <p class="mt-0.5 inline-flex items-center justify-center gap-1 text-xs text-ivory/60">
+                        <span>Administrator</span>
+                        <svg
+                            class="w-3.5 h-3.5 transition-transform duration-150"
+                            :class="profilSidebarTerbuka ? 'rotate-180' : ''"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </p>
+                </button>
+
+                <div
+                    x-show="profilSidebarTerbuka"
+                    x-cloak
+                    x-transition:enter="transition ease-out duration-150"
+                    x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-100"
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                    class="absolute left-0 right-0 top-full mt-2 z-30 rounded-xl bg-charcoal border border-champagne/30 shadow-2xl p-1.5 space-y-1 text-xs text-left"
+                >
+                    <a href="{{ route('admin.pengguna.index') }}" class="block rounded-lg px-3 py-2 text-ivory/85 hover:bg-white/10 hover:text-white transition">
+                        Manajemen Pengguna
+                    </a>
+                    <a href="{{ route('dasbor.index') }}" class="block rounded-lg px-3 py-2 text-ivory/85 hover:bg-white/10 hover:text-white transition">
+                        Dasbor Client
+                    </a>
+                    <form action="{{ route('keluar') }}" method="POST" class="pt-1 border-t border-white/10">
+                        @csrf
+                        <button type="submit" class="w-full text-left rounded-lg px-3 py-2 text-champagne font-semibold hover:bg-white/10 transition cursor-pointer">
+                            Keluar
+                        </button>
+                    </form>
                 </div>
-                <p class="mt-3 text-sm font-semibold text-white truncate">{{ $namaAdmin }}</p>
-                <p class="mt-0.5 text-xs text-ivory/60">Administrator</p>
             </div>
 
             {{-- Navigasi Vertikal --}}
