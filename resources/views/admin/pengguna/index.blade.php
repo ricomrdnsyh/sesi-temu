@@ -176,13 +176,13 @@
                                 <a
                                     href="{{ route('admin.pengguna.show', $pengguna) }}"
                                     title="Lihat Detail Pengguna"
-                                    class="inline-flex items-center gap-1.5 rounded-lg border border-charcoal/15 bg-white px-2.5 py-1.5 text-xs font-semibold text-charcoal hover:border-sage/40 hover:bg-sage/5 hover:text-sage transition"
+                                    aria-label="Lihat Detail Pengguna"
+                                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-charcoal/15 bg-white text-charcoal/75 hover:border-sage/40 hover:bg-sage/5 hover:text-sage transition"
                                 >
-                                    <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/>
                                         <circle cx="12" cy="12" r="3"/>
                                     </svg>
-                                    <span>Detail</span>
                                 </a>
 
                                 <button
@@ -190,13 +190,13 @@
                                     data-buka-modal-edit
                                     data-pengguna="{{ $payloadEdit }}"
                                     title="Edit Data &amp; Reset Kata Sandi"
-                                    class="inline-flex items-center gap-1.5 rounded-lg border border-champagne/50 bg-champagne/10 px-2.5 py-1.5 text-xs font-semibold text-charcoal hover:bg-champagne/25 cursor-pointer transition"
+                                    aria-label="Edit Data &amp; Reset Kata Sandi"
+                                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-champagne/50 bg-champagne/10 text-amber-700 hover:bg-champagne/25 cursor-pointer transition"
                                 >
-                                    <svg class="h-3.5 w-3.5 text-amber-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                                         <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>
                                     </svg>
-                                    <span>Edit</span>
                                 </button>
 
                                 @if (! $akunSendiri)
@@ -213,13 +213,17 @@
                                     >
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" title="Hapus Pengguna" class="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 cursor-pointer transition">
-                                            <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <button
+                                            type="submit"
+                                            title="Hapus Pengguna"
+                                            aria-label="Hapus Pengguna"
+                                            class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 cursor-pointer transition"
+                                        >
+                                            <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                                 <path d="M3 6h18"/>
                                                 <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
                                                 <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
                                             </svg>
-                                            <span>Hapus</span>
                                         </button>
                                     </form>
                                 @endif
@@ -276,11 +280,11 @@
         aria-labelledby="judul-modal-pengguna"
         class="fixed inset-0 z-50 flex items-center justify-center bg-charcoal/60 backdrop-blur-xs p-4 overflow-y-auto"
     >
-        <div class="w-full max-w-xl rounded-2xl bg-white p-6 sm:p-7 shadow-2xl ring-1 ring-champagne/25 my-8">
-            <div class="flex items-start justify-between gap-4 pb-4 border-b border-champagne/20">
+        <div class="w-full max-w-2xl lg:max-w-3xl rounded-2xl bg-white p-6 sm:p-8 shadow-2xl ring-1 ring-champagne/25 my-8">
+            <div class="flex items-start justify-between gap-4 pb-5 border-b border-champagne/20">
                 <div>
-                    <h2 id="judul-modal-pengguna" class="font-serif text-xl sm:text-2xl font-bold text-charcoal" x-text="modeEdit ? 'Edit Data Pengguna' : 'Tambah Pengguna Baru'"></h2>
-                    <p class="text-xs sm:text-sm text-charcoal/65 mt-1" x-text="modeEdit ? 'Perbarui profil, peran akun, atau atur ulang kata sandi pengguna.' : 'Buat akun baru untuk tim Administrator atau akun Client.'"></p>
+                    <h2 id="judul-modal-pengguna" class="font-serif text-2xl sm:text-3xl font-bold text-charcoal" x-text="modeEdit ? 'Edit Data Pengguna' : 'Tambah Pengguna Baru'"></h2>
+                    <p class="text-sm text-charcoal/65 mt-1" x-text="modeEdit ? 'Perbarui profil, peran akun, atau atur ulang kata sandi pengguna.' : 'Buat akun baru untuk tim Administrator atau akun Client.'"></p>
                 </div>
 
                 <button
@@ -298,7 +302,7 @@
             <form
                 :action="actionForm()"
                 method="POST"
-                class="mt-5 space-y-4"
+                class="mt-6 space-y-5"
                 data-swal-loading
                 :data-swal-loading-title="modeEdit ? 'Memperbarui Pengguna...' : 'Menyimpan Pengguna Baru...'"
                 data-swal-loading-text="Sedang menyimpan data akun pengguna..."
@@ -310,7 +314,7 @@
                 <input type="hidden" name="_modal_mode" :value="modeEdit ? 'edit' : 'create'">
                 <input type="hidden" name="_edit_id" :value="editId ?? ''">
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
                         <label for="modal_nama" class="block text-xs font-semibold text-charcoal/80 mb-1">Nama Lengkap</label>
                         <input
