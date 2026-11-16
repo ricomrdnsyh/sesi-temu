@@ -1,6 +1,18 @@
 @extends('layouts.aplikasi')
 
 @section('konten')
+@php
+    $judulHeaderAdmin = match (true) {
+        request()->routeIs('admin.undangan.*') => 'Manajemen Undangan',
+        request()->routeIs('admin.tema.*') => 'Katalog Tema',
+        request()->routeIs('admin.pengguna.*') => 'Manajemen Pengguna',
+        default => 'Ringkasan Platform',
+    };
+
+    $namaAdmin = auth()->user()?->nama ?? 'Administrator';
+    $inisialAdmin = strtoupper(mb_substr($namaAdmin, 0, 1));
+@endphp
+
 <div x-data="{ sidebarTerbuka: false }" class="min-h-screen w-full bg-ivory flex">
     {{-- Backdrop Mobile Drawer --}}
     <div
@@ -144,9 +156,62 @@
         </div>
     </aside>
 
-    {{-- Konten Utama --}}
+    {{-- Konten Utama + Header Panel Admin --}}
     <div class="flex-1 min-w-0 flex flex-col">
-        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 md:pb-8 space-y-6">
+        <header
+            aria-label="Header Panel Admin"
+            class="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-champagne/25"
+        >
+            <div class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button
+                        type="button"
+                        @click="sidebarTerbuka = true"
+                        aria-label="Buka menu admin"
+                        class="md:hidden inline-flex items-center justify-center rounded-xl border border-charcoal/15 p-2 text-charcoal hover:bg-ivory transition cursor-pointer"
+                    >
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+
+                    <div class="min-w-0">
+                        <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-champagne">
+                            Panel Admin &bull; SesiTemu
+                        </p>
+                        <p class="text-sm sm:text-base font-bold text-charcoal truncate">
+                            @yield('header_admin', $judulHeaderAdmin)
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 sm:gap-4 shrink-0">
+                    <span class="hidden lg:inline-flex items-center gap-1.5 rounded-full bg-ivory px-3 py-1 text-xs font-medium text-charcoal/75 border border-champagne/25">
+                        <span class="w-1.5 h-1.5 rounded-full bg-sage"></span>
+                        <span>{{ now()->locale('id')->translatedFormat('l, d M Y') }} WIB</span>
+                    </span>
+
+                    <a
+                        href="{{ route('beranda') }}"
+                        class="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-charcoal/15 px-3 py-1.5 text-xs font-semibold text-charcoal hover:bg-ivory transition"
+                    >
+                        <span>Lihat Beranda</span>
+                    </a>
+
+                    <div class="flex items-center gap-2.5 pl-1 border-l border-charcoal/10">
+                        <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-charcoal text-xs font-bold text-champagne">
+                            {{ $inisialAdmin }}
+                        </span>
+                        <div class="hidden sm:block text-left leading-tight">
+                            <p class="text-xs font-semibold text-charcoal">{{ $namaAdmin }}</p>
+                            <p class="text-[11px] text-charcoal/55">Administrator</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
             @if (session('sukses'))
                 <div class="rounded-xl bg-sage/10 border border-sage/30 px-4 py-3 text-sm text-sage">
                     {{ session('sukses') }}
@@ -166,18 +231,5 @@
             @yield('isi_admin')
         </main>
     </div>
-
-    {{-- Tombol Drawer Mobile (Tanpa Navbar Atas) --}}
-    <button
-        type="button"
-        @click="sidebarTerbuka = true"
-        aria-label="Buka menu admin"
-        class="md:hidden fixed bottom-5 right-5 z-30 inline-flex items-center gap-2 rounded-full bg-charcoal px-4 py-3 text-xs font-semibold text-champagne shadow-xl ring-1 ring-champagne/40 hover:bg-charcoal/95 transition cursor-pointer"
-    >
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-        <span>Menu Admin</span>
-    </button>
 </div>
 @endsection

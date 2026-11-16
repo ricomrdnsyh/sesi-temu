@@ -94,20 +94,27 @@ class LogoBrandingTest extends TestCase
     }
 
     /**
-     * Memastikan tata letak panel admin menggunakan sidebar penuh tanpa navbar atas.
+     * Memastikan tata letak panel admin menggunakan sidebar navigasi serta header informasi panel.
      */
-    public function test_tampilan_admin_menggunakan_sidebar_tanpa_navbar_atas(): void
+    public function test_tampilan_admin_menggunakan_sidebar_dan_header_panel(): void
     {
         $admin = Pengguna::factory()->admin()->create();
 
         foreach (['/admin', '/admin/undangan', '/admin/tema', '/admin/pengguna'] as $ruteAdmin) {
-            $this->actingAs($admin)
-                ->get($ruteAdmin)
-                ->assertOk()
+            $respon = $this->actingAs($admin)->get($ruteAdmin);
+            $respon->assertOk()
                 ->assertSee('aria-label="Navigasi Panel Admin"', false)
+                ->assertSee('aria-label="Header Panel Admin"', false)
                 ->assertSee('Menu Utama')
                 ->assertSee('Dasbor Client')
-                ->assertDontSee('<header', false);
+                ->assertSee('Administrator');
+
+            $konten = $respon->getContent();
+            if (preg_match('/<header\b[^>]*>.*?<\/header>/s', $konten, $cocokHeader)) {
+                $this->assertStringNotContainsString('<nav', $cocokHeader[0]);
+            } else {
+                $this->fail('Header panel admin tidak ditemukan pada '.$ruteAdmin);
+            }
         }
     }
 }
