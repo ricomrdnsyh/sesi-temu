@@ -4,9 +4,9 @@
 
 @section('konten')
 @php
-    $pesanWaBantuan = 'Halo Admin SesiTemu, saya butuh bantuan mengenai undangan digital saya.';
+    $penggunaAktif = auth()->user();
 @endphp
-<div x-data="{ modalBuatBaru: false }" class="min-h-screen flex flex-col bg-ivory">
+<div x-data="{ modalBuatBaru: {{ request()->boolean('buat') ? 'true' : 'false' }} }" class="min-h-screen flex flex-col bg-ivory">
     {{-- Header Top Navbar --}}
     <header class="bg-white/95 backdrop-blur-md border-b border-champagne/20 sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 md:h-16 flex items-center justify-between gap-3">
@@ -25,20 +25,26 @@
             </div>
 
             <div class="flex items-center gap-2.5 md:gap-4 text-xs sm:text-sm min-w-0">
-                @if (auth()->user()->adalahAdmin())
+                @if ($penggunaAktif->adalahAdmin())
                     <a href="{{ route('admin.ringkasan') }}" class="font-semibold text-champagne hover:underline shrink-0">
                         Panel Admin
                     </a>
                 @endif
-                <span class="hidden sm:inline text-charcoal/70 truncate max-w-[160px]">{{ auth()->user()->nama }}</span>
-                <form action="{{ route('keluar') }}" method="POST" class="shrink-0">
+
+                <a
+                    href="{{ route('dasbor.profil.tampil') }}"
+                    title="Buka Profil Saya"
+                    class="inline-flex items-center gap-2 rounded-full border border-champagne/35 bg-ivory/70 pl-1.5 pr-2.5 sm:pr-3.5 py-1 text-charcoal hover:bg-champagne/10 transition min-w-0"
+                >
+                    <span class="inline-flex h-6 w-6 md:h-7 md:w-7 items-center justify-center rounded-full bg-sage text-white text-[11px] font-bold shrink-0">
+                        {{ $penggunaAktif->inisialNama() }}
+                    </span>
+                    <span class="truncate max-w-[110px] sm:max-w-[160px] font-medium text-xs md:text-sm">{{ $penggunaAktif->nama }}</span>
+                </a>
+
+                <form action="{{ route('keluar') }}" method="POST" class="hidden md:inline-flex shrink-0">
                     @csrf
                     <button type="submit" class="inline-flex items-center gap-1.5 rounded-xl border border-charcoal/15 px-3 py-1.5 font-semibold text-charcoal hover:bg-charcoal/5 transition cursor-pointer">
-                        <svg class="h-3.5 w-3.5 md:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                            <polyline points="16 17 21 12 16 7"/>
-                            <line x1="21" x2="9" y1="12" y2="12"/>
-                        </svg>
                         <span>Keluar</span>
                     </button>
                 </form>
@@ -201,67 +207,7 @@
         </div>
     </main>
 
-    {{-- Bottom Navbar Mobile-First (Khusus Tampilan Mobile) --}}
-    <nav
-        aria-label="Navigasi Utama Client"
-        data-client-bottom-nav
-        class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-champagne/25 shadow-[0_-8px_28px_-10px_rgba(31,41,55,0.14)] pb-[env(safe-area-inset-bottom)]"
-    >
-        <div class="max-w-lg mx-auto grid grid-cols-4 h-16 px-2 items-center gap-1">
-            <a
-                href="{{ route('dasbor.index') }}"
-                class="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl text-sage font-bold bg-sage/10 transition"
-            >
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect width="7" height="9" x="3" y="3" rx="1"/>
-                    <rect width="7" height="5" x="14" y="3" rx="1"/>
-                    <rect width="7" height="9" x="14" y="12" rx="1"/>
-                    <rect width="7" height="5" x="3" y="16" rx="1"/>
-                </svg>
-                <span class="text-[11px] leading-tight">Undangan</span>
-            </a>
-
-            <button
-                type="button"
-                @click="modalBuatBaru = true"
-                class="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl text-charcoal/80 hover:text-sage hover:bg-ivory font-semibold transition cursor-pointer"
-            >
-                <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-sage text-white shadow-xs">
-                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <line x1="12" x2="12" y1="5" y2="19"/>
-                        <line x1="5" x2="19" y1="12" y2="12"/>
-                    </svg>
-                </span>
-                <span class="text-[11px] leading-tight">Buat Draft</span>
-            </button>
-
-            <a
-                href="{{ route('beranda') }}#katalog-tema"
-                class="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl text-charcoal/70 hover:text-sage hover:bg-ivory font-medium transition"
-            >
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
-                    <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
-                    <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>
-                    <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
-                    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
-                </svg>
-                <span class="text-[11px] leading-tight">Katalog</span>
-            </a>
-
-            <a
-                href="{{ \App\Support\PengaturanSesiTemu::urlWaAdmin($pesanWaBantuan) }}"
-                target="_blank"
-                rel="noopener"
-                class="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl text-charcoal/70 hover:text-sage hover:bg-ivory font-medium transition"
-            >
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>
-                <span class="text-[11px] leading-tight">Bantuan</span>
-            </a>
-        </div>
-    </nav>
+    @include('dasbor._bottom-nav', ['halamanAktif' => 'undangan', 'modalBuatOnPage' => true])
 
     {{-- Modal Buat Draft Undangan Baru (Bottom-sheet di mobile, centered di desktop) --}}
     <div

@@ -36,6 +36,8 @@ Route::post('/keluar', [AutentikasiController::class, 'keluar'])
 // 3. Area Dasbor Client (Juga bisa diakses Admin untuk Paket Terima Beres)
 Route::middleware('auth')->prefix('dasbor')->name('dasbor.')->group(function (): void {
     Route::get('/', [DasborUndanganController::class, 'index'])->name('index');
+    Route::get('/profil', [DasborUndanganController::class, 'profil'])->name('profil.tampil');
+    Route::put('/profil', [DasborUndanganController::class, 'perbaruiProfil'])->name('profil.perbarui');
     Route::post('/undangan', [DasborUndanganController::class, 'simpanUndanganBaru'])->name('undangan.simpan');
     Route::get('/undangan/{undangan}/kelola', [DasborUndanganController::class, 'kelola'])->name('undangan.kelola');
     Route::put('/undangan/{undangan}', [DasborUndanganController::class, 'perbaruiDataUtama'])->name('undangan.perbarui');

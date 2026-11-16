@@ -627,7 +627,17 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSee('data-client-bottom-nav', false)
             ->assertSee('md:hidden fixed bottom-0', false)
             ->assertSee('pb-28 md:py-8', false)
-            ->assertSee('Buat Draft');
+            ->assertSee('Buat Draft')
+            ->assertSee('data-client-nav="profil"', false);
+
+        $this->actingAs($client)
+            ->get('/dasbor/profil')
+            ->assertOk()
+            ->assertSee('data-client-bottom-nav', false)
+            ->assertSee('data-client-nav="profil"', false)
+            ->assertSee($client->nama)
+            ->assertSee($client->email)
+            ->assertSee($client->inisialNama());
 
         $this->actingAs($client)
             ->get("/dasbor/undangan/{$undangan->id}/kelola")
@@ -640,5 +650,58 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSee('data-mobile-tab="amplop"', false)
             ->assertSee('data-mobile-tab="tamu"', false)
             ->assertSee('data-mobile-tab="aktivasi"', false);
+    }
+
+    public function test_client_dapat_melihat_dan_memperbarui_profil_serta_kata_sandi(): void
+    {
+        $this->get('/dasbor/profil')->assertRedirect('/masuk');
+
+        $client = Pengguna::factory()->create([
+            'nama' => 'Raka Wijaya',
+            'email' => 'raka-profil@sesitemu.id',
+            'nomor_wa' => '628111111111',
+            'kata_sandi' => 'SandiLama123',
+            'peran' => 'client',
+        ]);
+
+        // Perbarui biodata + normalisasi nomor WA 08... -> 628...
+        $this->actingAs($client)
+            ->put('/dasbor/profil', [
+                'bagian' => 'biodata',
+                'nama' => 'Raka Wijaya Baru',
+                'email' => 'raka-baru@sesitemu.id',
+                'nomor_wa' => '081234567890',
+            ])
+            ->assertRedirect('/dasbor/profil')
+            ->assertSessionHas('sukses');
+
+        $client->refresh();
+        $this->assertSame('Raka Wijaya Baru', $client->nama);
+        $this->assertSame('raka-baru@sesitemu.id', $client->email);
+        $this->assertSame('6281234567890', $client->nomor_wa);
+        $this->assertSame('RW', $client->inisialNama());
+
+        // Salah kata sandi lama ditolak
+        $this->actingAs($client)
+            ->put('/dasbor/profil', [
+                'bagian' => 'kata_sandi',
+                'kata_sandi_lama' => 'SalahSandi99',
+                'kata_sandi_baru' => 'SandiBaru123',
+                'kata_sandi_baru_confirmation' => 'SandiBaru123',
+            ])
+            ->assertSessionHasErrors('kata_sandi_lama');
+
+        // Berhasil ubah kata sandi jika kata sandi lama benar
+        $this->actingAs($client)
+            ->put('/dasbor/profil', [
+                'bagian' => 'kata_sandi',
+                'kata_sandi_lama' => 'SandiLama123',
+                'kata_sandi_baru' => 'SandiBaru123',
+                'kata_sandi_baru_confirmation' => 'SandiBaru123',
+            ])
+            ->assertRedirect('/dasbor/profil')
+            ->assertSessionHas('sukses');
+
+        $this->assertTrue(Hash::check('SandiBaru123', $client->fresh()->kata_sandi));
     }
 }

@@ -75,7 +75,7 @@ class AdminPenggunaController extends Controller
         $pengguna = Pengguna::create([
             'nama' => $tervalidasi['nama'],
             'email' => $tervalidasi['email'],
-            'nomor_wa' => $this->normalisasiWa($tervalidasi['nomor_wa'] ?? null),
+            'nomor_wa' => Pengguna::normalisasiNomorWa($tervalidasi['nomor_wa'] ?? null),
             'peran' => $tervalidasi['peran'],
             'kata_sandi' => Hash::make($tervalidasi['kata_sandi']),
         ]);
@@ -139,7 +139,7 @@ class AdminPenggunaController extends Controller
         $dataUpdate = [
             'nama' => $tervalidasi['nama'],
             'email' => $tervalidasi['email'],
-            'nomor_wa' => $this->normalisasiWa($tervalidasi['nomor_wa'] ?? null),
+            'nomor_wa' => Pengguna::normalisasiNomorWa($tervalidasi['nomor_wa'] ?? null),
             'peran' => $tervalidasi['peran'],
         ];
 
@@ -170,19 +170,5 @@ class AdminPenggunaController extends Controller
         $pengguna->delete();
 
         return back()->with('sukses', "Akun \"{$nama}\" berhasil dihapus.");
-    }
-
-    private function normalisasiWa(?string $nomorWa): ?string
-    {
-        $bersih = preg_replace('/[^0-9]/', '', (string) ($nomorWa ?? ''));
-        if ($bersih === '') {
-            return null;
-        }
-
-        if (str_starts_with($bersih, '0')) {
-            return '62'.substr($bersih, 1);
-        }
-
-        return $bersih;
     }
 }

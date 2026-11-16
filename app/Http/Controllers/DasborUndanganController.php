@@ -7,6 +7,7 @@ use App\Models\AmplopDigital;
 use App\Models\BukuTamu;
 use App\Models\GaleriUndangan;
 use App\Models\MusikLatar;
+use App\Models\Pengguna;
 use App\Models\Tema;
 use App\Models\Transaksi;
 use App\Models\Undangan;
@@ -16,6 +17,7 @@ use App\Support\PengaturanSesiTemu;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -52,6 +54,85 @@ class DasborUndanganController extends Controller
             'daftarTema' => $daftarTema,
             'durasiAktifBulan' => PengaturanSesiTemu::masaAktifBulan(),
         ]);
+    }
+
+    public function profil(Request $request): View
+    {
+        $pengguna = $request->user();
+        $totalUndangan = $pengguna->undangan()->count();
+        $totalUndanganAktif = $pengguna->undangan()
+            ->where('status_publikasi', true)
+            ->where(function ($query): void {
+                $query->whereNull('berlaku_sampai')
+                    ->orWhere('berlaku_sampai', '>', now());
+            })
+            ->count();
+
+        $totalTransaksi = $pengguna->transaksi()->count();
+        $riwayatTransaksi = $pengguna->transaksi()
+            ->with(['undangan', 'tema'])
+            ->take(5)
+            ->get();
+
+        return view('dasbor.profil', [
+            'pengguna' => $pengguna,
+            'totalUndangan' => $totalUndangan,
+            'totalUndanganAktif' => $totalUndanganAktif,
+            'totalTransaksi' => $totalTransaksi,
+            'riwayatTransaksi' => $riwayatTransaksi,
+        ]);
+    }
+
+    public function perbaruiProfil(Request $request): RedirectResponse
+    {
+        $pengguna = $request->user();
+        $bagian = (string) $request->input('bagian', 'biodata');
+
+        if ($bagian === 'kata_sandi') {
+            $tervalidasi = $request->validate([
+                'kata_sandi_lama' => ['required', 'string'],
+                'kata_sandi_baru' => ['required', 'string', 'min:8', 'confirmed'],
+            ], [
+                'kata_sandi_lama.required' => 'Kata sandi saat ini wajib diisi.',
+                'kata_sandi_baru.required' => 'Kata sandi baru wajib diisi.',
+                'kata_sandi_baru.min' => 'Kata sandi baru minimal 8 karakter.',
+                'kata_sandi_baru.confirmed' => 'Konfirmasi kata sandi baru tidak cocok.',
+            ]);
+
+            if (! Hash::check($tervalidasi['kata_sandi_lama'], $pengguna->kata_sandi)) {
+                return back()
+                    ->withErrors(['kata_sandi_lama' => 'Kata sandi saat ini tidak sesuai.']);
+            }
+
+            $pengguna->update([
+                'kata_sandi' => Hash::make($tervalidasi['kata_sandi_baru']),
+            ]);
+
+            return redirect()
+                ->route('dasbor.profil.tampil')
+                ->with('sukses', 'Kata sandi akun berhasil diperbarui.');
+        }
+
+        $tervalidasi = $request->validate([
+            'nama' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('pengguna', 'email')->ignore($pengguna->id)],
+            'nomor_wa' => ['nullable', 'string', 'max:20'],
+        ], [
+            'nama.required' => 'Nama lengkap wajib diisi.',
+            'email.required' => 'Alamat email wajib diisi.',
+            'email.email' => 'Format alamat email tidak valid.',
+            'email.unique' => 'Email tersebut sudah digunakan oleh akun lain.',
+        ]);
+
+        $pengguna->update([
+            'nama' => $tervalidasi['nama'],
+            'email' => $tervalidasi['email'],
+            'nomor_wa' => Pengguna::normalisasiNomorWa($tervalidasi['nomor_wa'] ?? null),
+        ]);
+
+        return redirect()
+            ->route('dasbor.profil.tampil')
+            ->with('sukses', 'Profil akun Anda berhasil diperbarui.');
     }
 
     public function simpanUndanganBaru(Request $request): RedirectResponse
