@@ -114,8 +114,16 @@
         </div>
 
         <div>
-            <label for="gambar_pratinjau" class="block text-sm font-medium text-charcoal">Gambar Pratinjau (Opsional, otomatis WebP)</label>
-            <input id="gambar_pratinjau" name="gambar_pratinjau" type="file" accept="image/*" class="mt-1.5 block w-full text-sm text-charcoal">
+            <label for="gambar_pratinjau" class="block text-sm font-medium text-charcoal mb-1.5">Gambar Pratinjau (Opsional, otomatis WebP)</label>
+            <label for="gambar_pratinjau" class="flex flex-col sm:flex-row items-center gap-4 rounded-2xl border-2 border-dashed border-champagne/45 bg-ivory/70 p-4 hover:border-champagne hover:bg-champagne/5 cursor-pointer transition">
+                @if ($tema->urlGambarPratinjau())
+                    <img src="{{ $tema->urlGambarPratinjau() }}" alt="{{ $tema->nama_tema }}" class="h-20 w-28 rounded-xl object-cover shrink-0 ring-1 ring-champagne/25">
+                @endif
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-semibold text-charcoal">Klik untuk memilih gambar pratinjau (JPG, PNG, WebP • Maks 5 MB)</p>
+                    <input id="gambar_pratinjau" name="gambar_pratinjau" type="file" accept="image/jpeg,image/png,image/webp" class="mt-2 block w-full text-xs text-charcoal/70 file:mr-3 file:rounded-lg file:border-0 file:bg-champagne/20 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-charcoal hover:file:bg-champagne/30">
+                </div>
+            </label>
         </div>
 
         <label class="inline-flex items-center gap-2 text-sm font-medium text-charcoal cursor-pointer">

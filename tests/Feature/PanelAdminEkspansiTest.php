@@ -393,5 +393,14 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSessionHas('sukses');
 
         $this->assertDatabaseMissing('pengguna', ['id' => $adminKedua->id]);
+
+        // Katalog tema memakai modal tambah/edit beserta dropzone pratinjau gambar
+        $this->actingAs($adminUtama)
+            ->get('/admin/tema')
+            ->assertOk()
+            ->assertSee('data-buka-modal-tambah-tema', false)
+            ->assertSee('data-buka-modal-edit-tema', false)
+            ->assertSee('id="judul-modal-tema"', false)
+            ->assertSee('id="modal_gambar_pratinjau"', false);
     }
 }
