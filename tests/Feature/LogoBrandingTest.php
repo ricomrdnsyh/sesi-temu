@@ -116,6 +116,15 @@ class LogoBrandingTest extends TestCase
             } else {
                 $this->fail('Header panel admin tidak ditemukan pada '.$ruteAdmin);
             }
+
+            if (preg_match('/<aside\b[^>]*aria-label="Navigasi Panel Admin".*?<\/aside>/s', $konten, $cocokSidebar)) {
+                $this->assertStringContainsString('logo-sesi-temu-ikon.webp', $cocokSidebar[0]);
+                $this->assertStringContainsString('Keluar', $cocokSidebar[0]);
+                $this->assertStringNotContainsString($admin->email, $cocokSidebar[0]);
+                $this->assertStringNotContainsString('Sesi<span class="text-champagne">Temu</span>', $cocokSidebar[0]);
+            } else {
+                $this->fail('Sidebar panel admin tidak ditemukan pada '.$ruteAdmin);
+            }
         }
     }
 }

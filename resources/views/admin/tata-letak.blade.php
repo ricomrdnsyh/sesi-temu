@@ -30,20 +30,14 @@
         class="fixed inset-y-0 left-0 z-40 w-64 xl:w-72 shrink-0 bg-charcoal text-ivory border-r border-champagne/25 flex flex-col justify-between transition-transform duration-200 ease-in-out md:sticky md:top-0 md:h-screen md:translate-x-0"
     >
         <div class="flex flex-col flex-1 min-h-0">
-            {{-- Brand Sidebar --}}
-            <div class="px-5 py-5 border-b border-white/10 flex items-center justify-between gap-3">
-                <a href="{{ route('admin.ringkasan') }}" class="flex items-center gap-2.5 font-serif text-xl font-bold text-white min-w-0">
-                    <span class="inline-flex items-center justify-center rounded-xl bg-[#FBF3E6] p-1 shadow-sm shrink-0">
-                        <img
-                            src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}"
-                            alt="Logo SesiTemu"
-                            class="h-7 w-7 object-contain"
-                        >
-                    </span>
-                    <span class="truncate">Sesi<span class="text-champagne">Temu</span></span>
-                    <span class="rounded-md bg-champagne/15 border border-champagne/30 px-1.5 py-0.5 text-[10px] font-sans font-semibold uppercase tracking-wider text-champagne shrink-0">
-                        Admin
-                    </span>
+            {{-- Brand Sidebar (Logo Saja) --}}
+            <div class="h-16 px-5 border-b border-white/10 flex items-center justify-between md:justify-center gap-3">
+                <a href="{{ route('admin.ringkasan') }}" aria-label="Beranda Admin" class="inline-flex items-center justify-center rounded-xl bg-[#FBF3E6] p-1.5 shadow-sm transition hover:scale-105">
+                    <img
+                        src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}"
+                        alt="Logo SesiTemu"
+                        class="h-8 w-8 object-contain"
+                    >
                 </a>
 
                 <button
@@ -132,15 +126,8 @@
             </nav>
         </div>
 
-        {{-- Profil Admin & Keluar --}}
-        <div class="p-4 border-t border-white/10 bg-black/15 space-y-3">
-            @auth
-                <div class="px-1">
-                    <p class="text-xs font-semibold text-white truncate">{{ auth()->user()->nama }}</p>
-                    <p class="text-[11px] text-ivory/60 truncate">{{ auth()->user()->email }}</p>
-                </div>
-            @endauth
-
+        {{-- Tombol Keluar --}}
+        <div class="p-4 border-t border-white/10 bg-black/15">
             <form action="{{ route('keluar') }}" method="POST">
                 @csrf
                 <button
