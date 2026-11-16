@@ -790,4 +790,154 @@ class PanelAdminEkspansiTest extends TestCase
 
         $this->assertSame($temaPilihan->id, $undangan->fresh()->tema_id);
     }
+
+    public function test_bukti_pembayaran_wajib_kecuali_total_nol_dan_endpoint_cek_promo_live(): void
+    {
+        $client = Pengguna::factory()->create(['peran' => 'client']);
+        $clientLain = Pengguna::factory()->create(['peran' => 'client']);
+        $tema = $this->buatTemaContoh(); // Harga 129.000
+
+        $undangan = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $tema->id,
+            'slug' => 'uji-bukti-wajib-promo',
+            'nama_panggilan_pria' => 'Bima',
+            'nama_lengkap_pria' => 'Bima Pratama',
+            'nama_panggilan_wanita' => 'Nadia',
+            'nama_lengkap_wanita' => 'Nadia Putri',
+            'status_publikasi' => false,
+        ]);
+
+        $promoDiskon = Promo::create([
+            'kode' => 'POTONG29',
+            'nama_promo' => 'Potongan Langsung 29 Ribu',
+            'tipe_diskon' => 'nominal',
+            'nilai_diskon' => 29000,
+            'kuota' => 10,
+            'aktif' => true,
+        ]);
+
+        $promoGratis = Promo::create([
+            'kode' => 'GRATIS100',
+            'nama_promo' => 'Voucher Aktivasi Gratis',
+            'tipe_diskon' => 'persen',
+            'nilai_diskon' => 100,
+            'kuota' => 5,
+            'aktif' => true,
+        ]);
+
+        // Halaman kelola Tab 7 menampilkan Cek Promo & Ringkasan Pembayaran Live serta penanda Wajib bukti
+        $this->actingAs($client)
+            ->get("/dasbor/undangan/{$undangan->id}/kelola?tab=aktivasi")
+            ->assertOk()
+            ->assertSee('Cek Promo')
+            ->assertSee('Total yang Harus Ditransfer')
+            ->assertSee('Unggah Bukti Transfer')
+            ->assertSee('Pilih atau Seret Foto Bukti Transfer')
+            ->assertSee('Wajib')
+            ->assertSee('Transfer ke Rekening Resmi')
+            ->assertSee('Terverifikasi SesiTemu')
+            ->assertSee('Berita Acara (Slug)')
+            ->assertSee('order-1 lg:order-2', false)
+            ->assertSee('order-2 lg:order-1', false)
+            ->assertSee('#form-aktivasi-pembayaran', false);
+
+        // Pengajuan tanpa bukti pembayaran saat total > 0 ditolak
+        $this->actingAs($client)
+            ->post("/dasbor/undangan/{$undangan->id}/transaksi", [
+                'paket' => 'mandiri',
+            ])
+            ->assertRedirect()
+            ->assertSessionHasErrors('bukti_pembayaran')
+            ->assertSessionHas('tab_aktif', 'aktivasi');
+
+        $this->assertSame(0, Transaksi::where('undangan_id', $undangan->id)->count());
+
+        // Cek Promo: client lain diblokir policy
+        $this->actingAs($clientLain)
+            ->postJson("/dasbor/undangan/{$undangan->id}/promo/cek", [
+                'paket' => 'mandiri',
+                'kode_promo' => $promoDiskon->kode,
+            ])
+            ->assertForbidden();
+
+        // Cek Promo: kode salah mengembalikan 422
+        $this->actingAs($client)
+            ->postJson("/dasbor/undangan/{$undangan->id}/promo/cek", [
+                'paket' => 'mandiri',
+                'kode_promo' => 'TIDAKADA',
+            ])
+            ->assertStatus(422)
+            ->assertJson([
+                'valid' => false,
+            ]);
+
+        // Cek Promo: voucher potongan nominal menghitung total bersih & perlu_bukti = true
+        $this->actingAs($client)
+            ->postJson("/dasbor/undangan/{$undangan->id}/promo/cek", [
+                'paket' => 'mandiri',
+                'kode_promo' => 'potong29',
+            ])
+            ->assertOk()
+            ->assertJson([
+                'valid' => true,
+                'kode' => 'POTONG29',
+                'harga_tema' => 129000,
+                'potongan_promo' => 29000,
+                'total_bayar' => 100000,
+                'perlu_bukti' => true,
+            ]);
+
+        // Cek Promo: voucher 100% mengembalikan total_bayar = 0 & perlu_bukti = false
+        $this->actingAs($client)
+            ->postJson("/dasbor/undangan/{$undangan->id}/promo/cek", [
+                'paket' => 'mandiri',
+                'kode_promo' => $promoGratis->kode,
+            ])
+            ->assertOk()
+            ->assertJson([
+                'valid' => true,
+                'kode' => 'GRATIS100',
+                'total_bayar' => 0,
+                'perlu_bukti' => false,
+            ]);
+
+        // Pengajuan dengan voucher 100% (total Rp 0) diizinkan tanpa unggah bukti transfer & berstatus menunggu_verifikasi
+        $this->actingAs($client)
+            ->post("/dasbor/undangan/{$undangan->id}/transaksi", [
+                'paket' => 'mandiri',
+                'kode_promo' => 'GRATIS100',
+            ])
+            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola")
+            ->assertSessionHas('sukses')
+            ->assertSessionHas('tab_aktif', 'aktivasi');
+
+        $transaksiGratis = Transaksi::where('undangan_id', $undangan->id)->firstOrFail();
+        $this->assertSame(0, $transaksiGratis->total_bayar);
+        $this->assertSame('menunggu_verifikasi', $transaksiGratis->status);
+        $this->assertNull($transaksiGratis->bukti_pembayaran);
+
+        // Ajukan transaksi berbayar beserta bukti transfer -> riwayat invoice hanya menampilkan Lihat Bukti (bukan form upload ulang)
+        Storage::fake('public');
+        $bukti = UploadedFile::fake()->create('bukti-bayar.png', 100, 'image/png');
+        $this->actingAs($client)
+            ->post("/dasbor/undangan/{$undangan->id}/transaksi", [
+                'paket' => 'mandiri',
+                'bukti_pembayaran' => $bukti,
+            ])
+            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola");
+
+        $transaksiBerbayar = Transaksi::where('undangan_id', $undangan->id)
+            ->where('total_bayar', '>', 0)
+            ->firstOrFail();
+
+        $this->actingAs($client)
+            ->get("/dasbor/undangan/{$undangan->id}/kelola?tab=aktivasi")
+            ->assertOk()
+            ->assertSee('Gratis via Voucher')
+            ->assertSee('Lihat Bukti')
+            ->assertSee((string) $transaksiBerbayar->urlBukti(), false)
+            ->assertDontSee('Pilih Foto Bukti')
+            ->assertDontSee('/unggah-bukti');
+    }
 }

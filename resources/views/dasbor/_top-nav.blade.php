@@ -57,7 +57,17 @@
                 <span class="truncate max-w-[110px] sm:max-w-[160px] font-medium text-xs md:text-sm">{{ $penggunaAktif->nama }}</span>
             </a>
 
-            <form action="{{ route('keluar') }}" method="POST" class="hidden md:inline-flex shrink-0">
+            <form
+                action="{{ route('keluar') }}"
+                method="POST"
+                class="hidden md:inline-flex shrink-0"
+                data-swal-confirm="Yakin ingin keluar dari akun SesiTemu Anda?"
+                data-swal-title="Keluar dari Akun"
+                data-swal-confirm-button="Ya, Keluar"
+                data-swal-confirm-color="#DC2626"
+                data-swal-loading-title="Keluar dari Akun..."
+                data-swal-loading-text="Sedang mengakhiri sesi akun Anda..."
+            >
                 @csrf
                 <button type="submit" class="inline-flex items-center gap-1.5 rounded-xl border border-charcoal/15 px-3 py-1.5 font-semibold text-charcoal hover:bg-charcoal/5 transition cursor-pointer">
                     <span>Keluar</span>

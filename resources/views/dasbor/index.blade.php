@@ -25,12 +25,6 @@
     @include('dasbor._top-nav', ['halamanAktif' => 'undangan'])
 
     <main id="daftar-undangan" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-28 md:py-8 space-y-6">
-        @if (session('sukses'))
-            <div class="rounded-xl bg-sage/10 border border-sage/30 px-4 py-3 text-sm text-sage">
-                {{ session('sukses') }}
-            </div>
-        @endif
-
         @if ($errors->any())
             <div class="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
                 <ul class="list-disc list-inside space-y-1">
@@ -367,7 +361,14 @@
             <h3 class="font-logo text-2xl font-bold text-charcoal">Buat Draft Undangan Baru</h3>
             <p class="mt-1 text-sm text-charcoal/70">Isi data singkat awal; detail lengkap dapat diatur di editor 7-tab.</p>
 
-            <form action="{{ route('dasbor.undangan.simpan') }}" method="POST" class="mt-5 space-y-4">
+            <form
+                action="{{ route('dasbor.undangan.simpan') }}"
+                method="POST"
+                class="mt-5 space-y-4"
+                data-swal-loading
+                data-swal-loading-title="Membuat Draft Undangan..."
+                data-swal-loading-text="Menyiapkan link dan halaman editor undangan Anda..."
+            >
                 @csrf
 
                 <div>

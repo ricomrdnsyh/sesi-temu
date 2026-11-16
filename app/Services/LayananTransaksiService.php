@@ -91,7 +91,9 @@ class LayananTransaksiService
             $verifikator,
             $catatanAdmin
         ): Transaksi {
-            $statusAwal = $pathBukti !== null ? 'menunggu_verifikasi' : 'menunggu_pembayaran';
+            $statusAwal = ($pathBukti !== null || $rincian['total_bayar'] === 0)
+                ? 'menunggu_verifikasi'
+                : 'menunggu_pembayaran';
 
             $transaksi = Transaksi::create([
                 'kode_invoice' => $this->buatKodeInvoice(),

@@ -103,6 +103,10 @@ window.addEventListener('pageshow', (event) => {
 });
 
 document.addEventListener('submit', (event) => {
+    if (event.defaultPrevented) {
+        return;
+    }
+
     const form = event.target.closest('form[data-swal-confirm], form[data-swal-loading]');
     if (!form || form.dataset.swalConfirmed === 'true') {
         return;

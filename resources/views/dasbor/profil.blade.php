@@ -11,12 +11,6 @@
     @include('dasbor._top-nav', ['halamanAktif' => 'profil', 'judulMobile' => 'Akun & Profil', 'lebarKontainer' => 'max-w-6xl'])
 
     <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-28 md:py-8 space-y-5 md:space-y-6">
-        @if (session('sukses'))
-            <div class="rounded-xl bg-sage/10 border border-sage/30 px-4 py-3 text-sm text-sage">
-                {{ session('sukses') }}
-            </div>
-        @endif
-
         @if ($errors->any())
             <div class="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
                 <ul class="list-disc list-inside space-y-1">
@@ -312,6 +306,8 @@
                             data-swal-title="Keluar dari Akun"
                             data-swal-confirm-button="Ya, Keluar"
                             data-swal-confirm-color="#DC2626"
+                            data-swal-loading-title="Keluar dari Akun..."
+                            data-swal-loading-text="Sedang mengakhiri sesi akun Anda..."
                         >
                             @csrf
                             <button type="submit" class="w-full flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 text-left hover:bg-red-50/70 transition cursor-pointer">

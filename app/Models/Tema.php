@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use App\Support\MediaPublik;
 use App\Support\PengaturanSesiTemu;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Tema extends Model
@@ -350,15 +350,7 @@ class Tema extends Model
 
     public function urlGambarPratinjau(): ?string
     {
-        if (! $this->gambar_pratinjau) {
-            return null;
-        }
-
-        if (Str::startsWith($this->gambar_pratinjau, ['http://', 'https://', 'aset-demo/', 'aset-tema/'])) {
-            return asset($this->gambar_pratinjau);
-        }
-
-        return Storage::disk('public')->url($this->gambar_pratinjau);
+        return MediaPublik::url($this->gambar_pratinjau);
     }
 
     /**

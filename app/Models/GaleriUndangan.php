@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use App\Support\MediaPublik;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class GaleriUndangan extends Model
 {
@@ -47,10 +47,6 @@ class GaleriUndangan extends Model
 
     public function urlFoto(): string
     {
-        if (Str::startsWith($this->lokasi_foto, ['http://', 'https://', 'aset-demo/', 'aset-tema/'])) {
-            return asset($this->lokasi_foto);
-        }
-
-        return Storage::disk('public')->url($this->lokasi_foto);
+        return MediaPublik::url($this->lokasi_foto) ?? '';
     }
 }

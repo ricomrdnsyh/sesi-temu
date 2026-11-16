@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\MediaPublik;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -99,10 +100,6 @@ class Transaksi extends Model
 
     public function urlBukti(): ?string
     {
-        if (! $this->bukti_pembayaran) {
-            return null;
-        }
-
-        return asset('storage/'.$this->bukti_pembayaran);
+        return MediaPublik::url($this->bukti_pembayaran);
     }
 }

@@ -14,6 +14,7 @@ use App\Models\Undangan;
 use App\Services\LayananTransaksiService;
 use App\Services\PengolahGambarService;
 use App\Support\PengaturanSesiTemu;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -426,9 +427,10 @@ class DasborUndanganController extends Controller
         $undangan->save();
 
         $tabTujuan = match ($bagian) {
-            'mempelai' => 'mempelai',
-            'cerita_streaming' => 'galeri',
-            'kado_fisik' => 'amplop',
+            'tema' => 'mempelai',
+            'mempelai' => 'acara',
+            'cerita_streaming' => 'amplop',
+            'kado_fisik' => 'tamu',
             default => 'tema',
         };
 
@@ -614,6 +616,47 @@ class DasborUndanganController extends Controller
             ->with('sukses', 'Ucapan buku tamu berhasil dihapus.');
     }
 
+    public function cekPromo(
+        Request $request,
+        Undangan $undangan,
+        LayananTransaksiService $layanan
+    ): JsonResponse {
+        Gate::authorize('kelola', $undangan);
+
+        $tervalidasi = $request->validate([
+            'paket' => ['required', Rule::in(['mandiri', 'terima_beres'])],
+            'tema_id' => ['nullable', 'exists:tema,id'],
+            'kode_promo' => ['nullable', 'string', 'max:40'],
+        ]);
+
+        $penawaran = $this->hitungPenawaranTransaksi($undangan, $tervalidasi, $layanan);
+        if (isset($penawaran['error_message'])) {
+            return response()->json([
+                'valid' => false,
+                'field' => $penawaran['error_field'],
+                'pesan' => $penawaran['error_message'],
+            ], 422);
+        }
+
+        $promo = $penawaran['promo'];
+        $rincian = $penawaran['rincian'];
+
+        return response()->json([
+            'valid' => true,
+            'kode' => $promo?->kode,
+            'nama_promo' => $promo?->nama_promo,
+            'label_diskon' => $promo?->labelDiskon(),
+            'harga_tema' => $rincian['harga_tema'],
+            'biaya_jasa' => $rincian['biaya_jasa'],
+            'potongan_promo' => $rincian['potongan_promo'],
+            'total_bayar' => $rincian['total_bayar'],
+            'perlu_bukti' => $rincian['total_bayar'] > 0,
+            'pesan' => $promo
+                ? "Voucher {$promo->kode} ({$promo->nama_promo}) berhasil diterapkan!"
+                : 'Rincian pembayaran tanpa kode promo.',
+        ]);
+    }
+
     public function ajukanTransaksi(
         Request $request,
         Undangan $undangan,
@@ -632,31 +675,71 @@ class DasborUndanganController extends Controller
             'bukti_pembayaran.max' => 'Ukuran gambar bukti pembayaran maksimal 4 MB.',
         ]);
 
-        $hasilPromo = $layanan->validasiKodePromo($tervalidasi['kode_promo'] ?? null);
-        if ($hasilPromo['error'] !== null) {
+        $penawaran = $this->hitungPenawaranTransaksi($undangan, $tervalidasi, $layanan);
+        if (isset($penawaran['error_message'])) {
             return back()
-                ->withErrors(['kode_promo' => $hasilPromo['error']])
+                ->withErrors([$penawaran['error_field'] => $penawaran['error_message']])
                 ->withInput()
                 ->with('tab_aktif', 'aktivasi');
         }
 
-        $tema = isset($tervalidasi['tema_id'])
-            ? Tema::findOrFail((int) $tervalidasi['tema_id'])
-            : $undangan->tema;
+        if ($penawaran['rincian']['total_bayar'] > 0 && ! $request->hasFile('bukti_pembayaran')) {
+            return back()
+                ->withErrors(['bukti_pembayaran' => 'Bukti transfer wajib diunggah sebelum mengajukan aktivasi.'])
+                ->withInput()
+                ->with('tab_aktif', 'aktivasi');
+        }
 
         $transaksi = $layanan->buatTransaksi(
             $undangan,
             $request->user(),
-            $tema,
+            $penawaran['tema'],
             $tervalidasi['paket'],
-            $hasilPromo['promo'],
+            $penawaran['promo'],
             $request->file('bukti_pembayaran')
         );
 
         return redirect()
             ->route('dasbor.undangan.kelola', $undangan)
             ->with('tab_aktif', 'aktivasi')
-            ->with('sukses', "Order {$transaksi->kode_invoice} berhasil dibuat dengan total ".Tema::formatRupiah($transaksi->total_bayar).'.');
+            ->with('sukses', "Order {$transaksi->kode_invoice} berhasil diajukan dengan total ".Tema::formatRupiah($transaksi->total_bayar).' dan menunggu verifikasi Admin.');
+    }
+
+    /**
+     * Evaluasi tema, promo, dan rincian biaya aktivasi undangan secara seragam.
+     *
+     * @param  array<string, mixed>  $tervalidasi
+     * @return array<string, mixed>
+     */
+    private function hitungPenawaranTransaksi(
+        Undangan $undangan,
+        array $tervalidasi,
+        LayananTransaksiService $layanan
+    ): array {
+        $tema = isset($tervalidasi['tema_id'])
+            ? Tema::findOrFail((int) $tervalidasi['tema_id'])
+            : $undangan->tema;
+
+        if (! $tema) {
+            return [
+                'error_field' => 'paket',
+                'error_message' => 'Tema undangan belum dipilih.',
+            ];
+        }
+
+        $hasilPromo = $layanan->validasiKodePromo($tervalidasi['kode_promo'] ?? null);
+        if ($hasilPromo['error'] !== null) {
+            return [
+                'error_field' => 'kode_promo',
+                'error_message' => $hasilPromo['error'],
+            ];
+        }
+
+        return [
+            'tema' => $tema,
+            'promo' => $hasilPromo['promo'],
+            'rincian' => $layanan->hitungRincian($tema, $tervalidasi['paket'], $hasilPromo['promo']),
+        ];
     }
 
     public function unggahBuktiTransaksi(

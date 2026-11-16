@@ -95,12 +95,21 @@ const sinkronNilaiProgramatik = (selectEl) => {
     });
 };
 
+const harusDilewatiSelect2 = (selectEl) => (
+    selectEl.hasAttribute('data-no-select2')
+    || selectEl.multiple
+    || selectEl.hidden
+    || selectEl.style.display === 'none'
+    || selectEl.classList.contains('swal2-select')
+    || Boolean(selectEl.closest('.swal2-container, [data-no-select2-container], template'))
+);
+
 export const inisialisasiSelect2Element = (selectEl) => {
     if (!(selectEl instanceof HTMLSelectElement)) {
         return;
     }
 
-    if (selectEl.hasAttribute('data-no-select2') || selectEl.multiple) {
+    if (harusDilewatiSelect2(selectEl)) {
         return;
     }
 
@@ -178,6 +187,10 @@ export const amatiSelect2Baru = () => {
         mutasiDaftar.forEach((mutasi) => {
             mutasi.addedNodes.forEach((node) => {
                 if (!(node instanceof Element)) {
+                    return;
+                }
+
+                if (node.matches('.swal2-container, [data-no-select2-container]') || node.closest('.swal2-container, [data-no-select2-container]')) {
                     return;
                 }
 

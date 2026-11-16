@@ -184,15 +184,54 @@ class Tahap5UndanganPublikTemaTest extends TestCase
             ->assertDontSee('galeri-1.webp');
     }
 
-    public function test_undangan_draft_menampilkan_banner_pratinjau_dan_expired_menampilkan_halaman_kedaluwarsa(): void
+    public function test_undangan_draft_hanya_bisa_dipratinjau_pemilik_atau_admin_dan_rsvp_dikunci(): void
     {
-        $this->buatUndanganLengkap('rustic-floral', 'undangan-draft', false);
+        $draft = $this->buatUndanganLengkap('rustic-floral', 'undangan-draft', false);
         $this->buatUndanganLengkap('rustic-floral', 'undangan-habis', true, now()->subDay());
+        $orangLain = Pengguna::factory()->create();
+        $admin = Pengguna::factory()->admin()->create();
 
+        // Pengunjung umum & client lain melihat halaman "Undangan Belum Diaktifkan"
         $this->get('/undangan-draft')
+            ->assertOk()
+            ->assertSee('Undangan Belum Diaktifkan')
+            ->assertDontSee('Buka Undangan')
+            ->assertDontSee('Kirim Konfirmasi &amp; Doa', false);
+
+        $this->actingAs($orangLain)
+            ->get('/undangan-draft')
+            ->assertOk()
+            ->assertSee('Undangan Belum Diaktifkan')
+            ->assertDontSee('MODE PRATINJAU SESITEMU.ID');
+
+        // Pemilik undangan & Admin yang login boleh membuka Pratinjau (dengan RSVP terkunci)
+        $this->actingAs($draft->pengguna)
+            ->get('/undangan-draft')
+            ->assertOk()
+            ->assertSee('MODE PRATINJAU SESITEMU.ID — UNDANGAN BELUM AKTIF')
+            ->assertSee('Mode Pratinjau — Buku Tamu &amp; RSVP Dikunci', false)
+            ->assertDontSee('Kirim Konfirmasi &amp; Doa', false);
+
+        $this->actingAs($admin)
+            ->get('/undangan-draft')
             ->assertOk()
             ->assertSee('MODE PRATINJAU SESITEMU.ID — UNDANGAN BELUM AKTIF');
 
+        // Pengiriman RSVP/ucapan ke undangan draft ditolak 403 di backend
+        $this->post('/undangan-draft/buku-tamu', [
+            'nama_tamu' => 'Tamu Ilegal',
+            'status_kehadiran' => 'hadir',
+            'jumlah_tamu' => 1,
+            'ucapan_doa' => 'Coba kirim saat masih draft',
+        ])->assertStatus(403);
+
+        $this->assertDatabaseMissing('buku_tamu', [
+            'undangan_id' => $draft->id,
+            'nama_tamu' => 'Tamu Ilegal',
+        ]);
+
+        // Undangan kedaluwarsa menampilkan halaman kedaluwarsa
+        auth()->logout();
         $this->get('/undangan-habis')
             ->assertOk()
             ->assertSee('Masa Aktif Undangan Telah Berakhir');

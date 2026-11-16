@@ -82,12 +82,6 @@
     @include('dasbor._top-nav', ['halamanAktif' => 'katalog', 'judulMobile' => 'Katalog Tema'])
 
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-28 md:py-8 space-y-5 md:space-y-6">
-        @if (session('sukses'))
-            <div class="rounded-xl bg-sage/10 border border-sage/30 px-4 py-3 text-sm text-sage">
-                {{ session('sukses') }}
-            </div>
-        @endif
-
         @if ($errors->any())
             <div class="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
                 <ul class="list-disc list-inside space-y-1">

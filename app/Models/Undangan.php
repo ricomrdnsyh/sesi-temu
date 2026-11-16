@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use App\Support\MediaPublik;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Undangan extends Model
@@ -218,6 +218,20 @@ class Undangan extends Model
         return $this->berlaku_sampai !== null && $this->berlaku_sampai->isPast();
     }
 
+    public function sudahAktifPublik(): bool
+    {
+        return $this->status_publikasi && ! $this->sudahKedaluwarsa();
+    }
+
+    public function bolehDipratinjauOleh(?Pengguna $pengguna): bool
+    {
+        if (! $pengguna) {
+            return false;
+        }
+
+        return $pengguna->adalahAdmin() || $pengguna->id === $this->pengguna_id;
+    }
+
     public function fiturAktif(string $fitur): bool
     {
         $fiturAktif = $this->pengaturan['fitur_aktif'] ?? [];
@@ -339,14 +353,6 @@ class Undangan extends Model
 
     private function resolveUrlMedia(?string $path): ?string
     {
-        if (! $path) {
-            return null;
-        }
-
-        if (Str::startsWith($path, ['http://', 'https://', 'aset-demo/', 'aset-tema/'])) {
-            return asset($path);
-        }
-
-        return Storage::disk('public')->url($path);
+        return MediaPublik::url($path);
     }
 }

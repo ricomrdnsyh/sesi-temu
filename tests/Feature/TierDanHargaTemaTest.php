@@ -342,4 +342,215 @@ class TierDanHargaTemaTest extends TestCase
         $this->assertNull($undangan->pengaturan['foto_sampul'] ?? null);
         Storage::disk('public')->assertMissing($pathSampul);
     }
+
+    public function test_simpan_bagian_kelola_langsung_arahkan_ke_tab_berikutnya_tanpa_alert_duplikat(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        $client = Pengguna::factory()->create();
+        $tema = Tema::where('slug', 'adat-jawa')->firstOrFail();
+
+        $undangan = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $tema->id,
+            'slug' => 'uji-lanjut-tab',
+            'nama_panggilan_pria' => 'Dimas',
+            'nama_lengkap_pria' => 'Dimas Pratama',
+            'nama_panggilan_wanita' => 'Maya',
+            'nama_lengkap_wanita' => 'Maya Sari',
+            'status_publikasi' => false,
+        ]);
+
+        // Tab 1 (tema) -> Tab 2 (mempelai)
+        $this->actingAs($client)
+            ->put("/dasbor/undangan/{$undangan->id}", [
+                'bagian' => 'tema',
+                'tema_id' => $tema->id,
+                'slug' => 'uji-lanjut-tab',
+                'gaya_font' => 'bawaan',
+            ])
+            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola")
+            ->assertSessionHas('tab_aktif', 'mempelai')
+            ->assertSessionHas('sukses', 'Perubahan undangan berhasil disimpan.');
+
+        // Halaman kelola menampilkan atribut SweetAlert saja (tanpa banner sukses inline di atas tab)
+        $this->actingAs($client)
+            ->withSession([
+                'tab_aktif' => 'mempelai',
+                'sukses' => 'Perubahan undangan berhasil disimpan.',
+            ])
+            ->get("/dasbor/undangan/{$undangan->id}/kelola")
+            ->assertOk()
+            ->assertSee('data-swal-success="Perubahan undangan berhasil disimpan."', false)
+            ->assertDontSee('rounded-xl bg-sage/10 border border-sage/30 px-4 py-3 text-sm text-sage', false);
+
+        // Tab 2 (mempelai) -> Tab 3 (acara)
+        $this->actingAs($client)
+            ->put("/dasbor/undangan/{$undangan->id}", [
+                'bagian' => 'mempelai',
+                'nama_panggilan_pria' => 'Dimas',
+                'nama_lengkap_pria' => 'Dimas Pratama',
+                'nama_panggilan_wanita' => 'Maya',
+                'nama_lengkap_wanita' => 'Maya Sari',
+            ])
+            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola")
+            ->assertSessionHas('tab_aktif', 'acara');
+
+        // Tab 4 (cerita_streaming) -> Tab 5 (amplop)
+        $this->actingAs($client)
+            ->put("/dasbor/undangan/{$undangan->id}", [
+                'bagian' => 'cerita_streaming',
+                'cerita_cinta' => [
+                    ['judul' => 'Pertama Bertemu', 'tanggal' => '2024', 'cerita' => 'Berawal di kafe.'],
+                ],
+            ])
+            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola")
+            ->assertSessionHas('tab_aktif', 'amplop');
+
+        // Tab 5 (kado_fisik) -> Tab 6 (tamu)
+        $this->actingAs($client)
+            ->put("/dasbor/undangan/{$undangan->id}", [
+                'bagian' => 'kado_fisik',
+                'alamat_kado_fisik' => 'Jl. Merdeka No. 10, Jakarta',
+            ])
+            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola")
+            ->assertSessionHas('tab_aktif', 'tamu');
+
+        // Halaman kelola menampilkan dropzone pratinjau foto mempelai, mockup sampul, & template kutipan cepat
+        $this->actingAs($client)
+            ->get("/dasbor/undangan/{$undangan->id}/kelola?tab=mempelai")
+            ->assertOk()
+            ->assertSee('Pratinjau Sampul Undangan')
+            ->assertSee('Pilih atau Seret Foto Sampul')
+            ->assertSee('+ QS. Ar-Rum: 21')
+            ->assertSee('Pilih atau Seret Foto Prewedding')
+            ->assertSee('<textarea', false)
+            ->assertSee('name="keterangan"', false);
+    }
+
+    public function test_url_foto_galeri_mengikuti_host_permintaan_bukan_terkunci_app_url(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        $client = Pengguna::factory()->create();
+        $tema = Tema::firstOrFail();
+
+        $undangan = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $tema->id,
+            'slug' => 'uji-host-galeri',
+            'nama_panggilan_pria' => 'Dimas',
+            'nama_lengkap_pria' => 'Dimas Pratama',
+            'nama_panggilan_wanita' => 'Maya',
+            'nama_lengkap_wanita' => 'Maya Sari',
+            'foto_pria' => 'undangan/99/mempelai-pria.webp',
+        ]);
+
+        $undangan->daftarGaleri()->create([
+            'lokasi_foto' => 'undangan/99/hari-tunangan.webp',
+            'keterangan' => 'Hari Tunangan',
+            'urutan' => 1,
+        ]);
+
+        $this->actingAs($client)
+            ->get('http://127.0.0.1:8000/dasbor/undangan/'.$undangan->id.'/kelola?tab=galeri')
+            ->assertOk()
+            ->assertSee('http://127.0.0.1:8000/storage/undangan/99/hari-tunangan.webp', false);
+
+        $this->get('http://127.0.0.1:8000/uji-host-galeri')
+            ->assertOk()
+            ->assertSee('http://127.0.0.1:8000/storage/undangan/99/mempelai-pria.webp', false)
+            ->assertSee('http://127.0.0.1:8000/storage/undangan/99/hari-tunangan.webp', false);
+
+        $undangan->daftarAcara()->create([
+            'nama_acara' => 'Akad Nikah',
+            'tanggal_acara' => now()->addDays(10)->toDateString(),
+            'waktu_mulai' => '08:00:00',
+            'waktu_selesai' => '10:00:00',
+            'zona_waktu' => 'WIB',
+            'nama_tempat' => 'Masjid Agung',
+            'alamat_lengkap' => 'Jl. Merdeka No. 1',
+            'link_maps' => 'https://maps.google.com/?q=Masjid+Agung',
+        ]);
+
+        $this->actingAs($client)
+            ->get("/dasbor/undangan/{$undangan->id}/kelola?tab=acara")
+            ->assertOk()
+            ->assertSee('Daftar Jadwal Terpasang')
+            ->assertSee('1 Acara')
+            ->assertSee('Acara #1')
+            ->assertSee('H-10 Hari')
+            ->assertSee('Buka Google Maps')
+            ->assertSee('+ Akad Nikah');
+
+        $this->actingAs($client)
+            ->get("/dasbor/undangan/{$undangan->id}/kelola?tab=galeri")
+            ->assertOk()
+            ->assertSee('Linimasa Romantis')
+            ->assertSee('Pratinjau Tampilan Tamu')
+            ->assertSee('+ Pertama Bertemu')
+            ->assertSee('Fitur Live Streaming Pernikahan');
+
+        $undangan->daftarAmplop()->create([
+            'nama_bank' => 'BCA',
+            'nomor_rekening' => '1234567890',
+            'atas_nama' => 'Dimas Pratama',
+        ]);
+
+        $undangan->daftarAmplop()->create([
+            'nama_bank' => 'GoPay',
+            'nomor_rekening' => '081234567890',
+            'atas_nama' => 'Maya Sari',
+        ]);
+
+        $this->actingAs($client)
+            ->get("/dasbor/undangan/{$undangan->id}/kelola?tab=amplop")
+            ->assertOk()
+            ->assertSee('Pratinjau Kartu Bank Live')
+            ->assertSee('Koleksi Kartu Rekening Tersimpan')
+            ->assertSee('Bank Central Asia')
+            ->assertSee('Dompet Digital GoPay')
+            ->assertSee('1234 5678 90')
+            ->assertSee('#0057B8', false)
+            ->assertSee('#00AED6', false)
+            ->assertSee('Menyimpan Pengaturan Tema...')
+            ->assertSee('Menyimpan &amp; Mengompresi Foto...', false)
+            ->assertSee('Mengunggah &amp; Mengompresi Foto...', false)
+            ->assertSee('Menyimpan Cerita Cinta...')
+            ->assertSee('Menambahkan Kartu Rekening...')
+            ->assertSee('Menghapus Rekening...')
+            ->assertSee('Mode Simulasi — Aktifkan Undangan untuk Menyebar Link WA')
+            ->assertSee('Bayar &amp; Aktifkan Undangan', false)
+            ->assertDontSee(':href="tamu.waUrl"', false)
+            ->assertDontSee('onsubmit="return confirm', false);
+
+        // Setelah undangan diaktifkan, tombol Salin Teks & Kirim WA pada Tab 6 terbuka
+        $undangan->update([
+            'status_publikasi' => true,
+            'berlaku_sampai' => now()->addMonths(3),
+        ]);
+
+        $this->actingAs($client)
+            ->get("/dasbor/undangan/{$undangan->id}/kelola?tab=tamu")
+            ->assertOk()
+            ->assertDontSee('Mode Simulasi — Aktifkan Undangan untuk Menyebar Link WA')
+            ->assertSee(':href="tamu.waUrl"', false);
+
+        // Jika masa aktif sudah habis, Kirim WA & Salin Teks kembali dikunci
+        $undangan->update([
+            'berlaku_sampai' => now()->subDay(),
+        ]);
+
+        $this->actingAs($client)
+            ->get("/dasbor/undangan/{$undangan->id}/kelola?tab=tamu")
+            ->assertOk()
+            ->assertSee('Kirim WA Dikunci — Masa Aktif Undangan Berakhir')
+            ->assertDontSee(':href="tamu.waUrl"', false);
+
+        $this->actingAs($client)
+            ->get('/dasbor')
+            ->assertOk()
+            ->assertSee('Membuat Draft Undangan...')
+            ->assertSee('Keluar dari Akun...');
+    }
 }

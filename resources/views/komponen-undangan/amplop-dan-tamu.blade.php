@@ -113,6 +113,34 @@
                         <p x-show="demoTerkirim" x-cloak class="text-xs text-emerald-600 font-semibold">Simulasi ucapan berhasil ditampilkan pada mode demo!</p>
                     </form>
                 </div>
+            @elseif (! $undangan->sudahAktifPublik())
+                <div class="rounded-2xl border border-amber-300/70 bg-amber-50/90 p-5 text-charcoal space-y-3">
+                    <div class="flex items-start gap-3">
+                        <div class="shrink-0 w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-sm font-bold text-charcoal">Mode Pratinjau — Buku Tamu &amp; RSVP Dikunci</p>
+                            <p class="text-xs text-charcoal/75 leading-relaxed">
+                                Formulir konfirmasi kehadiran dan pengiriman ucapan doa baru dapat diisi tamu setelah undangan dibayar dan diaktifkan.
+                            </p>
+                        </div>
+                    </div>
+
+                    @if ($undangan->bolehDipratinjauOleh(auth()->user()))
+                        <div class="pt-1">
+                            <a
+                                href="{{ route('dasbor.undangan.kelola', [$undangan, 'tab' => 'aktivasi']) }}"
+                                class="inline-flex items-center gap-1.5 rounded-xl bg-sage px-4 py-2 text-xs font-semibold text-white hover:bg-sage/90 transition"
+                            >
+                                Bayar &amp; Aktifkan Undangan &rarr;
+                            </a>
+                        </div>
+                    @endif
+                </div>
             @else
                 <form action="{{ route('undangan.ucapan', $undangan->slug) }}" method="POST" class="space-y-4">
                     @csrf

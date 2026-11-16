@@ -42,7 +42,14 @@
                 </div>
             @endif
 
-            <form action="{{ route('masuk.proses') }}" method="POST" class="space-y-5">
+            <form
+                action="{{ route('masuk.proses') }}"
+                method="POST"
+                class="space-y-5"
+                data-swal-loading
+                data-swal-loading-title="Memverifikasi Akun..."
+                data-swal-loading-text="Sedang masuk ke dasbor Anda..."
+            >
                 @csrf
 
                 <div>

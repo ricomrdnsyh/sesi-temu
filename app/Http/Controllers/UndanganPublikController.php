@@ -23,6 +23,12 @@ class UndanganPublikController extends Controller
             ]);
         }
 
+        if (! $undangan->status_publikasi && ! $undangan->bolehDipratinjauOleh($request->user())) {
+            return view('undangan-belum-aktif', [
+                'undangan' => $undangan,
+            ]);
+        }
+
         $namaTamu = trim((string) $request->query('to', ''));
         if ($namaTamu === '') {
             $namaTamu = 'Tamu Undangan';
@@ -44,6 +50,10 @@ class UndanganPublikController extends Controller
 
         if ($undangan->sudahKedaluwarsa()) {
             abort(403, 'Masa aktif undangan telah berakhir.');
+        }
+
+        if (! $undangan->status_publikasi) {
+            abort(403, 'Undangan belum aktif. Fitur RSVP dan ucapan hanya tersedia setelah undangan diaktifkan.');
         }
 
         $tervalidasi = $request->validate([

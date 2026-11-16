@@ -56,6 +56,7 @@ Route::middleware('auth')->prefix('dasbor')->name('dasbor.')->group(function ():
 
     Route::delete('/undangan/{undangan}/buku-tamu/{ucapan}', [DasborUndanganController::class, 'hapusUcapan'])->name('ucapan.hapus');
 
+    Route::post('/undangan/{undangan}/promo/cek', [DasborUndanganController::class, 'cekPromo'])->name('transaksi.cek-promo');
     Route::post('/undangan/{undangan}/transaksi', [DasborUndanganController::class, 'ajukanTransaksi'])->name('transaksi.ajukan');
     Route::post('/transaksi/{transaksi}/unggah-bukti', [DasborUndanganController::class, 'unggahBuktiTransaksi'])->name('transaksi.unggah');
 });

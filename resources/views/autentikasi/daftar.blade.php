@@ -60,7 +60,14 @@
                 </div>
             @endif
 
-            <form action="{{ route('daftar.proses') }}" method="POST" class="space-y-4">
+            <form
+                action="{{ route('daftar.proses') }}"
+                method="POST"
+                class="space-y-4"
+                data-swal-loading
+                data-swal-loading-title="Membuat Akun &amp; Draft..."
+                data-swal-loading-text="Menyiapkan akun client dan link undangan pertama Anda..."
+            >
                 @csrf
                 <input type="hidden" name="slug" value="{{ old('slug', $slugTerpilih) }}">
                 <input type="hidden" name="tema_id" value="{{ old('tema_id', $temaTerpilih?->id) }}">
