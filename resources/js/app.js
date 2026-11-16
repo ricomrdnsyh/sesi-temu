@@ -12,9 +12,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const parsedLength = Number.parseInt(table.dataset.pageLength ?? '10', 10);
         const pageLength = Number.isFinite(parsedLength) && parsedLength > 0 ? parsedLength : 10;
         const emptyMessage = table.dataset.emptyMessage ?? 'Belum ada data tersedia.';
-        const columnDefs = [];
+        const headerCells = Array.from(table.querySelectorAll('thead tr:first-child th'));
+        const noSortTargets = headerCells.reduce((acc, th, index) => {
+            if (th.hasAttribute('data-no-sort')) {
+                acc.push(index);
+            }
 
-        if (table.dataset.disableLastSort !== 'false') {
+            return acc;
+        }, []);
+
+        const columnDefs = [];
+        if (noSortTargets.length > 0) {
+            columnDefs.push({
+                targets: noSortTargets,
+                orderable: false,
+                searchable: false,
+            });
+        } else if (table.dataset.disableLastSort !== 'false') {
             columnDefs.push({
                 targets: -1,
                 orderable: false,

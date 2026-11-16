@@ -205,16 +205,46 @@
         <table data-datatable data-page-length="5" data-empty-message="Belum ada data undangan." class="w-full text-sm">
             <thead>
                 <tr class="border-b border-champagne/20 text-left text-xs uppercase text-charcoal/60">
+                    <th data-no-sort class="py-3 dt-center text-center">Aksi</th>
                     <th class="py-3 pr-4">Pasangan &amp; Link</th>
                     <th class="py-3 pr-4">Client</th>
                     <th class="py-3 pr-4">Tema</th>
                     <th class="py-3 pr-4">Status</th>
-                    <th class="py-3 text-right">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-champagne/15">
                 @foreach ($undanganTerbaru as $item)
+                    @php
+                        $urlPublik = Route::has('undangan.tampil') ? route('undangan.tampil', $item->slug) : url('/'.$item->slug);
+                    @endphp
                     <tr>
+                        <td class="py-3 dt-center text-center whitespace-nowrap">
+                            <div class="inline-flex items-center justify-center gap-1.5">
+                                <a
+                                    href="{{ $urlPublik }}"
+                                    target="_blank"
+                                    rel="noopener"
+                                    title="Lihat Undangan"
+                                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-charcoal/15 bg-white text-charcoal/70 hover:border-sage/40 hover:bg-sage/5 hover:text-sage transition"
+                                >
+                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                </a>
+                                <a
+                                    href="{{ route('dasbor.undangan.kelola', $item) }}"
+                                    title="Edit Isian Client"
+                                    class="inline-flex items-center gap-1.5 rounded-lg border border-champagne/50 bg-champagne/10 px-2.5 py-1.5 text-xs font-semibold text-charcoal hover:bg-champagne/25 transition"
+                                >
+                                    <svg class="h-3.5 w-3.5 text-amber-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                        <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>
+                                    </svg>
+                                    <span>Edit Isian</span>
+                                </a>
+                            </div>
+                        </td>
                         <td class="py-3 pr-4">
                             <p class="font-semibold text-charcoal">{{ $item->nama_panggilan_pria }} &amp; {{ $item->nama_panggilan_wanita }}</p>
                             <p class="text-xs font-mono text-sage">sesitemu.id/{{ $item->slug }}</p>
@@ -229,9 +259,6 @@
                             @else
                                 <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">Draft</span>
                             @endif
-                        </td>
-                        <td class="py-3 text-right">
-                            <a href="{{ route('dasbor.undangan.kelola', $item) }}" class="text-xs font-semibold text-sage hover:underline">Edit Isian Client</a>
                         </td>
                     </tr>
                 @endforeach

@@ -104,12 +104,24 @@ table.dataTable > thead > tr > th {
     text-transform: uppercase;
 }
 
-table.dataTable > thead > tr > th:first-child {
+table.dataTable > thead > tr > th:first-child:not(.dt-center):not(.text-center) {
     padding-left: 0 !important;
 }
 
-table.dataTable > thead > tr > th.dt-orderable-none {
-    padding-right: 0 !important;
+table.dataTable > thead > tr > th.dt-orderable-none:not(.dt-center):not(.text-center) {
+    padding-right: 0.75rem !important;
+}
+
+table.dataTable > thead > tr > th.dt-center,
+table.dataTable > thead > tr > th.text-center {
+    padding: 0.75rem 0.75rem !important;
+    text-align: center !important;
+}
+
+table.dataTable > thead > tr > th.dt-center div.dt-column-header,
+table.dataTable > thead > tr > th.text-center div.dt-column-header {
+    justify-content: center !important;
+    text-align: center !important;
 }
 
 table.dataTable > tbody > tr > td {
@@ -118,12 +130,18 @@ table.dataTable > tbody > tr > td {
     vertical-align: middle;
 }
 
-table.dataTable > tbody > tr > td:first-child {
+table.dataTable > tbody > tr > td:first-child:not(.dt-center):not(.text-center) {
     padding-left: 0 !important;
 }
 
-table.dataTable > tbody > tr > td:last-child {
+table.dataTable > tbody > tr > td:last-child:not(.dt-center):not(.text-center) {
     padding-right: 0 !important;
+}
+
+table.dataTable > tbody > tr > td.dt-center,
+table.dataTable > tbody > tr > td.text-center {
+    padding: 0.875rem 0.75rem !important;
+    text-align: center !important;
 }
 
 table.dataTable > tbody > tr:first-child > td {

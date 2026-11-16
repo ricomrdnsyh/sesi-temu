@@ -169,19 +169,26 @@ class LogoBrandingTest extends TestCase
             '/admin/undangan' => 'data-page-length="10"',
             '/admin/pengguna' => 'data-page-length="10"',
         ] as $rute => $pageLengthAttr) {
-            $this->actingAs($admin)
+            $respon = $this->actingAs($admin)
                 ->get($rute)
                 ->assertOk()
                 ->assertSee('data-datatable', false)
                 ->assertSee($pageLengthAttr, false)
                 ->assertSee('data-empty-message', false)
                 ->assertDontSee('colspan="5"', false);
+
+            $konten = $respon->getContent();
+            $this->assertMatchesRegularExpression(
+                '/<thead>\s*<tr[^>]*>\s*<th[^>]*data-no-sort[^>]*dt-center text-center[^>]*>Aksi<\/th>/s',
+                $konten
+            );
         }
 
         $this->actingAs($admin)
             ->get('/admin/pengguna')
             ->assertOk()
             ->assertSee($client->email)
-            ->assertSee('Reset Sandi');
+            ->assertSee('Reset Sandi')
+            ->assertSee('<svg', false);
     }
 }

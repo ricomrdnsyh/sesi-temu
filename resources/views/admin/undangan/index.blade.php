@@ -33,11 +33,11 @@
     <table data-datatable data-page-length="10" data-empty-message="Tidak ada undangan yang cocok dengan filter." class="w-full text-sm">
         <thead>
             <tr class="border-b border-champagne/20 text-left text-xs uppercase text-charcoal/60">
+                <th data-no-sort class="py-3 dt-center text-center">Aksi</th>
                 <th class="py-3 pr-4">Undangan &amp; Slug</th>
                 <th class="py-3 pr-4">Client</th>
                 <th class="py-3 pr-4">Tema</th>
                 <th class="py-3 pr-4">Status &amp; Masa Aktif</th>
-                <th class="py-3 text-right">Aksi</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-champagne/15">
@@ -46,6 +46,48 @@
                     $urlPublik = Route::has('undangan.tampil') ? route('undangan.tampil', $undangan->slug) : url('/'.$undangan->slug);
                 @endphp
                 <tr>
+                    <td class="py-3.5 dt-center text-center whitespace-nowrap">
+                        <div class="inline-flex items-center justify-center gap-1.5">
+                            <a
+                                href="{{ route('dasbor.undangan.kelola', $undangan) }}"
+                                title="Edit Isian Client"
+                                class="inline-flex items-center gap-1.5 rounded-lg border border-champagne/50 bg-champagne/10 px-2.5 py-1.5 text-xs font-semibold text-charcoal hover:bg-champagne/25 transition"
+                            >
+                                <svg class="h-3.5 w-3.5 text-amber-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                    <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>
+                                </svg>
+                                <span>Edit Isian</span>
+                            </a>
+
+                            @if ($undangan->status_publikasi && ! $undangan->sudahKedaluwarsa())
+                                <form action="{{ route('admin.undangan.nonaktifkan', $undangan) }}" method="POST">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" title="Nonaktifkan Undangan" class="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50/70 px-2.5 py-1.5 text-xs font-semibold text-amber-800 hover:bg-amber-100/80 cursor-pointer transition">
+                                        <svg class="h-3.5 w-3.5 text-amber-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <line x1="10" x2="10" y1="15" y2="9"/>
+                                            <line x1="14" x2="14" y1="15" y2="9"/>
+                                        </svg>
+                                        <span>Nonaktifkan</span>
+                                    </button>
+                                </form>
+                            @else
+                                <form action="{{ route('admin.undangan.aktifkan', $undangan) }}" method="POST">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" title="Aktifkan Undangan (3 Bulan)" class="inline-flex items-center gap-1.5 rounded-lg bg-sage px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-sage/90 cursor-pointer shadow-xs transition">
+                                        <svg class="h-3.5 w-3.5 text-white shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M21.801 10A10 10 0 1 1 17 3.335"/>
+                                            <path d="m9 11 3 3L22 4"/>
+                                        </svg>
+                                        <span>Aktifkan</span>
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    </td>
                     <td class="py-3.5 pr-4">
                         <p class="font-semibold text-charcoal">{{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}</p>
                         <a href="{{ $urlPublik }}" target="_blank" class="text-xs font-mono text-sage hover:underline">sesitemu.id/{{ $undangan->slug }}</a>
@@ -67,31 +109,6 @@
                         @if ($undangan->berlaku_sampai)
                             <p class="mt-1 text-xs text-charcoal/60">s.d. {{ $undangan->berlaku_sampai->translatedFormat('d M Y') }}</p>
                         @endif
-                    </td>
-                    <td class="py-3.5 text-right">
-                        <div class="inline-flex flex-wrap items-center justify-end gap-2">
-                            <a href="{{ route('dasbor.undangan.kelola', $undangan) }}" class="rounded-lg border border-champagne px-3 py-1.5 text-xs font-semibold text-charcoal hover:bg-champagne/10">
-                                Edit Isian Client
-                            </a>
-
-                            @if ($undangan->status_publikasi && ! $undangan->sudahKedaluwarsa())
-                                <form action="{{ route('admin.undangan.nonaktifkan', $undangan) }}" method="POST">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" class="rounded-lg border border-amber-300 px-3 py-1.5 text-xs font-semibold text-amber-800 hover:bg-amber-50 cursor-pointer">
-                                        Nonaktifkan
-                                    </button>
-                                </form>
-                            @else
-                                <form action="{{ route('admin.undangan.aktifkan', $undangan) }}" method="POST">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" class="rounded-lg bg-sage px-3 py-1.5 text-xs font-semibold text-white hover:bg-sage/90 cursor-pointer">
-                                        Aktifkan
-                                    </button>
-                                </form>
-                            @endif
-                        </div>
                     </td>
                 </tr>
             @endforeach
