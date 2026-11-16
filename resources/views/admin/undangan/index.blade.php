@@ -1,4 +1,4 @@
-@extends('admin.tata-letak')
+@extends('admin.kerangka')
 
 @section('judul', 'Manajemen Undangan — Admin SesiTemu')
 
