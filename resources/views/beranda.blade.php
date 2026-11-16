@@ -312,6 +312,11 @@
                                 @endif
                                 <span>{{ $infoTier['label'] }}</span>
                             </span>
+                            @if ($tema->adaDiskon())
+                                <span class="absolute bottom-3 right-3 rounded-full bg-rose-600 px-3 py-1 text-[11px] font-bold text-white shadow-sm">
+                                    {{ $tema->labelBadgeDiskon() }}
+                                </span>
+                            @endif
                         </div>
 
                         <div class="p-6 flex-1 flex flex-col justify-between">
@@ -321,7 +326,10 @@
                                         {{ $infoTier['ringkasan'] }}
                                     </span>
                                     <div class="text-right shrink-0">
-                                        <span class="text-lg font-extrabold text-charcoal">{{ $tema->hargaFormatted() }}</span>
+                                        @if ($tema->adaDiskon())
+                                            <span class="block text-[11px] text-charcoal/45 line-through leading-none mb-0.5">{{ $tema->hargaAsliFormatted() }}</span>
+                                        @endif
+                                        <span class="text-lg font-extrabold {{ $tema->adaDiskon() ? 'text-rose-600' : 'text-charcoal' }}">{{ $tema->hargaFormatted() }}</span>
                                         <span class="text-[11px] text-charcoal/55">/ {{ $durasiAktifBulan ?? \App\Support\PengaturanSesiTemu::masaAktifBulan() }} bln</span>
                                     </div>
                                 </div>

@@ -72,6 +72,8 @@ Route::middleware(['auth', PastikanAdmin::class])->prefix('admin')->name('admin.
     Route::get('/buku-tamu', [AdminBukuTamuController::class, 'index'])->name('buku-tamu.index');
     Route::delete('/buku-tamu/{ucapan}', [AdminBukuTamuController::class, 'destroy'])->name('buku-tamu.destroy');
 
+    Route::post('/tema-diskon-massal', [AdminTemaController::class, 'terapkanDiskonMassal'])->name('tema.diskon-massal');
+    Route::post('/tema-reset-diskon', [AdminTemaController::class, 'resetDiskonMassal'])->name('tema.reset-diskon');
     Route::resource('/tema', AdminTemaController::class)->except(['show']);
 
     Route::get('/musik', [AdminMusikController::class, 'index'])->name('musik.index');

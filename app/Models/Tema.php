@@ -61,6 +61,8 @@ class Tema extends Model
         'kategori',
         'tier',
         'harga',
+        'diskon_tipe',
+        'diskon_nilai',
         'lokasi_view',
         'gambar_pratinjau',
         'aktif',
@@ -73,6 +75,7 @@ class Tema extends Model
     {
         return [
             'harga' => 'integer',
+            'diskon_nilai' => 'integer',
             'aktif' => 'boolean',
         ];
     }
@@ -104,9 +107,74 @@ class Tema extends Model
         return self::TIER_TERSEDIA[$this->tierKode()];
     }
 
-    public function hargaNominal(): int
+    public function hargaAsliNominal(): int
     {
         return (int) ($this->harga ?? self::hargaBawaanTier($this->tierKode()));
+    }
+
+    public function hargaAsliFormatted(): string
+    {
+        return self::formatRupiah($this->hargaAsliNominal());
+    }
+
+    public function diskonTipe(): ?string
+    {
+        return in_array($this->diskon_tipe, ['nominal', 'persen'], true) ? $this->diskon_tipe : null;
+    }
+
+    public function diskonNilai(): int
+    {
+        return max(0, (int) ($this->diskon_nilai ?? 0));
+    }
+
+    public function potonganDiskonNominal(): int
+    {
+        $hargaAsli = $this->hargaAsliNominal();
+        $tipe = $this->diskonTipe();
+        $nilai = $this->diskonNilai();
+
+        if ($hargaAsli <= 0 || $tipe === null || $nilai <= 0) {
+            return 0;
+        }
+
+        if ($tipe === 'persen') {
+            return min($hargaAsli, (int) floor($hargaAsli * min(100, $nilai) / 100));
+        }
+
+        return min($hargaAsli, $nilai);
+    }
+
+    public function adaDiskon(): bool
+    {
+        return $this->potonganDiskonNominal() > 0;
+    }
+
+    public function persenDiskon(): int
+    {
+        $hargaAsli = $this->hargaAsliNominal();
+        if ($hargaAsli <= 0 || ! $this->adaDiskon()) {
+            return 0;
+        }
+
+        return (int) round(($this->potonganDiskonNominal() / $hargaAsli) * 100);
+    }
+
+    public function labelBadgeDiskon(): ?string
+    {
+        if (! $this->adaDiskon()) {
+            return null;
+        }
+
+        if ($this->diskonTipe() === 'persen') {
+            return 'Diskon '.min(100, $this->diskonNilai()).'%';
+        }
+
+        return 'Hemat '.self::formatRupiah($this->potonganDiskonNominal());
+    }
+
+    public function hargaNominal(): int
+    {
+        return max(0, $this->hargaAsliNominal() - $this->potonganDiskonNominal());
     }
 
     public function hargaFormatted(): string

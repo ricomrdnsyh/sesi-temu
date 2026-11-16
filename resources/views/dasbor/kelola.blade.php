@@ -762,7 +762,12 @@
                                     <input type="radio" name="paket" value="mandiri" checked class="mt-1 text-sage">
                                     <span class="text-xs">
                                         <span class="block font-bold text-charcoal">Paket Mandiri</span>
-                                        <span class="text-charcoal/65">{{ $undangan->tema?->hargaFormatted() }}</span>
+                                        @if ($undangan->tema?->adaDiskon())
+                                            <span class="text-charcoal/45 line-through mr-1">{{ $undangan->tema->hargaAsliFormatted() }}</span>
+                                            <span class="font-semibold text-rose-600">{{ $undangan->tema->hargaFormatted() }}</span>
+                                        @else
+                                            <span class="text-charcoal/65">{{ $undangan->tema?->hargaFormatted() }}</span>
+                                        @endif
                                     </span>
                                 </label>
                                 <label class="flex items-start gap-2.5 rounded-xl border border-champagne/35 bg-ivory/60 p-3 cursor-pointer">

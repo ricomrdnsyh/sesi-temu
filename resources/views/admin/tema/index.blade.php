@@ -5,24 +5,30 @@
 @section('isi_admin')
 @php
     $adaGalat = $errors->any();
-    $modeAwalEdit = $adaGalat && old('_modal_mode') === 'edit';
+    $galatDariDiskonMassal = $adaGalat && old('target_tier') !== null;
+    $galatDariModalTema = $adaGalat && ! $galatDariDiskonMassal;
+    $modeAwalEdit = $galatDariModalTema && old('_modal_mode') === 'edit';
     $biayaTerimaBeres = \App\Support\PengaturanSesiTemu::biayaTerimaBeres();
 
     $modalInit = [
-        'modalTerbuka' => $adaGalat,
+        'modalTerbuka' => $galatDariModalTema,
+        'modalDiskonMassalTerbuka' => $galatDariDiskonMassal,
         'modeEdit' => $modeAwalEdit,
-        'editId' => $adaGalat ? old('_edit_id') : null,
+        'editId' => $galatDariModalTema ? old('_edit_id') : null,
         'form' => [
-            'nama_tema' => (string) ($adaGalat ? old('nama_tema', '') : ''),
-            'slug' => (string) ($adaGalat ? old('slug', '') : ''),
-            'kategori' => (string) ($adaGalat ? old('kategori', 'modern') : 'modern'),
-            'lokasi_view' => (string) ($adaGalat ? old('lokasi_view', 'tema.rustic-floral.index') : 'tema.rustic-floral.index'),
-            'tier' => (string) ($adaGalat ? old('tier', 'basic') : 'basic'),
-            'harga' => (int) ($adaGalat ? old('harga', \App\Models\Tema::HARGA_BAWAAN_TIER['basic']) : \App\Models\Tema::HARGA_BAWAAN_TIER['basic']),
-            'aktif' => $adaGalat ? (bool) old('aktif', false) : true,
+            'nama_tema' => (string) ($galatDariModalTema ? old('nama_tema', '') : ''),
+            'slug' => (string) ($galatDariModalTema ? old('slug', '') : ''),
+            'kategori' => (string) ($galatDariModalTema ? old('kategori', 'modern') : 'modern'),
+            'lokasi_view' => (string) ($galatDariModalTema ? old('lokasi_view', 'tema.rustic-floral.index') : 'tema.rustic-floral.index'),
+            'tier' => (string) ($galatDariModalTema ? old('tier', 'basic') : 'basic'),
+            'harga' => (int) ($galatDariModalTema ? old('harga', \App\Models\Tema::HARGA_BAWAAN_TIER['basic']) : \App\Models\Tema::HARGA_BAWAAN_TIER['basic']),
+            'diskon_tipe' => (string) ($galatDariModalTema ? old('diskon_tipe', '') : ''),
+            'diskon_nilai' => (int) ($galatDariModalTema ? old('diskon_nilai', 0) : 0),
+            'aktif' => $galatDariModalTema ? (bool) old('aktif', false) : true,
             'gambar_url' => '',
         ],
         'hargaBawaan' => \App\Models\Tema::HARGA_BAWAAN_TIER,
+        'biayaTerimaBeres' => $biayaTerimaBeres,
         'storeUrl' => route('admin.tema.store'),
         'updateBaseUrl' => url('/admin/tema'),
     ];
@@ -31,12 +37,14 @@
 <div
     x-data="{
         modalTerbuka: false,
+        modalDiskonMassalTerbuka: false,
         modeEdit: false,
         editId: null,
         sedangSeretFile: false,
         previewObjectUrl: null,
         namaFileDipilih: '',
         ukuranFileDipilih: '',
+        biayaTerimaBeres: 50000,
         form: {
             nama_tema: '',
             slug: '',
@@ -44,6 +52,8 @@
             lokasi_view: 'tema.rustic-floral.index',
             tier: 'basic',
             harga: 59000,
+            diskon_tipe: '',
+            diskon_nilai: 0,
             aktif: true,
             gambar_url: '',
         },
@@ -55,10 +65,12 @@
             if (initEl) {
                 const data = JSON.parse(initEl.textContent);
                 this.modalTerbuka = Boolean(data.modalTerbuka);
+                this.modalDiskonMassalTerbuka = Boolean(data.modalDiskonMassalTerbuka);
                 this.modeEdit = Boolean(data.modeEdit);
                 this.editId = data.editId ?? null;
                 this.form = { ...this.form, ...(data.form ?? {}) };
                 this.hargaBawaan = data.hargaBawaan ?? {};
+                this.biayaTerimaBeres = Number(data.biayaTerimaBeres ?? 50000);
                 this.storeUrl = data.storeUrl ?? '';
                 this.updateBaseUrl = data.updateBaseUrl ?? '';
             }
@@ -84,6 +96,8 @@
                 lokasi_view: 'tema.rustic-floral.index',
                 tier: 'basic',
                 harga: this.hargaBawaan.basic ?? 59000,
+                diskon_tipe: '',
+                diskon_nilai: 0,
                 aktif: true,
                 gambar_url: '',
             };
@@ -100,18 +114,39 @@
                 lokasi_view: tema.lokasi_view || 'tema.rustic-floral.index',
                 tier: tema.tier || 'basic',
                 harga: Number(tema.harga ?? 59000),
+                diskon_tipe: tema.diskon_tipe || '',
+                diskon_nilai: Number(tema.diskon_nilai ?? 0),
                 aktif: Boolean(tema.aktif),
                 gambar_url: tema.gambar_url || '',
             };
             this.modalTerbuka = true;
         },
+        bukaModalDiskonMassal() {
+            this.modalDiskonMassalTerbuka = true;
+        },
         tutupModal() {
             this.modalTerbuka = false;
+            this.modalDiskonMassalTerbuka = false;
         },
         terapkanHargaSaran(tier) {
             if (this.hargaBawaan[tier] !== undefined) {
                 this.form.harga = this.hargaBawaan[tier];
             }
+        },
+        hargaAkhirEstimasi() {
+            const hargaDasar = Math.max(0, Number(this.form.harga || 0));
+            const nilai = Math.max(0, Number(this.form.diskon_nilai || 0));
+            if (!this.form.diskon_tipe || nilai <= 0) {
+                return hargaDasar;
+            }
+            if (this.form.diskon_tipe === 'persen') {
+                const persen = Math.min(100, nilai);
+                return Math.max(0, hargaDasar - Math.floor(hargaDasar * persen / 100));
+            }
+            return Math.max(0, hargaDasar - nilai);
+        },
+        formatRupiah(angka) {
+            return 'Rp ' + Number(angka || 0).toLocaleString('id-ID');
         },
         actionForm() {
             return this.modeEdit && this.editId
@@ -167,19 +202,55 @@
 >
     <script type="application/json" id="tema-modal-init">{!! json_encode($modalInit, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
 
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div>
             <h1 class="font-serif text-3xl font-bold text-charcoal">Manajemen Katalog Tema</h1>
-            <p class="text-sm text-charcoal/70 mt-1">Kelola desain tema undangan, view Blade, thumbnail, dan status aktif.</p>
+            <p class="text-sm text-charcoal/70 mt-1">Kelola desain tema, harga, diskon satuan/massal, thumbnail, dan status aktif.</p>
         </div>
-        <button
-            type="button"
-            @click="bukaModalTambah()"
-            data-buka-modal-tambah-tema
-            class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-sage px-5 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer transition text-center"
-        >
-            <span>+ Tambah Tema Baru</span>
-        </button>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+            @if ($jumlahTemaDiskon > 0)
+                <form
+                    action="{{ route('admin.tema.reset-diskon') }}"
+                    method="POST"
+                    data-swal-title="Reset Semua Diskon Katalog?"
+                    data-swal-confirm="Kembalikan harga seluruh tema yang sedang promo ({{ $jumlahTemaDiskon }} tema) ke harga normal?"
+                    data-swal-icon="warning"
+                    data-swal-confirm-button="Ya, Reset Diskon"
+                    data-swal-confirm-color="#D97706"
+                    data-swal-loading-title="Mereset Diskon Katalog..."
+                    data-swal-loading-text="Sedang mengembalikan seluruh harga tema ke harga normal..."
+                >
+                    @csrf
+                    <button type="submit" class="inline-flex items-center gap-1.5 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-800 hover:bg-amber-100 cursor-pointer transition">
+                        <span>Reset Diskon ({{ $jumlahTemaDiskon }})</span>
+                    </button>
+                </form>
+            @endif
+
+            <button
+                type="button"
+                @click="bukaModalDiskonMassal()"
+                data-buka-modal-diskon-massal
+                class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-champagne bg-champagne/15 px-4 py-2.5 text-sm font-semibold text-charcoal hover:bg-champagne/25 cursor-pointer transition"
+            >
+                <svg class="h-4 w-4 text-amber-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M19 5 5 19"/>
+                    <circle cx="6.5" cy="6.5" r="2.5"/>
+                    <circle cx="17.5" cy="17.5" r="2.5"/>
+                </svg>
+                <span>Diskon Massal</span>
+            </button>
+
+            <button
+                type="button"
+                @click="bukaModalTambah()"
+                data-buka-modal-tambah-tema
+                class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-sage px-5 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer transition text-center"
+            >
+                <span>+ Tambah Tema Baru</span>
+            </button>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
@@ -193,7 +264,9 @@
                     'kategori' => $tema->kategori,
                     'lokasi_view' => $tema->lokasi_view,
                     'tier' => $tema->tierKode(),
-                    'harga' => $tema->hargaNominal(),
+                    'harga' => $tema->hargaAsliNominal(),
+                    'diskon_tipe' => $tema->diskonTipe() ?? '',
+                    'diskon_nilai' => $tema->diskonNilai(),
                     'aktif' => (bool) $tema->aktif,
                     'gambar_url' => $tema->urlGambarPratinjau() ?? '',
                 ], JSON_UNESCAPED_UNICODE);
@@ -213,13 +286,25 @@
                     <span class="absolute top-3 right-3 rounded-full px-3 py-1 text-xs font-semibold {{ $tema->aktif ? 'bg-sage text-white' : 'bg-charcoal/80 text-white' }}">
                         {{ $tema->aktif ? 'Aktif' : 'Nonaktif' }}
                     </span>
+                    @if ($tema->adaDiskon())
+                        <span class="absolute bottom-3 left-3 rounded-full bg-rose-600 px-3 py-1 text-xs font-bold text-white shadow-sm">
+                            {{ $tema->labelBadgeDiskon() }}
+                        </span>
+                    @endif
                 </div>
 
                 <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
                     <div>
-                        <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-start justify-between gap-2">
                             <p class="text-xs font-semibold uppercase tracking-wider text-champagne">{{ $tema->kategoriLabel() }}</p>
-                            <span class="text-sm font-bold text-charcoal">{{ $tema->hargaFormatted() }}</span>
+                            <div class="text-right leading-tight">
+                                @if ($tema->adaDiskon())
+                                    <span class="block text-[11px] text-charcoal/45 line-through">{{ $tema->hargaAsliFormatted() }}</span>
+                                    <span class="text-sm font-bold text-rose-600">{{ $tema->hargaFormatted() }}</span>
+                                @else
+                                    <span class="text-sm font-bold text-charcoal">{{ $tema->hargaFormatted() }}</span>
+                                @endif
+                            </div>
                         </div>
                         <h2 class="mt-1 font-serif text-2xl font-bold text-charcoal">{{ $tema->nama_tema }}</h2>
                         <p class="mt-1 text-xs font-mono text-charcoal/60">Slug: {{ $tema->slug }}</p>
@@ -278,7 +363,7 @@
             <div class="flex items-start justify-between gap-4 pb-5 border-b border-champagne/20">
                 <div>
                     <h2 id="judul-modal-tema" class="font-serif text-2xl sm:text-3xl font-bold text-charcoal" x-text="modeEdit ? 'Edit Tema Katalog' : 'Tambah Tema Baru'"></h2>
-                    <p class="text-xs sm:text-sm text-charcoal/65 mt-1" x-text="modeEdit ? 'Perbarui desain thumbnail, harga tier, view Blade, atau status aktif tema.' : 'Lengkapi informasi tema baru beserta gambar pratinjau untuk katalog SesiTemu.'"></p>
+                    <p class="text-xs sm:text-sm text-charcoal/65 mt-1" x-text="modeEdit ? 'Perbarui desain thumbnail, harga tier, diskon katalog, view Blade, atau status aktif tema.' : 'Lengkapi informasi tema baru beserta gambar pratinjau untuk katalog SesiTemu.'"></p>
                 </div>
 
                 <button
@@ -390,9 +475,21 @@
                                 <span class="font-mono text-[11px] shrink-0" x-text="ukuranFileDipilih"></span>
                             </div>
                         </template>
+
+                        {{-- Ringkasan Estimasi Harga Jual Akhir --}}
+                        <div class="rounded-xl bg-ivory/80 border border-champagne/25 p-3.5 text-xs space-y-1">
+                            <div class="flex items-center justify-between text-charcoal/70">
+                                <span>Harga Jual Katalog:</span>
+                                <strong class="text-sm text-charcoal" x-text="formatRupiah(hargaAkhirEstimasi())"></strong>
+                            </div>
+                            <div class="flex items-center justify-between text-charcoal/65">
+                                <span>Terima Beres:</span>
+                                <span class="font-semibold text-sage" x-text="formatRupiah(hargaAkhirEstimasi() + biayaTerimaBeres)"></span>
+                            </div>
+                        </div>
                     </div>
 
-                    {{-- Kolom Kanan: Pengaturan Metadata, Tier, & Harga --}}
+                    {{-- Kolom Kanan: Pengaturan Metadata, Tier, Harga, & Diskon --}}
                     <div class="lg:col-span-7 space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
@@ -463,7 +560,7 @@
 
                             <div>
                                 <div class="flex items-center justify-between mb-1">
-                                    <label for="modal_harga" class="block text-xs font-semibold text-charcoal/80">Harga Tema (Rp)</label>
+                                    <label for="modal_harga" class="block text-xs font-semibold text-charcoal/80">Harga Normal (Rp)</label>
                                     <button
                                         type="button"
                                         @click="terapkanHargaSaran(form.tier)"
@@ -485,9 +582,38 @@
                             </div>
                         </div>
 
-                        <p class="text-xs text-charcoal/60 bg-ivory/70 rounded-xl px-3.5 py-2.5 border border-champagne/15">
-                            Paket Terima Beres otomatis menjadi harga tema + <strong>{{ \App\Models\Tema::formatRupiah($biayaTerimaBeres) }}</strong> jasa input admin.
-                        </p>
+                        {{-- Pengaturan Diskon Tema (Opsional) --}}
+                        <div class="rounded-xl border border-champagne/25 bg-ivory/50 p-4 space-y-3">
+                            <p class="text-xs font-bold text-charcoal">Diskon Tema (Opsional — Tampil sebagai Harga Coret di Beranda)</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label for="modal_diskon_tipe" class="block text-[11px] font-semibold text-charcoal/70 mb-1">Tipe Diskon</label>
+                                    <select
+                                        id="modal_diskon_tipe"
+                                        name="diskon_tipe"
+                                        x-model="form.diskon_tipe"
+                                        class="w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-champagne focus:outline-none"
+                                    >
+                                        <option value="">Tanpa Diskon</option>
+                                        <option value="persen">Persentase (%)</option>
+                                        <option value="nominal">Potongan Nominal (Rp)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="modal_diskon_nilai" class="block text-[11px] font-semibold text-charcoal/70 mb-1">Nilai Diskon</label>
+                                    <input
+                                        id="modal_diskon_nilai"
+                                        name="diskon_nilai"
+                                        type="number"
+                                        min="0"
+                                        x-model="form.diskon_nilai"
+                                        :disabled="!form.diskon_tipe"
+                                        placeholder="0"
+                                        class="w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm disabled:opacity-50 focus:border-champagne focus:outline-none"
+                                    >
+                                </div>
+                            </div>
+                        </div>
 
                         <label class="flex items-center gap-2.5 rounded-xl border border-champagne/25 bg-ivory/50 px-4 py-3 text-sm font-medium text-charcoal cursor-pointer">
                             <input
@@ -515,6 +641,108 @@
                         class="rounded-xl bg-sage px-6 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer transition"
                         x-text="modeEdit ? 'Simpan Perubahan' : 'Simpan Tema'"
                     ></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- Modal Diskon Massal Katalog Tema --}}
+    <div
+        x-show="modalDiskonMassalTerbuka"
+        x-cloak
+        x-transition.opacity.duration.150ms
+        @click.self="tutupModal()"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="judul-modal-diskon-massal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-charcoal/60 backdrop-blur-xs p-4 overflow-y-auto"
+    >
+        <div class="w-full max-w-xl rounded-2xl bg-white p-6 sm:p-8 shadow-2xl ring-1 ring-champagne/25 my-8">
+            <div class="flex items-start justify-between gap-4 pb-4 border-b border-champagne/20">
+                <div>
+                    <h2 id="judul-modal-diskon-massal" class="font-serif text-2xl font-bold text-charcoal">Terapkan Diskon Massal</h2>
+                    <p class="text-xs sm:text-sm text-charcoal/65 mt-1">Pasang harga promo ke seluruh katalog tema atau khusus tier tertentu secara bersamaan.</p>
+                </div>
+
+                <button
+                    type="button"
+                    @click="tutupModal()"
+                    aria-label="Tutup modal diskon massal"
+                    class="rounded-lg p-1.5 text-charcoal/55 hover:bg-ivory hover:text-charcoal cursor-pointer transition"
+                >
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form
+                action="{{ route('admin.tema.diskon-massal') }}"
+                method="POST"
+                class="mt-5 space-y-4"
+                data-swal-loading
+                data-swal-loading-title="Menerapkan Diskon Katalog..."
+                data-swal-loading-text="Sedang memperbarui harga promo untuk tema terpilih..."
+            >
+                @csrf
+
+                <div>
+                    <label for="massal_target_tier" class="block text-xs font-semibold text-charcoal/80 mb-1">Target Penerapan</label>
+                    <select
+                        id="massal_target_tier"
+                        name="target_tier"
+                        class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:outline-none"
+                    >
+                        <option value="semua" @selected(old('target_tier') === 'semua')>Semua Tema Katalog ({{ $daftarTema->count() }} tema)</option>
+                        @foreach (\App\Models\Tema::TIER_TERSEDIA as $val => $label)
+                            <option value="{{ $val }}" @selected(old('target_tier') === $val)>Hanya Tier {{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="massal_diskon_tipe" class="block text-xs font-semibold text-charcoal/80 mb-1">Tipe Diskon</label>
+                        <select
+                            id="massal_diskon_tipe"
+                            name="diskon_tipe"
+                            class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:outline-none"
+                        >
+                            <option value="persen" @selected(old('diskon_tipe', 'persen') === 'persen')>Persentase (%)</option>
+                            <option value="nominal" @selected(old('diskon_tipe') === 'nominal')>Potongan Nominal (Rp)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="massal_diskon_nilai" class="block text-xs font-semibold text-charcoal/80 mb-1">Nilai Diskon</label>
+                        <input
+                            id="massal_diskon_nilai"
+                            name="diskon_nilai"
+                            type="number"
+                            min="1"
+                            required
+                            value="{{ old('diskon_nilai', 20) }}"
+                            placeholder="Contoh: 20 atau 25000"
+                            class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:outline-none"
+                        >
+                    </div>
+                </div>
+
+                <p class="text-xs text-charcoal/60 bg-ivory/70 rounded-xl px-3.5 py-2.5 border border-champagne/15">
+                    Harga setelah diskon otomatis ditampilkan sebagai harga coret di Beranda, Dasbor Client, serta dihitung ke order/transaksi baru.
+                </p>
+
+                <div class="pt-3 flex items-center justify-end gap-2.5">
+                    <button
+                        type="button"
+                        @click="tutupModal()"
+                        class="rounded-xl border border-charcoal/15 px-4 py-2 text-sm font-semibold text-charcoal hover:bg-ivory cursor-pointer transition"
+                    >
+                        Batal
+                    </button>
+                    <button type="submit" class="rounded-xl bg-sage px-5 py-2 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer transition">
+                        Terapkan Diskon
+                    </button>
                 </div>
             </form>
         </div>

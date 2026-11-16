@@ -29,7 +29,7 @@
         data-swal-loading-text="Sedang mengunggah aset dan menyimpan konfigurasi tema..."
         x-data="{
             tierTerpilih: '{{ old('tier', $tema->tierKode()) }}',
-            hargaTersimpan: '{{ old('harga', $tema->hargaNominal()) }}',
+            hargaTersimpan: '{{ old('harga', $tema->hargaAsliNominal()) }}',
             hargaBawaan: {{ json_encode(\App\Models\Tema::HARGA_BAWAAN_TIER) }},
             terapkanHargaSaran(tier) {
                 if (this.hargaBawaan[tier] !== undefined) {
@@ -103,13 +103,28 @@
                     min="0"
                     step="1000"
                     x-model="hargaTersimpan"
-                    value="{{ old('harga', $tema->hargaNominal()) }}"
+                    value="{{ old('harga', $tema->hargaAsliNominal()) }}"
                     required
                     class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm font-semibold"
                 >
                 <p class="mt-1 text-xs text-charcoal/60">
                     Terima Beres otomatis menjadi harga tema + {{ \App\Models\Tema::formatRupiah(\App\Models\Tema::BIAYA_JASA_TERIMA_BERES) }} jasa input admin.
                 </p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-2xl border border-champagne/25 bg-ivory/50 p-4">
+            <div>
+                <label for="diskon_tipe" class="block text-sm font-medium text-charcoal">Tipe Diskon Katalog (Opsional)</label>
+                <select id="diskon_tipe" name="diskon_tipe" class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-white px-4 py-2.5 text-sm">
+                    <option value="">Tanpa Diskon</option>
+                    <option value="persen" @selected(old('diskon_tipe', $tema->diskonTipe()) === 'persen')>Persentase (%)</option>
+                    <option value="nominal" @selected(old('diskon_tipe', $tema->diskonTipe()) === 'nominal')>Potongan Nominal (Rp)</option>
+                </select>
+            </div>
+            <div>
+                <label for="diskon_nilai" class="block text-sm font-medium text-charcoal">Nilai Diskon</label>
+                <input id="diskon_nilai" name="diskon_nilai" type="number" min="0" value="{{ old('diskon_nilai', $tema->diskonNilai()) }}" class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-white px-4 py-2.5 text-sm">
             </div>
         </div>
 

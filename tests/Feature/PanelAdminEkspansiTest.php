@@ -403,4 +403,154 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSee('id="judul-modal-tema"', false)
             ->assertSee('id="modal_gambar_pratinjau"', false);
     }
+
+    public function test_admin_menerapkan_diskon_per_tema_dan_diskon_massal_ke_katalog(): void
+    {
+        Storage::fake('public');
+
+        $admin = Pengguna::factory()->admin()->create();
+        $client = Pengguna::factory()->create(['peran' => 'client']);
+
+        $temaBasic = Tema::create([
+            'nama_tema' => 'Rustic Basic Uji',
+            'slug' => 'rustic-basic-uji',
+            'kategori' => 'modern',
+            'tier' => 'basic',
+            'harga' => 60000,
+            'lokasi_view' => 'tema.rustic-floral.index',
+            'aktif' => true,
+        ]);
+
+        $temaEksklusif = $this->buatTemaContoh();
+
+        $undangan = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $temaEksklusif->id,
+            'slug' => 'diskon-katalog-uji',
+            'nama_panggilan_pria' => 'Aldo',
+            'nama_lengkap_pria' => 'Aldo Pratama',
+            'nama_panggilan_wanita' => 'Nisa',
+            'nama_lengkap_wanita' => 'Nisa Putri',
+            'status_publikasi' => false,
+        ]);
+
+        // Validasi: persentase > 100 ditolak
+        $this->actingAs($admin)
+            ->put("/admin/tema/{$temaBasic->id}", [
+                'nama_tema' => $temaBasic->nama_tema,
+                'slug' => $temaBasic->slug,
+                'kategori' => $temaBasic->kategori,
+                'tier' => $temaBasic->tier,
+                'harga' => 60000,
+                'diskon_tipe' => 'persen',
+                'diskon_nilai' => 120,
+                'lokasi_view' => $temaBasic->lokasi_view,
+                'aktif' => 1,
+            ])
+            ->assertSessionHasErrors('diskon_nilai');
+
+        // Diskon per tema (nominal Rp 15.000 pada harga Rp 60.000 => Rp 45.000)
+        $this->actingAs($admin)
+            ->put("/admin/tema/{$temaBasic->id}", [
+                'nama_tema' => $temaBasic->nama_tema,
+                'slug' => $temaBasic->slug,
+                'kategori' => $temaBasic->kategori,
+                'tier' => $temaBasic->tier,
+                'harga' => 60000,
+                'diskon_tipe' => 'nominal',
+                'diskon_nilai' => 15000,
+                'lokasi_view' => $temaBasic->lokasi_view,
+                'aktif' => 1,
+            ])
+            ->assertRedirect('/admin/tema')
+            ->assertSessionHas('sukses');
+
+        $temaBasic->refresh();
+        $this->assertTrue($temaBasic->adaDiskon());
+        $this->assertSame(60000, $temaBasic->hargaAsliNominal());
+        $this->assertSame(45000, $temaBasic->hargaNominal());
+        $this->assertSame('Rp 60.000', $temaBasic->hargaAsliFormatted());
+        $this->assertSame('Rp 45.000', $temaBasic->hargaFormatted());
+        $this->assertSame('Hemat Rp 15.000', $temaBasic->labelBadgeDiskon());
+
+        $this->actingAs($admin)
+            ->get('/admin/tema')
+            ->assertOk()
+            ->assertSee('data-buka-modal-diskon-massal', false)
+            ->assertSee('Hemat Rp 15.000')
+            ->assertSee('Rp 60.000')
+            ->assertSee('Rp 45.000');
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Hemat Rp 15.000')
+            ->assertSee('Rp 60.000')
+            ->assertSee('Rp 45.000');
+
+        // Diskon massal 20% khusus tier eksklusif => Rp 129.000 - Rp 25.800 = Rp 103.200; tier basic tidak berubah
+        $this->actingAs($admin)
+            ->post('/admin/tema-diskon-massal', [
+                'target_tier' => 'eksklusif',
+                'diskon_tipe' => 'persen',
+                'diskon_nilai' => 20,
+            ])
+            ->assertRedirect('/admin/tema')
+            ->assertSessionHas('sukses');
+
+        $temaBasic->refresh();
+        $temaEksklusif->refresh();
+
+        $this->assertSame(45000, $temaBasic->hargaNominal());
+        $this->assertTrue($temaEksklusif->adaDiskon());
+        $this->assertSame(129000, $temaEksklusif->hargaAsliNominal());
+        $this->assertSame(103200, $temaEksklusif->hargaNominal());
+        $this->assertSame('Diskon 20%', $temaEksklusif->labelBadgeDiskon());
+
+        // Editor client Tab 7 & Beranda menampilkan harga coret + harga diskon
+        $this->actingAs($client)
+            ->get("/dasbor/undangan/{$undangan->id}/kelola")
+            ->assertOk()
+            ->assertSee('Rp 129.000')
+            ->assertSee('Rp 103.200');
+
+        // Checkout client otomatis memakai harga tema terdiskon (103.200 + biaya Terima Beres 50.000 = 153.200)
+        $bukti = UploadedFile::fake()->create('bukti-diskon.png', 100, 'image/png');
+        $this->actingAs($client)
+            ->post("/dasbor/undangan/{$undangan->id}/transaksi", [
+                'paket' => 'terima_beres',
+                'bukti_pembayaran' => $bukti,
+            ])
+            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola")
+            ->assertSessionHas('sukses');
+
+        $transaksi = Transaksi::where('undangan_id', $undangan->id)->firstOrFail();
+        $this->assertSame(103200, $transaksi->harga_tema);
+        $this->assertSame(50000, $transaksi->biaya_jasa);
+        $this->assertSame(153200, $transaksi->total_bayar);
+
+        // Diskon massal ke semua tema 10%, lalu reset semua diskon
+        $this->actingAs($admin)
+            ->post('/admin/tema-diskon-massal', [
+                'target_tier' => 'semua',
+                'diskon_tipe' => 'persen',
+                'diskon_nilai' => 10,
+            ])
+            ->assertRedirect('/admin/tema')
+            ->assertSessionHas('sukses');
+
+        $this->assertSame(54000, $temaBasic->fresh()->hargaNominal());
+        $this->assertSame(116100, $temaEksklusif->fresh()->hargaNominal());
+
+        $this->actingAs($admin)
+            ->post('/admin/tema-reset-diskon', [
+                'target_tier' => 'semua',
+            ])
+            ->assertRedirect('/admin/tema')
+            ->assertSessionHas('sukses');
+
+        $this->assertFalse($temaBasic->fresh()->adaDiskon());
+        $this->assertFalse($temaEksklusif->fresh()->adaDiskon());
+        $this->assertSame(60000, $temaBasic->fresh()->hargaNominal());
+        $this->assertSame(129000, $temaEksklusif->fresh()->hargaNominal());
+    }
 }
