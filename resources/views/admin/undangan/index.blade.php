@@ -82,6 +82,8 @@
                                     data-swal-icon="warning"
                                     data-swal-confirm-button="Ya, Nonaktifkan"
                                     data-swal-confirm-color="#D97706"
+                                    data-swal-loading-title="Menonaktifkan Undangan..."
+                                    data-swal-loading-text="Sedang mengembalikan status undangan ke mode Draft..."
                                 >
                                     @csrf
                                     @method('PATCH')
@@ -103,6 +105,8 @@
                                     data-swal-icon="question"
                                     data-swal-confirm-button="Ya, Aktifkan"
                                     data-swal-confirm-color="#4B6358"
+                                    data-swal-loading-title="Mengaktifkan Undangan..."
+                                    data-swal-loading-text="Sedang memublikasikan undangan &amp; mengatur masa aktif 3 bulan..."
                                 >
                                     @csrf
                                     @method('PATCH')

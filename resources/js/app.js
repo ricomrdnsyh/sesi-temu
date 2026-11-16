@@ -79,29 +79,58 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+const tampilkanSwalProses = (form) => {
+    Swal.fire({
+        title: form.dataset.swalLoadingTitle ?? 'Sedang Memproses...',
+        text: form.dataset.swalLoadingText ?? 'Mohon tunggu sebentar, permintaan Anda sedang diproses.',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            Swal.showLoading();
+        },
+    });
+};
+
+window.addEventListener('pageshow', (event) => {
+    if (event.persisted && Swal.isVisible() && Swal.isLoading()) {
+        Swal.close();
+    }
+});
+
 document.addEventListener('submit', (event) => {
-    const form = event.target.closest('form[data-swal-confirm]');
+    const form = event.target.closest('form[data-swal-confirm], form[data-swal-loading]');
     if (!form || form.dataset.swalConfirmed === 'true') {
         return;
     }
 
-    event.preventDefault();
+    if (form.hasAttribute('data-swal-confirm')) {
+        event.preventDefault();
 
-    Swal.fire({
-        title: form.dataset.swalTitle ?? 'Konfirmasi Tindakan',
-        text: form.dataset.swalConfirm ?? 'Apakah Anda yakin ingin melanjutkan?',
-        icon: form.dataset.swalIcon ?? 'question',
-        showCancelButton: true,
-        confirmButtonText: form.dataset.swalConfirmButton ?? 'Ya, Lanjutkan',
-        cancelButtonText: form.dataset.swalCancelButton ?? 'Batal',
-        confirmButtonColor: form.dataset.swalConfirmColor ?? '#4B6358',
-        cancelButtonColor: '#6B7280',
-        reverseButtons: true,
-        focusCancel: true,
-    }).then((result) => {
-        if (result.isConfirmed) {
-            form.dataset.swalConfirmed = 'true';
-            HTMLFormElement.prototype.submit.call(form);
-        }
-    });
+        Swal.fire({
+            title: form.dataset.swalTitle ?? 'Konfirmasi Tindakan',
+            text: form.dataset.swalConfirm ?? 'Apakah Anda yakin ingin melanjutkan?',
+            icon: form.dataset.swalIcon ?? 'question',
+            showCancelButton: true,
+            confirmButtonText: form.dataset.swalConfirmButton ?? 'Ya, Lanjutkan',
+            cancelButtonText: form.dataset.swalCancelButton ?? 'Batal',
+            confirmButtonColor: form.dataset.swalConfirmColor ?? '#4B6358',
+            cancelButtonColor: '#6B7280',
+            reverseButtons: true,
+            focusCancel: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.dataset.swalConfirmed = 'true';
+                tampilkanSwalProses(form);
+                HTMLFormElement.prototype.submit.call(form);
+            }
+        });
+
+        return;
+    }
+
+    if (form.hasAttribute('data-swal-loading')) {
+        form.dataset.swalConfirmed = 'true';
+        tampilkanSwalProses(form);
+    }
 });

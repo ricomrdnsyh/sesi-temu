@@ -57,6 +57,8 @@
                         data-swal-icon="warning"
                         data-swal-confirm-button="Ya, Hapus"
                         data-swal-confirm-color="#DC2626"
+                        data-swal-loading-title="Menghapus Tema..."
+                        data-swal-loading-text="Sedang menghapus data tema dari katalog..."
                     >
                         @csrf
                         @method('DELETE')

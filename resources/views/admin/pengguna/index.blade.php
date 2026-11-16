@@ -36,7 +36,14 @@
                 @endphp
                 <tr>
                     <td class="py-3.5 dt-center text-center whitespace-nowrap">
-                        <form action="{{ route('admin.pengguna.reset-sandi', $pengguna) }}" method="POST" class="inline-flex items-center justify-center gap-1.5">
+                        <form
+                            action="{{ route('admin.pengguna.reset-sandi', $pengguna) }}"
+                            method="POST"
+                            class="inline-flex items-center justify-center gap-1.5"
+                            data-swal-loading
+                            data-swal-loading-title="Mereset Kata Sandi..."
+                            data-swal-loading-text="Sedang memperbarui kata sandi untuk {{ $pengguna->nama }}..."
+                        >
                             @csrf
                             @method('PATCH')
                             <input type="text" name="kata_sandi_baru" required minlength="8" placeholder="Sandi baru (min 8)" class="w-36 rounded-lg border border-charcoal/15 bg-ivory/60 px-2.5 py-1.5 text-xs focus:border-champagne focus:outline-none">

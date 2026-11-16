@@ -46,6 +46,8 @@
                 data-swal-icon="warning"
                 data-swal-confirm-button="Ya, Bersihkan"
                 data-swal-confirm-color="#BFA15F"
+                data-swal-loading-title="Membersihkan Storage..."
+                data-swal-loading-text="Sedang menghapus foto undangan yang kedaluwarsa..."
             >
                 @csrf
                 <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-champagne px-4 py-2.5 text-xs sm:text-sm font-semibold text-charcoal hover:brightness-105 transition shadow-sm cursor-pointer">

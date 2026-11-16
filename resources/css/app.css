@@ -233,3 +233,7 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
     font-weight: 600 !important;
     padding: 0.55rem 1.15rem !important;
 }
+
+.swal2-loader {
+    border-color: #4B6358 rgba(191, 161, 95, 0.25) #BFA15F rgba(191, 161, 95, 0.25) !important;
+}

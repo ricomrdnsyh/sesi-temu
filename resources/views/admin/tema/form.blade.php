@@ -24,6 +24,9 @@
         method="POST"
         enctype="multipart/form-data"
         class="space-y-5"
+        data-swal-loading
+        data-swal-loading-title="{{ $modeEdit ? 'Memperbarui Tema...' : 'Menyimpan Tema Baru...' }}"
+        data-swal-loading-text="Sedang mengunggah aset dan menyimpan konfigurasi tema..."
         x-data="{
             tierTerpilih: '{{ old('tier', $tema->tierKode()) }}',
             hargaTersimpan: '{{ old('harga', $tema->hargaNominal()) }}',
