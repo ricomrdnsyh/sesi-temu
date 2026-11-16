@@ -295,14 +295,23 @@ class PanelAdminEkspansiTest extends TestCase
             'status_publikasi' => true,
         ]);
 
-        // Daftar pengguna menampilkan admin dan client sekaligus
+        // Daftar pengguna menampilkan admin, client, dan modal form tambah/edit sekaligus
         $this->actingAs($adminUtama)
             ->get('/admin/pengguna')
             ->assertOk()
             ->assertSee($adminUtama->email)
             ->assertSee($clientAwal->email)
             ->assertSee('Admin')
-            ->assertSee('Client');
+            ->assertSee('Client')
+            ->assertSee('data-buka-modal-tambah', false)
+            ->assertSee('data-buka-modal-edit', false)
+            ->assertSee('role="dialog"', false);
+
+        // Query ?edit=ID memuat data awal ke modal edit
+        $this->actingAs($adminUtama)
+            ->get("/admin/pengguna?edit={$clientAwal->id}")
+            ->assertOk()
+            ->assertSee('"modalTerbuka":true', false);
 
         // Filter berdasarkan peran admin
         $this->actingAs($adminUtama)

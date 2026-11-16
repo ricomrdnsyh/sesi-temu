@@ -33,6 +33,9 @@ class AdminPenggunaController extends Controller
 
         $daftarPengguna = $query->get();
 
+        $editId = (int) $request->query('edit', 0);
+        $penggunaEditAwal = $editId > 0 ? Pengguna::find($editId) : null;
+
         return view('admin.pengguna.index', [
             'daftarPengguna' => $daftarPengguna,
             'pencarian' => $pencarian,
@@ -40,6 +43,7 @@ class AdminPenggunaController extends Controller
             'totalSemua' => Pengguna::count(),
             'totalAdmin' => Pengguna::where('peran', 'admin')->count(),
             'totalClient' => Pengguna::where('peran', 'client')->count(),
+            'penggunaEditAwal' => $penggunaEditAwal,
         ]);
     }
 

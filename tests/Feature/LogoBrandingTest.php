@@ -201,11 +201,13 @@ class LogoBrandingTest extends TestCase
             'status_publikasi' => true,
         ]);
 
-        foreach ([
-            '/admin' => 'data-page-length="5"',
-            '/admin/undangan' => 'data-page-length="10"',
-            '/admin/pengguna' => 'data-page-length="10"',
-        ] as $rute => $pageLengthAttr) {
+        foreach (
+            [
+                '/admin' => 'data-page-length="5"',
+                '/admin/undangan' => 'data-page-length="10"',
+                '/admin/pengguna' => 'data-page-length="10"',
+            ] as $rute => $pageLengthAttr
+        ) {
             $respon = $this->actingAs($admin)
                 ->get($rute)
                 ->assertOk()
@@ -237,6 +239,9 @@ class LogoBrandingTest extends TestCase
             ->assertSee($admin->email)
             ->assertSee($client->email)
             ->assertSee('Tambah Pengguna')
+            ->assertSee('data-buka-modal-tambah', false)
+            ->assertSee('data-buka-modal-edit', false)
+            ->assertSee('id="judul-modal-pengguna"', false)
             ->assertSee('<span>Detail</span>', false)
             ->assertSee('<span>Edit</span>', false)
             ->assertSee('data-swal-confirm', false)

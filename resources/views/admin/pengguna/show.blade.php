@@ -30,7 +30,7 @@
         @endif
 
         <a
-            href="{{ route('admin.pengguna.edit', $pengguna) }}"
+            href="{{ route('admin.pengguna.index', ['edit' => $pengguna->id]) }}"
             class="inline-flex items-center gap-1.5 rounded-xl bg-champagne px-4 py-2 text-sm font-semibold text-charcoal hover:bg-champagne/90 transition"
         >
             <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
