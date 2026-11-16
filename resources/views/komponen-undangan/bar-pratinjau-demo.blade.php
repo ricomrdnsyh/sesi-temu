@@ -25,18 +25,21 @@
             <form method="GET" action="{{ url()->current() }}" class="flex flex-wrap items-center gap-2">
                 <input type="hidden" name="to" value="{{ $namaTamu }}">
                 <input type="hidden" name="tf" value="{{ $demoTanpaFoto ? '1' : '0' }}">
-                <select
-                    name="font"
-                    aria-label="Pilih Desain Font Demo"
-                    onchange="this.form.submit()"
-                    class="rounded-lg border border-ivory/25 bg-charcoal px-2.5 py-1 text-xs text-ivory focus:border-champagne focus:outline-none [&>option]:bg-charcoal [&>option]:text-ivory"
-                >
-                    @foreach (\App\Models\Undangan::GAYA_FONT_TERSEDIA as $kodeFont => $infoFont)
-                        <option value="{{ $kodeFont }}" @selected($demoFontTerpilih === $kodeFont)>
-                            Font: {{ $infoFont['label'] }}
-                        </option>
-                    @endforeach
-                </select>
+                <div class="w-44 sm:w-52">
+                    <select
+                        name="font"
+                        aria-label="Pilih Desain Font Demo"
+                        data-select2-variant="dark-compact"
+                        onchange="this.form.submit()"
+                        class="w-full rounded-lg border border-ivory/25 bg-charcoal px-2.5 py-1 text-xs text-ivory focus:border-champagne focus:outline-none [&>option]:bg-charcoal [&>option]:text-ivory"
+                    >
+                        @foreach (\App\Models\Undangan::GAYA_FONT_TERSEDIA as $kodeFont => $infoFont)
+                            <option value="{{ $kodeFont }}" @selected($demoFontTerpilih === $kodeFont)>
+                                Font: {{ $infoFont['label'] }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
                 <a
                     href="{{ request()->fullUrlWithQuery(['tf' => $demoTanpaFoto ? '0' : '1', 'font' => $demoFontTerpilih, 'to' => $namaTamu]) }}"

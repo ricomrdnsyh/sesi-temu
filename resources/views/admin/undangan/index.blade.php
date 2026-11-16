@@ -20,12 +20,14 @@
             placeholder="Cari slug atau nama client..."
             class="w-full sm:w-64 lg:w-72 rounded-xl border border-charcoal/15 bg-white px-4 py-2 text-sm focus:border-champagne focus:outline-none"
         >
-        <select name="status" class="w-full sm:w-auto rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm">
-            <option value="semua" @selected($status === 'semua')>Semua Status</option>
-            <option value="draft" @selected($status === 'draft')>Draft</option>
-            <option value="aktif" @selected($status === 'aktif')>Aktif</option>
-            <option value="kedaluwarsa" @selected($status === 'kedaluwarsa')>Kedaluwarsa</option>
-        </select>
+        <div class="w-full sm:w-44">
+            <select name="status" class="w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm">
+                <option value="semua" @selected($status === 'semua')>Semua Status</option>
+                <option value="draft" @selected($status === 'draft')>Draft</option>
+                <option value="aktif" @selected($status === 'aktif')>Aktif</option>
+                <option value="kedaluwarsa" @selected($status === 'kedaluwarsa')>Kedaluwarsa</option>
+            </select>
+        </div>
         <button type="submit" class="rounded-xl bg-sage px-5 py-2 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer shrink-0">
             Filter
         </button>

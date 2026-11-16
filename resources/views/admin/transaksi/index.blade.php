@@ -11,14 +11,16 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-            <form action="{{ route('admin.transaksi.index') }}" method="GET" class="flex flex-wrap items-center gap-2">
-                <select name="status" class="rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm">
-                    <option value="semua" @selected($status === 'semua')>Semua Status</option>
-                    @foreach (\App\Models\Transaksi::STATUS_TERSEDIA as $kode => $label)
-                        <option value="{{ $kode }}" @selected($status === $kode)>{{ $label }}</option>
-                    @endforeach
-                </select>
-                <button type="submit" class="rounded-xl border border-charcoal/15 bg-white px-4 py-2 text-sm font-semibold text-charcoal hover:bg-ivory cursor-pointer">
+            <form action="{{ route('admin.transaksi.index') }}" method="GET" class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                <div class="w-full sm:w-48">
+                    <select name="status" class="w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm">
+                        <option value="semua" @selected($status === 'semua')>Semua Status</option>
+                        @foreach (\App\Models\Transaksi::STATUS_TERSEDIA as $kode => $label)
+                            <option value="{{ $kode }}" @selected($status === $kode)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <button type="submit" class="rounded-xl border border-charcoal/15 bg-white px-4 py-2 text-sm font-semibold text-charcoal hover:bg-ivory cursor-pointer shrink-0">
                     Filter
                 </button>
             </form>

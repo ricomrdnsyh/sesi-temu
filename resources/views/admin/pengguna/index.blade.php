@@ -100,11 +100,13 @@
                     placeholder="Cari nama, email, atau WA..."
                     class="w-full sm:w-56 rounded-xl border border-charcoal/15 bg-white px-4 py-2 text-sm focus:border-champagne focus:outline-none"
                 >
-                <select name="peran" class="w-full sm:w-auto rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm">
-                    <option value="semua" @selected($peran === 'semua')>Semua Peran</option>
-                    <option value="admin" @selected($peran === 'admin')>Admin</option>
-                    <option value="client" @selected($peran === 'client')>Client</option>
-                </select>
+                <div class="w-full sm:w-44">
+                    <select name="peran" class="w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm">
+                        <option value="semua" @selected($peran === 'semua')>Semua Peran</option>
+                        <option value="admin" @selected($peran === 'admin')>Admin</option>
+                        <option value="client" @selected($peran === 'client')>Client</option>
+                    </select>
+                </div>
                 <button type="submit" class="rounded-xl border border-charcoal/15 bg-white px-4 py-2 text-sm font-semibold text-charcoal hover:bg-ivory cursor-pointer shrink-0">
                     Filter
                 </button>

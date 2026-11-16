@@ -9,24 +9,28 @@
         <p class="text-sm text-charcoal/70 mt-1">Pantau ucapan tamu dari seluruh undangan dan bersihkan komentar spam atau tidak pantas.</p>
     </div>
 
-    <form action="{{ route('admin.buku-tamu.index') }}" method="GET" class="flex flex-wrap gap-2">
-        <select name="undangan_id" class="rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm">
-            <option value="0">Semua Undangan</option>
-            @foreach ($daftarUndangan as $undanganItem)
-                <option value="{{ $undanganItem->id }}" @selected($undanganId === $undanganItem->id)>
-                    {{ $undanganItem->nama_panggilan_pria }} &amp; {{ $undanganItem->nama_panggilan_wanita }} ({{ $undanganItem->slug }})
-                </option>
-            @endforeach
-        </select>
+    <form action="{{ route('admin.buku-tamu.index') }}" method="GET" class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 w-full xl:w-auto">
+        <div class="w-full sm:w-64">
+            <select name="undangan_id" class="w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm">
+                <option value="0">Semua Undangan</option>
+                @foreach ($daftarUndangan as $undanganItem)
+                    <option value="{{ $undanganItem->id }}" @selected($undanganId === $undanganItem->id)>
+                        {{ $undanganItem->nama_panggilan_pria }} &amp; {{ $undanganItem->nama_panggilan_wanita }} ({{ $undanganItem->slug }})
+                    </option>
+                @endforeach
+            </select>
+        </div>
 
-        <select name="status" class="rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm">
-            <option value="semua" @selected($statusKehadiran === 'semua')>Semua Kehadiran</option>
-            <option value="hadir" @selected($statusKehadiran === 'hadir')>Hadir</option>
-            <option value="ragu" @selected($statusKehadiran === 'ragu')>Ragu-Ragu</option>
-            <option value="tidak_hadir" @selected($statusKehadiran === 'tidak_hadir')>Tidak Hadir</option>
-        </select>
+        <div class="w-full sm:w-44">
+            <select name="status" class="w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm">
+                <option value="semua" @selected($statusKehadiran === 'semua')>Semua Kehadiran</option>
+                <option value="hadir" @selected($statusKehadiran === 'hadir')>Hadir</option>
+                <option value="ragu" @selected($statusKehadiran === 'ragu')>Ragu-Ragu</option>
+                <option value="tidak_hadir" @selected($statusKehadiran === 'tidak_hadir')>Tidak Hadir</option>
+            </select>
+        </div>
 
-        <button type="submit" class="rounded-xl bg-sage px-4 py-2 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer">
+        <button type="submit" class="rounded-xl bg-sage px-4 py-2 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer shrink-0">
             Filter
         </button>
     </form>
