@@ -12,6 +12,7 @@ use App\Models\Undangan;
 use App\Support\PengaturanSesiTemu;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -275,5 +276,106 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSessionHas('sukses');
 
         $this->assertDatabaseMissing('buku_tamu', ['id' => $ucapan->id]);
+    }
+
+    public function test_admin_mengelola_pengguna_admin_dan_client_serta_detail_edit_reset_sandi(): void
+    {
+        $adminUtama = Pengguna::factory()->admin()->create();
+        $clientAwal = Pengguna::factory()->create(['peran' => 'client']);
+        $tema = $this->buatTemaContoh();
+
+        $undangan = Undangan::create([
+            'pengguna_id' => $clientAwal->id,
+            'tema_id' => $tema->id,
+            'slug' => 'detail-pengguna-uji',
+            'nama_panggilan_pria' => 'Aldi',
+            'nama_lengkap_pria' => 'Aldi Pratama',
+            'nama_panggilan_wanita' => 'Sari',
+            'nama_lengkap_wanita' => 'Sari Indah',
+            'status_publikasi' => true,
+        ]);
+
+        // Daftar pengguna menampilkan admin dan client sekaligus
+        $this->actingAs($adminUtama)
+            ->get('/admin/pengguna')
+            ->assertOk()
+            ->assertSee($adminUtama->email)
+            ->assertSee($clientAwal->email)
+            ->assertSee('Admin')
+            ->assertSee('Client');
+
+        // Filter berdasarkan peran admin
+        $this->actingAs($adminUtama)
+            ->get('/admin/pengguna?peran=admin')
+            ->assertOk()
+            ->assertSee($adminUtama->email)
+            ->assertDontSee($clientAwal->email);
+
+        // Tambah akun admin baru
+        $this->actingAs($adminUtama)
+            ->post('/admin/pengguna', [
+                'nama' => 'Admin Kedua',
+                'email' => 'admin2@sesitemu.id',
+                'nomor_wa' => '081234560000',
+                'peran' => 'admin',
+                'kata_sandi' => 'Rahasia123',
+            ])
+            ->assertRedirect('/admin/pengguna')
+            ->assertSessionHas('sukses');
+
+        $adminKedua = Pengguna::where('email', 'admin2@sesitemu.id')->firstOrFail();
+        $this->assertSame('admin', $adminKedua->peran);
+        $this->assertSame('6281234560000', $adminKedua->nomor_wa);
+        $this->assertTrue(Hash::check('Rahasia123', $adminKedua->kata_sandi));
+
+        // Lihat Detail Pengguna client lengkap dengan undangannya
+        $this->actingAs($adminUtama)
+            ->get("/admin/pengguna/{$clientAwal->id}")
+            ->assertOk()
+            ->assertSee($clientAwal->nama)
+            ->assertSee($undangan->slug);
+
+        // Edit data pengguna tanpa mengubah kata sandi (field kata_sandi dikosongkan)
+        $hashLama = $clientAwal->kata_sandi;
+        $this->actingAs($adminUtama)
+            ->put("/admin/pengguna/{$clientAwal->id}", [
+                'nama' => 'Nama Client Diubah',
+                'email' => $clientAwal->email,
+                'nomor_wa' => '089988776655',
+                'peran' => 'client',
+                'kata_sandi' => '',
+            ])
+            ->assertRedirect('/admin/pengguna')
+            ->assertSessionHas('sukses');
+
+        $this->assertSame('Nama Client Diubah', $clientAwal->fresh()->nama);
+        $this->assertSame('6289988776655', $clientAwal->fresh()->nomor_wa);
+        $this->assertSame($hashLama, $clientAwal->fresh()->kata_sandi);
+
+        // Edit pengguna sekaligus reset kata sandi baru
+        $this->actingAs($adminUtama)
+            ->put("/admin/pengguna/{$clientAwal->id}", [
+                'nama' => 'Nama Client Diubah',
+                'email' => $clientAwal->email,
+                'nomor_wa' => '6289988776655',
+                'peran' => 'client',
+                'kata_sandi' => 'SandiBaru999',
+            ])
+            ->assertRedirect('/admin/pengguna')
+            ->assertSessionHas('sukses');
+
+        $this->assertTrue(Hash::check('SandiBaru999', $clientAwal->fresh()->kata_sandi));
+
+        // Guard: tidak bisa menghapus akun sendiri, tetapi bisa hapus admin kedua
+        $this->actingAs($adminUtama)
+            ->delete("/admin/pengguna/{$adminUtama->id}")
+            ->assertSessionHasErrors('pengguna');
+
+        $this->actingAs($adminUtama)
+            ->delete("/admin/pengguna/{$adminKedua->id}")
+            ->assertRedirect()
+            ->assertSessionHas('sukses');
+
+        $this->assertDatabaseMissing('pengguna', ['id' => $adminKedua->id]);
     }
 }

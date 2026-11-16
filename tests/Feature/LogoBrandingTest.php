@@ -234,9 +234,13 @@ class LogoBrandingTest extends TestCase
         $this->actingAs($admin)
             ->get('/admin/pengguna')
             ->assertOk()
+            ->assertSee($admin->email)
             ->assertSee($client->email)
-            ->assertSee('Reset Sandi')
-            ->assertSee('data-swal-loading', false)
+            ->assertSee('Tambah Pengguna')
+            ->assertSee('<span>Detail</span>', false)
+            ->assertSee('<span>Edit</span>', false)
+            ->assertSee('data-swal-confirm', false)
+            ->assertSee('data-swal-loading-title', false)
             ->assertSee('<svg', false);
 
         $this->actingAs($admin)

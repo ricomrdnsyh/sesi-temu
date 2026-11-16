@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminBukuTamuController;
 use App\Http\Controllers\Admin\AdminLaporanController;
 use App\Http\Controllers\Admin\AdminMusikController;
 use App\Http\Controllers\Admin\AdminPengaturanController;
+use App\Http\Controllers\Admin\AdminPenggunaController;
 use App\Http\Controllers\Admin\AdminPromoController;
 use App\Http\Controllers\Admin\AdminTransaksiController;
 use App\Http\Controllers\AdminController;
@@ -86,7 +87,7 @@ Route::middleware(['auth', PastikanAdmin::class])->prefix('admin')->name('admin.
     Route::get('/laporan', [AdminLaporanController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/ekspor', [AdminLaporanController::class, 'eksporCsv'])->name('laporan.ekspor');
 
-    Route::get('/pengguna', [AdminController::class, 'daftarPengguna'])->name('pengguna.index');
+    Route::resource('/pengguna', AdminPenggunaController::class);
     Route::patch('/pengguna/{pengguna}/reset-sandi', [AdminController::class, 'resetSandiPengguna'])->name('pengguna.reset-sandi');
 
     Route::get('/pengaturan', [AdminPengaturanController::class, 'index'])->name('pengaturan.index');
