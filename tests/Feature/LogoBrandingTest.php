@@ -106,7 +106,7 @@ class LogoBrandingTest extends TestCase
             $respon->assertOk()
                 ->assertSee('aria-label="Navigasi Panel Admin"', false)
                 ->assertSee('aria-label="Header Panel Admin"', false)
-                ->assertSee('Menu Utama')
+                ->assertSee('MAIN')
                 ->assertSee('Dasbor Client')
                 ->assertSee('Administrator')
                 ->assertDontSee('flex-1 max-w-7xl', false);
@@ -122,6 +122,9 @@ class LogoBrandingTest extends TestCase
                 $this->assertStringContainsString('logo-sesi-temu-ikon.webp', $cocokSidebar[0]);
                 $this->assertStringContainsString('Sesi<span class="text-champagne">Temu</span>', $cocokSidebar[0]);
                 $this->assertStringContainsString('Playfair Display', $cocokSidebar[0]);
+                $this->assertStringContainsString($admin->nama, $cocokSidebar[0]);
+                $this->assertStringContainsString('Administrator', $cocokSidebar[0]);
+                $this->assertStringContainsString('MAIN', $cocokSidebar[0]);
                 $this->assertStringContainsString('h-16 shrink-0 px-5 border-b border-champagne/25 flex items-center justify-center', $cocokSidebar[0]);
                 $this->assertStringContainsString('Keluar', $cocokSidebar[0]);
                 $this->assertStringNotContainsString($admin->email, $cocokSidebar[0]);

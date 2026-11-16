@@ -62,10 +62,22 @@
                 </button>
             </div>
 
+            {{-- Kartu Profil Pengguna Sidebar --}}
+            <div class="mx-4 mt-4 rounded-xl bg-white/[0.04] border border-white/10 px-4 py-4 text-center shrink-0">
+                <div class="relative mx-auto w-14 h-14 rounded-full bg-white/15 flex items-center justify-center text-ivory/80">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z" />
+                    </svg>
+                    <span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-charcoal" title="Online"></span>
+                </div>
+                <p class="mt-3 text-sm font-semibold text-white truncate">{{ $namaAdmin }}</p>
+                <p class="mt-0.5 text-xs text-ivory/60">Administrator</p>
+            </div>
+
             {{-- Navigasi Vertikal --}}
-            <nav class="flex-1 px-4 py-5 space-y-1.5 overflow-y-auto text-sm">
+            <nav class="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto text-sm">
                 <p class="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-ivory/45">
-                    Menu Utama
+                    MAIN
                 </p>
 
                 <a
