@@ -114,6 +114,10 @@ class LogoBrandingTest extends TestCase
             $konten = $respon->getContent();
             if (preg_match('/<header\b[^>]*>.*?<\/header>/s', $konten, $cocokHeader)) {
                 $this->assertStringNotContainsString('<nav', $cocokHeader[0]);
+                $this->assertStringContainsString('menuProfilTerbuka', $cocokHeader[0]);
+                $this->assertStringContainsString('Administrator', $cocokHeader[0]);
+                $this->assertStringContainsString('Keluar', $cocokHeader[0]);
+                $this->assertStringNotContainsString('Lihat Beranda', $cocokHeader[0]);
             } else {
                 $this->fail('Header panel admin tidak ditemukan pada '.$ruteAdmin);
             }

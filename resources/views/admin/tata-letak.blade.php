@@ -7,14 +7,13 @@
 @section('konten')
 @php
     $judulHeaderAdmin = match (true) {
-        request()->routeIs('admin.undangan.*') => 'Manajemen Undangan',
+        request()->routeIs('admin.undangan.*') => 'Undangan',
         request()->routeIs('admin.tema.*') => 'Katalog Tema',
-        request()->routeIs('admin.pengguna.*') => 'Manajemen Pengguna',
-        default => 'Ringkasan Platform',
+        request()->routeIs('admin.pengguna.*') => 'Pengguna',
+        default => 'Ringkasan',
     };
 
     $namaAdmin = auth()->user()?->nama ?? 'Administrator';
-    $inisialAdmin = strtoupper(mb_substr($namaAdmin, 0, 1));
 @endphp
 
 <div x-data="{ sidebarTerbuka: false }" class="min-h-screen w-full bg-ivory flex">
@@ -184,37 +183,66 @@
                         </svg>
                     </button>
 
-                    <div class="min-w-0">
-                        <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-champagne">
-                            Panel Admin &bull; SesiTemu
-                        </p>
-                        <p class="text-sm sm:text-base font-bold text-charcoal truncate">
+                    <div class="min-w-0 leading-tight">
+                        <p class="text-base font-bold text-charcoal truncate">
                             @yield('header_admin', $judulHeaderAdmin)
+                        </p>
+                        <p class="text-xs text-charcoal/55 truncate">
+                            Administrator
                         </p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3 sm:gap-4 shrink-0">
-                    <span class="hidden lg:inline-flex items-center gap-1.5 rounded-full bg-ivory px-3 py-1 text-xs font-medium text-charcoal/75 border border-champagne/25">
-                        <span class="w-1.5 h-1.5 rounded-full bg-sage"></span>
-                        <span>{{ now()->locale('id')->translatedFormat('l, d M Y') }} WIB</span>
-                    </span>
-
-                    <a
-                        href="{{ route('beranda') }}"
-                        class="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-charcoal/15 px-3 py-1.5 text-xs font-semibold text-charcoal hover:bg-ivory transition"
+                <div
+                    x-data="{ menuProfilTerbuka: false }"
+                    @click.outside="menuProfilTerbuka = false"
+                    @keydown.escape.window="menuProfilTerbuka = false"
+                    class="relative shrink-0"
+                >
+                    <button
+                        type="button"
+                        @click="menuProfilTerbuka = !menuProfilTerbuka"
+                        aria-label="Menu profil admin"
+                        :aria-expanded="menuProfilTerbuka.toString()"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-charcoal/10 text-charcoal/65 hover:bg-charcoal/15 hover:text-charcoal transition cursor-pointer"
                     >
-                        <span>Lihat Beranda</span>
-                    </a>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z" />
+                        </svg>
+                    </button>
 
-                    <div class="flex items-center gap-2.5 pl-1 border-l border-charcoal/10">
-                        <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-charcoal text-xs font-bold text-champagne">
-                            {{ $inisialAdmin }}
-                        </span>
-                        <div class="hidden sm:block text-left leading-tight">
-                            <p class="text-xs font-semibold text-charcoal">{{ $namaAdmin }}</p>
-                            <p class="text-[11px] text-charcoal/55">Administrator</p>
+                    <div
+                        x-show="menuProfilTerbuka"
+                        x-cloak
+                        x-transition:enter="transition ease-out duration-150"
+                        x-transition:enter-start="opacity-0 scale-95 translate-y-1"
+                        x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                        x-transition:leave="transition ease-in duration-100"
+                        x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                        x-transition:leave-end="opacity-0 scale-95 translate-y-1"
+                        class="absolute right-0 mt-2 w-60 rounded-xl bg-white shadow-xl ring-1 ring-black/10 p-3 z-30"
+                    >
+                        <div class="flex items-center gap-3 px-1 pb-3 border-b border-charcoal/10">
+                            <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-charcoal/10 text-charcoal/65">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z" />
+                                </svg>
+                            </span>
+                            <div class="min-w-0 leading-tight">
+                                <p class="text-xs font-semibold text-charcoal truncate">{{ $namaAdmin }}</p>
+                                <p class="text-[11px] text-charcoal/55 mt-0.5">Administrator</p>
+                            </div>
                         </div>
+
+                        <form action="{{ route('keluar') }}" method="POST" class="mt-2">
+                            @csrf
+                            <button
+                                type="submit"
+                                class="w-full text-left rounded-lg px-2.5 py-2 text-xs font-medium text-charcoal hover:bg-ivory transition cursor-pointer"
+                            >
+                                Keluar
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
