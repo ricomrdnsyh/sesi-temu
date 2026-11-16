@@ -30,13 +30,13 @@
         class="fixed inset-y-0 left-0 z-40 w-64 xl:w-72 shrink-0 bg-charcoal text-ivory border-r border-champagne/25 flex flex-col justify-between transition-transform duration-200 ease-in-out md:sticky md:top-0 md:h-screen md:translate-x-0"
     >
         <div class="flex flex-col flex-1 min-h-0">
-            {{-- Brand Sidebar (Logo Saja) --}}
-            <div class="h-16 px-5 border-b border-white/10 flex items-center justify-between md:justify-center gap-3">
-                <a href="{{ route('admin.ringkasan') }}" aria-label="Beranda Admin" class="inline-flex items-center justify-center rounded-xl bg-[#FBF3E6] p-1.5 shadow-sm transition hover:scale-105">
+            {{-- Brand Sidebar (Logo Lengkap Tanpa Teks Tambahan) --}}
+            <div class="py-4 px-5 border-b border-white/10 flex items-center justify-between md:justify-center gap-3">
+                <a href="{{ route('admin.ringkasan') }}" aria-label="Beranda Admin" class="inline-flex items-center justify-center rounded-2xl bg-[#FBF3E6] px-4 py-2 shadow-sm transition hover:scale-105">
                     <img
-                        src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}"
+                        src="{{ asset('aset-demo/logo-sesi-temu-lengkap.webp') }}"
                         alt="Logo SesiTemu"
-                        class="h-8 w-8 object-contain"
+                        class="h-14 w-auto object-contain"
                     >
                 </a>
 

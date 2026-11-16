@@ -85,7 +85,7 @@ class LogoBrandingTest extends TestCase
             ->get('/admin')
             ->assertOk()
             ->assertSee('favicon.png', false)
-            ->assertSee('logo-sesi-temu-ikon.webp', false);
+            ->assertSee('logo-sesi-temu-lengkap.webp', false);
 
         $this->get('/demo/rustic-floral')
             ->assertOk()
@@ -118,7 +118,7 @@ class LogoBrandingTest extends TestCase
             }
 
             if (preg_match('/<aside\b[^>]*aria-label="Navigasi Panel Admin".*?<\/aside>/s', $konten, $cocokSidebar)) {
-                $this->assertStringContainsString('logo-sesi-temu-ikon.webp', $cocokSidebar[0]);
+                $this->assertStringContainsString('logo-sesi-temu-lengkap.webp', $cocokSidebar[0]);
                 $this->assertStringContainsString('Keluar', $cocokSidebar[0]);
                 $this->assertStringNotContainsString($admin->email, $cocokSidebar[0]);
                 $this->assertStringNotContainsString('Sesi<span class="text-champagne">Temu</span>', $cocokSidebar[0]);
