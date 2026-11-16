@@ -119,6 +119,7 @@ class LogoBrandingTest extends TestCase
                 $this->assertStringContainsString('Administrator', $cocokHeader[0]);
                 $this->assertStringContainsString('Keluar', $cocokHeader[0]);
                 $this->assertStringNotContainsString('Lihat Beranda', $cocokHeader[0]);
+                $this->assertMatchesRegularExpression('/<button[^>]*aria-label="Menu profil admin"[^>]*>.*?'.preg_quote($admin->nama, '/').'.*?<\/button>/s', $cocokHeader[0]);
             } else {
                 $this->fail('Header panel admin tidak ditemukan pada '.$ruteAdmin);
             }
@@ -132,6 +133,7 @@ class LogoBrandingTest extends TestCase
                 $this->assertStringContainsString('MAIN', $cocokSidebar[0]);
                 $this->assertStringContainsString('h-16 shrink-0 px-5 border-b border-champagne/25 flex items-center justify-center', $cocokSidebar[0]);
                 $this->assertStringContainsString('Keluar', $cocokSidebar[0]);
+                $this->assertStringContainsString('border-ivory/25', $cocokSidebar[0]);
                 $this->assertStringNotContainsString($admin->email, $cocokSidebar[0]);
                 $this->assertStringNotContainsString('rounded-md bg-champagne/15', $cocokSidebar[0]);
             } else {
