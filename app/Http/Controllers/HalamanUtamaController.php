@@ -23,17 +23,7 @@ class HalamanUtamaController extends Controller
             ->orderBy('id')
             ->get();
 
-        $ringkasanTier = collect(Tema::TIER_TERSEDIA)->map(function (string $label, string $kode) use ($daftarTema): array {
-            $temaTier = $daftarTema->filter(fn (Tema $tema): bool => $tema->tierKode() === $kode);
-            $hargaMinimal = $temaTier->min(fn (Tema $tema): int => $tema->hargaNominal());
-
-            return [
-                'kode' => $kode,
-                'label' => $label,
-                'jumlah' => $temaTier->count(),
-                'harga_mulai' => $hargaMinimal ?? Tema::hargaBawaanTier($kode),
-            ];
-        });
+        $ringkasanTier = Tema::ringkasanTier($daftarTema);
 
         $hargaTermurah = $daftarTema->min(fn (Tema $tema): int => $tema->hargaNominal())
             ?? Tema::HARGA_BAWAAN_TIER['basic'];

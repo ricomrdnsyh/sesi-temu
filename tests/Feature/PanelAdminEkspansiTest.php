@@ -704,4 +704,81 @@ class PanelAdminEkspansiTest extends TestCase
 
         $this->assertTrue(Hash::check('SandiBaru123', $client->fresh()->kata_sandi));
     }
+
+    public function test_client_katalog_tema_tetap_di_area_client_dan_melanjutkan_alur(): void
+    {
+        $this->get('/dasbor/katalog')->assertRedirect('/masuk');
+
+        $client = Pengguna::factory()->create(['peran' => 'client']);
+        $clientLain = Pengguna::factory()->create(['peran' => 'client']);
+
+        $temaAwal = Tema::create([
+            'nama_tema' => 'Rustic Awal',
+            'slug' => 'rustic-awal-katalog',
+            'kategori' => 'modern',
+            'tier' => 'basic',
+            'harga' => 59000,
+            'lokasi_view' => 'tema.rustic-floral.index',
+            'aktif' => true,
+        ]);
+
+        $temaPilihan = $this->buatTemaContoh();
+
+        $undangan = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $temaAwal->id,
+            'slug' => 'undangan-katalog-client',
+            'nama_panggilan_pria' => 'Agus',
+            'nama_lengkap_pria' => 'Agus Santoso',
+            'nama_panggilan_wanita' => 'Lina',
+            'nama_lengkap_wanita' => 'Lina Sari',
+            'status_publikasi' => false,
+        ]);
+
+        $undanganMilikOrangLain = Undangan::create([
+            'pengguna_id' => $clientLain->id,
+            'tema_id' => $temaAwal->id,
+            'slug' => 'undangan-orang-lain-katalog',
+            'nama_panggilan_pria' => 'Dodi',
+            'nama_lengkap_pria' => 'Dodi Putra',
+            'nama_panggilan_wanita' => 'Tia',
+            'nama_lengkap_wanita' => 'Tia Lestari',
+            'status_publikasi' => false,
+        ]);
+
+        // Katalog tetap berada di area client lengkap dengan bottom nav dan tombol Pakai Tema Ini
+        $this->actingAs($client)
+            ->get('/dasbor/katalog')
+            ->assertOk()
+            ->assertSee('data-client-bottom-nav', false)
+            ->assertSee('data-client-nav="katalog"', false)
+            ->assertSee($temaPilihan->nama_tema)
+            ->assertSee('Pakai Tema Ini');
+
+        // Saat client membuka demo dari katalog, bar demo kembali ke /dasbor/katalog dan lanjut pakai tema ke /dasbor/katalog?pakai=...
+        $this->actingAs($client)
+            ->get("/demo/{$temaPilihan->slug}?dari=katalog")
+            ->assertOk()
+            ->assertSee(route('dasbor.katalog'), false)
+            ->assertSee(route('dasbor.katalog', ['pakai' => $temaPilihan->id]), false);
+
+        // Policy guard: tidak bisa menerapkan tema ke undangan milik orang lain
+        $this->actingAs($client)
+            ->post('/dasbor/katalog/terapkan-tema', [
+                'undangan_id' => $undanganMilikOrangLain->id,
+                'tema_id' => $temaPilihan->id,
+            ])
+            ->assertForbidden();
+
+        // Terapkan tema pilihan ke undangan sendiri -> lanjut langsung ke halaman kelola undangan
+        $this->actingAs($client)
+            ->post('/dasbor/katalog/terapkan-tema', [
+                'undangan_id' => $undangan->id,
+                'tema_id' => $temaPilihan->id,
+            ])
+            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola?tab=tema")
+            ->assertSessionHas('sukses');
+
+        $this->assertSame($temaPilihan->id, $undangan->fresh()->tema_id);
+    }
 }

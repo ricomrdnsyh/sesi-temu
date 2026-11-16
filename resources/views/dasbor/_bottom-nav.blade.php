@@ -55,9 +55,9 @@
         @endif
 
         <a
-            href="{{ route('beranda') }}#katalog-tema"
+            href="{{ route('dasbor.katalog') }}"
             data-client-nav="katalog"
-            class="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl text-charcoal/70 hover:text-sage hover:bg-ivory font-medium transition"
+            class="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl transition {{ $halamanAktif === 'katalog' ? 'text-sage font-bold bg-sage/10' : 'text-charcoal/70 hover:text-sage hover:bg-ivory font-medium' }}"
         >
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>

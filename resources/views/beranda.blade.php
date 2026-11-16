@@ -352,7 +352,7 @@
                                     Lihat Demo
                                 </button>
                                 <a
-                                    href="{{ route('daftar', ['tema' => $tema->id]) }}"
+                                    href="{{ auth()->check() ? route('dasbor.katalog', ['pakai' => $tema->id]) : route('daftar', ['tema' => $tema->id]) }}"
                                     class="flex-1 text-center rounded-xl bg-sage px-4 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 transition"
                                 >
                                     Pakai Tema Ini

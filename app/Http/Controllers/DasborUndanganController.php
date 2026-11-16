@@ -56,6 +56,49 @@ class DasborUndanganController extends Controller
         ]);
     }
 
+    public function katalog(Request $request): View
+    {
+        $daftarTema = Tema::where('aktif', true)->orderBy('id')->get();
+        $ringkasanTier = Tema::ringkasanTier($daftarTema);
+        $daftarUndanganSaya = $request->user()
+            ->undangan()
+            ->with('tema')
+            ->latest()
+            ->get();
+
+        $idPrepilih = (int) ($request->old('tema_id') ?: $request->query('pakai') ?: $request->query('tema', 0));
+        $temaPrepilih = $idPrepilih > 0 ? $daftarTema->firstWhere('id', $idPrepilih) : null;
+
+        return view('dasbor.katalog', [
+            'daftarTema' => $daftarTema,
+            'ringkasanTier' => $ringkasanTier,
+            'daftarUndanganSaya' => $daftarUndanganSaya,
+            'temaPrepilih' => $temaPrepilih,
+            'durasiAktifBulan' => PengaturanSesiTemu::masaAktifBulan(),
+        ]);
+    }
+
+    public function terapkanTema(Request $request): RedirectResponse
+    {
+        $tervalidasi = $request->validate([
+            'undangan_id' => ['required', 'integer', 'exists:undangan,id'],
+            'tema_id' => ['required', 'integer', Rule::exists('tema', 'id')->where('aktif', true)],
+        ], [
+            'undangan_id.required' => 'Silakan pilih undangan yang ingin diperbarui.',
+            'tema_id.required' => 'Tema tidak valid atau sedang tidak aktif.',
+        ]);
+
+        $undangan = Undangan::findOrFail((int) $tervalidasi['undangan_id']);
+        Gate::authorize('kelola', $undangan);
+
+        $tema = Tema::findOrFail((int) $tervalidasi['tema_id']);
+        $undangan->update(['tema_id' => $tema->id]);
+
+        return redirect()
+            ->route('dasbor.undangan.kelola', [$undangan, 'tab' => 'tema'])
+            ->with('sukses', "Tema \"{$tema->nama_tema}\" berhasil diterapkan ke undangan {$undangan->nama_panggilan_pria} & {$undangan->nama_panggilan_wanita}. Lanjutkan melengkapi data undangan!");
+    }
+
     public function profil(Request $request): View
     {
         $pengguna = $request->user();

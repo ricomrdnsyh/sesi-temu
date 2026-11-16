@@ -3,54 +3,8 @@
 @section('judul', 'Dasbor Client — SesiTemu')
 
 @section('konten')
-@php
-    $penggunaAktif = auth()->user();
-@endphp
 <div x-data="{ modalBuatBaru: {{ request()->boolean('buat') ? 'true' : 'false' }} }" class="min-h-screen flex flex-col bg-ivory">
-    {{-- Header Top Navbar --}}
-    <header class="bg-white/95 backdrop-blur-md border-b border-champagne/20 sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 md:h-16 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-3 md:gap-6 min-w-0">
-                <a href="{{ route('beranda') }}" class="flex items-center gap-2 font-serif text-xl md:text-2xl font-bold text-charcoal shrink-0">
-                    <img
-                        src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}"
-                        alt="Logo SesiTemu"
-                        class="h-8 w-8 md:h-9 md:w-9 object-contain"
-                    >
-                    <span>Sesi<span class="text-champagne">Temu</span></span>
-                </a>
-                <span class="hidden md:inline-block text-xs font-semibold uppercase tracking-wider text-sage bg-sage/10 px-3 py-1 rounded-full">
-                    Dasbor Undangan
-                </span>
-            </div>
-
-            <div class="flex items-center gap-2.5 md:gap-4 text-xs sm:text-sm min-w-0">
-                @if ($penggunaAktif->adalahAdmin())
-                    <a href="{{ route('admin.ringkasan') }}" class="font-semibold text-champagne hover:underline shrink-0">
-                        Panel Admin
-                    </a>
-                @endif
-
-                <a
-                    href="{{ route('dasbor.profil.tampil') }}"
-                    title="Buka Profil Saya"
-                    class="inline-flex items-center gap-2 rounded-full border border-champagne/35 bg-ivory/70 pl-1.5 pr-2.5 sm:pr-3.5 py-1 text-charcoal hover:bg-champagne/10 transition min-w-0"
-                >
-                    <span class="inline-flex h-6 w-6 md:h-7 md:w-7 items-center justify-center rounded-full bg-sage text-white text-[11px] font-bold shrink-0">
-                        {{ $penggunaAktif->inisialNama() }}
-                    </span>
-                    <span class="truncate max-w-[110px] sm:max-w-[160px] font-medium text-xs md:text-sm">{{ $penggunaAktif->nama }}</span>
-                </a>
-
-                <form action="{{ route('keluar') }}" method="POST" class="hidden md:inline-flex shrink-0">
-                    @csrf
-                    <button type="submit" class="inline-flex items-center gap-1.5 rounded-xl border border-charcoal/15 px-3 py-1.5 font-semibold text-charcoal hover:bg-charcoal/5 transition cursor-pointer">
-                        <span>Keluar</span>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </header>
+    @include('dasbor._top-nav', ['halamanAktif' => 'undangan'])
 
     <main id="daftar-undangan" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-28 md:py-8 space-y-5 md:space-y-6">
         @if (session('sukses'))

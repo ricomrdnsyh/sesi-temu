@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use App\Support\PengaturanSesiTemu;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -196,6 +198,27 @@ class Tema extends Model
     public static function hargaBawaanTier(?string $tier): int
     {
         return self::HARGA_BAWAAN_TIER[$tier ?? 'basic'] ?? self::HARGA_BAWAAN_TIER['basic'];
+    }
+
+    /**
+     * Menghitung ringkasan jumlah tema dan harga mulai per tingkatan tier.
+     *
+     * @param  EloquentCollection<int, Tema>|Collection<int, Tema>  $daftarTema
+     * @return Collection<string, array{kode: string, label: string, jumlah: int, harga_mulai: int}>
+     */
+    public static function ringkasanTier(EloquentCollection|Collection $daftarTema): Collection
+    {
+        return collect(self::TIER_TERSEDIA)->map(function (string $label, string $kode) use ($daftarTema): array {
+            $temaTier = $daftarTema->filter(fn (Tema $tema): bool => $tema->tierKode() === $kode);
+            $hargaMinimal = $temaTier->min(fn (Tema $tema): int => $tema->hargaNominal());
+
+            return [
+                'kode' => $kode,
+                'label' => $label,
+                'jumlah' => $temaTier->count(),
+                'harga_mulai' => $hargaMinimal ?? self::hargaBawaanTier($kode),
+            ];
+        });
     }
 
     /**

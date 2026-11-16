@@ -8,44 +8,7 @@
 @endphp
 
 <div class="min-h-screen flex flex-col bg-ivory">
-    {{-- Header Top Navbar --}}
-    <header class="bg-white/95 backdrop-blur-md border-b border-champagne/20 sticky top-0 z-30">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-14 md:h-16 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-3 min-w-0">
-                <a href="{{ route('beranda') }}" class="flex items-center gap-2 font-serif text-xl md:text-2xl font-bold text-charcoal shrink-0">
-                    <img
-                        src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}"
-                        alt="Logo SesiTemu"
-                        class="h-8 w-8 md:h-9 md:w-9 object-contain"
-                    >
-                    <span class="hidden sm:inline">Sesi<span class="text-champagne">Temu</span></span>
-                </a>
-                <span class="md:hidden font-serif text-lg font-bold text-charcoal truncate">Akun &amp; Profil</span>
-                <span class="hidden md:inline-block text-xs font-semibold uppercase tracking-wider text-sage bg-sage/10 px-3 py-1 rounded-full">
-                    Profil Client
-                </span>
-            </div>
-
-            <div class="flex items-center gap-2.5 md:gap-4 text-xs sm:text-sm shrink-0">
-                <a href="{{ route('dasbor.index') }}" class="hidden md:inline-flex items-center gap-1.5 rounded-xl border border-charcoal/15 px-3.5 py-1.5 font-semibold text-charcoal hover:bg-ivory transition">
-                    ← Undangan Saya
-                </a>
-
-                @if ($pengguna->adalahAdmin())
-                    <a href="{{ route('admin.ringkasan') }}" class="font-semibold text-champagne hover:underline">
-                        Panel Admin
-                    </a>
-                @endif
-
-                <form action="{{ route('keluar') }}" method="POST" class="hidden md:inline-flex">
-                    @csrf
-                    <button type="submit" class="rounded-xl border border-charcoal/15 px-3.5 py-1.5 font-semibold text-charcoal hover:bg-charcoal/5 transition cursor-pointer">
-                        Keluar
-                    </button>
-                </form>
-            </div>
-        </div>
-    </header>
+    @include('dasbor._top-nav', ['halamanAktif' => 'profil', 'judulMobile' => 'Akun & Profil', 'lebarKontainer' => 'max-w-6xl'])
 
     <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-28 md:py-8 space-y-5 md:space-y-6">
         @if (session('sukses'))
@@ -289,7 +252,7 @@
                             <span class="text-charcoal/40 text-lg leading-none">›</span>
                         </a>
 
-                        <a href="{{ route('beranda') }}#katalog-tema" class="flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 hover:bg-ivory transition">
+                        <a href="{{ route('dasbor.katalog') }}" class="flex items-center justify-between gap-3 px-4 sm:px-5 py-3.5 hover:bg-ivory transition">
                             <div class="flex items-center gap-3 min-w-0">
                                 <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-champagne/15 text-charcoal shrink-0">
                                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
