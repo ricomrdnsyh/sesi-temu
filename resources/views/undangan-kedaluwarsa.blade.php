@@ -31,7 +31,7 @@
                 Ke Beranda SesiTemu
             </a>
             <a
-                href="https://wa.me/6281234567890?text={{ urlencode('Halo Admin SesiTemu, saya ingin memperpanjang masa aktif undangan sesitemu.id/'.$undangan->slug) }}"
+                href="{{ \App\Support\PengaturanSesiTemu::urlWaAdmin('Halo Admin SesiTemu, saya ingin memperpanjang masa aktif undangan sesitemu.id/'.$undangan->slug) }}"
                 target="_blank"
                 rel="noopener"
                 class="rounded-xl bg-sage px-5 py-2.5 text-sm font-semibold text-white hover:bg-sage/90"

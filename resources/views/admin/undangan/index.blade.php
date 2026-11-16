@@ -3,10 +3,13 @@
 @section('judul', 'Manajemen Undangan — Admin SesiTemu')
 
 @section('isi_admin')
+@php
+    $durasiBulanAktif = \App\Support\PengaturanSesiTemu::masaAktifBulan();
+@endphp
 <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
     <div>
         <h1 class="font-serif text-2xl sm:text-3xl font-bold text-charcoal">Manajemen &amp; Aktivasi Undangan</h1>
-        <p class="text-sm text-charcoal/70 mt-1">Aktifkan undangan client selama 3 bulan atau bantu edit untuk Paket Terima Beres.</p>
+        <p class="text-sm text-charcoal/70 mt-1">Aktifkan undangan client selama {{ $durasiBulanAktif }} bulan atau bantu edit untuk Paket Terima Beres.</p>
     </div>
 
     <form action="{{ route('admin.undangan.index') }}" method="GET" class="flex flex-col sm:flex-row flex-wrap gap-2 w-full xl:w-auto">
@@ -101,16 +104,16 @@
                                     action="{{ route('admin.undangan.aktifkan', $undangan) }}"
                                     method="POST"
                                     data-swal-title="Aktifkan Undangan?"
-                                    data-swal-confirm="Undangan {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }} (sesitemu.id/{{ $undangan->slug }}) akan dipublikasikan dan aktif selama 3 bulan."
+                                    data-swal-confirm="Undangan {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }} (sesitemu.id/{{ $undangan->slug }}) akan dipublikasikan dan aktif selama {{ $durasiBulanAktif }} bulan."
                                     data-swal-icon="question"
                                     data-swal-confirm-button="Ya, Aktifkan"
                                     data-swal-confirm-color="#4B6358"
                                     data-swal-loading-title="Mengaktifkan Undangan..."
-                                    data-swal-loading-text="Sedang memublikasikan undangan &amp; mengatur masa aktif 3 bulan..."
+                                    data-swal-loading-text="Sedang memublikasikan undangan &amp; mengatur masa aktif {{ $durasiBulanAktif }} bulan..."
                                 >
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" title="Aktifkan Undangan (3 Bulan)" class="inline-flex items-center gap-1.5 rounded-lg bg-sage px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-sage/90 cursor-pointer shadow-xs transition">
+                                    <button type="submit" title="Aktifkan Undangan ({{ $durasiBulanAktif }} Bulan)" class="inline-flex items-center gap-1.5 rounded-lg bg-sage px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-sage/90 cursor-pointer shadow-xs transition">
                                         <svg class="h-3.5 w-3.5 text-white shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                             <path d="M21.801 10A10 10 0 1 1 17 3.335"/>
                                             <path d="m9 11 3 3L22 4"/>

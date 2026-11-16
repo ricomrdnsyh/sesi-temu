@@ -137,7 +137,7 @@
             </div>
 
             <div class="mt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-charcoal/60">
-                <span>Aktif 3 Bulan Penuh</span>
+                <span>Aktif {{ $durasiAktifBulan ?? \App\Support\PengaturanSesiTemu::masaAktifBulan() }} Bulan Penuh</span>
                 <span>•</span>
                 <span>Kompresi Foto Otomatis .WebP</span>
                 <span>•</span>
@@ -322,7 +322,7 @@
                                     </span>
                                     <div class="text-right shrink-0">
                                         <span class="text-lg font-extrabold text-charcoal">{{ $tema->hargaFormatted() }}</span>
-                                        <span class="text-[11px] text-charcoal/55">/ 3 bln</span>
+                                        <span class="text-[11px] text-charcoal/55">/ {{ $durasiAktifBulan ?? \App\Support\PengaturanSesiTemu::masaAktifBulan() }} bln</span>
                                     </div>
                                 </div>
 
@@ -398,7 +398,7 @@
                             <div class="flex items-baseline gap-2">
                                 <span class="text-sm font-semibold text-charcoal/65">Mulai</span>
                                 <span class="font-serif text-4xl font-bold text-charcoal">{{ \App\Models\Tema::formatRupiah($hargaTermurah) }}</span>
-                                <span class="text-sm text-charcoal/60">/ 3 bulan aktif</span>
+                                <span class="text-sm text-charcoal/60">/ {{ $durasiAktifBulan ?? \App\Support\PengaturanSesiTemu::masaAktifBulan() }} bulan aktif</span>
                             </div>
                             <p class="mt-1 text-xs text-charcoal/60">
                                 Mengikuti harga tema pilihan ({{ \App\Models\Tema::formatRupiah($hargaTermurah) }} – {{ \App\Models\Tema::formatRupiah($hargaTermahal) }})

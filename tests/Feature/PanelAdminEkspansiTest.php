@@ -87,8 +87,15 @@ class PanelAdminEkspansiTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('6281122334455')
-            ->assertSee('6 bulan aktif')
+            ->assertSee('Aktif 6 Bulan Penuh')
+            ->assertSee('/ 6 bln')
+            ->assertSee('/ 6 bulan aktif')
             ->assertSee('Rp 75.000');
+
+        $this->actingAs($admin)
+            ->get('/admin/undangan')
+            ->assertOk()
+            ->assertSee('Aktifkan Undangan (6 Bulan)');
 
         $this->actingAs($client)
             ->get('/dasbor')
