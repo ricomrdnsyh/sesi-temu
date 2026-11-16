@@ -115,6 +115,7 @@ class LogoBrandingTest extends TestCase
             if (preg_match('/<header\b[^>]*>.*?<\/header>/s', $konten, $cocokHeader)) {
                 $this->assertStringNotContainsString('<nav', $cocokHeader[0]);
                 $this->assertStringContainsString('menuProfilTerbuka', $cocokHeader[0]);
+                $this->assertStringContainsString($admin->nama, $cocokHeader[0]);
                 $this->assertStringContainsString('Administrator', $cocokHeader[0]);
                 $this->assertStringContainsString('Keluar', $cocokHeader[0]);
                 $this->assertStringNotContainsString('Lihat Beranda', $cocokHeader[0]);
@@ -128,8 +129,6 @@ class LogoBrandingTest extends TestCase
                 $this->assertStringContainsString('Playfair Display', $cocokSidebar[0]);
                 $this->assertStringContainsString($admin->nama, $cocokSidebar[0]);
                 $this->assertStringContainsString('Administrator', $cocokSidebar[0]);
-                $this->assertStringContainsString('profilSidebarTerbuka', $cocokSidebar[0]);
-                $this->assertStringContainsString('aria-label="Menu akun admin"', $cocokSidebar[0]);
                 $this->assertStringContainsString('MAIN', $cocokSidebar[0]);
                 $this->assertStringContainsString('h-16 shrink-0 px-5 border-b border-champagne/25 flex items-center justify-center', $cocokSidebar[0]);
                 $this->assertStringContainsString('Keluar', $cocokSidebar[0]);
