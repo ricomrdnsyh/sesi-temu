@@ -604,4 +604,41 @@ class PanelAdminEkspansiTest extends TestCase
         $this->assertDatabaseMissing('tema', ['slug' => 'tema-fiktif']);
         $this->assertDatabaseMissing('tema', ['slug' => 'tema-salah-folder']);
     }
+
+    public function test_tampilan_dasbor_client_memiliki_bottom_navbar_mobile_first(): void
+    {
+        $client = Pengguna::factory()->create(['peran' => 'client']);
+        $tema = $this->buatTemaContoh();
+
+        $undangan = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $tema->id,
+            'slug' => 'mobile-nav-uji',
+            'nama_panggilan_pria' => 'Budi',
+            'nama_lengkap_pria' => 'Budi Santoso',
+            'nama_panggilan_wanita' => 'Sari',
+            'nama_lengkap_wanita' => 'Sari Dewi',
+            'status_publikasi' => false,
+        ]);
+
+        $this->actingAs($client)
+            ->get('/dasbor')
+            ->assertOk()
+            ->assertSee('data-client-bottom-nav', false)
+            ->assertSee('md:hidden fixed bottom-0', false)
+            ->assertSee('pb-28 md:py-8', false)
+            ->assertSee('Buat Draft');
+
+        $this->actingAs($client)
+            ->get("/dasbor/undangan/{$undangan->id}/kelola")
+            ->assertOk()
+            ->assertSee('data-client-bottom-nav', false)
+            ->assertSee('data-mobile-tab="tema"', false)
+            ->assertSee('data-mobile-tab="mempelai"', false)
+            ->assertSee('data-mobile-tab="acara"', false)
+            ->assertSee('data-mobile-tab="galeri"', false)
+            ->assertSee('data-mobile-tab="amplop"', false)
+            ->assertSee('data-mobile-tab="tamu"', false)
+            ->assertSee('data-mobile-tab="aktivasi"', false);
+    }
 }

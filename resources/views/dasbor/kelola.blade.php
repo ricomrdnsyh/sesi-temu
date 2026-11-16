@@ -19,6 +19,20 @@
         daftarCerita: @js($ceritaAwal),
         teksDaftarTamu: 'Budi Santoso\nSiti Aminah & Partner\nKeluarga Bpk. Hendra',
         acaraEdit: null,
+        init() {
+            this.$nextTick(() => {
+                const btn = this.$el.querySelector(`[data-mobile-tab='${this.tab}']`);
+                btn?.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
+            });
+        },
+        pilihTab(kodeTab) {
+            this.tab = kodeTab;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            this.$nextTick(() => {
+                const btn = this.$el.querySelector(`[data-mobile-tab='${kodeTab}']`);
+                btn?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            });
+        },
         tambahCerita() {
             this.daftarCerita.push({ judul: '', tanggal: '', cerita: '' });
         },
@@ -51,12 +65,12 @@
     }"
     class="min-h-screen bg-ivory flex flex-col"
 >
-    {{-- Header --}}
-    <header class="bg-white border-b border-champagne/20 sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-            <div class="flex items-center gap-3 min-w-0">
-                <a href="{{ auth()->user()->adalahAdmin() ? route('admin.undangan.index') : route('dasbor.index') }}" class="rounded-xl border border-charcoal/15 px-3 py-1.5 text-xs font-semibold text-charcoal hover:bg-ivory transition shrink-0">
-                    ← Kembali
+    {{-- Header Top Bar --}}
+    <header class="bg-white/95 backdrop-blur-md border-b border-champagne/20 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 h-14 md:h-16 flex items-center justify-between gap-2.5 sm:gap-4">
+            <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                <a href="{{ auth()->user()->adalahAdmin() ? route('admin.undangan.index') : route('dasbor.index') }}" class="rounded-xl border border-charcoal/15 px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-charcoal hover:bg-ivory transition shrink-0">
+                    ← <span class="hidden sm:inline">Kembali</span>
                 </a>
                 <a href="{{ route('beranda') }}" title="Beranda SesiTemu" class="hidden sm:inline-flex items-center shrink-0">
                     <img
@@ -65,17 +79,22 @@
                         class="h-8 w-8 object-contain"
                     >
                 </a>
-                <div class="truncate">
-                    <h1 class="font-serif text-lg sm:text-xl font-bold text-charcoal truncate">
+                <div class="min-w-0">
+                    <h1 class="font-serif text-base sm:text-xl font-bold text-charcoal truncate">
                         {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}
                     </h1>
-                    <p class="text-xs font-mono text-sage truncate">sesitemu.id/{{ $undangan->slug }}</p>
+                    <p class="text-[11px] sm:text-xs font-mono text-sage truncate">sesitemu.id/{{ $undangan->slug }}</p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-2.5 shrink-0">
-                <a href="{{ $urlPublik }}" target="_blank" class="rounded-xl border border-champagne px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-charcoal hover:bg-champagne/10 transition">
-                    Pratinjau Undangan
+            <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+                <a href="{{ $urlPublik }}" target="_blank" class="inline-flex items-center gap-1 rounded-xl border border-champagne px-3 sm:px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-charcoal hover:bg-champagne/10 transition">
+                    <svg class="h-3.5 w-3.5 sm:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    <span class="sm:hidden">Lihat</span>
+                    <span class="hidden sm:inline">Pratinjau Undangan</span>
                 </a>
 
                 @if (! $undangan->status_publikasi && ! auth()->user()->adalahAdmin())
@@ -83,7 +102,7 @@
                         href="{{ \App\Support\PengaturanSesiTemu::urlWaAdmin($pesanWaAktivasi) }}"
                         target="_blank"
                         rel="noopener"
-                        class="rounded-xl bg-champagne px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-charcoal hover:bg-champagne/90 transition"
+                        class="hidden sm:inline-flex rounded-xl bg-champagne px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-charcoal hover:bg-champagne/90 transition"
                     >
                         Aktifkan via WA
                     </a>
@@ -92,7 +111,7 @@
         </div>
     </header>
 
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <main class="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-6 lg:px-8 pt-4 pb-28 md:py-8 space-y-4 sm:space-y-6">
         @if (session('sukses'))
             <div class="rounded-xl bg-sage/10 border border-sage/30 px-4 py-3 text-sm text-sage">
                 {{ session('sukses') }}
@@ -109,31 +128,50 @@
             </div>
         @endif
 
-        {{-- Navigasi 7 Tab --}}
-        <div class="flex flex-wrap gap-2 bg-white p-2 rounded-2xl shadow-sm ring-1 ring-champagne/20">
-            @foreach ([
-                'tema' => '1. Tema & Link',
-                'mempelai' => '2. Data Mempelai',
-                'acara' => '3. Rangkaian Acara',
-                'galeri' => '4. Galeri & Cerita',
-                'amplop' => '5. Amplop Digital',
-                'tamu' => '6. Sebar Tamu & RSVP',
-                'aktivasi' => '7. Pembayaran & Aktivasi',
-            ] as $kode => $label)
+        @php
+            $daftarTabEditor = [
+                'tema' => ['label_desktop' => '1. Tema & Link', 'label_mobile' => 'Tema', 'langkah' => 1],
+                'mempelai' => ['label_desktop' => '2. Data Mempelai', 'label_mobile' => 'Mempelai', 'langkah' => 2],
+                'acara' => ['label_desktop' => '3. Rangkaian Acara', 'label_mobile' => 'Acara', 'langkah' => 3],
+                'galeri' => ['label_desktop' => '4. Galeri & Cerita', 'label_mobile' => 'Galeri', 'langkah' => 4],
+                'amplop' => ['label_desktop' => '5. Amplop Digital', 'label_mobile' => 'Amplop', 'langkah' => 5],
+                'tamu' => ['label_desktop' => '6. Sebar Tamu & RSVP', 'label_mobile' => 'Tamu', 'langkah' => 6],
+                'aktivasi' => ['label_desktop' => '7. Pembayaran & Aktivasi', 'label_mobile' => 'Bayar', 'langkah' => 7],
+            ];
+        @endphp
+
+        {{-- Penanda Bagian Aktif di Mobile --}}
+        <div class="md:hidden flex items-center justify-between gap-2 rounded-xl bg-white px-3.5 py-2.5 ring-1 ring-champagne/20 shadow-xs">
+            <div class="min-w-0">
+                @foreach ($daftarTabEditor as $kode => $metaTab)
+                    <div x-show="tab === '{{ $kode }}'" x-cloak class="flex items-center gap-2">
+                        <span class="rounded-full bg-sage/15 px-2.5 py-0.5 text-[11px] font-bold text-sage shrink-0">
+                            {{ $metaTab['langkah'] }}/7
+                        </span>
+                        <span class="text-xs font-bold text-charcoal truncate">{{ $metaTab['label_desktop'] }}</span>
+                    </div>
+                @endforeach
+            </div>
+            <span class="text-[11px] text-charcoal/55 shrink-0">Gunakan menu bawah ↕</span>
+        </div>
+
+        {{-- Navigasi 7 Tab Desktop --}}
+        <div class="hidden md:flex flex-wrap gap-2 bg-white p-2 rounded-2xl shadow-sm ring-1 ring-champagne/20">
+            @foreach ($daftarTabEditor as $kode => $metaTab)
                 <button
                     type="button"
-                    @click="tab = '{{ $kode }}'"
+                    @click="pilihTab('{{ $kode }}')"
                     :class="tab === '{{ $kode }}' ? 'bg-sage text-white shadow-sm' : 'text-charcoal/75 hover:bg-ivory'"
                     class="rounded-xl px-4 py-2 text-xs sm:text-sm font-semibold transition cursor-pointer"
                 >
-                    {{ $label }}
+                    {{ $metaTab['label_desktop'] }}
                 </button>
             @endforeach
         </div>
 
         {{-- TAB 1: Tema & Pengaturan Link --}}
-        <section x-show="tab === 'tema'" x-cloak class="rounded-2xl bg-white p-6 sm:p-8 shadow-sm ring-1 ring-champagne/20">
-            <h2 class="font-serif text-2xl font-bold text-charcoal">Tema, Musik &amp; Pengaturan Link</h2>
+        <section x-show="tab === 'tema'" x-cloak class="rounded-2xl bg-white p-4 sm:p-8 shadow-sm ring-1 ring-champagne/20">
+            <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Tema, Musik &amp; Pengaturan Link</h2>
             <p class="mt-1 text-sm text-charcoal/65">Ganti tema kapan saja tanpa kehilangan data yang sudah diisi.</p>
 
             <form action="{{ route('dasbor.undangan.perbarui', $undangan) }}" method="POST" class="mt-6 space-y-6">
@@ -237,7 +275,7 @@
                 </div>
 
                 <div class="flex justify-end">
-                    <button type="submit" class="rounded-xl bg-sage px-6 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 transition cursor-pointer">
+                    <button type="submit" class="w-full sm:w-auto rounded-xl bg-sage px-6 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 transition cursor-pointer">
                         Simpan Pengaturan Tema &amp; Link
                     </button>
                 </div>
@@ -245,8 +283,8 @@
         </section>
 
         {{-- TAB 2: Data Mempelai --}}
-        <section x-show="tab === 'mempelai'" x-cloak class="rounded-2xl bg-white p-6 sm:p-8 shadow-sm ring-1 ring-champagne/20">
-            <h2 class="font-serif text-2xl font-bold text-charcoal">Data Kedua Mempelai &amp; Kutipan Doa</h2>
+        <section x-show="tab === 'mempelai'" x-cloak class="rounded-2xl bg-white p-4 sm:p-8 shadow-sm ring-1 ring-champagne/20">
+            <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Data Kedua Mempelai &amp; Kutipan Doa</h2>
             <p class="mt-1 text-sm text-charcoal/65">Foto profil yang diunggah otomatis dikompresi ke format .webp hemat kuota.</p>
 
             <form action="{{ route('dasbor.undangan.perbarui', $undangan) }}" method="POST" enctype="multipart/form-data" class="mt-6 space-y-8">
@@ -356,7 +394,7 @@
                 </div>
 
                 <div class="flex justify-end">
-                    <button type="submit" class="rounded-xl bg-sage px-6 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 transition cursor-pointer">
+                    <button type="submit" class="w-full sm:w-auto rounded-xl bg-sage px-6 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 transition cursor-pointer">
                         Simpan Data Mempelai
                     </button>
                 </div>
@@ -365,9 +403,9 @@
 
         {{-- TAB 3: Rangkaian Acara --}}
         <section x-show="tab === 'acara'" x-cloak class="space-y-6">
-            <div class="rounded-2xl bg-white p-6 sm:p-8 shadow-sm ring-1 ring-champagne/20">
+            <div class="rounded-2xl bg-white p-4 sm:p-8 shadow-sm ring-1 ring-champagne/20">
                 <div class="flex items-center justify-between">
-                    <h2 class="font-serif text-2xl font-bold text-charcoal" x-text="acaraEdit ? 'Edit Jadwal Acara' : 'Tambah Jadwal Acara'"></h2>
+                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal" x-text="acaraEdit ? 'Edit Jadwal Acara' : 'Tambah Jadwal Acara'"></h2>
                     <button type="button" x-show="acaraEdit" @click="acaraEdit = null" class="text-xs font-semibold text-champagne hover:underline cursor-pointer">
                         + Batal Edit / Tambah Baru
                     </button>
@@ -387,7 +425,7 @@
                         <input type="date" name="tanggal_acara" :value="acaraEdit ? acaraEdit.tanggal_acara : ''" required class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2 text-sm">
                     </div>
 
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         <div>
                             <label class="block text-sm font-medium text-charcoal">Mulai</label>
                             <input type="time" name="waktu_mulai" :value="acaraEdit ? acaraEdit.waktu_mulai : '08:00'" required class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-2.5 py-2 text-sm">
@@ -396,7 +434,7 @@
                             <label class="block text-sm font-medium text-charcoal">Selesai</label>
                             <input type="time" name="waktu_selesai" :value="acaraEdit ? acaraEdit.waktu_selesai : ''" class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-2.5 py-2 text-sm">
                         </div>
-                        <div>
+                        <div class="col-span-2 sm:col-span-1">
                             <label class="block text-sm font-medium text-charcoal">Zona</label>
                             <select name="zona_waktu" :value="acaraEdit ? acaraEdit.zona_waktu : 'WIB'" class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-2 py-2 text-sm">
                                 <option value="WIB">WIB</option>
@@ -422,7 +460,7 @@
                     </div>
 
                     <div class="sm:col-span-2 lg:col-span-3 flex justify-end">
-                        <button type="submit" class="rounded-xl bg-sage px-6 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 transition cursor-pointer" x-text="acaraEdit ? 'Perbarui Acara' : '+ Tambah Acara'">
+                        <button type="submit" class="w-full sm:w-auto rounded-xl bg-sage px-6 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 transition cursor-pointer" x-text="acaraEdit ? 'Perbarui Acara' : '+ Tambah Acara'">
                         </button>
                     </div>
                 </form>
@@ -481,10 +519,10 @@
         {{-- TAB 4: Galeri & Cerita Cinta + Live Streaming --}}
         <section x-show="tab === 'galeri'" x-cloak class="space-y-6">
             {{-- Upload Galeri --}}
-            <div class="rounded-2xl bg-white p-6 sm:p-8 shadow-sm ring-1 ring-champagne/20">
+            <div class="rounded-2xl bg-white p-4 sm:p-8 shadow-sm ring-1 ring-champagne/20">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="font-serif text-2xl font-bold text-charcoal">Galeri Foto Prewedding</h2>
+                        <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Galeri Foto Prewedding</h2>
                         <p class="mt-1 text-sm text-charcoal/65">Maksimal 10 foto ({{ $undangan->daftarGaleri->count() }}/10 terunggah). Otomatis dikonversi ke .webp.</p>
                     </div>
                 </div>
@@ -522,8 +560,8 @@
             </div>
 
             {{-- Cerita Cinta & Live Streaming --}}
-            <div class="rounded-2xl bg-white p-6 sm:p-8 shadow-sm ring-1 ring-champagne/20">
-                <h2 class="font-serif text-2xl font-bold text-charcoal">Cerita Cinta &amp; Live Streaming</h2>
+            <div class="rounded-2xl bg-white p-4 sm:p-8 shadow-sm ring-1 ring-champagne/20">
+                <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Cerita Cinta &amp; Live Streaming</h2>
 
                 <form action="{{ route('dasbor.undangan.perbarui', $undangan) }}" method="POST" class="mt-5 space-y-6">
                     @csrf
@@ -569,7 +607,7 @@
                     </div>
 
                     <div class="flex justify-end">
-                        <button type="submit" class="rounded-xl bg-sage px-6 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 transition cursor-pointer">
+                        <button type="submit" class="w-full sm:w-auto rounded-xl bg-sage px-6 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 transition cursor-pointer">
                             Simpan Cerita &amp; Live Streaming
                         </button>
                     </div>
@@ -579,8 +617,8 @@
 
         {{-- TAB 5: Amplop Digital --}}
         <section x-show="tab === 'amplop'" x-cloak class="space-y-6">
-            <div class="rounded-2xl bg-white p-6 sm:p-8 shadow-sm ring-1 ring-champagne/20">
-                <h2 class="font-serif text-2xl font-bold text-charcoal">Tambah Rekening / E-Wallet Amplop Digital</h2>
+            <div class="rounded-2xl bg-white p-4 sm:p-8 shadow-sm ring-1 ring-champagne/20">
+                <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Tambah Rekening / E-Wallet Amplop Digital</h2>
 
                 <form action="{{ route('dasbor.amplop.simpan', $undangan) }}" method="POST" class="mt-5 grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
                     @csrf
@@ -619,15 +657,15 @@
                 </div>
             </div>
 
-            <div class="rounded-2xl bg-white p-6 sm:p-8 shadow-sm ring-1 ring-champagne/20">
-                <h3 class="font-serif text-xl font-bold text-charcoal">Alamat Pengiriman Kado Fisik</h3>
+            <div class="rounded-2xl bg-white p-4 sm:p-8 shadow-sm ring-1 ring-champagne/20">
+                <h3 class="font-serif text-lg sm:text-xl font-bold text-charcoal">Alamat Pengiriman Kado Fisik</h3>
                 <form action="{{ route('dasbor.undangan.perbarui', $undangan) }}" method="POST" class="mt-4 space-y-4">
                     @csrf
                     @method('PUT')
                     <input type="hidden" name="bagian" value="kado_fisik">
                     <textarea name="alamat_kado_fisik" rows="2" placeholder="Jl. Contoh No. 12, Jakarta Selatan..." class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm">{{ old('alamat_kado_fisik', $pengaturan['alamat_kado_fisik'] ?? '') }}</textarea>
                     <div class="flex justify-end">
-                        <button type="submit" class="rounded-xl bg-sage px-6 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 transition cursor-pointer">
+                        <button type="submit" class="w-full sm:w-auto rounded-xl bg-sage px-6 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 transition cursor-pointer">
                             Simpan Alamat Kado
                         </button>
                     </div>
@@ -638,8 +676,8 @@
         {{-- TAB 6: Sebar Tamu & Buku Tamu (RSVP) --}}
         <section x-show="tab === 'tamu'" x-cloak class="space-y-6">
             {{-- Generator Link Tamu WhatsApp --}}
-            <div class="rounded-2xl bg-white p-6 sm:p-8 shadow-sm ring-1 ring-champagne/20">
-                <h2 class="font-serif text-2xl font-bold text-charcoal">Generator Link Tamu WhatsApp</h2>
+            <div class="rounded-2xl bg-white p-4 sm:p-8 shadow-sm ring-1 ring-champagne/20">
+                <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Generator Link Tamu WhatsApp</h2>
                 <p class="mt-1 text-sm text-charcoal/65">Tulis daftar nama tamu (satu nama per baris) untuk menghasilkan link personal &amp; pesan undangan WhatsApp.</p>
 
                 <div class="mt-5 grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -673,29 +711,57 @@
             </div>
 
             {{-- Rekapitulasi Kehadiran & Daftar Ucapan --}}
-            <div class="rounded-2xl bg-white p-6 sm:p-8 shadow-sm ring-1 ring-champagne/20">
-                <h2 class="font-serif text-2xl font-bold text-charcoal">Rekapitulasi Kehadiran &amp; Buku Tamu</h2>
+            <div class="rounded-2xl bg-white p-4 sm:p-8 shadow-sm ring-1 ring-champagne/20">
+                <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Rekapitulasi Kehadiran &amp; Buku Tamu</h2>
 
-                <div class="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div class="rounded-xl bg-sage/10 p-4">
+                <div class="mt-4 sm:mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                    <div class="rounded-xl bg-sage/10 p-3.5 sm:p-4">
                         <p class="text-xs text-charcoal/70">Konfirmasi Hadir</p>
-                        <p class="mt-1 font-serif text-3xl font-bold text-sage">{{ $rekapRsvp['hadir'] }}</p>
+                        <p class="mt-1 font-serif text-2xl sm:text-3xl font-bold text-sage">{{ $rekapRsvp['hadir'] }}</p>
                     </div>
-                    <div class="rounded-xl bg-amber-50 p-4">
+                    <div class="rounded-xl bg-amber-50 p-3.5 sm:p-4">
                         <p class="text-xs text-charcoal/70">Masih Ragu</p>
-                        <p class="mt-1 font-serif text-3xl font-bold text-amber-700">{{ $rekapRsvp['ragu'] }}</p>
+                        <p class="mt-1 font-serif text-2xl sm:text-3xl font-bold text-amber-700">{{ $rekapRsvp['ragu'] }}</p>
                     </div>
-                    <div class="rounded-xl bg-red-50 p-4">
+                    <div class="rounded-xl bg-red-50 p-3.5 sm:p-4">
                         <p class="text-xs text-charcoal/70">Tidak Hadir</p>
-                        <p class="mt-1 font-serif text-3xl font-bold text-red-700">{{ $rekapRsvp['tidak_hadir'] }}</p>
+                        <p class="mt-1 font-serif text-2xl sm:text-3xl font-bold text-red-700">{{ $rekapRsvp['tidak_hadir'] }}</p>
                     </div>
-                    <div class="rounded-xl bg-champagne/15 p-4">
+                    <div class="rounded-xl bg-champagne/15 p-3.5 sm:p-4">
                         <p class="text-xs text-charcoal/70">Estimasi Orang Hadir</p>
-                        <p class="mt-1 font-serif text-3xl font-bold text-charcoal">{{ $rekapRsvp['total_orang_hadir'] }}</p>
+                        <p class="mt-1 font-serif text-2xl sm:text-3xl font-bold text-charcoal">{{ $rekapRsvp['total_orang_hadir'] }}</p>
                     </div>
                 </div>
 
-                <div class="mt-6 overflow-x-auto">
+                {{-- Daftar Ucapan Mobile (Kartu Bertumpuk) --}}
+                <div class="mt-5 space-y-3 md:hidden">
+                    @forelse ($undangan->bukuTamu as $ucapan)
+                        <div class="rounded-xl bg-ivory/75 p-4 ring-1 ring-champagne/20 space-y-2">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <p class="font-semibold text-sm text-charcoal">{{ $ucapan->nama_tamu }}</p>
+                                    <p class="text-xs text-charcoal/60">{{ $ucapan->jumlah_tamu }} tamu</p>
+                                </div>
+                                <span class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold shrink-0 {{ $ucapan->status_kehadiran === 'hadir' ? 'bg-sage/15 text-sage' : ($ucapan->status_kehadiran === 'ragu' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-700') }}">
+                                    {{ str_replace('_', ' ', ucfirst($ucapan->status_kehadiran)) }}
+                                </span>
+                            </div>
+                            <p class="text-xs text-charcoal/80 leading-relaxed">{{ $ucapan->ucapan_doa }}</p>
+                            <div class="flex justify-end pt-1">
+                                <form action="{{ route('dasbor.ucapan.hapus', [$undangan, $ucapan]) }}" method="POST" onsubmit="return confirm('Hapus komentar ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-xs font-semibold text-red-600 hover:underline cursor-pointer">Hapus</button>
+                                </form>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="py-6 text-center text-xs text-charcoal/60">Belum ada ucapan atau konfirmasi kehadiran dari tamu.</p>
+                    @endforelse
+                </div>
+
+                {{-- Daftar Ucapan Desktop (Tabel) --}}
+                <div class="mt-6 hidden md:block overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead>
                             <tr class="border-b border-champagne/20 text-left text-xs uppercase text-charcoal/60">
@@ -739,8 +805,8 @@
         {{-- TAB 7: Pembayaran & Aktivasi --}}
         <section x-show="tab === 'aktivasi'" x-cloak class="space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="rounded-2xl bg-white p-6 sm:p-8 shadow-sm ring-1 ring-champagne/20">
-                    <h2 class="font-serif text-2xl font-bold text-charcoal">Ajukan Pembayaran Aktivasi</h2>
+                <div class="rounded-2xl bg-white p-4 sm:p-8 shadow-sm ring-1 ring-champagne/20">
+                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Ajukan Pembayaran Aktivasi</h2>
                     <p class="mt-1 text-sm text-charcoal/65">
                         Masa aktif standar undangan adalah <strong>{{ $durasiAktifBulan ?? 3 }} bulan</strong> sejak diverifikasi lunas oleh Admin.
                     </p>
@@ -832,9 +898,49 @@
                 </div>
             </div>
 
-            <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-champagne/20">
+            <div class="rounded-2xl bg-white p-4 sm:p-6 shadow-sm ring-1 ring-champagne/20">
                 <h3 class="text-base font-bold text-charcoal mb-4">Riwayat Invoice Undangan Ini</h3>
-                <div class="overflow-x-auto">
+
+                {{-- Riwayat Invoice Mobile (Kartu) --}}
+                <div class="space-y-3 md:hidden">
+                    @forelse ($undangan->transaksi as $trx)
+                        <div class="rounded-xl bg-ivory/75 p-4 ring-1 ring-champagne/20 space-y-2.5">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <p class="font-mono font-bold text-sm text-charcoal">{{ $trx->kode_invoice }}</p>
+                                    <p class="text-xs text-charcoal/70">{{ $trx->labelPaket() }} • {{ $trx->tema?->nama_tema }}</p>
+                                </div>
+                                <span class="rounded-full px-2.5 py-0.5 text-[11px] font-semibold shrink-0 {{ $trx->status === 'lunas' ? 'bg-sage/15 text-sage' : ($trx->status === 'ditolak' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-800') }}">
+                                    {{ $trx->labelStatus() }}
+                                </span>
+                            </div>
+                            <p class="text-sm font-bold text-charcoal">{{ \App\Models\Tema::formatRupiah($trx->total_bayar) }}</p>
+                            @if ($trx->catatan_admin)
+                                <p class="text-xs text-charcoal/65">{{ $trx->catatan_admin }}</p>
+                            @endif
+                            <div class="pt-1">
+                                @if ($trx->status !== 'lunas')
+                                    <form action="{{ route('dasbor.transaksi.unggah', $trx) }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-2">
+                                        @csrf
+                                        <input type="file" name="bukti_pembayaran" accept="image/*" required class="w-full text-xs">
+                                        <button type="submit" class="w-full rounded-xl bg-sage px-3 py-2 text-xs font-semibold text-white hover:bg-sage/90 cursor-pointer">
+                                            Unggah Bukti Pembayaran
+                                        </button>
+                                    </form>
+                                @elseif ($trx->urlBukti())
+                                    <a href="{{ $trx->urlBukti() }}" target="_blank" class="inline-block text-xs font-semibold text-sage hover:underline">Lihat Bukti Transfer</a>
+                                @else
+                                    <span class="text-xs text-charcoal/50">Terverifikasi Admin</span>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <p class="py-6 text-center text-xs text-charcoal/60">Belum ada invoice pembayaran untuk undangan ini.</p>
+                    @endforelse
+                </div>
+
+                {{-- Riwayat Invoice Desktop (Tabel) --}}
+                <div class="hidden md:block overflow-x-auto">
                     <table class="min-w-full text-sm">
                         <thead>
                             <tr class="border-b border-champagne/20 text-left text-xs uppercase text-charcoal/60">
@@ -889,5 +995,84 @@
             </div>
         </section>
     </main>
+
+    {{-- Bottom Navbar Editor 7-Tab Mobile-First (Khusus Tampilan Mobile) --}}
+    <nav
+        aria-label="Navigasi Editor Undangan"
+        data-client-bottom-nav
+        class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-champagne/25 shadow-[0_-8px_28px_-10px_rgba(31,41,55,0.14)] pb-[env(safe-area-inset-bottom)]"
+    >
+        <div class="flex items-stretch overflow-x-auto no-scrollbar h-16 px-1.5 gap-1">
+            @foreach ($daftarTabEditor as $kode => $metaTab)
+                <button
+                    type="button"
+                    data-mobile-tab="{{ $kode }}"
+                    @click="pilihTab('{{ $kode }}')"
+                    :class="tab === '{{ $kode }}' ? 'text-sage bg-sage/10 font-bold' : 'text-charcoal/65 hover:text-charcoal hover:bg-ivory font-medium'"
+                    class="relative min-w-[68px] flex-1 flex flex-col items-center justify-center gap-0.5 rounded-xl px-1.5 py-1 transition cursor-pointer shrink-0"
+                >
+                    <span
+                        x-show="tab === '{{ $kode }}'"
+                        x-cloak
+                        class="absolute top-0.5 inset-x-4 h-0.5 rounded-full bg-sage"
+                    ></span>
+
+                    @switch($kode)
+                        @case('tema')
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
+                                <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
+                                <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>
+                                <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
+                                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+                            </svg>
+                            @break
+                        @case('mempelai')
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                            </svg>
+                            @break
+                        @case('acara')
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                                <line x1="16" x2="16" y1="2" y2="6"/>
+                                <line x1="8" x2="8" y1="2" y2="6"/>
+                                <line x1="3" x2="21" y1="10" y2="10"/>
+                            </svg>
+                            @break
+                        @case('galeri')
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                                <circle cx="9" cy="9" r="2"/>
+                                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                            </svg>
+                            @break
+                        @case('amplop')
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="8" width="18" height="4" rx="1"/>
+                                <path d="M12 8v13"/>
+                                <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/>
+                                <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/>
+                            </svg>
+                            @break
+                        @case('tamu')
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="m22 2-7 20-4-9-9-4Z"/>
+                                <path d="M22 2 11 13"/>
+                            </svg>
+                            @break
+                        @case('aktivasi')
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect width="20" height="14" x="2" y="5" rx="2"/>
+                                <line x1="2" x2="22" y1="10" y2="10"/>
+                            </svg>
+                            @break
+                    @endswitch
+
+                    <span class="text-[11px] leading-tight whitespace-nowrap">{{ $metaTab['label_mobile'] }}</span>
+                </button>
+            @endforeach
+        </div>
+    </nav>
 </div>
 @endsection

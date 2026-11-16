@@ -27,6 +27,15 @@
     display: none !important;
 }
 
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
 /* SesiTemu Admin DataTables Theme */
 div.dt-container {
     --dt-header_border: 1px solid rgba(191, 161, 95, 0.22);
