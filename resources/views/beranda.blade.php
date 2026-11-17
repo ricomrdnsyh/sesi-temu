@@ -160,80 +160,55 @@
         <div class="absolute -bottom-32 -left-12 w-[26rem] h-[26rem] rounded-full bg-sage/12 blur-3xl pointer-events-none"></div>
 
         <div class="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-            {{-- Kolom Kiri: Headline Jelas Undangan Digital + Cek Link --}}
-            <div class="lg:col-span-6 text-center lg:text-left space-y-5">
+            {{-- Kolom Kiri: Headline Jelas Undangan Digital + 2 CTA Utama --}}
+            <div class="lg:col-span-6 text-center lg:text-left space-y-6">
                 <div class="inline-flex items-center gap-2 rounded-full bg-champagne/15 border border-champagne/30 px-4 py-1.5 text-[11px] sm:text-xs font-bold uppercase tracking-widest text-[#8A6D33]">
                     <span class="h-2 w-2 rounded-full bg-sage"></span>
                     <span>Website Undangan Pernikahan Digital</span>
                 </div>
 
-                <h1 class="font-logo text-3xl sm:text-5xl lg:text-[3.35rem] font-bold text-charcoal leading-[1.15] tracking-tight">
+                <h1 class="font-logo text-3xl sm:text-5xl lg:text-[3.4rem] font-bold text-charcoal leading-[1.15] tracking-tight">
                     Abadikan Setiap Sesi Bahagia Menuju <span class="text-sage">Hari Pertemuan</span>
                 </h1>
 
-                <p class="text-sm sm:text-base lg:text-lg text-charcoal/75 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                <p class="text-sm sm:text-base lg:text-lg text-charcoal/75 max-w-xl mx-auto lg:mx-0 leading-relaxed">
                     Buat &amp; sebar <strong>undangan pernikahan website</strong> elegan dalam hitungan menit. Lengkap dengan galeri foto hemat kuota (.WebP), musik latar, amplop digital, RSVP real-time, hingga kirim link tamu WhatsApp personal.
                 </p>
 
-                {{-- Form Cek Link Pasangan --}}
-                <div class="pt-1 max-w-xl mx-auto lg:mx-0">
-                    <div class="bg-white p-2.5 sm:p-3 rounded-2xl shadow-lg shadow-charcoal/5 ring-1 ring-champagne/30">
-                        <form action="{{ route('cek.link') }}" method="POST" class="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center">
-                            @csrf
-                            <div class="flex-1 flex items-center rounded-xl border border-charcoal/15 bg-ivory/80 px-4 py-3 focus-within:border-champagne focus-within:bg-white focus-within:ring-2 focus-within:ring-champagne/25">
-                                <span class="text-sm font-semibold text-charcoal/50 select-none">sesitemu.id/</span>
-                                <input
-                                    type="text"
-                                    name="slug"
-                                    value="{{ old('slug') }}"
-                                    required
-                                    placeholder="dimas-rani"
-                                    aria-label="Nama link pasangan"
-                                    class="w-full bg-transparent text-sm font-semibold text-charcoal placeholder:font-normal placeholder:text-charcoal/40 focus:outline-none ml-0.5"
-                                >
-                            </div>
-                            <button type="submit" class="rounded-xl bg-sage px-5 py-3.5 text-sm font-semibold text-white hover:bg-sage/90 transition shrink-0 cursor-pointer shadow-sm">
-                                Cek Ketersediaan Link
-                            </button>
-                        </form>
+                {{-- 2 Tombol CTA Utama yang Bersih & Jelas --}}
+                <div class="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3">
+                    <a
+                        href="{{ auth()->check() ? route('dasbor.katalog') : route('daftar') }}"
+                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-sage px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-sage/20 hover:bg-sage/90 transition"
+                    >
+                        <span>{{ auth()->check() ? 'Buat Undangan Baru' : 'Buat Undangan Gratis' }}</span>
+                        <span aria-hidden="true">→</span>
+                    </a>
 
-                        @if (session('saran_link'))
-                            <div class="mt-2.5 rounded-xl bg-amber-50 border border-amber-200 px-4 py-2.5 text-left text-sm text-amber-800">
-                                {{ session('saran_link') }}
-                            </div>
-                        @endif
-
-                        @error('slug')
-                            <div class="mt-2.5 rounded-xl bg-red-50 border border-red-200 px-4 py-2.5 text-left text-sm text-red-700">
-                                {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
-                    <p class="mt-2 text-xs text-charcoal/55">Coba tulis nama panggilanmu &amp; pasangan — gratis pratinjau dulu sebelum bayar.</p>
-                </div>
-
-                {{-- Tombol Sekunder & Trust Highlights --}}
-                <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-1">
                     <a
                         href="#katalog-tema"
-                        class="inline-flex items-center gap-2 rounded-xl bg-charcoal px-5 py-2.5 text-xs sm:text-sm font-semibold text-champagne hover:bg-charcoal/90 transition shadow-sm"
+                        class="inline-flex items-center justify-center gap-2 rounded-xl border border-champagne bg-white px-6 py-3.5 text-sm font-semibold text-charcoal hover:bg-champagne/10 transition shadow-xs"
                     >
                         <span>Lihat {{ $daftarTema->count() > 0 ? $daftarTema->count().' ' : '' }}Koleksi Tema</span>
                         <span aria-hidden="true">↓</span>
                     </a>
-                    @if ($temaPertamaDemo)
+                </div>
+
+                @if ($temaPertamaDemo)
+                    <div class="text-xs text-charcoal/65">
+                        Atau
                         <button
                             type="button"
                             @click="bukaModalDemo('{{ $temaPertamaDemo->slug }}', '{{ e($temaPertamaDemo->nama_tema) }}', '{{ $temaPertamaDemo->tierLabel() }} • {{ $temaPertamaDemo->hargaFormatted() }}')"
-                            class="inline-flex items-center gap-2 rounded-xl border border-champagne bg-white px-5 py-2.5 text-xs sm:text-sm font-semibold text-charcoal hover:bg-champagne/10 transition cursor-pointer"
+                            class="font-semibold text-sage underline underline-offset-4 hover:text-charcoal cursor-pointer"
                         >
-                            <span>Coba Live Demo</span>
-                            <span aria-hidden="true">→</span>
+                            coba langsung Live Demo interaktif
                         </button>
-                    @endif
-                </div>
+                        tanpa perlu mendaftar.
+                    </div>
+                @endif
 
-                <div class="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-xs text-charcoal/65">
+                <div class="pt-1 flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-xs text-charcoal/65">
                     <span class="inline-flex items-center gap-1.5">
                         <span class="text-sage font-bold">✓</span>
                         <span>Aktif {{ $durasiTampil }} Bulan Penuh</span>
@@ -802,13 +777,59 @@
                 </div>
             </div>
 
-            {{-- CTA Penutup --}}
-            <div class="rounded-3xl bg-gradient-to-br from-[#1B2D24] via-charcoal to-[#262B31] text-ivory p-7 sm:p-10 text-center ring-1 ring-champagne/30 shadow-xl space-y-4">
-                <h2 class="font-logo text-2xl sm:text-3xl font-bold text-white">Siap Menyiapkan Undangan Hari Bahagiamu?</h2>
-                <p class="text-xs sm:text-sm text-ivory/75 max-w-xl mx-auto">
-                    Mulai buat draft undangan pernikahan digital Anda hari ini—gratis mencoba semua tema dan fitur sepuasnya.
-                </p>
-                <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+            {{-- CTA Penutup & Widget Cek Ketersediaan Link Pasangan --}}
+            <div
+                id="cek-link"
+                @if (session('saran_link') || $errors->has('slug'))
+                    x-init="$el.scrollIntoView({ behavior: 'smooth', block: 'center' })"
+                @endif
+                class="rounded-3xl bg-gradient-to-br from-[#1B2D24] via-charcoal to-[#262B31] text-ivory p-7 sm:p-10 text-center ring-1 ring-champagne/30 shadow-xl space-y-5"
+            >
+                <div class="space-y-2">
+                    <span class="inline-block rounded-full bg-champagne/15 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-champagne">
+                        Amankan Link Unik Pasangan
+                    </span>
+                    <h2 class="font-logo text-2xl sm:text-3xl font-bold text-white">Siap Menyiapkan Undangan Hari Bahagiamu?</h2>
+                    <p class="text-xs sm:text-sm text-ivory/75 max-w-xl mx-auto">
+                        Cek ketersediaan link undangan pasanganmu sekarang lalu lanjutkan membuat draft gratis di SesiTemu.
+                    </p>
+                </div>
+
+                {{-- Form Cek Ketersediaan Link Pasangan --}}
+                <div class="max-w-xl mx-auto bg-white p-2 sm:p-2.5 rounded-2xl shadow-md">
+                    <form action="{{ route('cek.link') }}" method="POST" class="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center">
+                        @csrf
+                        <div class="flex-1 flex items-center rounded-xl border border-charcoal/15 bg-ivory/80 px-4 py-3 focus-within:border-champagne focus-within:bg-white focus-within:ring-2 focus-within:ring-champagne/25">
+                            <span class="text-sm font-semibold text-charcoal/50 select-none">sesitemu.id/</span>
+                            <input
+                                type="text"
+                                name="slug"
+                                value="{{ old('slug') }}"
+                                required
+                                placeholder="dimas-rani"
+                                aria-label="Nama link pasangan"
+                                class="w-full bg-transparent text-sm font-semibold text-charcoal placeholder:font-normal placeholder:text-charcoal/40 focus:outline-none ml-0.5"
+                            >
+                        </div>
+                        <button type="submit" class="rounded-xl bg-sage px-5 py-3 text-sm font-semibold text-white hover:bg-sage/90 transition shrink-0 cursor-pointer">
+                            Cek &amp; Amankan Link
+                        </button>
+                    </form>
+
+                    @if (session('saran_link'))
+                        <div class="mt-2.5 rounded-xl bg-amber-50 border border-amber-200 px-4 py-2.5 text-left text-sm text-amber-800">
+                            {{ session('saran_link') }}
+                        </div>
+                    @endif
+
+                    @error('slug')
+                        <div class="mt-2.5 rounded-xl bg-red-50 border border-red-200 px-4 py-2.5 text-left text-sm text-red-700">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                </div>
+
+                <div class="pt-1 flex flex-col sm:flex-row items-center justify-center gap-3">
                     <a
                         href="{{ auth()->check() ? route('dasbor.katalog') : route('daftar') }}"
                         class="w-full sm:w-auto rounded-xl bg-champagne px-6 py-3 text-sm font-bold text-charcoal hover:bg-champagne/90 transition"

@@ -66,6 +66,12 @@ class HalamanUtamaController extends Controller
                 ->with('saran_link', "Maaf, link sesitemu.id/{$slug} sudah digunakan. Coba alternatif seperti {$saranSlug} atau {$slug}-official.");
         }
 
+        if ($request->user()) {
+            return redirect()
+                ->route('dasbor.index', ['buat' => 1, 'slug' => $slug])
+                ->with('sukses', "Kabar baik! Link sesitemu.id/{$slug} masih tersedia. Lengkapi draft undangan Anda di bawah ini.");
+        }
+
         return redirect()
             ->route('daftar', ['slug' => $slug])
             ->with('sukses', "Kabar baik! Link sesitemu.id/{$slug} masih tersedia. Lengkapi pendaftaran untuk mengamankannya.");

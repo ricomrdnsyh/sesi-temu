@@ -384,7 +384,7 @@
                     <label for="slug_baru" class="block text-sm font-medium text-charcoal">Link Undangan</label>
                     <div class="mt-1.5 flex items-center rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5">
                         <span class="text-sm text-charcoal/50">sesitemu.id/</span>
-                        <input id="slug_baru" name="slug" type="text" value="{{ old('slug') }}" required placeholder="raka-maya" class="w-full bg-transparent text-sm font-semibold focus:outline-none ml-0.5">
+                        <input id="slug_baru" name="slug" type="text" value="{{ old('slug', request()->query('slug', '')) }}" required placeholder="raka-maya" class="w-full bg-transparent text-sm font-semibold focus:outline-none ml-0.5">
                     </div>
                 </div>
 
