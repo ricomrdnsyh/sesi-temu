@@ -58,13 +58,18 @@ class Tahap3LandingDemoTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('SesiTemu')
-            ->assertSee('Abadikan Setiap Sesi Bahagia Menuju Hari Pertemuan')
+            ->assertSee('Website Undangan Pernikahan Digital')
+            ->assertSee('Abadikan Setiap Sesi Bahagia Menuju')
+            ->assertSee('Hari Pertemuan')
+            ->assertSee('Buka Contoh Undangan')
+            ->assertSee('3 Langkah Undangan Digital Siap Sebar')
             ->assertSee('Rustic Floral')
             ->assertSee('Adat Jawa Keraton')
             ->assertSee('Islami Syari')
             ->assertDontSee('Tema Nonaktif')
             ->assertSee('Paket Mandiri')
-            ->assertSee('Paket Terima Beres');
+            ->assertSee('Paket Terima Beres')
+            ->assertSee('Pertanyaan Seputar Undangan Digital');
     }
 
     public function test_cek_link_tersedia_mengarahkan_ke_daftar_dengan_slug_terformat(): void
