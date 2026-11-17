@@ -47,7 +47,7 @@
 @endphp
 
 <div x-data="{
-    menuMobileTerbuka: false,
+    seksiAktif: 'beranda',
     kategoriAktif: 'semua',
     tierAktif: 'semua',
     daftarFilter: @js($daftarFilterJson),
@@ -93,14 +93,14 @@
         this.modalDemoTerbuka = false;
     }
 }">
-    {{-- Header / Navbar --}}
+    {{-- Header / Navbar Atas (Simpel di Mobile, Lengkap di Desktop) --}}
     <header class="sticky top-0 z-40 bg-ivory/95 backdrop-blur-md border-b border-champagne/20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-            <a href="{{ route('beranda') }}" class="flex items-center gap-2.5 group shrink-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 md:h-16 flex items-center justify-between gap-3">
+            <a href="{{ route('beranda') }}" class="flex items-center gap-2 sm:gap-2.5 group shrink-0">
                 <img
                     src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}"
                     alt="Logo SesiTemu"
-                    class="h-9 w-9 sm:h-10 sm:w-10 object-contain transition-transform duration-200 group-hover:scale-105"
+                    class="h-8 w-8 sm:h-10 sm:w-10 object-contain transition-transform duration-200 group-hover:scale-105"
                 >
                 <span class="font-logo text-2xl sm:text-3xl font-bold tracking-tight text-[#1D3B2C] leading-none">
                     Sesi<span class="text-champagne">Temu</span>
@@ -117,69 +117,69 @@
 
             <div class="flex items-center gap-2 sm:gap-3 shrink-0">
                 @auth
-                    <a href="{{ auth()->user()->adalahAdmin() ? '/admin' : '/dasbor' }}" class="rounded-xl bg-sage px-4 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-sage/90 transition">
+                    <a href="{{ auth()->user()->adalahAdmin() ? '/admin' : '/dasbor' }}" class="rounded-xl bg-sage px-3.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-white hover:bg-sage/90 transition">
                         {{ auth()->user()->adalahAdmin() ? 'Panel Admin' : 'Dasbor Saya' }}
                     </a>
                 @else
-                    <a href="{{ route('login') }}" class="px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-charcoal hover:text-sage transition">
+                    <a href="{{ route('login') }}" class="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-charcoal hover:text-sage transition">
                         Masuk
                     </a>
-                    <a href="{{ route('daftar') }}" class="rounded-xl bg-sage px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-sage/90 transition">
+                    <a href="{{ route('daftar') }}" class="hidden md:inline-flex rounded-xl bg-sage px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sage/90 transition">
                         Buat Undangan
                     </a>
                 @endauth
-
-                <button
-                    type="button"
-                    @click="menuMobileTerbuka = !menuMobileTerbuka"
-                    aria-label="Buka menu navigasi"
-                    class="md:hidden rounded-xl border border-charcoal/15 p-2 text-charcoal hover:bg-white cursor-pointer"
-                >
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <line x1="4" x2="20" y1="6" y2="6"/>
-                        <line x1="4" x2="20" y1="12" y2="12"/>
-                        <line x1="4" x2="20" y1="18" y2="18"/>
-                    </svg>
-                </button>
             </div>
-        </div>
-
-        {{-- Dropdown Navigasi Mobile --}}
-        <div x-show="menuMobileTerbuka" x-cloak @click.away="menuMobileTerbuka = false" class="md:hidden border-t border-champagne/20 bg-white px-4 py-3 space-y-1 shadow-lg">
-            <a href="#cara-kerja" @click="menuMobileTerbuka = false" class="block rounded-xl px-3 py-2 text-sm font-medium text-charcoal hover:bg-ivory">Cara Kerja</a>
-            <a href="#keunggulan" @click="menuMobileTerbuka = false" class="block rounded-xl px-3 py-2 text-sm font-medium text-charcoal hover:bg-ivory">Fitur Lengkap</a>
-            <a href="#katalog-tema" @click="menuMobileTerbuka = false" class="block rounded-xl px-3 py-2 text-sm font-medium text-charcoal hover:bg-ivory">Katalog Tema</a>
-            <a href="#paket-harga" @click="menuMobileTerbuka = false" class="block rounded-xl px-3 py-2 text-sm font-medium text-charcoal hover:bg-ivory">Paket Harga</a>
-            <a href="#faq" @click="menuMobileTerbuka = false" class="block rounded-xl px-3 py-2 text-sm font-medium text-charcoal hover:bg-ivory">FAQ</a>
         </div>
     </header>
 
-    {{-- Hero Section: Split Value Proposition + Pratinjau Ponsel Undangan Digital Interaktif --}}
-    <section class="relative overflow-hidden pt-10 pb-16 sm:pt-16 sm:pb-24 px-4 sm:px-6 lg:px-8">
-        <div class="absolute -top-28 right-0 w-[30rem] h-[30rem] rounded-full bg-champagne/15 blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-32 -left-12 w-[26rem] h-[26rem] rounded-full bg-sage/12 blur-3xl pointer-events-none"></div>
+    {{-- Hero Section: Editorial Boutique Showcase + Layered Undangan Digital --}}
+    <section class="relative overflow-hidden bg-gradient-to-b from-[#FAF5EA] via-ivory to-white pt-8 pb-14 sm:pt-14 sm:pb-20 lg:pt-16 lg:pb-24 px-4 sm:px-6 lg:px-8">
+        <div class="absolute -top-24 right-0 w-[34rem] h-[34rem] rounded-full bg-champagne/15 blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-32 -left-16 w-[28rem] h-[28rem] rounded-full bg-sage/12 blur-3xl pointer-events-none"></div>
 
-        <div class="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-            {{-- Kolom Kiri: Headline Jelas Undangan Digital + 2 CTA Utama --}}
-            <div class="lg:col-span-6 text-center lg:text-left space-y-6">
-                <div class="inline-flex items-center gap-2 rounded-full bg-champagne/15 border border-champagne/30 px-4 py-1.5 text-[11px] sm:text-xs font-bold uppercase tracking-widest text-[#8A6D33]">
+        <div class="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+            {{-- Kolom Kiri: Headline Jelas, Fitur Ringkas, & Dual CTA --}}
+            <div class="lg:col-span-6 text-center lg:text-left space-y-5 sm:space-y-6">
+                <div class="inline-flex items-center gap-2 rounded-full bg-white/90 border border-champagne/35 px-4 py-1.5 text-[11px] sm:text-xs font-bold uppercase tracking-widest text-[#8A6D33] shadow-xs">
                     <span class="h-2 w-2 rounded-full bg-sage"></span>
                     <span>Website Undangan Pernikahan Digital</span>
                 </div>
 
-                <h1 class="font-logo text-3xl sm:text-5xl lg:text-[3.4rem] font-bold text-charcoal leading-[1.15] tracking-tight">
-                    Abadikan Setiap Sesi Bahagia Menuju <span class="text-sage">Hari Pertemuan</span>
+                <h1 class="font-logo text-[2rem] sm:text-5xl lg:text-[3.4rem] font-bold text-charcoal leading-[1.15] tracking-tight">
+                    Abadikan Setiap Sesi Bahagia Menuju
+                    <span class="relative inline-block text-sage">
+                        Hari Pertemuan
+                        <svg class="absolute -bottom-1.5 left-0 w-full h-2.5 text-champagne" viewBox="0 0 220 12" fill="none" preserveAspectRatio="none" aria-hidden="true">
+                            <path d="M2 9.5C58 3 145 2 218 8.5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                    </span>
                 </h1>
 
                 <p class="text-sm sm:text-base lg:text-lg text-charcoal/75 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                    Buat &amp; sebar <strong>undangan pernikahan website</strong> elegan dalam hitungan menit. Lengkap dengan galeri foto hemat kuota (.WebP), musik latar, amplop digital, RSVP real-time, hingga kirim link tamu WhatsApp personal.
+                    Buat &amp; sebar <strong>website undangan pernikahan</strong> berkelas dalam hitungan menit. Dilengkapi foto galeri hemat kuota (.WebP), musik latar, amplop digital, RSVP real-time, dan generator link tamu WhatsApp.
                 </p>
 
-                {{-- 2 Tombol CTA Utama yang Bersih & Jelas --}}
+                {{-- Chip Fitur Kunci Undangan Digital --}}
+                <div class="grid grid-cols-3 gap-2 max-w-md mx-auto lg:mx-0">
+                    <div class="rounded-xl bg-white/85 px-2.5 py-2 ring-1 ring-champagne/25 text-center sm:text-left">
+                        <p class="text-[11px] font-bold text-sage">♫ Musik</p>
+                        <p class="text-[10px] text-charcoal/65 truncate">Autoplay elegan</p>
+                    </div>
+                    <div class="rounded-xl bg-white/85 px-2.5 py-2 ring-1 ring-champagne/25 text-center sm:text-left">
+                        <p class="text-[11px] font-bold text-charcoal">💌 Link WA</p>
+                        <p class="text-[10px] text-charcoal/65 truncate">Nama tamu personal</p>
+                    </div>
+                    <div class="rounded-xl bg-white/85 px-2.5 py-2 ring-1 ring-champagne/25 text-center sm:text-left">
+                        <p class="text-[11px] font-bold text-[#8A6D33]">💳 Amplop</p>
+                        <p class="text-[10px] text-charcoal/65 truncate">Salin no rekening</p>
+                    </div>
+                </div>
+
+                {{-- Dual CTA Utama --}}
                 <div class="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3">
                     <a
                         href="{{ auth()->check() ? route('dasbor.katalog') : route('daftar') }}"
-                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-sage px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-sage/20 hover:bg-sage/90 transition"
+                        class="inline-flex items-center justify-center gap-2 rounded-2xl bg-sage px-7 py-4 text-sm font-bold text-white shadow-lg shadow-sage/20 hover:bg-[#3b5047] transition"
                     >
                         <span>{{ auth()->check() ? 'Buat Undangan Baru' : 'Buat Undangan Gratis' }}</span>
                         <span aria-hidden="true">→</span>
@@ -187,79 +187,87 @@
 
                     <a
                         href="#katalog-tema"
-                        class="inline-flex items-center justify-center gap-2 rounded-xl border border-champagne bg-white px-6 py-3.5 text-sm font-semibold text-charcoal hover:bg-champagne/10 transition shadow-xs"
+                        class="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 text-sm font-semibold text-charcoal ring-1 ring-champagne/50 hover:bg-champagne/10 transition shadow-sm"
                     >
                         <span>Lihat {{ $daftarTema->count() > 0 ? $daftarTema->count().' ' : '' }}Koleksi Tema</span>
                         <span aria-hidden="true">↓</span>
                     </a>
                 </div>
 
-                @if ($temaPertamaDemo)
-                    <div class="text-xs text-charcoal/65">
-                        Atau
-                        <button
-                            type="button"
-                            @click="bukaModalDemo('{{ $temaPertamaDemo->slug }}', '{{ e($temaPertamaDemo->nama_tema) }}', '{{ $temaPertamaDemo->tierLabel() }} • {{ $temaPertamaDemo->hargaFormatted() }}')"
-                            class="font-semibold text-sage underline underline-offset-4 hover:text-charcoal cursor-pointer"
-                        >
-                            coba langsung Live Demo interaktif
-                        </button>
-                        tanpa perlu mendaftar.
+                {{-- Mini Strip Avatars + Highlights --}}
+                <div class="pt-1 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 text-xs text-charcoal/70">
+                    <div class="flex -space-x-2.5 shrink-0">
+                        <img src="{{ asset('aset-demo/sampul-rustic.webp') }}" alt="Tema Rustic Floral" class="h-8 w-8 rounded-full object-cover ring-2 ring-white shadow-xs">
+                        <img src="{{ asset('aset-demo/sampul-luxury.webp') }}" alt="Tema Luxury Noir" class="h-8 w-8 rounded-full object-cover ring-2 ring-white shadow-xs">
+                        <img src="{{ asset('aset-demo/sampul-jawa.webp') }}" alt="Tema Adat Jawa" class="h-8 w-8 rounded-full object-cover ring-2 ring-white shadow-xs">
                     </div>
-                @endif
-
-                <div class="pt-1 flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-xs text-charcoal/65">
-                    <span class="inline-flex items-center gap-1.5">
-                        <span class="text-sage font-bold">✓</span>
-                        <span>Aktif {{ $durasiTampil }} Bulan Penuh</span>
-                    </span>
-                    <span class="inline-flex items-center gap-1.5">
-                        <span class="text-sage font-bold">✓</span>
-                        <span>Kompresi Foto Otomatis .WebP</span>
-                    </span>
-                    <span class="inline-flex items-center gap-1.5">
-                        <span class="text-sage font-bold">✓</span>
-                        <span>Siap Mobile &amp; OpenGraph WhatsApp</span>
-                    </span>
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-x-3 gap-y-1">
+                        <span><strong>Aktif {{ $durasiTampil }} Bulan Penuh</strong></span>
+                        <span class="text-champagne">•</span>
+                        <span>Kompresi WebP</span>
+                        <span class="text-champagne">•</span>
+                        <span>Mode Tanpa Foto</span>
+                        @if ($temaPertamaDemo)
+                            <span class="text-champagne">•</span>
+                            <button
+                                type="button"
+                                @click="bukaModalDemo('{{ $temaPertamaDemo->slug }}', '{{ e($temaPertamaDemo->nama_tema) }}', '{{ $temaPertamaDemo->tierLabel() }} • {{ $temaPertamaDemo->hargaFormatted() }}')"
+                                class="font-semibold text-sage underline underline-offset-4 hover:text-charcoal cursor-pointer"
+                            >
+                                Coba Live Demo
+                            </button>
+                        @endif
+                    </div>
                 </div>
             </div>
 
-            {{-- Kolom Kanan: Mockup Interaktif Layar HP Undangan Digital --}}
-            <div class="lg:col-span-6 relative">
-                <div class="relative mx-auto max-w-[330px] sm:max-w-[360px]">
-                    {{-- Kartu Melayang Atas Kiri: Link Tamu WhatsApp --}}
-                    <div class="hidden sm:flex items-center gap-2.5 absolute -left-10 top-10 z-20 rounded-2xl bg-white/95 backdrop-blur-md px-3.5 py-2.5 shadow-xl ring-1 ring-champagne/30 max-w-[215px]">
-                        <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 shrink-0">
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="m22 2-7 20-4-9-9-4Z"/>
-                                <path d="M22 2 11 13"/>
-                            </svg>
-                        </span>
-                        <div class="min-w-0">
-                            <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Link Personal Tamu</p>
-                            <p class="text-[11px] font-medium text-charcoal truncate">?to=Budi+Santoso</p>
-                        </div>
-                    </div>
+            {{-- Kolom Kanan: Stage 3 Kartu Tema Berlapis (Bebas Overlap Teks!) --}}
+            <div class="lg:col-span-6 relative pt-2 lg:pt-0">
+                <div class="relative mx-auto max-w-[300px] sm:max-w-[330px]">
+                    {{-- Halo Dekoratif di Belakang Stage --}}
+                    <div class="pointer-events-none absolute -inset-6 sm:-inset-10 rounded-full bg-gradient-to-tr from-champagne/20 via-sage/10 to-transparent blur-xl"></div>
 
-                    {{-- Kartu Melayang Bawah Kanan: RSVP & Amplop --}}
-                    <div class="hidden sm:flex items-center gap-2.5 absolute -right-10 bottom-20 z-20 rounded-2xl bg-charcoal/95 text-ivory px-3.5 py-2.5 shadow-xl ring-1 ring-champagne/40 max-w-[215px]">
-                        <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-champagne/20 text-champagne shrink-0">
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-                            </svg>
-                        </span>
-                        <div class="min-w-0">
-                            <p class="text-[10px] font-bold uppercase tracking-wider text-champagne">RSVP Real-Time</p>
-                            <p class="text-[11px] text-ivory/85 truncate">Fajar &amp; Kel. • Hadir ✓</p>
+                    {{-- Kartu Tema Kiri (Luxury Noir) --}}
+                    <button
+                        type="button"
+                        @click="heroTemaIndex = 1"
+                        aria-label="Pilih pratinjau Luxury Noir"
+                        class="hidden sm:flex flex-col justify-between p-4 text-left absolute -left-28 top-14 w-44 h-64 -rotate-12 rounded-3xl overflow-hidden shadow-xl ring-2 ring-champagne/45 bg-charcoal text-ivory cursor-pointer transition duration-300 hover:-translate-y-1.5"
+                    >
+                        <img src="{{ asset('aset-demo/sampul-luxury.webp') }}" alt="Luxury Noir" class="absolute inset-0 w-full h-full object-cover opacity-50">
+                        <div class="relative z-10">
+                            <span class="rounded-full bg-champagne/20 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-champagne">Eksklusif</span>
                         </div>
-                    </div>
+                        <div class="relative z-10">
+                            <p class="text-[9px] uppercase tracking-widest text-ivory/75">The Wedding Of</p>
+                            <p class="font-logo text-base font-bold text-white">Arga &amp; Nadira</p>
+                        </div>
+                    </button>
 
-                    {{-- Bingkai Smartphone --}}
-                    <div class="rounded-[2.6rem] bg-charcoal p-2.5 shadow-2xl ring-2 ring-champagne/45">
+                    {{-- Kartu Tema Kanan (Adat Jawa) --}}
+                    <button
+                        type="button"
+                        @click="heroTemaIndex = 2"
+                        aria-label="Pilih pratinjau Adat Keraton"
+                        class="hidden sm:flex flex-col justify-between p-4 text-left absolute -right-28 top-14 w-44 h-64 rotate-12 rounded-3xl overflow-hidden shadow-xl ring-2 ring-champagne/40 bg-ivory text-charcoal cursor-pointer transition duration-300 hover:-translate-y-1.5"
+                    >
+                        <img src="{{ asset('aset-demo/sampul-jawa.webp') }}" alt="Adat Jawa Keraton" class="absolute inset-0 w-full h-full object-cover opacity-80">
+                        <div class="absolute inset-0 bg-gradient-to-b from-white/50 via-transparent to-ivory/90"></div>
+                        <div class="relative z-10">
+                            <span class="rounded-full bg-charcoal/85 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-champagne">Adat Jawa</span>
+                        </div>
+                        <div class="relative z-10">
+                            <p class="text-[9px] uppercase tracking-widest text-charcoal/75">The Wedding Of</p>
+                            <p class="font-logo text-base font-bold text-charcoal">Bagas &amp; Laras</p>
+                        </div>
+                    </button>
+
+                    {{-- Bingkai Ponsel Utama (100% Bersih Tanpa Terhalang Badge) --}}
+                    <div class="relative z-10 rounded-[2.6rem] bg-charcoal p-2.5 shadow-2xl ring-2 ring-champagne/55">
                         <div class="rounded-[2.1rem] overflow-hidden bg-ivory relative flex flex-col">
                             {{-- Address Bar Mockup Website Undangan --}}
-                            <div class="bg-charcoal/95 px-4 pt-2.5 pb-2 flex items-center justify-between gap-2 text-[10px] text-ivory/80">
-                                <span class="inline-flex items-center gap-1 font-mono truncate">
+                            <div class="bg-charcoal px-4 pt-2.5 pb-2 flex items-center justify-between gap-2 text-[10px] text-ivory/85">
+                                <span class="inline-flex items-center gap-1.5 font-mono truncate">
                                     <span class="text-emerald-400">🔒</span>
                                     <span>sesitemu.id/dimas-rani</span>
                                 </span>
@@ -270,20 +278,20 @@
 
                             {{-- Layar Sampul Undangan Digital --}}
                             <div
-                                class="relative h-[370px] sm:h-[395px] flex flex-col justify-between p-5 text-center transition-colors duration-300"
+                                class="relative h-[380px] sm:h-[405px] flex flex-col justify-between p-5 text-center transition-colors duration-300"
                                 :class="heroSlideAktif.gelap ? 'bg-[#111827] text-ivory' : 'bg-[#FDFBF7] text-charcoal'"
                             >
                                 <img
                                     :src="heroSlideAktif.gambar"
                                     :alt="heroSlideAktif.nama_tema"
                                     class="absolute inset-0 w-full h-full object-cover transition-all duration-500"
-                                    :class="heroSlideAktif.gelap ? 'opacity-45' : 'opacity-85'"
+                                    :class="heroSlideAktif.gelap ? 'opacity-45' : 'opacity-90'"
                                 >
                                 <div
                                     class="absolute inset-0"
                                     :class="heroSlideAktif.gelap
-                                        ? 'bg-gradient-to-b from-[#0f172a]/70 via-[#0f172a]/45 to-[#0f172a]/90'
-                                        : 'bg-gradient-to-b from-white/80 via-white/35 to-ivory/95'"
+                                        ? 'bg-gradient-to-b from-[#0f172a]/75 via-[#0f172a]/40 to-[#0f172a]/92'
+                                        : 'bg-gradient-to-b from-white/85 via-white/30 to-ivory/95'"
                                 ></div>
 
                                 {{-- Konten Atas Sampul --}}
@@ -294,12 +302,12 @@
                                 </div>
 
                                 {{-- Konten Bawah Sampul + Personalisasi Tamu --}}
-                                <div class="relative z-10 space-y-3 pb-1">
+                                <div class="relative z-10 space-y-2.5 pb-1">
                                     <div
                                         class="rounded-2xl px-4 py-3 backdrop-blur-md border text-center"
                                         :class="heroSlideAktif.gelap
                                             ? 'bg-white/10 border-champagne/35 text-ivory'
-                                            : 'bg-white/88 border-champagne/40 text-charcoal shadow-sm'"
+                                            : 'bg-white/92 border-champagne/40 text-charcoal shadow-sm'"
                                     >
                                         <p class="text-[10px] opacity-75">Kepada Yth. Bapak/Ibu/Saudara/i</p>
                                         <p class="text-sm font-bold mt-0.5">Budi Santoso &amp; Partner</p>
@@ -333,17 +341,30 @@
                         </div>
                     </div>
 
-                    {{-- Switcher Tema di Bawah Mockup HP --}}
-                    <div class="mt-4 flex items-center justify-center gap-2 flex-wrap">
-                        <template x-for="(slide, idx) in heroSlides" :key="idx">
-                            <button
-                                type="button"
-                                @click="heroTemaIndex = idx"
-                                :class="heroTemaIndex === idx ? 'bg-charcoal text-champagne ring-1 ring-champagne shadow-sm' : 'bg-white text-charcoal/75 ring-1 ring-charcoal/15 hover:bg-champagne/10'"
-                                class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition cursor-pointer"
-                                x-text="slide.label"
-                            ></button>
-                        </template>
+                    {{-- Switcher Tema + Info Fitur Ringkas di Bawah Ponsel --}}
+                    <div class="relative z-10 mt-4 space-y-2.5">
+                        <div class="flex items-center justify-center gap-2 flex-wrap">
+                            <template x-for="(slide, idx) in heroSlides" :key="idx">
+                                <button
+                                    type="button"
+                                    @click="heroTemaIndex = idx"
+                                    :class="heroTemaIndex === idx ? 'bg-charcoal text-champagne ring-1 ring-champagne shadow-sm' : 'bg-white text-charcoal/75 ring-1 ring-charcoal/15 hover:bg-champagne/10'"
+                                    class="rounded-full px-3.5 py-1.5 text-[11px] font-semibold transition cursor-pointer"
+                                    x-text="slide.label"
+                                ></button>
+                            </template>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-[11px]">
+                            <div class="flex items-center gap-2 rounded-xl bg-white px-3 py-2 ring-1 ring-champagne/25 shadow-xs">
+                                <span class="h-2 w-2 rounded-full bg-emerald-500 shrink-0"></span>
+                                <span class="font-medium text-charcoal truncate">Link: ?to=Nama+Tamu</span>
+                            </div>
+                            <div class="flex items-center gap-2 rounded-xl bg-charcoal text-ivory px-3 py-2 ring-1 ring-champagne/30 shadow-xs">
+                                <span class="h-2 w-2 rounded-full bg-champagne shrink-0"></span>
+                                <span class="font-medium truncate">RSVP &amp; Ucapan Live</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -850,7 +871,7 @@
     </section>
 
     {{-- Footer --}}
-    <footer class="py-10 px-4 sm:px-6 lg:px-8 border-t border-champagne/20 bg-ivory text-center text-sm text-charcoal/65">
+    <footer class="pt-10 pb-24 md:pb-10 px-4 sm:px-6 lg:px-8 border-t border-champagne/20 bg-ivory text-center text-sm text-charcoal/65">
         <a href="{{ route('beranda') }}" class="inline-flex flex-col items-center">
             <img
                 src="{{ asset('aset-demo/logo-sesi-temu-lengkap.webp') }}"
@@ -861,6 +882,87 @@
         </a>
         <p class="mt-1">Abadikan Setiap Sesi Bahagia Menuju Hari Pertemuan &copy; {{ now()->format('Y') }}</p>
     </footer>
+
+    {{-- Bottom Navbar Khusus Mobile (Gaya Aplikasi Mobile) --}}
+    <nav
+        aria-label="Navigasi Mobile Beranda"
+        data-landing-bottom-nav
+        class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-champagne/25 shadow-[0_-8px_28px_-10px_rgba(31,41,55,0.14)] pb-[env(safe-area-inset-bottom)]"
+    >
+        <div class="max-w-lg mx-auto grid grid-cols-5 h-16 px-1 items-center gap-0.5">
+            <button
+                type="button"
+                @click="seksiAktif = 'beranda'; window.scrollTo({ top: 0, behavior: 'smooth' })"
+                :class="seksiAktif === 'beranda' ? 'text-sage font-bold bg-sage/10' : 'text-charcoal/70 hover:text-sage font-medium'"
+                class="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl transition cursor-pointer"
+            >
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+                <span class="text-[10px] leading-tight">Beranda</span>
+            </button>
+
+            <a
+                href="#katalog-tema"
+                @click="seksiAktif = 'tema'"
+                :class="seksiAktif === 'tema' ? 'text-sage font-bold bg-sage/10' : 'text-charcoal/70 hover:text-sage font-medium'"
+                class="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl transition"
+            >
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
+                    <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
+                    <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>
+                    <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
+                    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+                </svg>
+                <span class="text-[10px] leading-tight">Tema</span>
+            </a>
+
+            <a
+                href="{{ auth()->check() ? route('dasbor.katalog') : route('daftar') }}"
+                class="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl text-charcoal/85 hover:text-sage font-semibold transition"
+            >
+                <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-sage text-white shadow-xs">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="12" x2="12" y1="5" y2="19"/>
+                        <line x1="5" x2="19" y1="12" y2="12"/>
+                    </svg>
+                </span>
+                <span class="text-[10px] leading-tight">Buat</span>
+            </a>
+
+            <a
+                href="#paket-harga"
+                @click="seksiAktif = 'harga'"
+                :class="seksiAktif === 'harga' ? 'text-sage font-bold bg-sage/10' : 'text-charcoal/70 hover:text-sage font-medium'"
+                class="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl transition"
+            >
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/>
+                    <path d="M7 7h.01"/>
+                </svg>
+                <span class="text-[10px] leading-tight">Harga</span>
+            </a>
+
+            <a
+                href="{{ auth()->check() ? (auth()->user()->adalahAdmin() ? '/admin' : '/dasbor') : route('login') }}"
+                class="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl text-charcoal/70 hover:text-sage font-medium transition"
+            >
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M20 21a8 8 0 0 0-16 0"/>
+                </svg>
+                <span class="text-[10px] leading-tight">
+                    @auth
+                        {{ auth()->user()->adalahAdmin() ? 'Admin' : 'Dasbor' }}
+                    @else
+                        Masuk
+                    @endauth
+                </span>
+            </a>
+        </div>
+    </nav>
 
     {{-- Modal Simulasi Nama Tamu Live Demo --}}
     <div
@@ -926,7 +1028,7 @@
         target="_blank"
         rel="noopener"
         aria-label="Hubungi WhatsApp SesiTemu"
-        class="fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 rounded-full bg-sage px-4 py-3 text-sm font-semibold text-white shadow-lg hover:bg-sage/90 transition"
+        class="fixed bottom-20 right-3.5 md:bottom-5 md:right-5 z-40 inline-flex items-center gap-2 rounded-full bg-sage px-3.5 py-2.5 md:px-4 md:py-3 text-xs sm:text-sm font-semibold text-white shadow-lg hover:bg-sage/90 transition"
     >
         <span>Konsultasi WA</span>
     </a>
