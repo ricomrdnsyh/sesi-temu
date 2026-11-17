@@ -22,12 +22,14 @@ class Tahap2AutentikasiPolicyTest extends TestCase
             ->assertOk()
             ->assertSee('Masuk')
             ->assertSee('Selamat Datang Kembali')
-            ->assertSee('Kembali ke Beranda');
+            ->assertSee('Kembali ke Beranda')
+            ->assertSee('data-landing-bottom-nav', false);
         $this->get('/daftar')
             ->assertOk()
             ->assertSee('Daftar')
             ->assertSee('Buat Akun Gratis')
-            ->assertSee('Kembali ke Beranda');
+            ->assertSee('Kembali ke Beranda')
+            ->assertSee('data-landing-bottom-nav', false);
         $this->assertSame(url('/masuk'), route('login'));
     }
 

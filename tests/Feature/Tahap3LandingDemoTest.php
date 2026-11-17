@@ -78,7 +78,14 @@ class Tahap3LandingDemoTest extends TestCase
             ->assertDontSee('Tema Nonaktif')
             ->assertSee('Paket Mandiri')
             ->assertSee('Paket Terima Beres')
-            ->assertSee('Pertanyaan Seputar Undangan Digital');
+            ->assertSee('Pertanyaan Seputar Undangan Digital')
+            ->assertSee('Inspirasi Tema')
+            ->assertSee('Siapkan Undangan Anda');
+
+        $this->get('/?tab=paket&sub=fitur')
+            ->assertOk()
+            ->assertSee("tabMobile: 'paket'", false)
+            ->assertSee("subTabPaket: 'fitur'", false);
     }
 
     public function test_cek_link_tersedia_mengarahkan_ke_daftar_dengan_slug_terformat(): void
