@@ -21,8 +21,10 @@
 
 <div
     x-data="{
-        kategoriAktif: 'semua',
         tierAktif: 'semua',
+        kataCariTema: '',
+        previewTerbukaId: null,
+        sampulLightboxSlug: null,
         modalDemoTerbuka: false,
         temaDemoSlug: '',
         temaDemoNama: '',
@@ -67,14 +69,22 @@
             this.alurPakai = {{ $punyaUndanganSebelumnya ? 'true' : 'false' }} ? 'terapkan' : 'buat';
             this.modalPakaiTerbuka = true;
         },
-        temaCocok(kategori, tier) {
-            const cocokKategori = this.kategoriAktif === 'semua' || this.kategoriAktif === kategori;
+        temaCocok(tier, nama = '') {
             const cocokTier = this.tierAktif === 'semua' || this.tierAktif === tier;
-            return cocokKategori && cocokTier;
+            const kata = this.kataCariTema.trim().toLowerCase();
+            const cocokCari = !kata || nama.toLowerCase().includes(kata);
+            return cocokTier && cocokCari;
         },
         resetFilter() {
-            this.kategoriAktif = 'semua';
             this.tierAktif = 'semua';
+            this.kataCariTema = '';
+        },
+        bukaLightboxSampul(slug) {
+            this.previewTerbukaId = null;
+            this.sampulLightboxSlug = slug;
+        },
+        tutupLightboxSampul() {
+            this.sampulLightboxSlug = null;
         }
     }"
     class="min-h-screen flex flex-col bg-ivory"
@@ -92,34 +102,27 @@
             </div>
         @endif
 
-        {{-- Judul & Filter Kategori --}}
+        {{-- Judul, Pencarian & Filter Kategori --}}
         <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
             <div>
                 <h1 class="font-serif text-2xl sm:text-3xl font-bold text-charcoal">Katalog Tema Undangan</h1>
                 <p class="text-xs sm:text-sm text-charcoal/70 mt-1">
-                    Pilih desain favorit Anda lalu langsung terapkan ke undangan yang ada atau buat draft baru.
+                    Sentuh <strong>Preview</strong> lalu pilih <strong>Pakai Foto</strong> atau <strong>Tanpa Foto</strong> untuk uji tampilan sebelum menerapkan tema.
                 </p>
             </div>
 
-            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 lg:pb-0">
-                <button
-                    type="button"
-                    @click="kategoriAktif = 'semua'"
-                    :class="kategoriAktif === 'semua' ? 'bg-sage text-white shadow-sm' : 'bg-white text-charcoal/80 hover:bg-champagne/10 ring-1 ring-charcoal/10'"
-                    class="rounded-xl px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-semibold transition cursor-pointer shrink-0"
+            <div class="relative w-full sm:w-64 shrink-0">
+                <svg class="w-4 h-4 text-charcoal/45 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                </svg>
+                <input
+                    type="search"
+                    x-model="kataCariTema"
+                    placeholder="Cari tema..."
+                    aria-label="Cari tema katalog"
+                    class="w-full rounded-xl border border-champagne/40 bg-white pl-9 pr-3 py-2 text-xs sm:text-sm text-charcoal placeholder:text-charcoal/45 focus:border-sage focus:outline-none focus:ring-2 focus:ring-sage/15"
                 >
-                    Semua
-                </button>
-                @foreach (\App\Models\Tema::KATEGORI_TERSEDIA as $kode => $label)
-                    <button
-                        type="button"
-                        @click="kategoriAktif = '{{ $kode }}'"
-                        :class="kategoriAktif === '{{ $kode }}' ? 'bg-sage text-white shadow-sm' : 'bg-white text-charcoal/80 hover:bg-champagne/10 ring-1 ring-charcoal/10'"
-                        class="rounded-xl px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-semibold transition cursor-pointer shrink-0"
-                    >
-                        {{ $label }}
-                    </button>
-                @endforeach
             </div>
         </div>
 
@@ -192,82 +195,151 @@
                     ];
                 @endphp
                 <div
-                    x-show="temaCocok('{{ $tema->kategori }}', '{{ $infoTier['kode'] }}')"
+                    x-show="temaCocok('{{ $infoTier['kode'] }}', '{{ e($tema->nama_tema.' '.$tema->kategoriLabel()) }}')"
                     x-transition
-                    class="group rounded-2xl bg-white overflow-hidden {{ $infoTier['card_ring'] }} flex flex-col transition duration-300"
+                    class="group rounded-2xl bg-white {{ $infoTier['card_ring'] }} flex flex-col transition duration-300 hover:shadow-xl hover:-translate-y-0.5 relative"
                 >
-                    <div class="aspect-[4/3] bg-ivory relative overflow-hidden">
-                        @if ($tema->urlGambarPratinjau())
-                            <img
-                                src="{{ $tema->urlGambarPratinjau() }}"
-                                alt="{{ $tema->nama_tema }}"
-                                class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-                            >
-                        @else
-                            <div class="w-full h-full flex items-center justify-center bg-sage/10 text-sage font-serif text-xl sm:text-2xl">
-                                {{ $tema->nama_tema }}
-                            </div>
-                        @endif
+                    <button
+                        type="button"
+                        @click="bukaLightboxSampul('{{ $tema->slug }}')"
+                        aria-label="Perbesar sampul {{ $tema->nama_tema }}"
+                        class="group/poster relative block w-full overflow-hidden rounded-t-2xl bg-ivory text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sage"
+                    >
+                        <div class="transition-transform duration-500 group-hover/poster:scale-[1.02]">
+                            <x-poster-sampul-tema :tema="$tema" />
+                        </div>
 
-                        <span class="absolute top-3 left-3 rounded-full bg-white/95 backdrop-blur px-2.5 sm:px-3 py-1 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-charcoal shadow-sm">
-                            {{ $tema->kategoriLabel() }}
+                        <span class="pointer-events-none absolute bottom-2.5 right-2.5 z-20 inline-flex items-center gap-1 rounded-full bg-charcoal/80 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-xs shadow-sm opacity-90 group-hover/poster:opacity-100 group-hover/poster:bg-sage transition">
+                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="11" cy="11" r="8" />
+                                <path d="m21 21-4.3-4.3" />
+                                <path d="M11 8v6" />
+                                <path d="M8 11h6" />
+                            </svg>
+                            <span>Lihat Sampul</span>
                         </span>
+                    </button>
 
-                        @if ($infoDesain['dukungan_tf'])
-                            <span class="absolute top-3 right-3 rounded-full bg-charcoal/85 backdrop-blur px-2.5 py-1 text-[10px] sm:text-[11px] font-medium text-ivory">
-                                Support Tanpa Foto
-                            </span>
-                        @endif
-
-                        <span class="absolute bottom-3 left-3 inline-flex items-center gap-1 rounded-full px-2.5 sm:px-3 py-1 text-[11px] font-bold uppercase tracking-wider backdrop-blur {{ $infoTier['badge_class'] }}">
-                            <span>{{ $infoTier['label'] }}</span>
-                        </span>
-
-                        @if ($tema->adaDiskon())
-                            <span class="absolute bottom-3 right-3 rounded-full bg-rose-600 px-2.5 sm:px-3 py-1 text-[11px] font-bold text-white shadow-sm">
-                                {{ $tema->labelBadgeDiskon() }}
-                            </span>
-                        @endif
-                    </div>
-
-                    <div class="p-4 sm:p-6 flex-1 flex flex-col justify-between">
+                    <div class="p-4 sm:p-6 bg-white rounded-b-2xl flex-1 flex flex-col justify-between">
                         <div>
-                            <div class="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-champagne/15">
-                                <span class="inline-flex items-center rounded-lg px-2.5 py-1 text-[11px] font-semibold {{ $infoTier['chip_class'] }}">
-                                    {{ $infoTier['ringkasan'] }}
-                                </span>
-                                <div class="text-right shrink-0">
+                            <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-bold uppercase tracking-wider text-[#8A6D33]">{{ $tema->kategoriLabel() }}</span>
+                                    <span class="text-charcoal/25">&bull;</span>
+                                    <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider {{ $infoTier['badge_class'] }}">
+                                        <span>{{ $infoTier['label'] }}</span>
+                                    </span>
+                                </div>
+                                @if ($infoDesain['dukungan_tf'])
+                                    <span class="rounded-full bg-ivory px-2.5 py-0.5 font-medium text-charcoal/75 ring-1 ring-champagne/30">
+                                        Support Tanpa Foto
+                                    </span>
+                                @endif
+                            </div>
+
+                            <h2 class="mt-2 font-logo text-xl sm:text-2xl font-bold text-charcoal leading-snug">{{ $tema->nama_tema }}</h2>
+                            <p class="mt-1.5 text-xs sm:text-sm text-charcoal/65 leading-relaxed">{{ $infoDesain['deskripsi'] }}</p>
+
+                            <div class="mt-3 pt-3 border-t border-champagne/15 flex items-end justify-between gap-2">
+                                <div>
                                     @if ($tema->adaDiskon())
                                         <span class="block text-[11px] text-charcoal/45 line-through leading-none mb-0.5">{{ $tema->hargaAsliFormatted() }}</span>
                                     @endif
-                                    <span class="text-base sm:text-lg font-extrabold {{ $tema->adaDiskon() ? 'text-rose-600' : 'text-charcoal' }}">{{ $tema->hargaFormatted() }}</span>
-                                    <span class="text-[11px] text-charcoal/55">/ {{ $durasiAktifBulan }} bln</span>
+                                    <div class="flex items-baseline gap-1">
+                                        <span class="text-base sm:text-lg font-extrabold {{ $tema->adaDiskon() ? 'text-rose-600' : 'text-charcoal' }}">{{ $tema->hargaFormatted() }}</span>
+                                        <span class="text-[11px] text-charcoal/55">/ {{ $durasiAktifBulan }} bln</span>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-champagne">
-                                <span class="inline-block w-2 h-2 rounded-full" style="background-color: {{ $infoDesain['warna_aksen'] }}"></span>
-                                <span>{{ $infoDesain['font_label'] }}</span>
+                                <span class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-semibold {{ $infoTier['chip_class'] }}">
+                                    <span class="inline-block w-1.5 h-1.5 rounded-full" style="background-color: {{ $infoDesain['warna_aksen'] }}"></span>
+                                    <span>{{ $infoTier['ringkasan'] }}</span>
+                                </span>
                             </div>
-                            <h2 class="mt-1.5 font-serif text-xl sm:text-2xl font-bold text-charcoal">{{ $tema->nama_tema }}</h2>
-                            <p class="mt-1.5 text-xs sm:text-sm text-charcoal/65 leading-relaxed">{{ $infoDesain['deskripsi'] }}</p>
-                            <p class="mt-2 text-[11px] font-medium text-sage">{{ $infoTier['fitur_singkat'] }}</p>
                         </div>
 
-                        <div class="mt-5 grid grid-cols-2 gap-2.5">
-                            <button
-                                type="button"
-                                @click="bukaModalDemo('{{ $tema->slug }}', '{{ e($tema->nama_tema) }}', '{{ $infoTier['label'] }} • {{ $tema->hargaFormatted() }}')"
-                                class="rounded-xl border border-champagne px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold text-charcoal hover:bg-champagne/10 transition cursor-pointer"
+                        <div class="mt-5 space-y-2">
+                            <div
+                                class="relative"
+                                @click.away="if (previewTerbukaId === {{ $tema->id }}) previewTerbukaId = null"
+                                @keydown.escape.window="if (previewTerbukaId === {{ $tema->id }}) previewTerbukaId = null"
                             >
-                                Lihat Demo
-                            </button>
+                                {{-- Menu 2 Pilihan Muncul di Atas Tombol Preview --}}
+                                <div
+                                    x-show="previewTerbukaId === {{ $tema->id }}"
+                                    x-cloak
+                                    x-transition:enter="transition ease-out duration-150"
+                                    x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                                    x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                    x-transition:leave="transition ease-in duration-100"
+                                    x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                    x-transition:leave-end="opacity-0 translate-y-1 scale-95"
+                                    class="absolute bottom-full inset-x-0 mb-2 z-30 rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-champagne/45 space-y-1.5"
+                                >
+                                    <a
+                                        href="{{ route('tema.demo', ['slugTema' => $tema->slug, 'dari' => 'katalog']) }}"
+                                        class="w-full flex items-center justify-between gap-2 rounded-xl bg-ivory/80 hover:bg-sage/10 px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-charcoal hover:text-sage transition"
+                                    >
+                                        <span class="inline-flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-sage shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                                                <circle cx="9" cy="9" r="2" />
+                                                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                                            </svg>
+                                            <span>Pakai Foto</span>
+                                        </span>
+                                        <svg class="w-3.5 h-3.5 text-charcoal/45 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M5 12h14" />
+                                            <path d="m12 5 7 7-7 7" />
+                                        </svg>
+                                    </a>
+
+                                    <a
+                                        href="{{ route('tema.demo', ['slugTema' => $tema->slug, 'tf' => 1, 'dari' => 'katalog']) }}"
+                                        class="w-full flex items-center justify-between gap-2 rounded-xl bg-ivory/80 hover:bg-champagne/15 px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-charcoal hover:text-[#8A6D33] transition"
+                                    >
+                                        <span class="inline-flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-[#8A6D33] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                                                <path d="m9 12 2 2 4-4" />
+                                            </svg>
+                                            <span>Tanpa Foto</span>
+                                        </span>
+                                        <svg class="w-3.5 h-3.5 text-charcoal/45 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M5 12h14" />
+                                            <path d="m12 5 7 7-7 7" />
+                                        </svg>
+                                    </a>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    @click.stop="previewTerbukaId = (previewTerbukaId === {{ $tema->id }} ? null : {{ $tema->id }})"
+                                    :aria-expanded="(previewTerbukaId === {{ $tema->id }}).toString()"
+                                    :class="previewTerbukaId === {{ $tema->id }} ? 'border-sage bg-sage/5 text-sage' : 'border-champagne/55 bg-white text-charcoal hover:bg-champagne/10'"
+                                    class="w-full inline-flex items-center justify-between gap-2 rounded-xl border px-3.5 py-2.5 text-xs sm:text-sm font-semibold transition cursor-pointer"
+                                >
+                                    <span class="inline-flex items-center gap-1.5">
+                                        <svg class="w-4 h-4 text-sage shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                                            <circle cx="12" cy="12" r="3" />
+                                        </svg>
+                                        <span>Preview</span>
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5">
+                                        <span class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-sage text-[10px] font-bold text-white px-1.5">2</span>
+                                        <svg class="w-3.5 h-3.5 transition-transform duration-200" :class="previewTerbukaId === {{ $tema->id }} ? 'rotate-180 text-sage' : 'text-charcoal/55'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="m18 15-6-6-6 6" />
+                                        </svg>
+                                    </span>
+                                </button>
+                            </div>
 
                             <button
                                 type="button"
                                 data-pakai-tema="{{ $tema->id }}"
                                 @click="bukaModalPakai(@js($payloadTema))"
-                                class="rounded-xl bg-sage px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-sage/90 transition cursor-pointer"
+                                class="w-full rounded-xl bg-sage px-3 sm:px-4 py-2.5 text-xs sm:text-sm font-bold text-white shadow-xs hover:bg-[#3b5047] transition cursor-pointer"
                             >
                                 Pakai Tema Ini
                             </button>
@@ -292,7 +364,7 @@
         @keydown.escape.window="modalDemoTerbuka = false"
     >
         <div @click.away="modalDemoTerbuka = false" class="w-full max-w-md rounded-t-3xl sm:rounded-2xl bg-white p-5 sm:p-6 shadow-xl ring-1 ring-champagne/30 max-h-[90dvh] overflow-y-auto">
-            <h3 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Pratinjau Live Demo</h3>
+            <h3 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Pratinjau Tema</h3>
             <p class="mt-1 text-xs sm:text-sm text-charcoal/70">
                 Uji tampilan tema <span class="font-semibold text-sage" x-text="temaDemoNama"></span><span x-show="temaDemoInfo" class="ml-1 inline-block rounded-full bg-champagne/15 px-2 py-0.5 text-[11px] font-semibold text-charcoal" x-text="temaDemoInfo"></span>.
             </p>
@@ -332,7 +404,7 @@
                     Batal
                 </button>
                 <button type="button" @click="bukaUrlDemo()" class="rounded-xl bg-sage px-5 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer">
-                    Buka Live Demo
+                    Buka Preview
                 </button>
             </div>
         </div>
@@ -496,5 +568,7 @@
             </form>
         </div>
     </div>
+
+    <x-modal-lightbox-sampul :daftar-tema="$daftarTema" :mode-katalog-client="true" />
 </div>
 @endsection

@@ -110,8 +110,14 @@ class TemaMotion3DTest extends TestCase
                 ->assertSee('animasi-ayun-3d', false)
                 ->assertSee('data-panggung-3d', false)
                 ->assertSee('Buka Undangan', false)
+                ->assertSee('We Are Getting Married!', false)
+                ->assertSee('Save The Date', false)
                 ->assertSee($item['ornamen'], false)
                 ->assertSee($item['penandaGerak'], false);
+
+            if ($item['slug'] !== 'editorial-monokrom') {
+                $respon->assertSee('rounded-t-[10.5rem]', false);
+            }
 
             $konten = $respon->getContent();
             $this->assertStringNotContainsString('&amp;bull;', $konten);

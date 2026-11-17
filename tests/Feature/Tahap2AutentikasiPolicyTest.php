@@ -18,8 +18,16 @@ class Tahap2AutentikasiPolicyTest extends TestCase
 
     public function test_halaman_masuk_dan_daftar_dapat_diakses_tamu(): void
     {
-        $this->get('/masuk')->assertOk()->assertSee('Masuk');
-        $this->get('/daftar')->assertOk()->assertSee('Daftar');
+        $this->get('/masuk')
+            ->assertOk()
+            ->assertSee('Masuk')
+            ->assertSee('Selamat Datang Kembali')
+            ->assertSee('Kembali ke Beranda');
+        $this->get('/daftar')
+            ->assertOk()
+            ->assertSee('Daftar')
+            ->assertSee('Buat Akun Gratis')
+            ->assertSee('Kembali ke Beranda');
         $this->assertSame(url('/masuk'), route('login'));
     }
 
@@ -34,7 +42,10 @@ class Tahap2AutentikasiPolicyTest extends TestCase
         ]);
 
         // Kunjungi halaman daftar dengan parameter slug & tema terlebih dahulu
-        $this->get('/daftar?slug=andi-sinta&tema='.$tema->id)->assertOk();
+        $this->get('/daftar?slug=andi-sinta&tema='.$tema->id)
+            ->assertOk()
+            ->assertSee('Draft Undangan Awal Anda Siap Dibuat')
+            ->assertSee('Rustic Floral');
 
         $response = $this->post('/daftar', [
             'nama' => 'Andi Pratama',

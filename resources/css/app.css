@@ -40,6 +40,14 @@
     font-family: 'Playfair Display', Georgia, serif;
 }
 
+.font-script {
+    font-family: 'Great Vibes', 'Playfair Display', cursive;
+}
+
+.font-serif-poster {
+    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+}
+
 /* SesiTemu Admin DataTables Theme */
 div.dt-container {
     --dt-header_border: 1px solid rgba(191, 161, 95, 0.22);

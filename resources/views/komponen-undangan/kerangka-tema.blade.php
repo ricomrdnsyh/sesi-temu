@@ -17,6 +17,7 @@
     'kelasTeksSampul' => null,
     'kelasBody' => 'bg-[#FDFBF7] text-[#1F2937]',
     'kelasAksen' => 'text-[#BFA15F]',
+    'kelasAksenKartu' => null,
     'kelasSubAksen' => 'text-[#4B6358]',
     'kelasKartu' => 'bg-white/90 backdrop-blur-md border border-[#BFA15F]/35 text-[#1F2937]',
     'kelasTombol' => 'bg-[#4B6358] text-white hover:bg-[#3A4D44]',
@@ -24,6 +25,9 @@
     'kelasBatas' => 'border-[#BFA15F]/35',
     'kelasTirai' => null,
     'kelasProgres' => 'bg-gradient-to-r from-[#BFA15F] via-[#F3E5AB] to-[#BFA15F]',
+    'kelasBandCountdown' => null,
+    'kelasKotakCountdown' => null,
+    'kelasTombolCountdown' => null,
     'subjudulPanggung' => 'The Wedding Of',
     'taglineSampul' => 'Undangan Pernikahan',
     'sapaanSampul' => 'Kepada Yth. Bapak/Ibu/Saudara/i',
@@ -64,6 +68,7 @@
     $radiusKartuSedang = $sudutEditorial ? 'rounded-none' : 'rounded-2xl';
     $radiusTombol = $sudutEditorial ? 'rounded-none' : 'rounded-full';
     $ekstraKartu = $isEksklusif ? 'efek-shimmer-kartu' : '';
+    $aksenKartu = $kelasAksenKartu ?? $kelasAksen;
 
     $polaDataUri = match ($polaTekstur) {
         'batik' => "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23BFA15F' stroke-opacity='0.14' stroke-width='1'%3E%3Ccircle cx='32' cy='32' r='22'/%3E%3Ccircle cx='0' cy='0' r='22'/%3E%3Ccircle cx='64' cy='0' r='22'/%3E%3Ccircle cx='0' cy='64' r='22'/%3E%3Ccircle cx='64' cy='64' r='22'/%3E%3Ccircle cx='32' cy='32' r='4'/%3E%3C/g%3E%3C/svg%3E",
@@ -83,7 +88,7 @@
 
     $overlaySampul = $sampulGelap
         ? 'bg-gradient-to-b from-black/70 via-black/35 to-black/85'
-        : 'bg-gradient-to-b from-[#FFFDF8]/78 via-[#FFFDF8]/22 to-black/55';
+        : 'bg-gradient-to-b from-[#FFFDF8]/68 via-[#FFFDF8]/18 to-black/32';
 
     $sampulPakaiModeGelap = $pakaiFotoSampul || $sampulGelap;
     $gambarSampul = $pakaiFotoSampul ? $urlFotoSampul : $latarUtamaUrl;
@@ -463,8 +468,20 @@
                     'kelasBatas' => $kelasBatas,
                 ])
 
-                {{-- Profil Kedua Mempelai --}}
+                {{-- Profil Kedua Mempelai (Selaras Layar Kanan Sampul) --}}
                 <section data-aos="fade-up" data-aos-duration="1000" class="py-10 px-5 space-y-6">
+                    <div class="text-center space-y-2 pb-1">
+                        @if ($bismillahHeader)
+                            <p class="text-base {{ $kelasAksen }}" style="font-family: 'Amiri', serif;">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</p>
+                        @endif
+                        <h2 class="{{ $sudutEditorial ? 'font-serif text-2xl sm:text-3xl font-bold uppercase tracking-[0.18em]' : 'font-kaligrafi text-4xl sm:text-[2.75rem] leading-tight' }} {{ $kelasAksen }}">
+                            We Are Getting Married!
+                        </h2>
+                        <p class="text-xs opacity-75 max-w-sm mx-auto leading-relaxed">
+                            Dengan memohon rahmat dan ridho-Nya, kami bermaksud menyelenggarakan akad serta resepsi pernikahan putra-putri kami:
+                        </p>
+                    </div>
+
                     {{-- Mempelai Pria --}}
                     <div
                         data-aos="fade-up"
@@ -483,20 +500,21 @@
                                 <img
                                     src="{{ $undangan->urlFotoPria() }}"
                                     alt="{{ $undangan->nama_lengkap_pria }}"
-                                    class="{{ $sudutEditorial ? '' : 'mx-auto' }} object-cover ring-4 {{ $kelasBatas }} {{ $bingkaiFoto === 'katedral' ? 'w-36 h-44 rounded-t-full rounded-b-2xl' : ($bingkaiFoto === 'kotak-editorial' ? 'w-44 h-52 grayscale hover:grayscale-0 transition duration-700' : 'w-36 h-36 rounded-full') }}"
+                                    class="{{ $sudutEditorial ? '' : 'mx-auto' }} object-cover object-top ring-4 {{ $kelasBatas }} {{ $bingkaiFoto === 'katedral' ? 'w-36 h-48 rounded-t-full rounded-b-3xl' : ($bingkaiFoto === 'kotak-editorial' ? 'w-44 h-56 grayscale hover:grayscale-0 transition duration-700' : 'w-36 h-48 rounded-full') }}"
                                 >
                             </div>
                         @else
-                            <div class="{{ $sudutEditorial ? '' : 'mx-auto' }} relative flex items-center justify-center border-2 {{ $kelasBatas }} {{ $bingkaiFoto === 'katedral' ? 'w-28 h-32 rounded-t-full rounded-b-2xl' : ($bingkaiFoto === 'kotak-editorial' ? 'w-28 h-32' : 'w-28 h-28 rounded-full') }} {{ $gelap ? 'bg-black/35' : 'bg-white/60' }}">
+                            <div class="{{ $sudutEditorial ? '' : 'mx-auto' }} relative flex items-center justify-center border-2 {{ $kelasBatas }} {{ $bingkaiFoto === 'katedral' ? 'w-28 h-36 rounded-t-full rounded-b-3xl' : ($bingkaiFoto === 'kotak-editorial' ? 'w-28 h-36 rounded-none' : 'w-28 h-36 rounded-full') }} {{ $gelap ? 'bg-black/35' : 'bg-white/60' }}">
                                 @if ($isEksklusif)
                                     <span aria-hidden="true" class="pointer-events-none absolute -inset-2 {{ $haloMempelaiClass }}"></span>
                                 @endif
-                                <span class="font-serif text-4xl font-bold {{ $kelasAksen }}">{{ $undangan->inisialPria() }}</span>
+                                <span class="font-serif text-4xl font-bold {{ $aksenKartu }}">{{ $undangan->inisialPria() }}</span>
                             </div>
                         @endif
 
-                        <p class="mt-4 text-[10px] font-semibold uppercase tracking-[0.3em] {{ $kelasAksen }}">Mempelai Pria</p>
-                        <h3 class="mt-1 font-serif text-2xl sm:text-3xl font-bold">{{ $undangan->nama_lengkap_pria }}</h3>
+                        <p class="mt-4 text-[10px] font-semibold uppercase tracking-[0.3em] {{ $aksenKartu }}">Mempelai Pria</p>
+                        <p class="{{ $sudutEditorial ? 'mt-2 font-serif text-xl font-semibold tracking-wide' : 'mt-1.5 font-kaligrafi text-3xl sm:text-4xl leading-none' }} {{ $aksenKartu }}">{{ $undangan->nama_panggilan_pria }}</p>
+                        <h3 class="mt-1 font-serif text-xl sm:text-2xl font-bold">{{ $undangan->nama_lengkap_pria }}</h3>
                         @if ($undangan->nama_ayah_pria || $undangan->nama_ibu_pria)
                             <p class="mt-1.5 text-xs opacity-75">{{ $labelPutra }} {{ $undangan->nama_ayah_pria }} &amp; {{ $undangan->nama_ibu_pria }}</p>
                         @endif
@@ -524,36 +542,41 @@
                                 <img
                                     src="{{ $undangan->urlFotoWanita() }}"
                                     alt="{{ $undangan->nama_lengkap_wanita }}"
-                                    class="{{ $sudutEditorial ? 'ml-auto' : 'mx-auto' }} object-cover ring-4 {{ $kelasBatas }} {{ $bingkaiFoto === 'katedral' ? 'w-36 h-44 rounded-t-full rounded-b-2xl' : ($bingkaiFoto === 'kotak-editorial' ? 'w-44 h-52 grayscale hover:grayscale-0 transition duration-700' : 'w-36 h-36 rounded-full') }}"
+                                    class="{{ $sudutEditorial ? 'ml-auto' : 'mx-auto' }} object-cover object-top ring-4 {{ $kelasBatas }} {{ $bingkaiFoto === 'katedral' ? 'w-36 h-48 rounded-t-full rounded-b-3xl' : ($bingkaiFoto === 'kotak-editorial' ? 'w-44 h-56 grayscale hover:grayscale-0 transition duration-700' : 'w-36 h-48 rounded-full') }}"
                                 >
                             </div>
                         @else
-                            <div class="{{ $sudutEditorial ? 'ml-auto' : 'mx-auto' }} relative flex items-center justify-center border-2 {{ $kelasBatas }} {{ $bingkaiFoto === 'katedral' ? 'w-28 h-32 rounded-t-full rounded-b-2xl' : ($bingkaiFoto === 'kotak-editorial' ? 'w-28 h-32' : 'w-28 h-28 rounded-full') }} {{ $gelap ? 'bg-black/35' : 'bg-white/60' }}">
+                            <div class="{{ $sudutEditorial ? 'ml-auto' : 'mx-auto' }} relative flex items-center justify-center border-2 {{ $kelasBatas }} {{ $bingkaiFoto === 'katedral' ? 'w-28 h-36 rounded-t-full rounded-b-3xl' : ($bingkaiFoto === 'kotak-editorial' ? 'w-28 h-36 rounded-none' : 'w-28 h-36 rounded-full') }} {{ $gelap ? 'bg-black/35' : 'bg-white/60' }}">
                                 @if ($isEksklusif)
                                     <span aria-hidden="true" class="pointer-events-none absolute -inset-2 {{ $haloMempelaiClass }}"></span>
                                 @endif
-                                <span class="font-serif text-4xl font-bold {{ $kelasAksen }}">{{ $undangan->inisialWanita() }}</span>
+                                <span class="font-serif text-4xl font-bold {{ $aksenKartu }}">{{ $undangan->inisialWanita() }}</span>
                             </div>
                         @endif
 
-                        <p class="mt-4 text-[10px] font-semibold uppercase tracking-[0.3em] {{ $kelasAksen }}">Mempelai Wanita</p>
-                        <h3 class="mt-1 font-serif text-2xl sm:text-3xl font-bold">{{ $undangan->nama_lengkap_wanita }}</h3>
+                        <p class="mt-4 text-[10px] font-semibold uppercase tracking-[0.3em] {{ $aksenKartu }}">Mempelai Wanita</p>
+                        <p class="{{ $sudutEditorial ? 'mt-2 font-serif text-xl font-semibold tracking-wide' : 'mt-1.5 font-kaligrafi text-3xl sm:text-4xl leading-none' }} {{ $aksenKartu }}">{{ $undangan->nama_panggilan_wanita }}</p>
+                        <h3 class="mt-1 font-serif text-xl sm:text-2xl font-bold">{{ $undangan->nama_lengkap_wanita }}</h3>
                         @if ($undangan->nama_ayah_wanita || $undangan->nama_ibu_wanita)
                             <p class="mt-1.5 text-xs opacity-75">{{ $labelPutri }} {{ $undangan->nama_ayah_wanita }} &amp; {{ $undangan->nama_ibu_wanita }}</p>
                         @endif
                     </div>
                 </section>
 
-                {{-- Hitung Mundur & Google Calendar --}}
+                {{-- Hitung Mundur & Google Calendar (Selaras Layar Kiri Sampul) --}}
                 @include('komponen-undangan.hitung-mundur', [
                     'kelasAksen' => $kelasAksen,
+                    'kelasAksenKartu' => $aksenKartu,
                     'kelasKartu' => $kelasKartu,
                     'kelasTombol' => $kelasTombol,
+                    'kelasBandCountdown' => $kelasBandCountdown,
+                    'kelasKotakCountdown' => $kelasKotakCountdown,
+                    'kelasTombolCountdown' => $kelasTombolCountdown,
                     'sudutEditorial' => $sudutEditorial,
                     'kelasEkstraKartu' => $ekstraKartu,
                 ])
 
-                {{-- Rangkaian Acara --}}
+                {{-- Rangkaian Acara (Kartu Arch Kubah Selaras Layar Kiri Sampul) --}}
                 @if ($undangan->daftarAcara->isNotEmpty())
                 <section data-aos="fade-up" data-aos-duration="1000" class="py-10 px-5">
                     <div class="text-center mb-6">
@@ -563,15 +586,15 @@
 
                     <div class="space-y-5">
                         @foreach ($undangan->daftarAcara as $acara)
-                            <div data-aos="zoom-in" data-aos-duration="1000" class="{{ $radiusKartuBesar }} p-6 text-center space-y-2.5 kartu-3d masuk-3d {{ $ekstraKartu }} {{ $kelasKartu }}">
-                                <h3 class="font-serif text-2xl font-bold {{ $kelasAksen }}">{{ $acara->nama_acara }}</h3>
-                                <p class="text-sm font-semibold">{{ $acara->tanggal_acara->translatedFormat('l, d F Y') }}</p>
-                                <p class="text-xs font-semibold {{ $kelasAksen }}">
+                            <div data-aos="zoom-in" data-aos-duration="1000" class="{{ $sudutEditorial ? 'rounded-none p-7' : 'rounded-t-[10.5rem] rounded-b-3xl pt-12 pb-8 px-6' }} text-center space-y-2.5 kartu-3d masuk-3d {{ $ekstraKartu }} {{ $kelasKartu }}">
+                                <h3 class="{{ $sudutEditorial ? 'font-serif text-2xl font-bold uppercase tracking-wider' : 'font-kaligrafi text-3xl sm:text-4xl font-normal leading-tight' }} {{ $aksenKartu }}">{{ $acara->nama_acara }}</h3>
+                                <p class="text-sm font-bold uppercase tracking-wide">{{ $acara->tanggal_acara->translatedFormat('l, d F Y') }}</p>
+                                <p class="text-xs font-semibold {{ $aksenKartu }}">
                                     {{ substr($acara->waktu_mulai, 0, 5) }}
                                     @if ($acara->waktu_selesai) - {{ substr($acara->waktu_selesai, 0, 5) }} @endif
                                     {{ $acara->zona_waktu }}
                                 </p>
-                                <div class="pt-2 border-t {{ $kelasBatas }}">
+                                <div class="pt-2.5 border-t {{ $kelasBatas }}">
                                     <p class="font-semibold text-sm">{{ $acara->nama_tempat }}</p>
                                     <p class="text-xs opacity-75 mt-1">{{ $acara->alamat_lengkap }}</p>
                                 </div>
@@ -670,6 +693,7 @@
                 {{-- Live Streaming, Amplop Digital & Buku Tamu --}}
                 @include('komponen-undangan.amplop-dan-tamu', [
                     'kelasAksen' => $kelasAksen,
+                    'kelasAksenKartu' => $aksenKartu,
                     'kelasKartu' => $kelasKartu,
                     'kelasTombol' => $kelasTombol,
                     'sudutEditorial' => $sudutEditorial,

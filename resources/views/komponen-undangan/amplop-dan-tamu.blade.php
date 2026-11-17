@@ -8,13 +8,14 @@
     $kelasRadiusKecil = $sudutTajam ? 'rounded-none' : 'rounded-xl';
     $kelasRadiusPill = $sudutTajam ? 'rounded-none' : 'rounded-full';
     $ekstraKartu = $kelasEkstraKartu ?? '';
+    $aksenKartu = $kelasAksenKartu ?? ($kelasAksen ?? 'text-champagne');
 @endphp
 
 {{-- Live Streaming --}}
 @if (!empty($live['aktif']) && !empty($live['link']))
 <section data-aos="fade-up" data-aos-duration="1000" class="py-12 px-4">
     <div class="max-w-2xl mx-auto {{ $kelasRadiusBesar }} p-7 text-center kartu-3d masuk-3d {{ $ekstraKartu }} {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
-        <p class="text-xs font-semibold uppercase tracking-[0.25em] {{ $kelasAksen ?? 'text-champagne' }}">Siaran Langsung</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.25em] {{ $aksenKartu }}">Siaran Langsung</p>
         <h2 class="mt-2 font-serif text-3xl font-bold">Live Streaming ({{ $live['platform'] ?? 'Online' }})</h2>
         <p class="mt-2 text-sm opacity-75">Bagi kerabat yang berhalangan hadir langsung, silakan menyaksikan momen sakral kami secara virtual.</p>
         <a href="{{ $live['link'] }}" target="_blank" rel="noopener" class="mt-5 inline-flex items-center gap-2 {{ $kelasRadiusPill }} px-6 py-2.5 text-sm font-semibold transition {{ $kelasTombol ?? 'bg-sage text-white hover:bg-sage/90' }}">
@@ -39,7 +40,7 @@
                     class="{{ $kelasRadiusSedang }} p-5 kartu-3d masuk-3d flex flex-col justify-between gap-4 {{ $ekstraKartu }} {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}"
                 >
                     <div>
-                        <p class="text-xs font-bold uppercase tracking-wider {{ $kelasAksen ?? 'text-champagne' }}">{{ $amplop->nama_bank }}</p>
+                        <p class="text-xs font-bold uppercase tracking-wider {{ $aksenKartu }}">{{ $amplop->nama_bank }}</p>
                         <p class="mt-1 font-mono text-xl font-bold">{{ $amplop->nomor_rekening }}</p>
                         <p class="mt-0.5 text-xs opacity-75">a.n. {{ $amplop->atas_nama }}</p>
                     </div>
@@ -57,7 +58,7 @@
 
         @if ($alamatKado !== '')
             <div class="mt-6 {{ $kelasRadiusSedang }} p-5 text-center kartu-3d masuk-3d {{ $ekstraKartu }} {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
-                <p class="text-xs font-bold uppercase tracking-wider {{ $kelasAksen ?? 'text-champagne' }}">Alamat Pengiriman Kado Fisik</p>
+                <p class="text-xs font-bold uppercase tracking-wider {{ $aksenKartu }}">Alamat Pengiriman Kado Fisik</p>
                 <p class="mt-1.5 text-sm opacity-85">{{ $alamatKado }}</p>
             </div>
         @endif

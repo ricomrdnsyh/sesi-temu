@@ -3,9 +3,13 @@
     $isoTarget = null;
     $googleCalUrl = null;
     $sudutTajam = !empty($sudutEditorial);
+    $kelasRadiusBand = $sudutTajam ? 'rounded-none' : 'rounded-3xl';
     $kelasRadiusBox = $sudutTajam ? 'rounded-none' : 'rounded-2xl';
     $kelasRadiusTombol = $sudutTajam ? 'rounded-none' : 'rounded-full';
     $ekstraKartu = $kelasEkstraKartu ?? '';
+    $bandCountdown = $kelasBandCountdown ?? 'bg-[#4B6358] text-white';
+    $kotakCountdown = $kelasKotakCountdown ?? 'bg-white/95 text-[#1F2937] shadow-sm';
+    $tombolCountdown = $kelasTombolCountdown ?? 'bg-white text-[#1F2937] hover:bg-ivory shadow-sm';
 
     if ($acaraPertama) {
         $offset = match ($acaraPertama->zona_waktu) {
@@ -64,35 +68,42 @@
             setInterval(() => this.perbarui(), 1000);
         }
     }"
-    class="py-12 px-4 text-center"
+    class="py-10 px-5 text-center"
 >
-    <p class="text-xs font-semibold uppercase tracking-[0.25em] {{ $kelasAksen ?? 'text-champagne' }}">Menuju Hari Bahagia</p>
-    <h2 class="mt-2 font-serif text-3xl sm:text-4xl font-bold">Hitung Mundur Acara</h2>
+    <div class="max-w-md mx-auto {{ $kelasRadiusBand }} p-6 sm:p-8 shadow-xl relative overflow-hidden kartu-3d masuk-3d {{ $ekstraKartu }} {{ $bandCountdown }}">
+        <svg class="w-8 h-8 mx-auto mb-2 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+            <path d="M12 21c-3.5-2.8-6-5.7-6-9a6 6 0 0 1 12 0c0 3.3-2.5 6.2-6 9Z" />
+            <path d="M12 10.5c1.6-2 4-2.5 5.5-1.5M12 10.5c-1.6-2-4-2.5-5.5-1.5" />
+        </svg>
 
-    <div class="mt-7 max-w-md mx-auto grid grid-cols-4 gap-2 sm:gap-3 panggung-3d">
-        @foreach (['hari' => 'Hari', 'jam' => 'Jam', 'menit' => 'Menit', 'detik' => 'Detik'] as $var => $label)
-            <div class="{{ $kelasRadiusBox }} p-3 sm:p-4 kartu-3d masuk-3d {{ $ekstraKartu }} {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
-                <div
-                    class="font-serif text-2xl sm:text-3xl font-bold"
-                    x-text="{{ $var }}"
-                    x-effect="if ({{ $var }}) { $el.classList.remove('angka-flip-3d'); void $el.offsetWidth; $el.classList.add('angka-flip-3d'); }"
-                >00</div>
-                <div class="mt-1 text-[10px] uppercase tracking-widest opacity-70">{{ $label }}</div>
-            </div>
-        @endforeach
-    </div>
+        <p class="text-[11px] font-semibold uppercase tracking-[0.28em] opacity-80">Menuju Hari Bahagia</p>
+        <h2 class="{{ $sudutTajam ? 'mt-2 font-serif text-3xl font-bold uppercase tracking-[0.14em]' : 'mt-1.5 font-kaligrafi text-4xl sm:text-5xl font-normal leading-tight' }}">Save The Date</h2>
 
-    @if ($googleCalUrl)
-        <div class="mt-7">
-            <a
-                href="{{ $googleCalUrl }}"
-                target="_blank"
-                rel="noopener"
-                class="inline-flex items-center gap-2 {{ $kelasRadiusTombol }} px-6 py-3 text-sm font-semibold shadow-sm transition {{ $kelasTombol ?? 'bg-sage text-white hover:bg-sage/90' }}"
-            >
-                <span>Simpan ke Kalender</span>
-            </a>
+        <div class="mt-6 grid grid-cols-4 gap-2 sm:gap-2.5 panggung-3d">
+            @foreach (['hari' => 'Hari', 'jam' => 'Jam', 'menit' => 'Menit', 'detik' => 'Detik'] as $var => $label)
+                <div class="{{ $kelasRadiusBox }} p-2.5 sm:p-3.5 {{ $kotakCountdown }}">
+                    <div
+                        class="font-serif text-xl sm:text-2xl font-bold leading-none"
+                        x-text="{{ $var }}"
+                        x-effect="if ({{ $var }}) { $el.classList.remove('angka-flip-3d'); void $el.offsetWidth; $el.classList.add('angka-flip-3d'); }"
+                    >00</div>
+                    <div class="mt-1.5 text-[10px] uppercase tracking-wider opacity-75">{{ $label }}</div>
+                </div>
+            @endforeach
         </div>
-    @endif
+
+        @if ($googleCalUrl)
+            <div class="mt-6">
+                <a
+                    href="{{ $googleCalUrl }}"
+                    target="_blank"
+                    rel="noopener"
+                    class="inline-flex items-center gap-2 {{ $kelasRadiusTombol }} px-6 py-2.5 text-xs sm:text-sm font-semibold transition {{ $tombolCountdown }}"
+                >
+                    <span>Simpan ke Kalender</span>
+                </a>
+            </div>
+        @endif
+    </div>
 </section>
 @endif

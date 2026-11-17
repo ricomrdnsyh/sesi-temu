@@ -87,7 +87,7 @@ class PanelAdminEkspansiTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('6281122334455')
-            ->assertSee('Aktif 6 Bulan Penuh')
+            ->assertSee('masa aktif 6 bulan penuh')
             ->assertSee('/ 6 bln')
             ->assertSee('/ 6 bulan aktif')
             ->assertSee('Rp 75.000');
@@ -762,6 +762,8 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSee('data-client-bottom-nav', false)
             ->assertSee('data-client-nav="katalog"', false)
             ->assertSee($temaPilihan->nama_tema)
+            ->assertSee('Lihat Sampul')
+            ->assertSee('Pratinjau sampul tema')
             ->assertSee('Pakai Tema Ini');
 
         // Saat client membuka demo dari katalog, bar demo kembali ke /dasbor/katalog dan lanjut pakai tema ke /dasbor/katalog?pakai=...
