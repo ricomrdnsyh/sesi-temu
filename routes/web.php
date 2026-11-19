@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HalamanUtamaController::class, 'beranda'])->name('beranda');
 Route::post('/cek-link', [HalamanUtamaController::class, 'cekLink'])->name('cek.link');
 Route::get('/demo/{slugTema}', [HalamanUtamaController::class, 'demoTema'])->name('tema.demo');
+Route::get('/kebijakan-privasi', [HalamanUtamaController::class, 'kebijakanPrivasi'])->name('halaman.kebijakan-privasi');
+Route::get('/syarat-ketentuan', [HalamanUtamaController::class, 'syaratKetentuan'])->name('halaman.syarat-ketentuan');
 
 // 2. Autentikasi Pengguna (Tanpa Breeze)
 Route::middleware('guest')->group(function (): void {

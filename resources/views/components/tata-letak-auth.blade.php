@@ -108,16 +108,13 @@
                     {{-- Aksen Garis Champagne di Tepi Atas Kartu --}}
                     <div aria-hidden="true" class="pointer-events-none absolute inset-x-14 top-0 h-[2px] bg-gradient-to-r from-transparent via-champagne/80 to-transparent"></div>
 
-                    {{-- Logo + Tajuk Halaman Terpisah --}}
-                    <div class="text-center">
-                        <a href="{{ route('beranda') }}" class="inline-flex flex-col items-center justify-center group">
-                            <img
-                                src="{{ asset('aset-demo/logo-sesi-temu-lengkap.webp') }}"
-                                alt="Logo SesiTemu"
-                                class="h-14 sm:h-16 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.03]"
-                            >
-                            <span class="sr-only">SesiTemu</span>
-                        </a>
+                {{-- Logo + Tajuk Halaman Terpisah --}}
+                <div class="text-center">
+                    <a href="{{ route('beranda') }}" class="inline-flex flex-col items-center justify-center group">
+                        <img src="{{ asset('logo/logo-vertikal.webp') }}" alt="Logo SesiTemu"
+                            class="h-16 sm:h-20 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.03]">
+                        <span class="sr-only">SesiTemu</span>
+                    </a>
 
                         <div class="mt-4 flex items-center justify-center gap-2.5">
                             <span class="h-px w-7 bg-champagne/45" aria-hidden="true"></span>

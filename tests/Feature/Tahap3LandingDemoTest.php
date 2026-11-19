@@ -65,8 +65,9 @@ class Tahap3LandingDemoTest extends TestCase
             ->assertSee('data-landing-bottom-nav', false)
             ->assertSee('md:hidden fixed bottom-0', false)
             ->assertSee('Lihat Katalog Tema')
-            ->assertSee('Mengapa Memilih')
-            ->assertSee('SesiTemu?')
+            ->assertSeeText('Mengapa Memilih SesiTemu?')
+            ->assertSee('text-[#223F2E]', false)
+            ->assertSee('text-[#C29940]', false)
             ->assertSee('Rustic Floral')
             ->assertSee('Adat Jawa Keraton')
             ->assertSee('Islami Syari')
@@ -76,9 +77,12 @@ class Tahap3LandingDemoTest extends TestCase
             ->assertSee('Save The Date')
             ->assertSee('The Wedding Of')
             ->assertDontSee('Tema Nonaktif')
-            ->assertSee('Paket Mandiri')
-            ->assertSee('Paket Terima Beres')
-            ->assertSee('Pertanyaan Seputar Undangan Digital')
+            ->assertSee('font-logo text-3xl sm:text-4xl font-bold text-charcoal tracking-tight">Pilih Paket Sesuai Kebutuhan', false)
+            ->assertSee('font-logo text-2xl sm:text-3xl font-bold text-charcoal tracking-tight">Paket Mandiri</h3>', false)
+            ->assertSee('font-logo text-2xl sm:text-3xl font-bold text-white tracking-tight">Paket Terima Beres</h3>', false)
+            ->assertSee('font-logo text-2xl sm:text-4xl font-bold text-charcoal tracking-tight">Pertanyaan Seputar Undangan Digital</h2>', false)
+            ->assertSee('font-logo text-2xl font-bold text-charcoal tracking-tight">Pratinjau Tema</h3>', false)
+            ->assertSee('font-sans tabular-nums text-3xl sm:text-4xl font-bold tracking-tight text-charcoal', false)
             ->assertSee('Inspirasi Tema')
             ->assertSee('Siapkan Undangan Anda');
 
@@ -158,5 +162,35 @@ class Tahap3LandingDemoTest extends TestCase
         $this->get('/demo/velvet-garden')->assertOk()->assertSee('animasi-melayang');
         $this->get('/demo/sunda-heritage')->assertOk()->assertSee('Sampurasun');
         $this->get('/demo/islamic-heavenly')->assertOk()->assertSee('animasi-bintang');
+    }
+
+    public function test_footer_beranda_menampilkan_tautan_kebijakan_privasi_dan_syarat_ketentuan(): void
+    {
+        $this->buatTemaBawaan();
+
+        $respon = $this->get('/')
+            ->assertOk()
+            ->assertDontSee('Abadikan Setiap Sesi Bahagia Menuju Hari Pertemuan')
+            ->assertDontSee('Akses Cepat')
+            ->assertSee('Kebijakan Privasi')
+            ->assertSee('Syarat &amp; Ketentuan', false)
+            ->assertSee(route('halaman.kebijakan-privasi'), false)
+            ->assertSee(route('halaman.syarat-ketentuan'), false);
+
+        $this->assertSame(1, preg_match('/<footer\b.*?<\/footer>/s', $respon->getContent(), $cocokFooter));
+        $this->assertStringNotContainsString('Jelajahi', $cocokFooter[0]);
+        $this->assertStringNotContainsString('Konsultasi Admin', $cocokFooter[0]);
+        $this->assertStringNotContainsString('Pratinjau Gratis', $cocokFooter[0]);
+        $this->assertStringNotContainsString('Masa Aktif', $cocokFooter[0]);
+
+        $this->get('/kebijakan-privasi')
+            ->assertOk()
+            ->assertSee('Kebijakan Privasi')
+            ->assertSee('Data yang Kami Kumpulkan');
+
+        $this->get('/syarat-ketentuan')
+            ->assertOk()
+            ->assertSee('Syarat &amp; Ketentuan', false)
+            ->assertSee('Masa Aktif');
     }
 }

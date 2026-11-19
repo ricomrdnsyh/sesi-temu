@@ -7,9 +7,9 @@
     <div class="max-w-lg w-full rounded-2xl bg-white p-8 sm:p-10 text-center shadow-sm ring-1 ring-champagne/25 space-y-5">
         <a href="{{ route('beranda') }}" class="inline-block">
             <img
-                src="{{ asset('aset-demo/logo-sesi-temu-lengkap.webp') }}"
+                src="{{ asset('logo/logo-vertikal.webp') }}"
                 alt="Logo SesiTemu"
-                class="h-20 w-auto mx-auto object-contain"
+                class="h-24 w-auto mx-auto object-contain"
             >
         </a>
         <div>

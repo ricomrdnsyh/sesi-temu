@@ -104,6 +104,96 @@ class HalamanUtamaController extends Controller
         ]);
     }
 
+    public function kebijakanPrivasi(): View
+    {
+        $durasiBulan = PengaturanSesiTemu::masaAktifBulan();
+
+        return view('halaman-legal', [
+            'halamanAktif' => 'privasi',
+            'judulTab' => 'Kebijakan Privasi — SesiTemu',
+            'labelBadge' => 'Perlindungan Data',
+            'judul' => 'Kebijakan Privasi',
+            'subjudul' => 'Komitmen SesiTemu dalam menjaga kerahasiaan data akun, informasi mempelai, media undangan, dan ucapan tamu Anda.',
+            'urlWaAdmin' => PengaturanSesiTemu::urlWaAdmin('Halo Admin SesiTemu, saya ingin menanyakan mengenai Kebijakan Privasi.'),
+            'pasal' => [
+                [
+                    'judul' => '1. Data yang Kami Kumpulkan',
+                    'isi' => [
+                        'Saat Anda mendaftar dan menyusun undangan di SesiTemu, kami mengumpulkan data akun (nama lengkap, alamat email, nomor WhatsApp, dan kata sandi terenkripsi) serta konten undangan yang Anda masukkan secara sukarela seperti nama mempelai, nama orang tua, jadwal dan lokasi acara, cerita cinta, nomor rekening amplop digital, alamat pengiriman kado, serta foto galeri.',
+                        'Ketika tamu mengisi formulir Buku Tamu & RSVP pada undangan aktif, sistem menyimpan nama tamu, status kehadiran, jumlah tamu, serta pesan doa restu untuk ditampilkan pada undangan dan dasbor pemilik undangan.',
+                    ],
+                ],
+                [
+                    'judul' => '2. Penggunaan Informasi',
+                    'isi' => [
+                        'Data Anda digunakan semata-mata untuk menampilkan halaman undangan digital pada link pilihan Anda, menyediakan dasbor pengelolaan undangan, memproses verifikasi pembayaran aktivasi, serta memberikan dukungan layanan melalui WhatsApp Admin.',
+                        'Kami tidak pernah menjual, menyewakan, atau membagikan data pribadi Anda kepada pihak ketiga untuk keperluan pemasaran di luar layanan SesiTemu.',
+                    ],
+                ],
+                [
+                    'judul' => '3. Privasi Foto & Mode Tanpa Foto (TF)',
+                    'isi' => [
+                        'Seluruh foto yang diunggah dioptimalkan otomatis ke format WebP agar ringan diakses tamu. Anda memegang kendali penuh atas foto yang ingin ditampilkan atau dihapus kapan saja melalui dasbor.',
+                        'Bagi pasangan yang mengutamakan privasi atau konsep syar\'i, SesiTemu menyediakan Mode Tanpa Foto (TF / Monogram) yang menyembunyikan foto sampul, potret mempelai, dan galeri dari tampilan publik undangan.',
+                    ],
+                ],
+                [
+                    'judul' => '4. Masa Penyimpanan & Hak Pengguna',
+                    'isi' => [
+                        "Undangan yang telah diaktifkan dapat diakses publik selama masa aktif {$durasiBulan} bulan penuh sejak tanggal verifikasi. Setelah masa aktif berakhir, tautan publik tidak lagi ditampilkan kepada tamu.",
+                        'Anda berhak memperbarui data profil, menghapus ucapan tamu tertentu, mengubah isi undangan, atau menghubungi Admin SesiTemu melalui WhatsApp apabila ingin mengajukan penghapusan akun beserta seluruh berkas undangan secara permanen.',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function syaratKetentuan(): View
+    {
+        $durasiBulan = PengaturanSesiTemu::masaAktifBulan();
+        $biayaTerimaBeres = Tema::formatRupiah(PengaturanSesiTemu::biayaTerimaBeres());
+
+        return view('halaman-legal', [
+            'halamanAktif' => 'syarat',
+            'judulTab' => 'Syarat & Ketentuan — SesiTemu',
+            'labelBadge' => 'Ketentuan Layanan',
+            'judul' => 'Syarat & Ketentuan',
+            'subjudul' => 'Ketentuan penggunaan platform, paket aktivasi, masa aktif undangan, dan tanggung jawab konten di SesiTemu.',
+            'urlWaAdmin' => PengaturanSesiTemu::urlWaAdmin('Halo Admin SesiTemu, saya ingin menanyakan mengenai Syarat & Ketentuan layanan.'),
+            'pasal' => [
+                [
+                    'judul' => '1. Pendaftaran Akun & Draft Gratis',
+                    'isi' => [
+                        'Pengguna dapat membuat akun, mengecek ketersediaan link pasangan, mengisi data undangan, dan melihat pratinjau desain secara gratis sebelum melakukan pembayaran aktivasi.',
+                        'Anda bertanggung jawab menjaga kerahasiaan email dan kata sandi akun Anda serta memastikan seluruh informasi yang didaftarkan adalah benar dan sah.',
+                    ],
+                ],
+                [
+                    'judul' => '2. Pilihan Paket, Pembayaran & Aktivasi',
+                    'isi' => [
+                        "SesiTemu menyediakan Paket Mandiri (harga mengikuti tema Basic, Premium, atau Eksklusif yang dipilih) serta Paket Terima Beres (harga tema ditambah jasa input penuh Admin sebesar {$biayaTerimaBeres}).",
+                        'Aktivasi undangan diproses setelah bukti transfer pembayaran diverifikasi oleh Admin. Kode promo atau diskon tema yang berlaku akan dihitung otomatis pada halaman aktivasi sebelum pembayaran dilakukan.',
+                        'Pembayaran untuk undangan yang sudah diverifikasi dan aktif bersifat final (tidak dapat dikembalikan), kecuali terjadi kendala teknis permanen dari sisi platform yang tidak dapat diselesaikan.',
+                    ],
+                ],
+                [
+                    'judul' => '3. Masa Aktif & Perubahan Tema',
+                    'isi' => [
+                        "Setiap undangan yang telah diverifikasi memiliki masa aktif selama {$durasiBulan} bulan penuh sejak aktivasi, lengkap dengan akses editor untuk revisi teks, jadwal acara, galeri foto, dan pengelolaan daftar tamu tanpa batas.",
+                        'Anda bebas berganti ke tema lain yang setara maupun melakukan peningkatan tier kapan saja melalui Dasbor Client tanpa kehilangan data undangan yang sudah diisi.',
+                    ],
+                ],
+                [
+                    'judul' => '4. Ketentuan Konten & Penggunaan Wajar',
+                    'isi' => [
+                        'Pengguna bertanggung jawab penuh atas legalitas, keakuratan, dan kepatutan seluruh teks, foto, tautan peta, nomor rekening, dan media yang diunggah pada halaman undangan.',
+                        'SesiTemu berhak menonaktifkan undangan apabila ditemukan penyalahgunaan layanan, konten yang melanggar hukum, atau aktivitas yang mengganggu stabilitas sistem.',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
     private function buatUndanganDemoInMemory(
         Tema $tema,
         bool $tanpaFoto = false,

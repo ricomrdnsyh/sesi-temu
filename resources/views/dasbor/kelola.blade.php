@@ -128,7 +128,7 @@
                 </a>
                 <a href="{{ route('beranda') }}" title="Beranda SesiTemu" class="hidden sm:inline-flex items-center shrink-0">
                     <img
-                        src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}"
+                        src="{{ asset('logo/logo-ikon.webp') }}"
                         alt="Logo SesiTemu"
                         class="h-8 w-8 object-contain"
                     >

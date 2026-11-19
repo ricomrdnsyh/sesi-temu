@@ -48,10 +48,10 @@
                             </p>
                             <div class="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-white/80">
                                 @if ($temaLightbox->adaDiskon())
-                                    <span class="line-through text-white/50">{{ $temaLightbox->hargaAsliFormatted() }}</span>
-                                    <span class="font-bold text-rose-300">{{ $temaLightbox->hargaFormatted() }}</span>
+                                    <span class="font-sans tabular-nums line-through text-white/50">{{ $temaLightbox->hargaAsliFormatted() }}</span>
+                                    <span class="font-sans tabular-nums font-bold text-rose-300">{{ $temaLightbox->hargaFormatted() }}</span>
                                 @else
-                                    <span class="font-bold text-champagne">{{ $temaLightbox->hargaFormatted() }}</span>
+                                    <span class="font-sans tabular-nums font-bold text-champagne">{{ $temaLightbox->hargaFormatted() }}</span>
                                 @endif
                                 <span class="text-white/40">&bull;</span>
                                 <span>{{ $temaLightbox->tierLabel() }}</span>

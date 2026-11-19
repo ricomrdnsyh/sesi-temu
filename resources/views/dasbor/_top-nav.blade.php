@@ -8,15 +8,26 @@
 <header class="bg-white/95 backdrop-blur-md border-b border-champagne/20 sticky top-0 z-30">
     <div class="{{ $lebarKontainer }} mx-auto px-4 sm:px-6 lg:px-8 h-14 md:h-16 flex items-center justify-between gap-3">
         <div class="flex items-center gap-3 md:gap-6 min-w-0">
-            <a href="{{ route('beranda') }}" class="flex items-center gap-2 text-charcoal shrink-0 group">
-                <img
-                    src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}"
-                    alt="Logo SesiTemu"
-                    class="h-8 w-8 md:h-9 md:w-9 object-contain transition-transform duration-200 group-hover:scale-105"
-                >
-                <span class="{{ $judulMobile ? 'hidden sm:inline' : '' }} font-logo text-[22px] md:text-[26px] font-bold tracking-tight text-[#1D3B2C] leading-none">
-                    Sesi<span class="text-champagne">Temu</span>
-                </span>
+            <a href="{{ route('beranda') }}" class="flex items-center text-charcoal shrink-0 group">
+                @if ($judulMobile)
+                    <img
+                        src="{{ asset('logo/logo-ikon.webp') }}"
+                        alt="Logo SesiTemu"
+                        class="sm:hidden h-8 w-8 object-contain transition-transform duration-200 group-hover:scale-105"
+                    >
+                    <img
+                        src="{{ asset('logo/logo-horizontal.webp') }}"
+                        alt="Logo SesiTemu"
+                        class="hidden sm:block h-9 md:h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.03]"
+                    >
+                @else
+                    <img
+                        src="{{ asset('logo/logo-horizontal.webp') }}"
+                        alt="Logo SesiTemu"
+                        class="h-8 sm:h-9 md:h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.03]"
+                    >
+                @endif
+                <span class="sr-only">SesiTemu</span>
             </a>
 
             @if ($judulMobile)

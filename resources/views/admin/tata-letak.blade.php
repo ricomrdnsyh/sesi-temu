@@ -51,13 +51,11 @@
             {{-- Brand Sidebar (Logo + SesiTemu Rata Tengah, Garis Sejajar Header) --}}
             <div class="h-16 shrink-0 px-5 border-b border-champagne/25 flex items-center justify-center relative">
                 <a href="{{ route('admin.ringkasan') }}" class="inline-flex items-center justify-center gap-2.5 leading-none">
-                    <span class="inline-flex items-center justify-center rounded-xl bg-[#FBF3E6] p-1 shadow-sm shrink-0">
-                        <img
-                            src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}"
-                            alt="Logo SesiTemu"
-                            class="h-8 w-8 object-contain"
-                        >
-                    </span>
+                    <img
+                        src="{{ asset('logo/logo-ikon-gelap.webp') }}"
+                        alt="Logo SesiTemu"
+                        class="h-9 w-9 object-contain shrink-0"
+                    >
                     <span
                         class="text-[22px] font-bold tracking-tight text-white"
                         style="font-family: 'Playfair Display', Georgia, serif;"

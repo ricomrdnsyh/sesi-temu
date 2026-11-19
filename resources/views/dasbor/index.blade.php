@@ -220,7 +220,7 @@
                         <div class="text-center max-w-md mx-auto space-y-3">
                             <div class="mx-auto inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-sage/15 to-champagne/25 ring-1 ring-champagne/35">
                                 <img
-                                    src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}"
+                                    src="{{ asset('logo/logo-ikon.webp') }}"
                                     alt="SesiTemu"
                                     class="h-11 w-11 object-contain"
                                 >

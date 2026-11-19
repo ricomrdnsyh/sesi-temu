@@ -38,6 +38,7 @@
 
 .font-logo {
     font-family: 'Playfair Display', Georgia, serif;
+    font-variant-numeric: lining-nums;
 }
 
 .font-script {

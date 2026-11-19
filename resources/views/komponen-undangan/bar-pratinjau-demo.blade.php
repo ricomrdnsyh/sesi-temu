@@ -6,9 +6,9 @@
     <div class="fixed top-0 inset-x-0 z-50 bg-charcoal/95 text-ivory border-b border-champagne/40 px-4 py-2 shadow-md">
         <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
             <div class="flex flex-wrap items-center gap-2">
-                <a href="{{ route('beranda') }}" title="SesiTemu" class="inline-flex items-center gap-1.5 rounded-full bg-[#FBF3E6] px-2 py-0.5 text-charcoal shrink-0">
-                    <img src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}" alt="Logo SesiTemu" class="h-4 w-4 object-contain">
-                    <span class="font-logo text-xs font-bold tracking-tight text-[#1D3B2C]">Sesi<span class="text-champagne">Temu</span></span>
+                <a href="{{ route('beranda') }}" title="SesiTemu" class="inline-flex items-center rounded-full bg-[#FBF3E6] px-2.5 py-1 text-charcoal shrink-0">
+                    <img src="{{ asset('logo/logo-horizontal.webp') }}" alt="Logo SesiTemu" class="h-4 sm:h-5 w-auto object-contain">
+                    <span class="sr-only">SesiTemu</span>
                 </a>
                 <span class="rounded-full bg-champagne px-2.5 py-0.5 text-[11px] font-bold uppercase text-charcoal">Live Demo</span>
                 <span>Tema: <strong>{{ $undangan->tema?->nama_tema }}</strong></span>

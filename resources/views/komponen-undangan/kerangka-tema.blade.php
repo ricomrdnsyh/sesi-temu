@@ -702,9 +702,9 @@
 
                 <footer class="py-8 px-4 text-center text-xs opacity-80">
                     <img
-                        src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}"
+                        src="{{ $gelap ? asset('logo/logo-ikon-gelap.webp') : asset('logo/logo-ikon.webp') }}"
                         alt="Logo SesiTemu"
-                        class="mx-auto mb-2 h-7 w-7 rounded-lg bg-[#FBF3E6]/90 p-0.5 object-contain"
+                        class="mx-auto mb-2 h-8 w-8 object-contain"
                     >
                     {{ $footerTeks }} &bull; <a href="{{ route('beranda') }}" class="font-semibold {{ $kelasAksen }} hover:underline">SesiTemu.id</a>
                 </footer>

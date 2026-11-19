@@ -149,12 +149,10 @@
         {{-- Header / Top App Bar (Gaya Aplikasi di Mobile, Navbar Lengkap di Desktop) --}}
         <header class="sticky top-0 z-40 bg-ivory/95 backdrop-blur-md border-b border-champagne/20 px-4 sm:px-6 lg:px-8">
             <div class="max-w-7xl mx-auto h-14 md:h-16 flex items-center justify-between gap-3">
-                <a href="{{ route('beranda') }}" class="flex items-center gap-2 sm:gap-2.5 group shrink-0">
-                    <img src="{{ asset('aset-demo/logo-sesi-temu-ikon.webp') }}" alt="Logo SesiTemu"
-                        class="h-8 w-8 sm:h-10 sm:w-10 object-contain transition-transform duration-200 group-hover:scale-105">
-                    <span class="font-logo text-2xl sm:text-3xl font-bold tracking-tight text-[#1D3B2C] leading-none">
-                        Sesi<span class="text-champagne">Temu</span>
-                    </span>
+                <a href="{{ route('beranda') }}" class="flex items-center group shrink-0">
+                    <img src="{{ asset('logo/logo-horizontal.webp') }}" alt="Logo SesiTemu"
+                        class="h-9 sm:h-11 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.03]">
+                    <span class="sr-only">SesiTemu</span>
                 </a>
 
                 {{-- Aksi Ringkas Top App Bar Mobile --}}
@@ -195,6 +193,16 @@
                             {{ auth()->user()->adalahAdmin() ? 'Panel Admin' : 'Dasbor Saya' }}
                         </a>
                     @else
+                        <a href="{{ route('daftar') }}"
+                            class="inline-flex items-center gap-1.5 rounded-xl bg-sage px-4 py-2 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-sage/90 hover:-translate-y-0.5 transition">
+                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"
+                                aria-hidden="true">
+                                <line x1="12" x2="12" y1="5" y2="19" />
+                                <line x1="5" x2="19" y1="12" y2="12" />
+                            </svg>
+                            <span>Buat Undangan</span>
+                        </a>
                         <a href="{{ route('login') }}"
                             class="inline-flex items-center gap-1.5 rounded-xl border-[1.5px] border-sage bg-white/85 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-sage hover:bg-sage/10 hover:-translate-y-0.5 transition shadow-2xs">
                             <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" viewBox="0 0 24 24" fill="none"
@@ -205,10 +213,6 @@
                                 <line x1="15" x2="3" y1="12" y2="12" />
                             </svg>
                             <span>Masuk</span>
-                        </a>
-                        <a href="{{ route('daftar') }}"
-                            class="inline-flex rounded-xl bg-sage px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-sage/90 hover:-translate-y-0.5 transition">
-                            Buat Undangan
                         </a>
                     @endauth
                 </div>
@@ -395,15 +399,15 @@
                                             <div class="mt-1.5 sm:mt-2 grid grid-cols-3 gap-1.5 text-center border-t pt-1.5"
                                                 :class="heroSlideAktif.gelap ? 'border-white/15' : 'border-champagne/20'">
                                                 <div>
-                                                    <p class="text-[11px] sm:text-xs font-bold">14</p>
+                                                    <p class="font-sans tabular-nums text-[11px] sm:text-xs font-bold">14</p>
                                                     <p class="text-[8px] sm:text-[9px] opacity-65">Hari</p>
                                                 </div>
                                                 <div>
-                                                    <p class="text-[11px] sm:text-xs font-bold">08</p>
+                                                    <p class="font-sans tabular-nums text-[11px] sm:text-xs font-bold">08</p>
                                                     <p class="text-[8px] sm:text-[9px] opacity-65">Jam</p>
                                                 </div>
                                                 <div>
-                                                    <p class="text-[11px] sm:text-xs font-bold">25</p>
+                                                    <p class="font-sans tabular-nums text-[11px] sm:text-xs font-bold">25</p>
                                                     <p class="text-[8px] sm:text-[9px] opacity-65">Menit</p>
                                                 </div>
                                             </div>
@@ -509,7 +513,7 @@
                                             <p class="mt-1 font-logo text-sm font-bold text-charcoal truncate">{{ $temaSorotan->nama_tema }}</p>
                                         </div>
                                         <div class="flex items-center justify-between gap-2 pt-1 border-t border-champagne/15">
-                                            <span class="text-xs font-extrabold {{ $temaSorotan->adaDiskon() ? 'text-rose-600' : 'text-charcoal' }}">
+                                            <span class="font-sans tabular-nums text-xs font-bold {{ $temaSorotan->adaDiskon() ? 'text-rose-600' : 'text-charcoal' }}">
                                                 {{ $temaSorotan->hargaFormatted() }}
                                             </span>
                                             <a href="{{ route('tema.demo', ['slugTema' => $temaSorotan->slug]) }}" target="_blank" rel="noopener"
@@ -528,7 +532,7 @@
                 <div class="rounded-2xl bg-gradient-to-br from-[#1B2D24] to-charcoal text-ivory p-4 ring-1 ring-champagne/30 shadow-md flex items-center justify-between gap-3">
                     <div class="min-w-0">
                         <p class="text-[10px] font-semibold uppercase tracking-wider text-champagne">Aktif {{ $durasiTampil }} Bulan</p>
-                        <p class="mt-0.5 font-logo text-lg font-bold text-white">Mulai {{ \App\Models\Tema::formatRupiah($hargaTermurah) }}</p>
+                        <p class="mt-0.5 font-sans tabular-nums text-lg font-bold tracking-tight text-white">Mulai {{ \App\Models\Tema::formatRupiah($hargaTermurah) }}</p>
                         <p class="text-[11px] text-ivory/70">Edit &amp; pratinjau gratis sepuasnya.</p>
                     </div>
                     <button type="button" @click="bukaTabMobile('paket', 'harga')"
@@ -569,7 +573,7 @@
                 {{-- Header Seksi --}}
                 <div class="text-center max-w-2xl mx-auto">
                     <h2 class="font-logo text-3xl sm:text-4xl lg:text-[2.6rem] font-bold text-charcoal tracking-tight">
-                        Mengapa Memilih <span class="text-sage">SesiTemu?</span>
+                        Mengapa Memilih <span class="text-[#223F2E]">Sesi</span><span class="text-[#C29940]">Temu</span>?
                     </h2>
                 </div>
 
@@ -591,7 +595,7 @@
                             </p>
                             <div class="mt-1.5 flex items-baseline justify-center sm:justify-start gap-2">
                                 <span
-                                    class="font-logo text-3xl sm:text-4xl font-bold text-charcoal">{{ \App\Models\Tema::formatRupiah($hargaTermurah) }}</span>
+                                    class="font-sans tabular-nums text-3xl sm:text-4xl font-bold tracking-tight text-charcoal">{{ \App\Models\Tema::formatRupiah($hargaTermurah) }}</span>
                                 <span class="text-xs text-charcoal/55">/ {{ $durasiTampil }} bln</span>
                             </div>
                             <span
@@ -646,7 +650,7 @@
 
                 {{-- Subjudul Grid Fitur --}}
                 <div class="mt-10 sm:mt-14 text-center">
-                    <h3 class="font-logo text-xl sm:text-2xl font-bold text-charcoal">
+                    <h3 class="font-logo text-xl sm:text-2xl font-bold text-charcoal tracking-tight">
                         Semua Fitur Unggulan Sudah Termasuk
                     </h3>
                 </div>
@@ -949,7 +953,7 @@
                             </span>
 
                             <div class="min-w-0">
-                                <h4 class="font-serif text-[13.5px] sm:text-base font-bold text-charcoal leading-snug">
+                                <h4 class="font-sans text-[13.5px] sm:text-[15px] font-bold text-charcoal leading-snug">
                                     {{ $item['judul'] }}
                                 </h4>
                                 <p class="mt-0.5 text-[11.5px] sm:text-[13px] text-charcoal/70 leading-relaxed">
@@ -1150,7 +1154,7 @@
                                         @endif
                                     </div>
 
-                                    <h3 class="mt-2 font-logo text-xl sm:text-2xl font-bold text-charcoal leading-snug">
+                                    <h3 class="mt-2 font-logo text-xl sm:text-2xl font-bold text-charcoal leading-snug tracking-tight">
                                         {{ $tema->nama_tema }}
                                     </h3>
 
@@ -1163,11 +1167,11 @@
                                         <div>
                                             @if ($tema->adaDiskon())
                                                 <span
-                                                    class="block text-[11px] text-charcoal/45 line-through leading-none mb-0.5">{{ $tema->hargaAsliFormatted() }}</span>
+                                                    class="block font-sans tabular-nums text-[11px] text-charcoal/45 line-through leading-none mb-0.5">{{ $tema->hargaAsliFormatted() }}</span>
                                             @endif
                                             <div class="flex items-baseline gap-1">
                                                 <span
-                                                    class="text-lg sm:text-xl font-extrabold {{ $tema->adaDiskon() ? 'text-rose-600' : 'text-charcoal' }}">{{ $tema->hargaFormatted() }}</span>
+                                                    class="font-sans tabular-nums text-lg sm:text-xl font-bold tracking-tight {{ $tema->adaDiskon() ? 'text-rose-600' : 'text-charcoal' }}">{{ $tema->hargaFormatted() }}</span>
                                                 <span class="text-[11px] text-charcoal/55">/ {{ $durasiTampil }}
                                                     bln</span>
                                             </div>
@@ -1308,7 +1312,7 @@
                 <div class="text-center max-w-2xl mx-auto">
                     <span class="text-xs font-semibold uppercase tracking-widest text-champagne">Transparan &amp;
                         Fleksibel</span>
-                    <h2 class="mt-2 font-serif text-3xl sm:text-4xl font-bold text-charcoal">Pilih Paket Sesuai Kebutuhan
+                    <h2 class="mt-2 font-logo text-3xl sm:text-4xl font-bold text-charcoal tracking-tight">Pilih Paket Sesuai Kebutuhan
                         Anda</h2>
                     <p class="mt-3 text-sm sm:text-base text-charcoal/70">Harga dasar mengikuti tema pilihan Anda (Basic,
                         Premium, atau Eksklusif). Susun sendiri lewat dasbor atau serahkan ke tim SesiTemu.</p>
@@ -1320,14 +1324,14 @@
                         <div>
                             <span
                                 class="inline-block rounded-full bg-sage/10 px-3 py-1 text-xs font-semibold text-sage">Self-Service</span>
-                            <h3 class="mt-4 font-serif text-3xl font-bold text-charcoal">Paket Mandiri</h3>
+                            <h3 class="mt-4 font-logo text-2xl sm:text-3xl font-bold text-charcoal tracking-tight">Paket Mandiri</h3>
                             <p class="mt-2 text-sm text-charcoal/70">Client mengisi data mempelai, acara, galeri, dan
                                 amplop secara mandiri melalui dasbor SesiTemu.</p>
                             <div class="mt-6">
                                 <div class="flex items-baseline gap-2">
                                     <span class="text-sm font-semibold text-charcoal/65">Mulai</span>
                                     <span
-                                        class="font-serif text-4xl font-bold text-charcoal">{{ \App\Models\Tema::formatRupiah($hargaTermurah) }}</span>
+                                        class="font-sans tabular-nums text-3xl sm:text-4xl font-bold tracking-tight text-charcoal">{{ \App\Models\Tema::formatRupiah($hargaTermurah) }}</span>
                                     <span class="text-sm text-charcoal/60">/ {{ $durasiTampil }} bulan aktif</span>
                                 </div>
                                 <p class="mt-1 text-xs text-charcoal/60">
@@ -1347,8 +1351,14 @@
                         </div>
 
                         <a href="{{ auth()->check() ? route('dasbor.index', ['buat' => 1]) : route('daftar') }}"
-                            class="mt-8 block text-center rounded-xl bg-sage px-6 py-3.5 text-sm font-semibold text-white hover:bg-sage/90 transition">
-                            Mulai Buat Draft Gratis
+                            class="mt-8 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-sage px-6 py-3.5 text-sm font-semibold text-white hover:bg-sage/90 transition">
+                            <svg class="w-4 h-4 text-champagne shrink-0" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                aria-hidden="true">
+                                <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                <path d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z" />
+                            </svg>
+                            <span>Mulai Buat Draft Gratis</span>
                         </a>
                     </div>
 
@@ -1364,12 +1374,12 @@
                             <span
                                 class="inline-block rounded-full bg-champagne/20 px-3 py-1 text-xs font-semibold text-champagne">Full
                                 Assistance</span>
-                            <h3 class="mt-4 font-serif text-3xl font-bold text-white">Paket Terima Beres</h3>
+                            <h3 class="mt-4 font-logo text-2xl sm:text-3xl font-bold text-white tracking-tight">Paket Terima Beres</h3>
                             <p class="mt-2 text-sm text-ivory/75">Client cukup mengirimkan data &amp; foto via WhatsApp,
                                 Admin SesiTemu yang menginputkan semuanya hingga siap sebar.</p>
                             <div class="mt-6">
                                 <div class="flex flex-wrap items-baseline gap-2">
-                                    <span class="font-serif text-3xl sm:text-4xl font-bold text-champagne">Harga Tema + {{ \App\Models\Tema::formatRupiah($biayaTerimaBeres) }}</span>
+                                    <span class="font-sans tabular-nums text-2xl sm:text-[2rem] font-bold tracking-tight leading-tight text-champagne">Harga Tema + {{ \App\Models\Tema::formatRupiah($biayaTerimaBeres) }}</span>
                                 </div>
                                 <p class="mt-1 text-xs text-ivory/65">
                                     Total mulai {{ \App\Models\Tema::formatRupiah($hargaTermurah + $biayaTerimaBeres) }} /
@@ -1389,8 +1399,13 @@
 
                         <a href="{{ $urlWaTerimaBeres ?? \App\Support\PengaturanSesiTemu::urlWaAdmin('Halo Admin SesiTemu, saya tertarik memesan Paket Terima Beres untuk undangan pernikahan digital.') }}"
                             target="_blank" rel="noopener"
-                            class="mt-8 block text-center rounded-xl bg-champagne px-6 py-3.5 text-sm font-semibold text-charcoal hover:bg-champagne/90 transition">
-                            Pesan via WhatsApp Admin
+                            class="mt-8 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-champagne px-6 py-3.5 text-sm font-semibold text-charcoal hover:bg-champagne/90 transition">
+                            <svg class="w-4 h-4 text-charcoal shrink-0" viewBox="0 0 24 24" fill="currentColor"
+                                aria-hidden="true">
+                                <path
+                                    d="M12.031 2c-5.516 0-9.969 4.453-9.969 9.969 0 1.766.469 3.484 1.344 5l-1.406 5.156 5.281-1.375c1.469.797 3.109 1.219 4.75 1.219 5.516 0 9.969-4.453 9.969-9.969S17.547 2 12.031 2Zm5.813 14.125c-.25.703-1.438 1.344-2 1.422-.516.078-1.172.109-1.891-.125-.438-.141-1-.328-1.719-.641-3.016-1.313-4.984-4.359-5.141-4.563-.156-.203-1.234-1.641-1.234-3.125s.781-2.219 1.063-2.516c.281-.297.609-.375.813-.375.203 0 .406 0 .578.016.188.016.438-.078.688.531.25.609.859 2.094.938 2.25.078.156.125.344.016.547-.109.203-.156.344-.313.516-.156.172-.328.391-.469.516-.156.156-.313.328-.141.641.172.313.781 1.297 1.672 2.094 1.156 1.031 2.125 1.344 2.438 1.5.313.156.484.125.672-.078.188-.203.781-.906.984-1.219.203-.313.406-.266.688-.156.281.109 1.797.844 2.109 1 .313.156.516.234.594.359.078.125.078.734-.172 1.438Z" />
+                            </svg>
+                            <span>Pesan via WhatsApp Admin</span>
                         </a>
                     </div>
                 </div>
@@ -1405,7 +1420,7 @@
                 <div>
                     <div class="text-center max-w-xl mx-auto">
                         <span class="text-xs font-semibold uppercase tracking-widest text-champagne">Pertanyaan Umum</span>
-                        <h2 class="mt-2 font-serif text-2xl sm:text-4xl font-bold text-charcoal">Pertanyaan Seputar Undangan Digital</h2>
+                        <h2 class="mt-2 font-logo text-2xl sm:text-4xl font-bold text-charcoal tracking-tight">Pertanyaan Seputar Undangan Digital</h2>
                     </div>
 
                     <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-3.5 items-start">
@@ -1474,7 +1489,7 @@
                             class="inline-block rounded-full bg-champagne/15 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-champagne">
                             Amankan Link Unik Pasangan
                         </span>
-                        <h2 class="font-logo text-2xl sm:text-3xl font-bold text-white">Siap Menyiapkan Undangan Hari
+                        <h2 class="font-logo text-2xl sm:text-3xl font-bold text-white tracking-tight">Siap Menyiapkan Undangan Hari
                             Bahagiamu?</h2>
                         <p class="text-xs sm:text-sm text-ivory/75 max-w-xl mx-auto">
                             Cek ketersediaan link undangan pasanganmu sekarang lalu lanjutkan membuat draft gratis di
@@ -1495,8 +1510,14 @@
                                     class="w-full bg-transparent text-sm font-semibold text-charcoal placeholder:font-normal placeholder:text-charcoal/40 focus:outline-none ml-0.5">
                             </div>
                             <button type="submit"
-                                class="rounded-xl bg-sage px-5 py-3 text-sm font-semibold text-white hover:bg-sage/90 transition shrink-0 cursor-pointer">
-                                Cek &amp; Amankan Link
+                                class="inline-flex items-center justify-center gap-2 rounded-xl bg-sage px-5 py-3 text-sm font-semibold text-white hover:bg-sage/90 transition shrink-0 cursor-pointer">
+                                <svg class="w-4 h-4 text-champagne shrink-0" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                                </svg>
+                                <span>Cek &amp; Amankan Link</span>
                             </button>
                         </form>
 
@@ -1517,13 +1538,26 @@
 
                     <div class="pt-1 flex flex-col sm:flex-row items-center justify-center gap-3">
                         <a href="{{ auth()->check() ? route('dasbor.katalog') : route('daftar') }}"
-                            class="w-full sm:w-auto rounded-xl bg-champagne px-6 py-3 text-sm font-bold text-charcoal hover:bg-champagne/90 transition">
-                            {{ auth()->check() ? 'Buka Katalog Tema Saya' : 'Buat Draft Gratis Sekarang' }}
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-champagne px-6 py-3 text-sm font-bold text-charcoal hover:bg-champagne/90 transition">
+                            <svg class="w-4 h-4 text-charcoal shrink-0" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                aria-hidden="true">
+                                <path
+                                    d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+                                <path d="M5 3v4" />
+                                <path d="M3 5h4" />
+                            </svg>
+                            <span>{{ auth()->check() ? 'Buka Katalog Tema Saya' : 'Buat Draft Gratis Sekarang' }}</span>
                         </a>
                         <a href="{{ $urlWaKonsultasi ?? \App\Support\PengaturanSesiTemu::urlWaAdmin('Halo SesiTemu, saya ingin konsultasi mengenai undangan pernikahan digital.') }}"
                             target="_blank" rel="noopener"
-                            class="w-full sm:w-auto rounded-xl bg-white/10 border border-white/15 px-6 py-3 text-sm font-semibold text-ivory hover:bg-white/15 transition">
-                            Konsultasi via WhatsApp
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 border border-white/15 px-6 py-3 text-sm font-semibold text-ivory hover:bg-white/15 transition">
+                            <svg class="w-4 h-4 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="currentColor"
+                                aria-hidden="true">
+                                <path
+                                    d="M12.031 2c-5.516 0-9.969 4.453-9.969 9.969 0 1.766.469 3.484 1.344 5l-1.406 5.156 5.281-1.375c1.469.797 3.109 1.219 4.75 1.219 5.516 0 9.969-4.453 9.969-9.969S17.547 2 12.031 2Zm5.813 14.125c-.25.703-1.438 1.344-2 1.422-.516.078-1.172.109-1.891-.125-.438-.141-1-.328-1.719-.641-3.016-1.313-4.984-4.359-5.141-4.563-.156-.203-1.234-1.641-1.234-3.125s.781-2.219 1.063-2.516c.281-.297.609-.375.813-.375.203 0 .406 0 .578.016.188.016.438-.078.688.531.25.609.859 2.094.938 2.25.078.156.125.344.016.547-.109.203-.156.344-.313.516-.156.172-.328.391-.469.516-.156.156-.313.328-.141.641.172.313.781 1.297 1.672 2.094 1.156 1.031 2.125 1.344 2.438 1.5.313.156.484.125.672-.078.188-.203.781-.906.984-1.219.203-.313.406-.266.688-.156.281.109 1.797.844 2.109 1 .313.156.516.234.594.359.078.125.078.734-.172 1.438Z" />
+                            </svg>
+                            <span>Konsultasi via WhatsApp</span>
                         </a>
                     </div>
                 </div>
@@ -1532,7 +1566,7 @@
 
         {{-- Footer Editorial SesiTemu --}}
         <footer
-            class="relative overflow-hidden pt-12 sm:pt-14 pb-24 md:pb-9 px-4 sm:px-6 lg:px-8 bg-[#FAF7F0] text-charcoal">
+            class="relative overflow-hidden pt-10 sm:pt-12 pb-24 md:pb-8 px-4 sm:px-6 lg:px-8 bg-[#FAF7F0] text-charcoal">
             {{-- Garis Aksen Champagne Halus di Atas Footer --}}
             <div aria-hidden="true"
                 class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-champagne/55 to-transparent">
@@ -1546,114 +1580,38 @@
             </div>
 
             <div class="relative max-w-7xl mx-auto">
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-9 lg:gap-10 pb-9 border-b border-champagne/20 items-start">
-                    {{-- Kolom 1: Identitas Brand --}}
-                    <div class="md:col-span-5 lg:col-span-4 space-y-4">
-                        <a href="{{ route('beranda') }}" class="inline-flex items-center group">
-                            <img src="{{ asset('aset-demo/logo-sesi-temu-lengkap.webp') }}" alt="Logo SesiTemu"
-                                class="h-16 sm:h-[4.25rem] w-auto object-contain transition-transform duration-200 group-hover:scale-105">
+                {{-- Baris Utama: Identitas Brand (Kiri) & Kanal Terhubung (Kanan) --}}
+                <div class="pb-8 border-b border-champagne/25 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+                    {{-- Identitas Brand Lockup Horizontal --}}
+                    <div class="flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-6 text-center sm:text-left">
+                        <a href="{{ route('beranda') }}" class="inline-flex items-center shrink-0 group">
+                            <img src="{{ asset('logo/logo-editorial.webp') }}" alt="Logo SesiTemu"
+                                class="h-14 sm:h-[4.25rem] w-auto object-contain transition-transform duration-200 group-hover:scale-[1.03]">
                         </a>
 
-                        <p class="text-xs sm:text-[13px] text-charcoal/70 leading-relaxed max-w-xs">
+                        <div aria-hidden="true"
+                            class="hidden sm:block h-14 w-px shrink-0 bg-gradient-to-b from-transparent via-champagne/45 to-transparent">
+                        </div>
+
+                        <p class="text-xs sm:text-[13px] text-charcoal/70 leading-relaxed max-w-sm">
                             Platform undangan pernikahan digital modern. Susun draft gratis dengan galeri ringan WebP, RSVP tamu, amplop digital, dan link personal WhatsApp.
                         </p>
-
-                        <div class="pt-0.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] font-medium text-[#1D3B2C]/80">
-                            <span class="inline-flex items-center gap-1.5">
-                                <span class="h-1.5 w-1.5 rounded-full bg-sage"></span>
-                                Pratinjau Gratis
-                            </span>
-                            <span class="inline-flex items-center gap-1.5">
-                                <span class="h-1.5 w-1.5 rounded-full bg-champagne"></span>
-                                Masa Aktif {{ $durasiTampil }} Bulan
-                            </span>
-                        </div>
                     </div>
 
-                    {{-- Kolom 2 & 3: Navigasi & Akses Cepat (Sejajar 2 Kolom di Mobile) --}}
-                    <div class="md:col-span-7 lg:col-span-4 grid grid-cols-2 gap-6 sm:gap-8">
-                        <div>
-                            <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-[#8A6D33]">Jelajahi</p>
-                            <ul class="mt-3.5 space-y-2.5 text-xs sm:text-[13px] text-charcoal/75">
-                                <li>
-                                    <a href="#beranda"
-                                        @click="if (window.innerWidth < 768) { $event.preventDefault(); bukaTabMobile('beranda'); }"
-                                        class="hover:text-sage transition">Beranda</a>
-                                </li>
-                                <li>
-                                    <a href="#keunggulan"
-                                        @click="if (window.innerWidth < 768) { $event.preventDefault(); bukaTabMobile('paket', 'fitur'); }"
-                                        class="hover:text-sage transition">Fitur Unggulan</a>
-                                </li>
-                                <li>
-                                    <a href="#katalog-tema"
-                                        @click="if (window.innerWidth < 768) { $event.preventDefault(); bukaTabMobile('tema'); }"
-                                        class="hover:text-sage transition">Katalog Tema</a>
-                                </li>
-                                <li>
-                                    <a href="#paket-harga"
-                                        @click="if (window.innerWidth < 768) { $event.preventDefault(); bukaTabMobile('paket', 'harga'); }"
-                                        class="hover:text-sage transition">Paket Harga</a>
-                                </li>
-                                <li>
-                                    <a href="#faq"
-                                        @click="if (window.innerWidth < 768) { $event.preventDefault(); bukaTabMobile('paket', 'faq'); }"
-                                        class="hover:text-sage transition">Pertanyaan (FAQ)</a>
-                                </li>
-                            </ul>
-                        </div>
+                    {{-- Kanal Media Sosial --}}
+                    <div class="flex flex-col items-center lg:items-end space-y-3">
+                        <p class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#8A6D33]">
+                            <span class="h-1.5 w-1.5 rounded-full bg-champagne"></span>
+                            <span>Ikuti Kami</span>
+                        </p>
 
-                        <div>
-                            <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-[#8A6D33]">Akses Cepat</p>
-                            <ul class="mt-3.5 space-y-2.5 text-xs sm:text-[13px] text-charcoal/75">
-                                @auth
-                                    <li>
-                                        <a href="{{ auth()->user()->adalahAdmin() ? '/admin' : '/dasbor' }}"
-                                            class="font-medium text-[#1D3B2C] hover:text-sage transition">
-                                            {{ auth()->user()->adalahAdmin() ? 'Panel Admin' : 'Dasbor Saya' }}
-                                        </a>
-                                    </li>
-                                    @if (!auth()->user()->adalahAdmin())
-                                        <li>
-                                            <a href="{{ route('dasbor.katalog') }}"
-                                                class="hover:text-sage transition">Pilih Tema Undangan</a>
-                                        </li>
-                                    @endif
-                                @else
-                                    <li>
-                                        <a href="{{ route('daftar') }}"
-                                            class="font-medium text-[#1D3B2C] hover:text-sage transition">Buat Draft Gratis</a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ route('login') }}"
-                                            class="hover:text-sage transition">Masuk Akun</a>
-                                    </li>
-                                @endauth
-                                <li>
-                                    <a href="#cek-link"
-                                        @click="if (window.innerWidth < 768) { $event.preventDefault(); sheetBuatTerbuka = true; }"
-                                        class="hover:text-sage transition">Cek Link Pasangan</a>
-                                </li>
-                                <li>
-                                    <a href="{{ $urlWaTerimaBeres ?? \App\Support\PengaturanSesiTemu::urlWaAdmin('Halo Admin SesiTemu, saya tertarik memesan Paket Terima Beres untuk undangan pernikahan digital.') }}"
-                                        target="_blank" rel="noopener"
-                                        class="hover:text-sage transition">Paket Terima Beres</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    {{-- Kolom 4: Media Sosial & Konsultasi --}}
-                    <div class="md:col-span-12 lg:col-span-4 space-y-3">
-                        <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-[#8A6D33]">Terhubung Bersama Kami</p>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-2.5">
+                        <div class="grid grid-cols-2 gap-2.5 w-full sm:w-auto">
                             <a href="https://www.instagram.com/sesitemu.id" target="_blank" rel="noopener"
                                 aria-label="Instagram SesiTemu"
-                                class="group flex items-center justify-between gap-3 rounded-xl bg-white/90 px-3.5 py-2.5 ring-1 ring-champagne/25 shadow-2xs hover:bg-white hover:ring-[#E1306C]/40 hover:-translate-y-0.5 transition">
-                                <div class="flex items-center gap-3 min-w-0">
+                                class="group flex items-center justify-between gap-3 rounded-2xl bg-white px-4 py-2.5 ring-1 ring-champagne/25 shadow-2xs hover:ring-[#E1306C]/45 hover:-translate-y-0.5 transition">
+                                <div class="flex items-center gap-2.5 min-w-0">
                                     <span
-                                        class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#FDF2F7] text-[#C13584] ring-1 ring-[#E1306C]/15">
+                                        class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#FDF2F7] text-[#C13584] ring-1 ring-[#E1306C]/15">
                                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                             aria-hidden="true">
@@ -1662,12 +1620,12 @@
                                             <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
                                         </svg>
                                     </span>
-                                    <div class="min-w-0 leading-tight">
+                                    <div class="min-w-0 leading-tight text-left">
                                         <span class="block text-xs font-semibold text-charcoal group-hover:text-[#C13584] transition">Instagram</span>
                                         <span class="block text-[11px] text-charcoal/55 truncate">@sesitemu.id</span>
                                     </div>
                                 </div>
-                                <svg class="w-3.5 h-3.5 shrink-0 text-charcoal/35 group-hover:text-[#C13584] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition"
+                                <svg class="w-3.5 h-3.5 shrink-0 text-charcoal/30 group-hover:text-[#C13584] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                     <path d="M7 17 17 7" />
@@ -1677,45 +1635,21 @@
 
                             <a href="https://www.tiktok.com/@sesitemu.id" target="_blank" rel="noopener"
                                 aria-label="TikTok SesiTemu"
-                                class="group flex items-center justify-between gap-3 rounded-xl bg-white/90 px-3.5 py-2.5 ring-1 ring-champagne/25 shadow-2xs hover:bg-white hover:ring-charcoal/35 hover:-translate-y-0.5 transition">
-                                <div class="flex items-center gap-3 min-w-0">
+                                class="group flex items-center justify-between gap-3 rounded-2xl bg-white px-4 py-2.5 ring-1 ring-champagne/25 shadow-2xs hover:ring-charcoal/35 hover:-translate-y-0.5 transition">
+                                <div class="flex items-center gap-2.5 min-w-0">
                                     <span
-                                        class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-charcoal/6 text-charcoal ring-1 ring-charcoal/10">
+                                        class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-charcoal/6 text-charcoal ring-1 ring-charcoal/10">
                                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                             <path
                                                 d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.15 15a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.87a8.16 8.16 0 0 0 4.76 1.52v-3.4a4.85 4.85 0 0 1-1-.3Z" />
                                         </svg>
                                     </span>
-                                    <div class="min-w-0 leading-tight">
+                                    <div class="min-w-0 leading-tight text-left">
                                         <span class="block text-xs font-semibold text-charcoal group-hover:text-black transition">TikTok</span>
                                         <span class="block text-[11px] text-charcoal/55 truncate">@sesitemu.id</span>
                                     </div>
                                 </div>
-                                <svg class="w-3.5 h-3.5 shrink-0 text-charcoal/35 group-hover:text-charcoal group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M7 17 17 7" />
-                                    <path d="M7 7h10v10" />
-                                </svg>
-                            </a>
-
-                            <a href="{{ $urlWaKonsultasi ?? \App\Support\PengaturanSesiTemu::urlWaAdmin('Halo SesiTemu, saya ingin konsultasi mengenai undangan pernikahan digital.') }}"
-                                target="_blank" rel="noopener" aria-label="WhatsApp SesiTemu"
-                                class="group flex items-center justify-between gap-3 rounded-xl bg-white/90 px-3.5 py-2.5 ring-1 ring-champagne/25 shadow-2xs hover:bg-white hover:ring-sage/45 hover:-translate-y-0.5 transition">
-                                <div class="flex items-center gap-3 min-w-0">
-                                    <span
-                                        class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sage/10 text-sage ring-1 ring-sage/15">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                            <path
-                                                d="M12.031 2c-5.516 0-9.969 4.453-9.969 9.969 0 1.766.469 3.484 1.344 5l-1.406 5.156 5.281-1.375c1.469.797 3.109 1.219 4.75 1.219 5.516 0 9.969-4.453 9.969-9.969S17.547 2 12.031 2Zm5.813 14.125c-.25.703-1.438 1.344-2 1.422-.516.078-1.172.109-1.891-.125-.438-.141-1-.328-1.719-.641-3.016-1.313-4.984-4.359-5.141-4.563-.156-.203-1.234-1.641-1.234-3.125s.781-2.219 1.063-2.516c.281-.297.609-.375.813-.375.203 0 .406 0 .578.016.188.016.438-.078.688.531.25.609.859 2.094.938 2.25.078.156.125.344.016.547-.109.203-.156.344-.313.516-.156.172-.328.391-.469.516-.156.156-.313.328-.141.641.172.313.781 1.297 1.672 2.094 1.156 1.031 2.125 1.344 2.438 1.5.313.156.484.125.672-.078.188-.203.781-.906.984-1.219.203-.313.406-.266.688-.156.281.109 1.797.844 2.109 1 .313.156.516.234.594.359.078.125.078.734-.172 1.438Z" />
-                                        </svg>
-                                    </span>
-                                    <div class="min-w-0 leading-tight">
-                                        <span class="block text-xs font-semibold text-charcoal group-hover:text-sage transition">WhatsApp</span>
-                                        <span class="block text-[11px] text-charcoal/55 truncate">Konsultasi Admin</span>
-                                    </div>
-                                </div>
-                                <svg class="w-3.5 h-3.5 shrink-0 text-charcoal/35 group-hover:text-sage group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition"
+                                <svg class="w-3.5 h-3.5 shrink-0 text-charcoal/30 group-hover:text-charcoal group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                     <path d="M7 17 17 7" />
@@ -1726,14 +1660,20 @@
                     </div>
                 </div>
 
-                {{-- Baris Hak Cipta & Signature Editorial --}}
-                <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+                {{-- Baris Hak Cipta & Tautan Legal --}}
+                <div class="pt-5 md:pr-14 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
                     <p class="text-xs text-charcoal/55">
                         &copy; {{ now()->format('Y') }} <span class="font-semibold text-[#1D3B2C]">SesiTemu.id</span>. Seluruh hak cipta dilindungi.
                     </p>
-                    <p class="font-script text-xl sm:text-[1.35rem] leading-none text-[#8A6D33]/90">
-                        Abadikan Setiap Sesi Bahagia Menuju Hari Pertemuan
-                    </p>
+                    <nav aria-label="Tautan Legal" class="flex flex-wrap items-center justify-center sm:justify-end gap-x-4 gap-y-1 text-xs font-medium text-charcoal/70">
+                        <a href="{{ route('halaman.kebijakan-privasi') }}" class="hover:text-sage hover:underline underline-offset-4 transition">
+                            Kebijakan Privasi
+                        </a>
+                        <span aria-hidden="true" class="text-champagne/60">&bull;</span>
+                        <a href="{{ route('halaman.syarat-ketentuan') }}" class="hover:text-sage hover:underline underline-offset-4 transition">
+                            Syarat &amp; Ketentuan
+                        </a>
+                    </nav>
                 </div>
             </div>
         </footer>
@@ -1783,8 +1723,14 @@
                                 class="w-full bg-transparent text-sm font-semibold text-charcoal placeholder:font-normal placeholder:text-charcoal/40 focus:outline-none ml-0.5">
                         </div>
                         <button type="submit"
-                            class="w-full rounded-xl bg-sage px-4 py-2.5 text-xs font-bold text-white hover:bg-[#3b5047] transition cursor-pointer">
-                            Cek Ketersediaan Link
+                            class="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-sage px-4 py-2.5 text-xs font-bold text-white hover:bg-[#3b5047] transition cursor-pointer">
+                            <svg class="w-3.5 h-3.5 text-champagne shrink-0" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                aria-hidden="true">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                            </svg>
+                            <span>Cek Ketersediaan Link</span>
                         </button>
                     </form>
 
@@ -1858,7 +1804,7 @@
             @keydown.escape.window="modalDemoTerbuka = false">
             <div @click.away="modalDemoTerbuka = false"
                 class="w-full max-w-md rounded-t-3xl sm:rounded-2xl bg-white p-5 sm:p-6 shadow-xl ring-1 ring-champagne/30 max-h-[90dvh] overflow-y-auto">
-                <h3 class="font-serif text-2xl font-bold text-charcoal">Pratinjau Tema</h3>
+                <h3 class="font-logo text-2xl font-bold text-charcoal tracking-tight">Pratinjau Tema</h3>
                 <p class="mt-1 text-sm text-charcoal/70">
                     Masukkan nama tamu contoh untuk melihat tampilan sampul tema <span class="font-semibold text-sage"
                         x-text="temaDemoNama"></span><span x-show="temaDemoInfo"
