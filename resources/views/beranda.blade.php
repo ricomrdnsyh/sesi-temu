@@ -56,7 +56,7 @@
         $tabAwalMobile = in_array(request()->query('tab'), ['beranda', 'tema', 'paket'], true)
             ? request()->query('tab')
             : 'beranda';
-        $subTabAwalPaket = in_array(request()->query('sub'), ['harga', 'fitur', 'faq'], true)
+        $subTabAwalPaket = in_array(request()->query('sub'), ['harga', 'faq'], true)
             ? request()->query('sub')
             : 'harga';
         $bukaSheetAwal = (session('saran_link') || $errors->has('slug') || request()->boolean('buat')) ? 'true' : 'false';
@@ -434,128 +434,16 @@
                     </div>
                 </div>
             </div>
-
-            {{-- Blok Hub Aplikasi Mobile (Pintasan Cepat + Karosel Geser Tema + Ringkasan Paket) --}}
-            <div class="md:hidden relative z-10 max-w-xl mx-auto mt-8 space-y-6">
-                {{-- 3 Menu Pintasan Cepat Aplikasi --}}
-                <div class="grid grid-cols-3 gap-2.5">
-                    <button type="button" @click="sheetBuatTerbuka = true"
-                        class="rounded-2xl bg-white p-3 text-left ring-1 ring-champagne/30 shadow-2xs active:scale-[0.98] transition cursor-pointer">
-                        <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-sage/10 text-sage">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                            </svg>
-                        </span>
-                        <p class="mt-2 text-xs font-bold text-charcoal leading-tight">Cek Link</p>
-                        <p class="mt-0.5 text-[10px] text-charcoal/55 leading-tight">Amankan slug</p>
-                    </button>
-
-                    <button type="button" @click="bukaTabMobile('paket', 'fitur')"
-                        class="rounded-2xl bg-white p-3 text-left ring-1 ring-champagne/30 shadow-2xs active:scale-[0.98] transition cursor-pointer">
-                        <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-champagne/15 text-[#8A6D33]">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
-                            </svg>
-                        </span>
-                        <p class="mt-2 text-xs font-bold text-charcoal leading-tight">18+ Fitur</p>
-                        <p class="mt-0.5 text-[10px] text-charcoal/55 leading-tight">RSVP &amp; WebP</p>
-                    </button>
-
-                    <button type="button" @click="bukaTabMobile('paket', 'faq')"
-                        class="rounded-2xl bg-white p-3 text-left ring-1 ring-champagne/30 shadow-2xs active:scale-[0.98] transition cursor-pointer">
-                        <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-charcoal/8 text-charcoal">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <circle cx="12" cy="12" r="10" />
-                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                                <path d="M12 17h.01" />
-                            </svg>
-                        </span>
-                        <p class="mt-2 text-xs font-bold text-charcoal leading-tight">Info &amp; FAQ</p>
-                        <p class="mt-0.5 text-[10px] text-charcoal/55 leading-tight">Tanya jawab</p>
-                    </button>
-                </div>
-
-                {{-- Karosel Geser Horizontal: Inspirasi Tema --}}
-                @if ($daftarTema->isNotEmpty())
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between gap-2">
-                            <div>
-                                <h2 class="font-logo text-lg font-bold text-charcoal">Inspirasi Tema</h2>
-                                <p class="text-[11px] text-charcoal/60">Geser untuk lihat koleksi populer</p>
-                            </div>
-                            <button type="button" @click="bukaTabMobile('tema')"
-                                class="inline-flex items-center gap-1 rounded-full bg-sage/10 px-3 py-1.5 text-[11px] font-semibold text-sage cursor-pointer">
-                                <span>Lihat Semua</span>
-                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="m9 18 6-6-6-6" />
-                                </svg>
-                            </button>
-                        </div>
-
-                        <div class="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-3 pb-1 -mx-1 px-1">
-                            @foreach ($daftarTema->take(5) as $temaSorotan)
-                                @php $tierSorotan = $temaSorotan->infoTier(); @endphp
-                                <div class="w-[186px] shrink-0 snap-start rounded-2xl bg-white border border-champagne/30 overflow-hidden shadow-xs flex flex-col">
-                                    <button type="button" @click="bukaLightboxSampul('{{ $temaSorotan->slug }}')"
-                                        class="block w-full overflow-hidden bg-ivory text-left cursor-pointer">
-                                        <x-poster-sampul-tema :tema="$temaSorotan" />
-                                    </button>
-                                    <div class="p-3 flex-1 flex flex-col justify-between gap-2">
-                                        <div>
-                                            <span class="inline-block rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider {{ $tierSorotan['badge_class'] }}">
-                                                {{ $tierSorotan['label'] }}
-                                            </span>
-                                            <p class="mt-1 font-logo text-sm font-bold text-charcoal truncate">{{ $temaSorotan->nama_tema }}</p>
-                                        </div>
-                                        <div class="flex items-center justify-between gap-2 pt-1 border-t border-champagne/15">
-                                            <span class="font-sans tabular-nums text-xs font-bold {{ $temaSorotan->adaDiskon() ? 'text-rose-600' : 'text-charcoal' }}">
-                                                {{ $temaSorotan->hargaFormatted() }}
-                                            </span>
-                                            <a href="{{ route('tema.demo', ['slugTema' => $temaSorotan->slug]) }}" target="_blank" rel="noopener"
-                                                class="text-[11px] font-semibold text-sage hover:underline">
-                                                Demo &rarr;
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-
-                {{-- Kartu Ringkas Harga & Masa Aktif di Mobile Home --}}
-                <div class="rounded-2xl bg-gradient-to-br from-[#1B2D24] to-charcoal text-ivory p-4 ring-1 ring-champagne/30 shadow-md flex items-center justify-between gap-3">
-                    <div class="min-w-0">
-                        <p class="text-[10px] font-semibold uppercase tracking-wider text-champagne">Aktif {{ $durasiTampil }} Bulan</p>
-                        <p class="mt-0.5 font-sans tabular-nums text-lg font-bold tracking-tight text-white">Mulai {{ \App\Models\Tema::formatRupiah($hargaTermurah) }}</p>
-                        <p class="text-[11px] text-ivory/70">Edit &amp; pratinjau gratis sepuasnya.</p>
-                    </div>
-                    <button type="button" @click="bukaTabMobile('paket', 'harga')"
-                        class="shrink-0 rounded-xl bg-champagne px-3.5 py-2 text-xs font-bold text-charcoal shadow-xs cursor-pointer">
-                        Lihat Paket
-                    </button>
-                </div>
-            </div>
         </section>
 
-        {{-- Segmented Control Sticky Khusus Mobile untuk Tab Paket & Info (Harga | 18 Fitur | FAQ) --}}
+        {{-- Segmented Control Sticky Khusus Mobile untuk Tab Paket & Info (Harga | FAQ) --}}
         <div x-show="tabMobile === 'paket'" x-cloak
             class="md:hidden sticky top-14 z-30 bg-ivory/95 backdrop-blur-md border-b border-champagne/20 px-4 py-2.5">
-            <div class="max-w-lg mx-auto grid grid-cols-3 rounded-2xl bg-[#F3EDE0] p-1 ring-1 ring-champagne/20">
+            <div class="max-w-lg mx-auto grid grid-cols-2 rounded-2xl bg-[#F3EDE0] p-1 ring-1 ring-champagne/20">
                 <button type="button" @click="subTabPaket = 'harga'; window.scrollTo({ top: 0, behavior: 'smooth' })"
                     :class="subTabPaket === 'harga' ? 'bg-white text-charcoal font-bold shadow-xs ring-1 ring-champagne/20' : 'text-charcoal/65 font-medium'"
                     class="rounded-xl py-1.5 text-xs transition cursor-pointer">
                     Paket Harga
-                </button>
-                <button type="button" @click="subTabPaket = 'fitur'; window.scrollTo({ top: 0, behavior: 'smooth' })"
-                    :class="subTabPaket === 'fitur' ? 'bg-white text-charcoal font-bold shadow-xs ring-1 ring-champagne/20' : 'text-charcoal/65 font-medium'"
-                    class="rounded-xl py-1.5 text-xs transition cursor-pointer">
-                    18 Fitur
                 </button>
                 <button type="button" @click="subTabPaket = 'faq'; window.scrollTo({ top: 0, behavior: 'smooth' })"
                     :class="subTabPaket === 'faq' ? 'bg-white text-charcoal font-bold shadow-xs ring-1 ring-champagne/20' : 'text-charcoal/65 font-medium'"
@@ -567,12 +455,12 @@
 
         {{-- Keunggulan SesiTemu: Editorial Ticket Highlight + Grid Fitur Bersih Tanpa Border --}}
         <section id="keunggulan"
-            :class="(tabMobile === 'paket' && subTabPaket === 'fitur') ? 'block' : 'hidden md:block'"
-            class="pt-6 pb-10 sm:pt-14 sm:pb-20 bg-gradient-to-b from-white via-[#F9F5EB] to-[#F9F5EB] border-b border-champagne/20 px-4 sm:px-6 lg:px-8">
+            :class="tabMobile === 'beranda' ? 'block' : 'hidden md:block'"
+            class="pt-7 pb-12 sm:pt-14 sm:pb-20 bg-gradient-to-b from-white via-[#F9F5EB] to-[#F9F5EB] border-b border-champagne/20 px-4 sm:px-6 lg:px-8">
             <div class="max-w-7xl mx-auto">
                 {{-- Header Seksi --}}
                 <div class="text-center max-w-2xl mx-auto">
-                    <h2 class="font-logo text-3xl sm:text-4xl lg:text-[2.6rem] font-bold text-charcoal tracking-tight">
+                    <h2 class="font-logo text-[1.65rem] sm:text-4xl lg:text-[2.6rem] font-bold text-charcoal tracking-tight">
                         Mengapa Memilih <span class="text-[#223F2E]">Sesi</span><span class="text-[#C29940]">Temu</span>?
                     </h2>
                 </div>
@@ -770,7 +658,7 @@
                 {{-- Grid Kartu Fitur Unggulan (2 Kolom Expandable di Mobile, 3 Kolom di Desktop) --}}
                 <div class="mt-6 sm:mt-10 grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
                     @foreach ($daftarKeunggulanGrid as $item)
-                        <div :class="(semuaFiturMobile || tabMobile === 'paket' || {{ $loop->index }} < 6) ? 'flex' : 'hidden sm:flex'"
+                        <div :class="(semuaFiturMobile || {{ $loop->index }} < 6) ? 'flex' : 'hidden sm:flex'"
                             class="flex-col sm:flex-row items-start gap-2.5 sm:gap-3.5 rounded-2xl bg-[#FDFBF7] p-3.5 sm:p-5 border border-champagne/35 shadow-2xs hover:bg-white hover:border-sage/45 hover:shadow-md hover:-translate-y-0.5 transition duration-200">
                             <span
                                 class="sm:mt-0.5 inline-flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full border border-champagne/45 bg-ivory text-sage shadow-2xs">
@@ -964,8 +852,8 @@
                     @endforeach
                 </div>
 
-                {{-- Tombol Tampilkan Semua Fitur Khusus Mobile (Saat di Luar Tab Fitur) --}}
-                <div x-show="tabMobile !== 'paket'" class="sm:hidden mt-6 text-center">
+                {{-- Tombol Tampilkan Semua Fitur Khusus Mobile --}}
+                <div class="sm:hidden mt-6 text-center">
                     <button type="button" @click="semuaFiturMobile = !semuaFiturMobile"
                         class="inline-flex items-center justify-center gap-2 rounded-full bg-white border border-champagne/45 px-5 py-2.5 text-xs font-semibold text-charcoal shadow-2xs hover:bg-champagne/10 transition cursor-pointer">
                         <span x-text="semuaFiturMobile ? 'Tampilkan Lebih Ringkas' : 'Lihat 12 Fitur Lainnya'"></span>

@@ -83,13 +83,15 @@ class Tahap3LandingDemoTest extends TestCase
             ->assertSee('font-logo text-2xl sm:text-4xl font-bold text-charcoal tracking-tight">Pertanyaan Seputar Undangan Digital</h2>', false)
             ->assertSee('font-logo text-2xl font-bold text-charcoal tracking-tight">Pratinjau Tema</h3>', false)
             ->assertSee('font-sans tabular-nums text-3xl sm:text-4xl font-bold tracking-tight text-charcoal', false)
-            ->assertSee('Inspirasi Tema')
+            ->assertSee('Semua Fitur Unggulan Sudah Termasuk')
+            ->assertSee('Lihat 12 Fitur Lainnya')
+            ->assertDontSee('Inspirasi Tema')
             ->assertSee('Siapkan Undangan Anda');
 
-        $this->get('/?tab=paket&sub=fitur')
+        $this->get('/?tab=paket&sub=faq')
             ->assertOk()
             ->assertSee("tabMobile: 'paket'", false)
-            ->assertSee("subTabPaket: 'fitur'", false);
+            ->assertSee("subTabPaket: 'faq'", false);
     }
 
     public function test_cek_link_tersedia_mengarahkan_ke_daftar_dengan_slug_terformat(): void

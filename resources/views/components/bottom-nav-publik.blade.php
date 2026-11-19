@@ -118,7 +118,7 @@
             </a>
         @endif
 
-        {{-- 4. Paket (Harga, Fitur & FAQ) --}}
+        {{-- 4. Paket (Harga & FAQ) --}}
         @if ($dalamBeranda)
             <button
                 type="button"
