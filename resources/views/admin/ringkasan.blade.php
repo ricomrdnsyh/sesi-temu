@@ -244,7 +244,7 @@
                                     <span>Preview</span>
                                 </a>
                                 <a
-                                    href="{{ route('dasbor.undangan.kelola', $item) }}"
+                                    href="{{ route('dashboard.undangan.kelola', $item) }}"
                                     title="Edit Isian Client"
                                     class="inline-flex items-center gap-1.5 rounded-lg border border-champagne/50 bg-champagne/10 px-2.5 py-1.5 text-xs font-semibold text-charcoal hover:bg-champagne/25 transition"
                                 >

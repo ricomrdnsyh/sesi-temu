@@ -1,5 +1,5 @@
 @php
-    $halamanAktif = $halamanAktif ?? 'undangan';
+    $halamanAktif = $halamanAktif ?? 'beranda';
     $judulMobile = $judulMobile ?? null;
     $lebarKontainer = $lebarKontainer ?? 'max-w-7xl';
     $penggunaAktif = auth()->user();
@@ -31,18 +31,24 @@
             </a>
 
             @if ($judulMobile)
-                <span class="md:hidden font-serif text-lg font-bold text-charcoal truncate">{{ $judulMobile }}</span>
+                <span class="md:hidden font-logo text-lg font-bold tracking-tight text-charcoal truncate">{{ $judulMobile }}</span>
             @endif
 
-            <nav aria-label="Navigasi Dasbor Client" class="hidden md:flex items-center gap-1.5">
+            <nav aria-label="Navigasi Dashboard Client" class="hidden md:flex items-center gap-1.5">
                 <a
-                    href="{{ route('dasbor.index') }}"
+                    href="{{ route('dashboard.index') }}"
+                    class="rounded-xl px-3.5 py-1.5 text-sm font-semibold transition {{ $halamanAktif === 'beranda' ? 'bg-sage/12 text-sage' : 'text-charcoal/70 hover:bg-ivory hover:text-charcoal' }}"
+                >
+                    Beranda
+                </a>
+                <a
+                    href="{{ route('dashboard.undangan.index') }}"
                     class="rounded-xl px-3.5 py-1.5 text-sm font-semibold transition {{ $halamanAktif === 'undangan' ? 'bg-sage/12 text-sage' : 'text-charcoal/70 hover:bg-ivory hover:text-charcoal' }}"
                 >
                     Undangan Saya
                 </a>
                 <a
-                    href="{{ route('dasbor.katalog') }}"
+                    href="{{ route('dashboard.katalog') }}"
                     class="rounded-xl px-3.5 py-1.5 text-sm font-semibold transition {{ $halamanAktif === 'katalog' ? 'bg-sage/12 text-sage' : 'text-charcoal/70 hover:bg-ivory hover:text-charcoal' }}"
                 >
                     Katalog Tema
@@ -58,14 +64,13 @@
             @endif
 
             <a
-                href="{{ route('dasbor.profil.tampil') }}"
-                title="Buka Profil Saya"
-                class="inline-flex items-center gap-2 rounded-full border pl-1.5 pr-2.5 sm:pr-3.5 py-1 transition min-w-0 {{ $halamanAktif === 'profil' ? 'border-sage bg-sage/10 text-sage' : 'border-champagne/35 bg-ivory/70 text-charcoal hover:bg-champagne/10' }}"
+                href="{{ route('dashboard.profil.tampil') }}"
+                title="Profil — {{ $penggunaAktif->nama }}"
+                aria-label="Buka profil {{ $penggunaAktif->nama }}"
+                class="inline-flex h-9 w-9 items-center justify-center rounded-full font-sans text-xs font-bold tracking-wide transition shrink-0 {{ $halamanAktif === 'profil' ? 'bg-sage text-white ring-2 ring-champagne shadow-xs' : 'bg-sage text-white ring-2 ring-champagne/40 hover:bg-sage/90 hover:ring-champagne hover:scale-105 shadow-2xs' }}"
             >
-                <span class="inline-flex h-6 w-6 md:h-7 md:w-7 items-center justify-center rounded-full bg-sage text-white text-[11px] font-bold shrink-0">
-                    {{ $penggunaAktif->inisialNama() }}
-                </span>
-                <span class="truncate max-w-[110px] sm:max-w-[160px] font-medium text-xs md:text-sm">{{ $penggunaAktif->nama }}</span>
+                <span>{{ $penggunaAktif->inisialNama() }}</span>
+                <span class="sr-only">{{ $penggunaAktif->nama }}</span>
             </a>
 
             <form
@@ -81,6 +86,11 @@
             >
                 @csrf
                 <button type="submit" class="inline-flex items-center gap-1.5 rounded-xl border border-charcoal/15 px-3 py-1.5 font-semibold text-charcoal hover:bg-charcoal/5 transition cursor-pointer">
+                    <svg class="h-3.5 w-3.5 text-charcoal/65" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" x2="9" y1="12" y2="12" />
+                    </svg>
                     <span>Keluar</span>
                 </button>
             </form>

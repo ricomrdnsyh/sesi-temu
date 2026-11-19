@@ -59,7 +59,7 @@ class Tahap2AutentikasiPolicyTest extends TestCase
             'tema_id' => $tema->id,
         ]);
 
-        $response->assertRedirect('/dasbor');
+        $response->assertRedirect('/dashboard');
 
         $pengguna = Pengguna::where('email', 'andi@sesitemu.id')->first();
         $this->assertNotNull($pengguna);
@@ -97,11 +97,11 @@ class Tahap2AutentikasiPolicyTest extends TestCase
             ->assertSessionHasErrors('email');
         $this->assertGuest();
 
-        // Client masuk -> /dasbor
+        // Client masuk -> /dashboard
         $this->post('/masuk', [
             'email' => 'client@sesitemu.id',
             'kata_sandi' => 'sandi-client',
-        ])->assertRedirect('/dasbor');
+        ])->assertRedirect('/dashboard');
         $this->assertAuthenticatedAs($client);
 
         // Keluar -> /

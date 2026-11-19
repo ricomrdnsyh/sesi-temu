@@ -299,7 +299,7 @@ class TierDanHargaTemaTest extends TestCase
         $fileSampul = new UploadedFile($tmpPath, 'sampul.png', 'image/png', null, true);
 
         $this->actingAs($client)
-            ->put("/dasbor/undangan/{$undangan->id}", [
+            ->put("/dashboard/undangan/{$undangan->id}", [
                 'bagian' => 'mempelai',
                 'nama_panggilan_pria' => 'Pratama',
                 'nama_lengkap_pria' => 'Pratama Wijaya',
@@ -307,7 +307,7 @@ class TierDanHargaTemaTest extends TestCase
                 'nama_lengkap_wanita' => 'Putri Lestari',
                 'foto_sampul' => $fileSampul,
             ])
-            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola");
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola");
 
         $undangan->refresh();
         $pathSampul = $undangan->pengaturan['foto_sampul'] ?? null;
@@ -328,7 +328,7 @@ class TierDanHargaTemaTest extends TestCase
             ->assertDontSee('foto-sampul-');
 
         $this->actingAs($client)
-            ->put("/dasbor/undangan/{$undangan->id}", [
+            ->put("/dashboard/undangan/{$undangan->id}", [
                 'bagian' => 'mempelai',
                 'nama_panggilan_pria' => 'Pratama',
                 'nama_lengkap_pria' => 'Pratama Wijaya',
@@ -336,7 +336,7 @@ class TierDanHargaTemaTest extends TestCase
                 'nama_lengkap_wanita' => 'Putri Lestari',
                 'hapus_foto_sampul' => '1',
             ])
-            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola");
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola");
 
         $undangan->refresh();
         $this->assertNull($undangan->pengaturan['foto_sampul'] ?? null);
@@ -363,13 +363,13 @@ class TierDanHargaTemaTest extends TestCase
 
         // Tab 1 (tema) -> Tab 2 (mempelai)
         $this->actingAs($client)
-            ->put("/dasbor/undangan/{$undangan->id}", [
+            ->put("/dashboard/undangan/{$undangan->id}", [
                 'bagian' => 'tema',
                 'tema_id' => $tema->id,
                 'slug' => 'uji-lanjut-tab',
                 'gaya_font' => 'bawaan',
             ])
-            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola")
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola")
             ->assertSessionHas('tab_aktif', 'mempelai')
             ->assertSessionHas('sukses', 'Perubahan undangan berhasil disimpan.');
 
@@ -379,46 +379,46 @@ class TierDanHargaTemaTest extends TestCase
                 'tab_aktif' => 'mempelai',
                 'sukses' => 'Perubahan undangan berhasil disimpan.',
             ])
-            ->get("/dasbor/undangan/{$undangan->id}/kelola")
+            ->get("/dashboard/undangan/{$undangan->id}/kelola")
             ->assertOk()
             ->assertSee('data-swal-success="Perubahan undangan berhasil disimpan."', false)
             ->assertDontSee('rounded-xl bg-sage/10 border border-sage/30 px-4 py-3 text-sm text-sage', false);
 
         // Tab 2 (mempelai) -> Tab 3 (acara)
         $this->actingAs($client)
-            ->put("/dasbor/undangan/{$undangan->id}", [
+            ->put("/dashboard/undangan/{$undangan->id}", [
                 'bagian' => 'mempelai',
                 'nama_panggilan_pria' => 'Dimas',
                 'nama_lengkap_pria' => 'Dimas Pratama',
                 'nama_panggilan_wanita' => 'Maya',
                 'nama_lengkap_wanita' => 'Maya Sari',
             ])
-            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola")
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola")
             ->assertSessionHas('tab_aktif', 'acara');
 
         // Tab 4 (cerita_streaming) -> Tab 5 (amplop)
         $this->actingAs($client)
-            ->put("/dasbor/undangan/{$undangan->id}", [
+            ->put("/dashboard/undangan/{$undangan->id}", [
                 'bagian' => 'cerita_streaming',
                 'cerita_cinta' => [
                     ['judul' => 'Pertama Bertemu', 'tanggal' => '2024', 'cerita' => 'Berawal di kafe.'],
                 ],
             ])
-            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola")
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola")
             ->assertSessionHas('tab_aktif', 'amplop');
 
         // Tab 5 (kado_fisik) -> Tab 6 (tamu)
         $this->actingAs($client)
-            ->put("/dasbor/undangan/{$undangan->id}", [
+            ->put("/dashboard/undangan/{$undangan->id}", [
                 'bagian' => 'kado_fisik',
                 'alamat_kado_fisik' => 'Jl. Merdeka No. 10, Jakarta',
             ])
-            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola")
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola")
             ->assertSessionHas('tab_aktif', 'tamu');
 
         // Halaman kelola menampilkan dropzone pratinjau foto mempelai, mockup sampul, & template kutipan cepat
         $this->actingAs($client)
-            ->get("/dasbor/undangan/{$undangan->id}/kelola?tab=mempelai")
+            ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=mempelai")
             ->assertOk()
             ->assertSee('Pratinjau Sampul Undangan')
             ->assertSee('Pilih atau Seret Foto Sampul')
@@ -453,7 +453,7 @@ class TierDanHargaTemaTest extends TestCase
         ]);
 
         $this->actingAs($client)
-            ->get('http://127.0.0.1:8000/dasbor/undangan/'.$undangan->id.'/kelola?tab=galeri')
+            ->get('http://127.0.0.1:8000/dashboard/undangan/'.$undangan->id.'/kelola?tab=galeri')
             ->assertOk()
             ->assertSee('http://127.0.0.1:8000/storage/undangan/99/hari-tunangan.webp', false);
 
@@ -474,7 +474,7 @@ class TierDanHargaTemaTest extends TestCase
         ]);
 
         $this->actingAs($client)
-            ->get("/dasbor/undangan/{$undangan->id}/kelola?tab=acara")
+            ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=acara")
             ->assertOk()
             ->assertSee('Daftar Jadwal Terpasang')
             ->assertSee('1 Acara')
@@ -484,7 +484,7 @@ class TierDanHargaTemaTest extends TestCase
             ->assertSee('+ Akad Nikah');
 
         $this->actingAs($client)
-            ->get("/dasbor/undangan/{$undangan->id}/kelola?tab=galeri")
+            ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=galeri")
             ->assertOk()
             ->assertSee('Linimasa Romantis')
             ->assertSee('Pratinjau Tampilan Tamu')
@@ -504,7 +504,7 @@ class TierDanHargaTemaTest extends TestCase
         ]);
 
         $this->actingAs($client)
-            ->get("/dasbor/undangan/{$undangan->id}/kelola?tab=amplop")
+            ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=amplop")
             ->assertOk()
             ->assertSee('Pratinjau Kartu Bank Live')
             ->assertSee('Koleksi Kartu Rekening Tersimpan')
@@ -531,7 +531,7 @@ class TierDanHargaTemaTest extends TestCase
         ]);
 
         $this->actingAs($client)
-            ->get("/dasbor/undangan/{$undangan->id}/kelola?tab=tamu")
+            ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=tamu")
             ->assertOk()
             ->assertDontSee('Mode Simulasi — Aktifkan Undangan untuk Menyebar Link WA')
             ->assertSee(':href="tamu.waUrl"', false);
@@ -542,13 +542,13 @@ class TierDanHargaTemaTest extends TestCase
         ]);
 
         $this->actingAs($client)
-            ->get("/dasbor/undangan/{$undangan->id}/kelola?tab=tamu")
+            ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=tamu")
             ->assertOk()
             ->assertSee('Kirim WA Dikunci — Masa Aktif Undangan Berakhir')
             ->assertDontSee(':href="tamu.waUrl"', false);
 
         $this->actingAs($client)
-            ->get('/dasbor')
+            ->get('/dashboard')
             ->assertOk()
             ->assertSee('Membuat Draft Undangan...')
             ->assertSee('Keluar dari Akun...');

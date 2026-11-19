@@ -17,7 +17,7 @@
                 Undangan Nonaktif
             </span>
         </div>
-        <h1 class="font-serif text-3xl font-bold text-charcoal">Masa Aktif Undangan Telah Berakhir</h1>
+        <h1 class="font-logo text-3xl font-bold text-charcoal tracking-tight">Masa Aktif Undangan Telah Berakhir</h1>
         <p class="text-sm text-charcoal/70 leading-relaxed">
             Mohon maaf, masa aktif undangan digital untuk pasangan
             <strong class="text-charcoal">{{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}</strong>

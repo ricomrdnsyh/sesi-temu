@@ -10,7 +10,7 @@ use App\Http\Controllers\Admin\AdminTransaksiController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminTemaController;
 use App\Http\Controllers\AutentikasiController;
-use App\Http\Controllers\DasborUndanganController;
+use App\Http\Controllers\DashboardUndanganController;
 use App\Http\Controllers\HalamanUtamaController;
 use App\Http\Controllers\UndanganPublikController;
 use App\Http\Middleware\PastikanAdmin;
@@ -35,32 +35,33 @@ Route::post('/keluar', [AutentikasiController::class, 'keluar'])
     ->middleware('auth')
     ->name('keluar');
 
-// 3. Area Dasbor Client (Juga bisa diakses Admin untuk Paket Terima Beres)
-Route::middleware('auth')->prefix('dasbor')->name('dasbor.')->group(function (): void {
-    Route::get('/', [DasborUndanganController::class, 'index'])->name('index');
-    Route::get('/katalog', [DasborUndanganController::class, 'katalog'])->name('katalog');
-    Route::post('/katalog/terapkan-tema', [DasborUndanganController::class, 'terapkanTema'])->name('katalog.terapkan');
-    Route::get('/profil', [DasborUndanganController::class, 'profil'])->name('profil.tampil');
-    Route::put('/profil', [DasborUndanganController::class, 'perbaruiProfil'])->name('profil.perbarui');
-    Route::post('/undangan', [DasborUndanganController::class, 'simpanUndanganBaru'])->name('undangan.simpan');
-    Route::get('/undangan/{undangan}/kelola', [DasborUndanganController::class, 'kelola'])->name('undangan.kelola');
-    Route::put('/undangan/{undangan}', [DasborUndanganController::class, 'perbaruiDataUtama'])->name('undangan.perbarui');
+// 3. Area Dashboard Client (Juga bisa diakses Admin untuk Paket Terima Beres)
+Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(function (): void {
+    Route::get('/', [DashboardUndanganController::class, 'index'])->name('index');
+    Route::get('/undangan', [DashboardUndanganController::class, 'daftarUndangan'])->name('undangan.index');
+    Route::get('/katalog', [DashboardUndanganController::class, 'katalog'])->name('katalog');
+    Route::post('/katalog/terapkan-tema', [DashboardUndanganController::class, 'terapkanTema'])->name('katalog.terapkan');
+    Route::get('/profil', [DashboardUndanganController::class, 'profil'])->name('profil.tampil');
+    Route::put('/profil', [DashboardUndanganController::class, 'perbaruiProfil'])->name('profil.perbarui');
+    Route::post('/undangan', [DashboardUndanganController::class, 'simpanUndanganBaru'])->name('undangan.simpan');
+    Route::get('/undangan/{undangan}/kelola', [DashboardUndanganController::class, 'kelola'])->name('undangan.kelola');
+    Route::put('/undangan/{undangan}', [DashboardUndanganController::class, 'perbaruiDataUtama'])->name('undangan.perbarui');
 
     // Sub-fitur di dalam pengelolaan undangan
-    Route::post('/undangan/{undangan}/acara', [DasborUndanganController::class, 'simpanAcara'])->name('acara.simpan');
-    Route::delete('/undangan/{undangan}/acara/{acara}', [DasborUndanganController::class, 'hapusAcara'])->name('acara.hapus');
+    Route::post('/undangan/{undangan}/acara', [DashboardUndanganController::class, 'simpanAcara'])->name('acara.simpan');
+    Route::delete('/undangan/{undangan}/acara/{acara}', [DashboardUndanganController::class, 'hapusAcara'])->name('acara.hapus');
 
-    Route::post('/undangan/{undangan}/galeri', [DasborUndanganController::class, 'unggahGaleri'])->name('galeri.unggah');
-    Route::delete('/undangan/{undangan}/galeri/{galeri}', [DasborUndanganController::class, 'hapusGaleri'])->name('galeri.hapus');
+    Route::post('/undangan/{undangan}/galeri', [DashboardUndanganController::class, 'unggahGaleri'])->name('galeri.unggah');
+    Route::delete('/undangan/{undangan}/galeri/{galeri}', [DashboardUndanganController::class, 'hapusGaleri'])->name('galeri.hapus');
 
-    Route::post('/undangan/{undangan}/amplop', [DasborUndanganController::class, 'simpanAmplop'])->name('amplop.simpan');
-    Route::delete('/undangan/{undangan}/amplop/{amplop}', [DasborUndanganController::class, 'hapusAmplop'])->name('amplop.hapus');
+    Route::post('/undangan/{undangan}/amplop', [DashboardUndanganController::class, 'simpanAmplop'])->name('amplop.simpan');
+    Route::delete('/undangan/{undangan}/amplop/{amplop}', [DashboardUndanganController::class, 'hapusAmplop'])->name('amplop.hapus');
 
-    Route::delete('/undangan/{undangan}/buku-tamu/{ucapan}', [DasborUndanganController::class, 'hapusUcapan'])->name('ucapan.hapus');
+    Route::delete('/undangan/{undangan}/buku-tamu/{ucapan}', [DashboardUndanganController::class, 'hapusUcapan'])->name('ucapan.hapus');
 
-    Route::post('/undangan/{undangan}/promo/cek', [DasborUndanganController::class, 'cekPromo'])->name('transaksi.cek-promo');
-    Route::post('/undangan/{undangan}/transaksi', [DasborUndanganController::class, 'ajukanTransaksi'])->name('transaksi.ajukan');
-    Route::post('/transaksi/{transaksi}/unggah-bukti', [DasborUndanganController::class, 'unggahBuktiTransaksi'])->name('transaksi.unggah');
+    Route::post('/undangan/{undangan}/promo/cek', [DashboardUndanganController::class, 'cekPromo'])->name('transaksi.cek-promo');
+    Route::post('/undangan/{undangan}/transaksi', [DashboardUndanganController::class, 'ajukanTransaksi'])->name('transaksi.ajukan');
+    Route::post('/transaksi/{transaksi}/unggah-bukti', [DashboardUndanganController::class, 'unggahBuktiTransaksi'])->name('transaksi.unggah');
 });
 
 // 4. Area Panel Admin

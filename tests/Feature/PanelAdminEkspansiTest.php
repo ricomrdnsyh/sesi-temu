@@ -50,7 +50,7 @@ class PanelAdminEkspansiTest extends TestCase
         }
     }
 
-    public function test_pengaturan_platform_memengaruhi_beranda_dasbor_dan_durasi_aktivasi(): void
+    public function test_pengaturan_platform_memengaruhi_beranda_dashboard_dan_durasi_aktivasi(): void
     {
         $admin = Pengguna::factory()->admin()->create();
         $client = Pengguna::factory()->create(['peran' => 'client']);
@@ -98,7 +98,7 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSee('Aktifkan Undangan (6 Bulan)');
 
         $this->actingAs($client)
-            ->get('/dasbor')
+            ->get('/dashboard')
             ->assertOk()
             ->assertSee('6281122334455');
 
@@ -147,7 +147,7 @@ class PanelAdminEkspansiTest extends TestCase
         Storage::disk('public')->assertExists(substr($musikBaru->path_file, 8));
 
         $this->actingAs($client)
-            ->get("/dasbor/undangan/{$undangan->id}/kelola")
+            ->get("/dashboard/undangan/{$undangan->id}/kelola")
             ->assertOk()
             ->assertSee('Melodi Cinta Baru')
             ->assertSee($musikBaru->path_file);
@@ -160,7 +160,7 @@ class PanelAdminEkspansiTest extends TestCase
         session()->forget('sukses');
 
         $this->actingAs($client)
-            ->get("/dasbor/undangan/{$undangan->id}/kelola")
+            ->get("/dashboard/undangan/{$undangan->id}/kelola")
             ->assertOk()
             ->assertDontSee('Melodi Cinta Baru')
             ->assertDontSee($musikBaru->path_file);
@@ -207,12 +207,12 @@ class PanelAdminEkspansiTest extends TestCase
 
         // Total: harga tema 129.000 + Terima Beres 50.000 = 179.000; 20% = 35.800 dibatasi maks 30.000 => 149.000
         $this->actingAs($client)
-            ->post("/dasbor/undangan/{$undangan->id}/transaksi", [
+            ->post("/dashboard/undangan/{$undangan->id}/transaksi", [
                 'paket' => 'terima_beres',
                 'kode_promo' => 'hemat20',
                 'bukti_pembayaran' => $bukti,
             ])
-            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola")
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola")
             ->assertSessionHas('sukses');
 
         $transaksi = Transaksi::where('undangan_id', $undangan->id)->firstOrFail();
@@ -508,7 +508,7 @@ class PanelAdminEkspansiTest extends TestCase
 
         // Editor client Tab 7 & Beranda menampilkan harga coret + harga diskon
         $this->actingAs($client)
-            ->get("/dasbor/undangan/{$undangan->id}/kelola")
+            ->get("/dashboard/undangan/{$undangan->id}/kelola")
             ->assertOk()
             ->assertSee('Rp 129.000')
             ->assertSee('Rp 103.200');
@@ -516,11 +516,11 @@ class PanelAdminEkspansiTest extends TestCase
         // Checkout client otomatis memakai harga tema terdiskon (103.200 + biaya Terima Beres 50.000 = 153.200)
         $bukti = UploadedFile::fake()->create('bukti-diskon.png', 100, 'image/png');
         $this->actingAs($client)
-            ->post("/dasbor/undangan/{$undangan->id}/transaksi", [
+            ->post("/dashboard/undangan/{$undangan->id}/transaksi", [
                 'paket' => 'terima_beres',
                 'bukti_pembayaran' => $bukti,
             ])
-            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola")
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola")
             ->assertSessionHas('sukses');
 
         $transaksi = Transaksi::where('undangan_id', $undangan->id)->firstOrFail();
@@ -605,7 +605,7 @@ class PanelAdminEkspansiTest extends TestCase
         $this->assertDatabaseMissing('tema', ['slug' => 'tema-salah-folder']);
     }
 
-    public function test_tampilan_dasbor_client_memiliki_bottom_navbar_mobile_first(): void
+    public function test_tampilan_dashboard_client_memiliki_bottom_navbar_mobile_first(): void
     {
         $client = Pengguna::factory()->create(['peran' => 'client']);
         $tema = $this->buatTemaContoh();
@@ -621,26 +621,62 @@ class PanelAdminEkspansiTest extends TestCase
             'status_publikasi' => false,
         ]);
 
+        $this->get('/dashboard/undangan')->assertRedirect('/masuk');
+
         $this->actingAs($client)
-            ->get('/dasbor')
+            ->get('/dashboard')
             ->assertOk()
             ->assertSee('data-client-bottom-nav', false)
             ->assertSee('md:hidden fixed bottom-0', false)
             ->assertSee('pb-28 md:py-8', false)
             ->assertSee('font-logo', false)
+            ->assertSee('Lanjutkan Undangan Terakhir')
             ->assertSee('Pilihan Tema Favorit')
             ->assertSee('Buat Draft')
+            ->assertSee('data-client-nav="beranda"', false)
+            ->assertSee('data-client-nav="undangan"', false)
+            ->assertSee('data-client-nav="buat"', false)
+            ->assertSee('data-client-nav="katalog"', false)
             ->assertSee('data-client-nav="profil"', false);
 
-        $clientKosong = Pengguna::factory()->create(['peran' => 'client']);
-        $this->actingAs($clientKosong)
-            ->get('/dasbor')
+        $this->actingAs($client)
+            ->get('/dashboard/undangan')
             ->assertOk()
+            ->assertSee('data-client-bottom-nav', false)
+            ->assertSee('data-client-nav="undangan"', false)
+            ->assertSee('Undangan Saya')
+            ->assertSee('mobile-nav-uji')
+            ->assertSee('Kelengkapan Undangan')
+            ->assertSee('Salin Link')
+            ->assertSee('Bayar &amp; Aktifkan', false);
+
+        $clientKosong = Pengguna::factory()->create([
+            'peran' => 'client',
+            'nama' => 'Dimas Pratama Pamungkas Putra',
+        ]);
+        $this->actingAs($clientKosong)
+            ->get('/dashboard')
+            ->assertOk()
+            ->assertSee('Dimas Pratama Pamungkas Putra')
             ->assertSee('Wujudkan Undangan Digital Impian')
-            ->assertSee('Pilih Tema Desain');
+            ->assertSee('Mulai dalam 3 Langkah Mudah')
+            ->assertSee('Pilih Tema Desain')
+            ->assertSee('font-sans text-base sm:text-lg font-bold text-charcoal tracking-tight', false)
+            ->assertSee('Pilihan Tema Favorit')
+            ->assertSee('scroll-px-4', false)
+            ->assertSee('Lihat Sampul')
+            ->assertSee('Pakai Foto')
+            ->assertSee('Tanpa Foto')
+            ->assertSee('Pakai Tema Ini');
+
+        $this->actingAs($clientKosong)
+            ->get('/dashboard/undangan')
+            ->assertOk()
+            ->assertSee('Belum Ada Undangan Tersimpan')
+            ->assertSee('Buat Draft Undangan Pertama');
 
         $this->actingAs($client)
-            ->get('/dasbor/profil')
+            ->get('/dashboard/profil')
             ->assertOk()
             ->assertSee('data-client-bottom-nav', false)
             ->assertSee('data-client-nav="profil"', false)
@@ -649,7 +685,7 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSee($client->inisialNama());
 
         $this->actingAs($client)
-            ->get("/dasbor/undangan/{$undangan->id}/kelola")
+            ->get("/dashboard/undangan/{$undangan->id}/kelola")
             ->assertOk()
             ->assertSee('data-client-bottom-nav', false)
             ->assertSee('data-mobile-tab="tema"', false)
@@ -663,7 +699,7 @@ class PanelAdminEkspansiTest extends TestCase
 
     public function test_client_dapat_melihat_dan_memperbarui_profil_serta_kata_sandi(): void
     {
-        $this->get('/dasbor/profil')->assertRedirect('/masuk');
+        $this->get('/dashboard/profil')->assertRedirect('/masuk');
 
         $client = Pengguna::factory()->create([
             'nama' => 'Raka Wijaya',
@@ -675,13 +711,13 @@ class PanelAdminEkspansiTest extends TestCase
 
         // Perbarui biodata + normalisasi nomor WA 08... -> 628...
         $this->actingAs($client)
-            ->put('/dasbor/profil', [
+            ->put('/dashboard/profil', [
                 'bagian' => 'biodata',
                 'nama' => 'Raka Wijaya Baru',
                 'email' => 'raka-baru@sesitemu.id',
                 'nomor_wa' => '081234567890',
             ])
-            ->assertRedirect('/dasbor/profil')
+            ->assertRedirect('/dashboard/profil')
             ->assertSessionHas('sukses');
 
         $client->refresh();
@@ -692,7 +728,7 @@ class PanelAdminEkspansiTest extends TestCase
 
         // Salah kata sandi lama ditolak
         $this->actingAs($client)
-            ->put('/dasbor/profil', [
+            ->put('/dashboard/profil', [
                 'bagian' => 'kata_sandi',
                 'kata_sandi_lama' => 'SalahSandi99',
                 'kata_sandi_baru' => 'SandiBaru123',
@@ -702,13 +738,13 @@ class PanelAdminEkspansiTest extends TestCase
 
         // Berhasil ubah kata sandi jika kata sandi lama benar
         $this->actingAs($client)
-            ->put('/dasbor/profil', [
+            ->put('/dashboard/profil', [
                 'bagian' => 'kata_sandi',
                 'kata_sandi_lama' => 'SandiLama123',
                 'kata_sandi_baru' => 'SandiBaru123',
                 'kata_sandi_baru_confirmation' => 'SandiBaru123',
             ])
-            ->assertRedirect('/dasbor/profil')
+            ->assertRedirect('/dashboard/profil')
             ->assertSessionHas('sukses');
 
         $this->assertTrue(Hash::check('SandiBaru123', $client->fresh()->kata_sandi));
@@ -716,7 +752,7 @@ class PanelAdminEkspansiTest extends TestCase
 
     public function test_client_katalog_tema_tetap_di_area_client_dan_melanjutkan_alur(): void
     {
-        $this->get('/dasbor/katalog')->assertRedirect('/masuk');
+        $this->get('/dashboard/katalog')->assertRedirect('/masuk');
 
         $client = Pengguna::factory()->create(['peran' => 'client']);
         $clientLain = Pengguna::factory()->create(['peran' => 'client']);
@@ -757,7 +793,7 @@ class PanelAdminEkspansiTest extends TestCase
 
         // Katalog tetap berada di area client lengkap dengan bottom nav dan tombol Pakai Tema Ini
         $this->actingAs($client)
-            ->get('/dasbor/katalog')
+            ->get('/dashboard/katalog')
             ->assertOk()
             ->assertSee('data-client-bottom-nav', false)
             ->assertSee('data-client-nav="katalog"', false)
@@ -766,16 +802,16 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSee('Pratinjau sampul tema')
             ->assertSee('Pakai Tema Ini');
 
-        // Saat client membuka demo dari katalog, bar demo kembali ke /dasbor/katalog dan lanjut pakai tema ke /dasbor/katalog?pakai=...
+        // Saat client membuka demo dari katalog, bar demo kembali ke /dashboard/katalog dan lanjut pakai tema ke /dashboard/katalog?pakai=...
         $this->actingAs($client)
             ->get("/demo/{$temaPilihan->slug}?dari=katalog")
             ->assertOk()
-            ->assertSee(route('dasbor.katalog'), false)
-            ->assertSee(route('dasbor.katalog', ['pakai' => $temaPilihan->id]), false);
+            ->assertSee(route('dashboard.katalog'), false)
+            ->assertSee(route('dashboard.katalog', ['pakai' => $temaPilihan->id]), false);
 
         // Policy guard: tidak bisa menerapkan tema ke undangan milik orang lain
         $this->actingAs($client)
-            ->post('/dasbor/katalog/terapkan-tema', [
+            ->post('/dashboard/katalog/terapkan-tema', [
                 'undangan_id' => $undanganMilikOrangLain->id,
                 'tema_id' => $temaPilihan->id,
             ])
@@ -783,11 +819,11 @@ class PanelAdminEkspansiTest extends TestCase
 
         // Terapkan tema pilihan ke undangan sendiri -> lanjut langsung ke halaman kelola undangan
         $this->actingAs($client)
-            ->post('/dasbor/katalog/terapkan-tema', [
+            ->post('/dashboard/katalog/terapkan-tema', [
                 'undangan_id' => $undangan->id,
                 'tema_id' => $temaPilihan->id,
             ])
-            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola?tab=tema")
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola?tab=tema")
             ->assertSessionHas('sukses');
 
         $this->assertSame($temaPilihan->id, $undangan->fresh()->tema_id);
@@ -830,7 +866,7 @@ class PanelAdminEkspansiTest extends TestCase
 
         // Halaman kelola Tab 7 menampilkan Cek Promo & Ringkasan Pembayaran Live serta penanda Wajib bukti
         $this->actingAs($client)
-            ->get("/dasbor/undangan/{$undangan->id}/kelola?tab=aktivasi")
+            ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=aktivasi")
             ->assertOk()
             ->assertSee('Cek Promo')
             ->assertSee('Total yang Harus Ditransfer')
@@ -846,7 +882,7 @@ class PanelAdminEkspansiTest extends TestCase
 
         // Pengajuan tanpa bukti pembayaran saat total > 0 ditolak
         $this->actingAs($client)
-            ->post("/dasbor/undangan/{$undangan->id}/transaksi", [
+            ->post("/dashboard/undangan/{$undangan->id}/transaksi", [
                 'paket' => 'mandiri',
             ])
             ->assertRedirect()
@@ -857,7 +893,7 @@ class PanelAdminEkspansiTest extends TestCase
 
         // Cek Promo: client lain diblokir policy
         $this->actingAs($clientLain)
-            ->postJson("/dasbor/undangan/{$undangan->id}/promo/cek", [
+            ->postJson("/dashboard/undangan/{$undangan->id}/promo/cek", [
                 'paket' => 'mandiri',
                 'kode_promo' => $promoDiskon->kode,
             ])
@@ -865,7 +901,7 @@ class PanelAdminEkspansiTest extends TestCase
 
         // Cek Promo: kode salah mengembalikan 422
         $this->actingAs($client)
-            ->postJson("/dasbor/undangan/{$undangan->id}/promo/cek", [
+            ->postJson("/dashboard/undangan/{$undangan->id}/promo/cek", [
                 'paket' => 'mandiri',
                 'kode_promo' => 'TIDAKADA',
             ])
@@ -876,7 +912,7 @@ class PanelAdminEkspansiTest extends TestCase
 
         // Cek Promo: voucher potongan nominal menghitung total bersih & perlu_bukti = true
         $this->actingAs($client)
-            ->postJson("/dasbor/undangan/{$undangan->id}/promo/cek", [
+            ->postJson("/dashboard/undangan/{$undangan->id}/promo/cek", [
                 'paket' => 'mandiri',
                 'kode_promo' => 'potong29',
             ])
@@ -892,7 +928,7 @@ class PanelAdminEkspansiTest extends TestCase
 
         // Cek Promo: voucher 100% mengembalikan total_bayar = 0 & perlu_bukti = false
         $this->actingAs($client)
-            ->postJson("/dasbor/undangan/{$undangan->id}/promo/cek", [
+            ->postJson("/dashboard/undangan/{$undangan->id}/promo/cek", [
                 'paket' => 'mandiri',
                 'kode_promo' => $promoGratis->kode,
             ])
@@ -906,11 +942,11 @@ class PanelAdminEkspansiTest extends TestCase
 
         // Pengajuan dengan voucher 100% (total Rp 0) diizinkan tanpa unggah bukti transfer & berstatus menunggu_verifikasi
         $this->actingAs($client)
-            ->post("/dasbor/undangan/{$undangan->id}/transaksi", [
+            ->post("/dashboard/undangan/{$undangan->id}/transaksi", [
                 'paket' => 'mandiri',
                 'kode_promo' => 'GRATIS100',
             ])
-            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola")
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola")
             ->assertSessionHas('sukses')
             ->assertSessionHas('tab_aktif', 'aktivasi');
 
@@ -923,18 +959,18 @@ class PanelAdminEkspansiTest extends TestCase
         Storage::fake('public');
         $bukti = UploadedFile::fake()->create('bukti-bayar.png', 100, 'image/png');
         $this->actingAs($client)
-            ->post("/dasbor/undangan/{$undangan->id}/transaksi", [
+            ->post("/dashboard/undangan/{$undangan->id}/transaksi", [
                 'paket' => 'mandiri',
                 'bukti_pembayaran' => $bukti,
             ])
-            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola");
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola");
 
         $transaksiBerbayar = Transaksi::where('undangan_id', $undangan->id)
             ->where('total_bayar', '>', 0)
             ->firstOrFail();
 
         $this->actingAs($client)
-            ->get("/dasbor/undangan/{$undangan->id}/kelola?tab=aktivasi")
+            ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=aktivasi")
             ->assertOk()
             ->assertSee('Gratis via Voucher')
             ->assertSee('Lihat Bukti')

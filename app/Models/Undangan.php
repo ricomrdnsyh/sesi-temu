@@ -223,6 +223,84 @@ class Undangan extends Model
         return $this->status_publikasi && ! $this->sudahKedaluwarsa();
     }
 
+    public function statusKode(): string
+    {
+        if ($this->sudahKedaluwarsa()) {
+            return 'kedaluwarsa';
+        }
+
+        if ($this->status_publikasi) {
+            return 'aktif';
+        }
+
+        return 'draft';
+    }
+
+    public function acaraTerdekat(): ?AcaraUndangan
+    {
+        $daftar = $this->relationLoaded('daftarAcara')
+            ? $this->daftarAcara
+            : $this->daftarAcara()->get();
+
+        if ($daftar->isEmpty()) {
+            return null;
+        }
+
+        $hariIni = now()->startOfDay();
+
+        return $daftar->first(
+            static fn (AcaraUndangan $acara): bool => $acara->tanggal_acara !== null
+                && $acara->tanggal_acara->copy()->startOfDay()->greaterThanOrEqualTo($hariIni)
+        ) ?? $daftar->first();
+    }
+
+    /**
+     * Ringkasan progres kelengkapan isi undangan (4 tahap utama).
+     *
+     * @return array{
+     *     terpenuhi: int,
+     *     total: int,
+     *     persen: int,
+     *     butir: list<array{kode: string, label: string, selesai: bool, tab: string}>
+     * }
+     */
+    public function ringkasanKelengkapan(): array
+    {
+        $acaraAda = $this->relationLoaded('daftarAcara')
+            ? $this->daftarAcara->isNotEmpty()
+            : $this->daftarAcara()->exists();
+
+        $galeriAda = $this->modeTanpaFoto()
+            || ($this->relationLoaded('daftarGaleri')
+                ? $this->daftarGaleri->isNotEmpty()
+                : $this->daftarGaleri()->exists());
+
+        $amplopAda = ($this->relationLoaded('daftarAmplop')
+            ? $this->daftarAmplop->isNotEmpty()
+            : $this->daftarAmplop()->exists())
+            || trim((string) data_get($this->pengaturan, 'alamat_kado_fisik', '')) !== '';
+
+        $mempelaiAda = trim((string) $this->nama_lengkap_pria) !== ''
+            && trim((string) $this->nama_lengkap_wanita) !== '';
+
+        $butir = [
+            ['kode' => 'mempelai', 'label' => 'Mempelai', 'selesai' => $mempelaiAda, 'tab' => 'mempelai'],
+            ['kode' => 'acara', 'label' => 'Acara', 'selesai' => $acaraAda, 'tab' => 'acara'],
+            ['kode' => 'galeri', 'label' => $this->modeTanpaFoto() ? 'Mode TF' : 'Galeri', 'selesai' => $galeriAda, 'tab' => 'galeri'],
+            ['kode' => 'amplop', 'label' => 'Amplop', 'selesai' => $amplopAda, 'tab' => 'amplop'],
+        ];
+
+        $terpenuhi = collect($butir)->where('selesai', true)->count();
+        $total = count($butir);
+
+        return [
+            'terpenuhi' => $terpenuhi,
+            'total' => $total,
+            'persen' => (int) round(($terpenuhi / $total) * 100),
+            'butir' => $butir,
+        ];
+    }
+
     public function bolehDipratinjauOleh(?Pengguna $pengguna): bool
     {
         if (! $pengguna) {
@@ -342,7 +420,7 @@ class Undangan extends Model
         return $this->urlFotoPria() ?? $this->urlFotoWanita();
     }
 
-    public function urlFotoSampulKhususDasbor(): ?string
+    public function urlFotoSampulKhususDashboard(): ?string
     {
         $fotoSampul = data_get($this->pengaturan, 'foto_sampul');
 

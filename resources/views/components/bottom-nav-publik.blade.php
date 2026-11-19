@@ -87,7 +87,7 @@
             </button>
         @else
             <a
-                href="{{ auth()->check() ? route('dasbor.katalog') : route('daftar') }}"
+                href="{{ auth()->check() ? route('dashboard.katalog') : route('daftar') }}"
                 class="flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl transition {{ $halaman === 'daftar' ? 'text-sage font-bold bg-sage/10' : 'text-charcoal/85 hover:text-sage font-semibold' }}"
             >
                 <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[#2D4439] to-sage text-white shadow-sm ring-2 {{ $halaman === 'daftar' ? 'ring-champagne' : 'ring-champagne/30' }}">
@@ -129,7 +129,7 @@
 
         {{-- 5. Masuk / Akun --}}
         <a
-            href="{{ auth()->check() ? (auth()->user()->adalahAdmin() ? '/admin' : '/dasbor') : route('login') }}"
+            href="{{ auth()->check() ? (auth()->user()->adalahAdmin() ? '/admin' : '/dashboard') : route('login') }}"
             class="flex flex-col items-center justify-center gap-0.5 py-1.5 rounded-xl transition {{ $halaman === 'masuk' ? 'text-sage font-bold bg-sage/10' : 'text-charcoal/65 hover:text-sage font-medium' }}"
         >
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -138,7 +138,7 @@
             </svg>
             <span class="text-[10px] leading-tight">
                 @auth
-                    {{ auth()->user()->adalahAdmin() ? 'Admin' : 'Dasbor' }}
+                    {{ auth()->user()->adalahAdmin() ? 'Admin' : 'Dashboard' }}
                 @else
                     Masuk
                 @endauth

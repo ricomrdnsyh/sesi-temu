@@ -29,7 +29,7 @@
         <div class="relative z-10 flex items-start justify-between gap-2">
             <div class="min-w-0">
                 <p class="text-[10px] uppercase tracking-[0.22em] text-white/75" x-text="gayaKartuLive().label_jenis"></p>
-                <p class="font-serif text-lg sm:text-xl font-bold tracking-wide truncate drop-shadow-xs" x-text="bankBaru.trim() || gayaKartuLive().singkatan"></p>
+                <p class="font-logo text-lg sm:text-xl font-bold tracking-wide truncate drop-shadow-xs" x-text="bankBaru.trim() || gayaKartuLive().singkatan"></p>
             </div>
             <span class="rounded-lg bg-white/15 backdrop-blur-xs border border-white/25 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shrink-0" x-text="gayaKartuLive().singkatan"></span>
         </div>
@@ -92,7 +92,7 @@
         <div class="relative z-10 flex items-start justify-between gap-2">
             <div class="min-w-0">
                 <p class="text-[10px] uppercase tracking-[0.2em] text-white/75">{{ $gaya['label_jenis'] }}</p>
-                <h3 class="font-serif text-lg font-bold tracking-wide truncate drop-shadow-xs">{{ $namaBankKartu }}</h3>
+                <h3 class="font-logo text-lg font-bold tracking-wide truncate drop-shadow-xs">{{ $namaBankKartu }}</h3>
             </div>
 
             <div class="flex items-center gap-1.5 shrink-0">
@@ -109,7 +109,7 @@
                     </span>
                 @elseif (isset($amplop))
                     <form
-                        action="{{ route('dasbor.amplop.hapus', [$undangan, $amplop]) }}"
+                        action="{{ route('dashboard.amplop.hapus', [$undangan, $amplop]) }}"
                         method="POST"
                         data-swal-title="Hapus Rekening?"
                         data-swal-confirm="Yakin ingin menghapus kartu {{ $amplop->nama_bank }} ({{ $amplop->nomor_rekening }})?"

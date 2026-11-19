@@ -26,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return '/admin';
             }
 
-            return '/dasbor';
+            return '/dashboard';
         });
     })
     ->withExceptions(function (Exceptions $exceptions): void {

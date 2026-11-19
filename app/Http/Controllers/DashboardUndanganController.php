@@ -24,7 +24,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
-class DasborUndanganController extends Controller
+class DashboardUndanganController extends Controller
 {
     /**
      * @var list<string>
@@ -33,7 +33,7 @@ class DasborUndanganController extends Controller
         'masuk',
         'daftar',
         'keluar',
-        'dasbor',
+        'dashboard',
         'admin',
         'demo',
         'cek-link',
@@ -44,13 +44,30 @@ class DasborUndanganController extends Controller
     {
         $daftarUndangan = $request->user()
             ->undangan()
-            ->with(['tema', 'bukuTamu', 'daftarAcara', 'transaksi'])
+            ->with(['tema', 'bukuTamu', 'daftarAcara', 'daftarGaleri', 'daftarAmplop', 'transaksi'])
             ->latest()
             ->get();
 
         $daftarTema = Tema::where('aktif', true)->orderBy('id')->get();
 
-        return view('dasbor.index', [
+        return view('dashboard.index', [
+            'daftarUndangan' => $daftarUndangan,
+            'daftarTema' => $daftarTema,
+            'durasiAktifBulan' => PengaturanSesiTemu::masaAktifBulan(),
+        ]);
+    }
+
+    public function daftarUndangan(Request $request): View
+    {
+        $daftarUndangan = $request->user()
+            ->undangan()
+            ->with(['tema', 'bukuTamu', 'daftarAcara', 'daftarGaleri', 'daftarAmplop', 'transaksi'])
+            ->latest()
+            ->get();
+
+        $daftarTema = Tema::where('aktif', true)->orderBy('id')->get();
+
+        return view('dashboard.undangan', [
             'daftarUndangan' => $daftarUndangan,
             'daftarTema' => $daftarTema,
             'durasiAktifBulan' => PengaturanSesiTemu::masaAktifBulan(),
@@ -70,7 +87,7 @@ class DasborUndanganController extends Controller
         $idPrepilih = (int) ($request->old('tema_id') ?: $request->query('pakai') ?: $request->query('tema', 0));
         $temaPrepilih = $idPrepilih > 0 ? $daftarTema->firstWhere('id', $idPrepilih) : null;
 
-        return view('dasbor.katalog', [
+        return view('dashboard.katalog', [
             'daftarTema' => $daftarTema,
             'ringkasanTier' => $ringkasanTier,
             'daftarUndanganSaya' => $daftarUndanganSaya,
@@ -96,7 +113,7 @@ class DasborUndanganController extends Controller
         $undangan->update(['tema_id' => $tema->id]);
 
         return redirect()
-            ->route('dasbor.undangan.kelola', [$undangan, 'tab' => 'tema'])
+            ->route('dashboard.undangan.kelola', [$undangan, 'tab' => 'tema'])
             ->with('sukses', "Tema \"{$tema->nama_tema}\" berhasil diterapkan ke undangan {$undangan->nama_panggilan_pria} & {$undangan->nama_panggilan_wanita}. Lanjutkan melengkapi data undangan!");
     }
 
@@ -118,7 +135,7 @@ class DasborUndanganController extends Controller
             ->take(5)
             ->get();
 
-        return view('dasbor.profil', [
+        return view('dashboard.profil', [
             'pengguna' => $pengguna,
             'totalUndangan' => $totalUndangan,
             'totalUndanganAktif' => $totalUndanganAktif,
@@ -153,7 +170,7 @@ class DasborUndanganController extends Controller
             ]);
 
             return redirect()
-                ->route('dasbor.profil.tampil')
+                ->route('dashboard.profil.tampil')
                 ->with('sukses', 'Kata sandi akun berhasil diperbarui.');
         }
 
@@ -175,7 +192,7 @@ class DasborUndanganController extends Controller
         ]);
 
         return redirect()
-            ->route('dasbor.profil.tampil')
+            ->route('dashboard.profil.tampil')
             ->with('sukses', 'Profil akun Anda berhasil diperbarui.');
     }
 
@@ -216,7 +233,7 @@ class DasborUndanganController extends Controller
         ]);
 
         return redirect()
-            ->route('dasbor.undangan.kelola', $undangan)
+            ->route('dashboard.undangan.kelola', $undangan)
             ->with('sukses', 'Draft undangan berhasil dibuat! Silakan lengkapi detail undangan Anda.');
     }
 
@@ -238,7 +255,7 @@ class DasborUndanganController extends Controller
 
         $tabAktif = (string) ($request->session()->get('tab_aktif') ?: $request->query('tab', 'tema'));
 
-        return view('dasbor.kelola', [
+        return view('dashboard.kelola', [
             'undangan' => $undangan,
             'daftarTema' => $daftarTema,
             'daftarMusik' => $daftarMusik,
@@ -435,7 +452,7 @@ class DasborUndanganController extends Controller
         };
 
         return redirect()
-            ->route('dasbor.undangan.kelola', $undangan)
+            ->route('dashboard.undangan.kelola', $undangan)
             ->with('tab_aktif', $tabTujuan)
             ->with('sukses', 'Perubahan undangan berhasil disimpan.');
     }
@@ -485,7 +502,7 @@ class DasborUndanganController extends Controller
         }
 
         return redirect()
-            ->route('dasbor.undangan.kelola', $undangan)
+            ->route('dashboard.undangan.kelola', $undangan)
             ->with('tab_aktif', 'acara')
             ->with('sukses', $pesan);
     }
@@ -501,7 +518,7 @@ class DasborUndanganController extends Controller
         $acara->delete();
 
         return redirect()
-            ->route('dasbor.undangan.kelola', $undangan)
+            ->route('dashboard.undangan.kelola', $undangan)
             ->with('tab_aktif', 'acara')
             ->with('sukses', 'Jadwal acara berhasil dihapus.');
     }
@@ -515,7 +532,7 @@ class DasborUndanganController extends Controller
 
         if ($undangan->daftarGaleri()->count() >= 10) {
             return redirect()
-                ->route('dasbor.undangan.kelola', $undangan)
+                ->route('dashboard.undangan.kelola', $undangan)
                 ->with('tab_aktif', 'galeri')
                 ->withErrors(['foto' => 'Maksimal 10 foto galeri per undangan.']);
         }
@@ -540,7 +557,7 @@ class DasborUndanganController extends Controller
         ]);
 
         return redirect()
-            ->route('dasbor.undangan.kelola', $undangan)
+            ->route('dashboard.undangan.kelola', $undangan)
             ->with('tab_aktif', 'galeri')
             ->with('sukses', 'Foto galeri berhasil dikompresi ke WebP dan disimpan.');
     }
@@ -556,7 +573,7 @@ class DasborUndanganController extends Controller
         $galeri->delete();
 
         return redirect()
-            ->route('dasbor.undangan.kelola', $undangan)
+            ->route('dashboard.undangan.kelola', $undangan)
             ->with('tab_aktif', 'galeri')
             ->with('sukses', 'Foto galeri berhasil dihapus.');
     }
@@ -579,7 +596,7 @@ class DasborUndanganController extends Controller
         ]);
 
         return redirect()
-            ->route('dasbor.undangan.kelola', $undangan)
+            ->route('dashboard.undangan.kelola', $undangan)
             ->with('tab_aktif', 'amplop')
             ->with('sukses', 'Rekening amplop digital berhasil ditambahkan.');
     }
@@ -595,7 +612,7 @@ class DasborUndanganController extends Controller
         $amplop->delete();
 
         return redirect()
-            ->route('dasbor.undangan.kelola', $undangan)
+            ->route('dashboard.undangan.kelola', $undangan)
             ->with('tab_aktif', 'amplop')
             ->with('sukses', 'Rekening amplop digital berhasil dihapus.');
     }
@@ -611,7 +628,7 @@ class DasborUndanganController extends Controller
         $ucapan->delete();
 
         return redirect()
-            ->route('dasbor.undangan.kelola', $undangan)
+            ->route('dashboard.undangan.kelola', $undangan)
             ->with('tab_aktif', 'tamu')
             ->with('sukses', 'Ucapan buku tamu berhasil dihapus.');
     }
@@ -700,7 +717,7 @@ class DasborUndanganController extends Controller
         );
 
         return redirect()
-            ->route('dasbor.undangan.kelola', $undangan)
+            ->route('dashboard.undangan.kelola', $undangan)
             ->with('tab_aktif', 'aktivasi')
             ->with('sukses', "Order {$transaksi->kode_invoice} berhasil diajukan dengan total ".Tema::formatRupiah($transaksi->total_bayar).' dan menunggu verifikasi Admin.');
     }
@@ -759,7 +776,7 @@ class DasborUndanganController extends Controller
         $layanan->unggahBukti($transaksi, $request->file('bukti_pembayaran'));
 
         return redirect()
-            ->route('dasbor.undangan.kelola', $transaksi->undangan)
+            ->route('dashboard.undangan.kelola', $transaksi->undangan)
             ->with('tab_aktif', 'aktivasi')
             ->with('sukses', "Bukti pembayaran untuk invoice {$transaksi->kode_invoice} berhasil diunggah.");
     }

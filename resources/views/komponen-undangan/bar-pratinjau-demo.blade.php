@@ -51,10 +51,10 @@
                     {{ $demoTanpaFoto ? 'Mode: Tanpa Foto (TF)' : 'Coba Tanpa Foto (TF)' }}
                 </a>
 
-                <a href="{{ auth()->check() && request()->query('dari') === 'katalog' ? route('dasbor.katalog') : route('beranda').'#katalog-tema' }}" class="rounded-lg border border-ivory/25 px-3 py-1 text-xs font-semibold hover:bg-white/10 transition">
+                <a href="{{ auth()->check() && request()->query('dari') === 'katalog' ? route('dashboard.katalog') : route('beranda').'#katalog-tema' }}" class="rounded-lg border border-ivory/25 px-3 py-1 text-xs font-semibold hover:bg-white/10 transition">
                     Kembali
                 </a>
-                <a href="{{ auth()->check() ? route('dasbor.katalog', ['pakai' => $undangan->tema?->id]) : route('daftar', ['tema' => $undangan->tema?->id]) }}" class="rounded-lg bg-champagne px-3.5 py-1 text-xs font-bold text-charcoal hover:bg-champagne/90 transition">
+                <a href="{{ auth()->check() ? route('dashboard.katalog', ['pakai' => $undangan->tema?->id]) : route('daftar', ['tema' => $undangan->tema?->id]) }}" class="rounded-lg bg-champagne px-3.5 py-1 text-xs font-bold text-charcoal hover:bg-champagne/90 transition">
                     Pakai Tema Ini
                 </a>
             </form>

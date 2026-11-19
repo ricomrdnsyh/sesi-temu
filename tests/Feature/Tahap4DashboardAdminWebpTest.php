@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
-class Tahap4DasborAdminWebpTest extends TestCase
+class Tahap4DashboardAdminWebpTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -75,7 +75,7 @@ class Tahap4DasborAdminWebpTest extends TestCase
 
         // Client A buat draft baru
         $this->actingAs($clientA)
-            ->post('/dasbor/undangan', [
+            ->post('/dashboard/undangan', [
                 'tema_id' => $tema->id,
                 'slug' => 'Raka & Maya',
                 'nama_panggilan_pria' => 'Raka',
@@ -88,19 +88,19 @@ class Tahap4DasborAdminWebpTest extends TestCase
         $undangan = Undangan::where('slug', 'raka-maya')->firstOrFail();
         $this->assertSame($clientA->id, $undangan->pengguna_id);
 
-        // Client A buka dasbor dan halaman kelola
-        $this->actingAs($clientA)->get('/dasbor')->assertOk()->assertSee('raka-maya');
-        $this->actingAs($clientA)->get("/dasbor/undangan/{$undangan->id}/kelola")->assertOk()->assertSee('Generator Link Tamu WhatsApp');
+        // Client A buka dashboard dan halaman kelola
+        $this->actingAs($clientA)->get('/dashboard')->assertOk()->assertSee('raka-maya');
+        $this->actingAs($clientA)->get("/dashboard/undangan/{$undangan->id}/kelola")->assertOk()->assertSee('Generator Link Tamu WhatsApp');
 
         // Client B tidak boleh kelola undangan Client A
         $this->actingAs($clientB)
-            ->get("/dasbor/undangan/{$undangan->id}/kelola")
+            ->get("/dashboard/undangan/{$undangan->id}/kelola")
             ->assertForbidden();
 
         // Client A perbarui data mempelai + upload foto pria -> WebP
         $fotoPria = $this->buatGambarPngDummy('pria.png', 1400, 1400);
         $this->actingAs($clientA)
-            ->put("/dasbor/undangan/{$undangan->id}", [
+            ->put("/dashboard/undangan/{$undangan->id}", [
                 'bagian' => 'mempelai',
                 'nama_panggilan_pria' => 'Raka',
                 'nama_lengkap_pria' => 'Raka Wijaya, S.T.',
@@ -118,7 +118,7 @@ class Tahap4DasborAdminWebpTest extends TestCase
 
         // Tambah & hapus acara
         $this->actingAs($clientA)
-            ->post("/dasbor/undangan/{$undangan->id}/acara", [
+            ->post("/dashboard/undangan/{$undangan->id}/acara", [
                 'nama_acara' => 'Akad Nikah',
                 'tanggal_acara' => '2026-12-12',
                 'waktu_mulai' => '08:00',
@@ -133,7 +133,7 @@ class Tahap4DasborAdminWebpTest extends TestCase
 
         // Tambah & hapus amplop digital
         $this->actingAs($clientA)
-            ->post("/dasbor/undangan/{$undangan->id}/amplop", [
+            ->post("/dashboard/undangan/{$undangan->id}/amplop", [
                 'nama_bank' => 'BCA',
                 'nomor_rekening' => '5566778899',
                 'atas_nama' => 'Raka Wijaya',
@@ -152,17 +152,17 @@ class Tahap4DasborAdminWebpTest extends TestCase
         ]);
 
         $this->actingAs($clientA)
-            ->delete("/dasbor/undangan/{$undangan->id}/buku-tamu/{$ucapan->id}")
+            ->delete("/dashboard/undangan/{$undangan->id}/buku-tamu/{$ucapan->id}")
             ->assertRedirect();
         $this->assertDatabaseMissing('buku_tamu', ['id' => $ucapan->id]);
 
         $this->actingAs($clientA)
-            ->delete("/dasbor/undangan/{$undangan->id}/acara/{$acara->id}")
+            ->delete("/dashboard/undangan/{$undangan->id}/acara/{$acara->id}")
             ->assertRedirect();
         $this->assertDatabaseMissing('acara_undangan', ['id' => $acara->id]);
 
         $this->actingAs($clientA)
-            ->delete("/dasbor/undangan/{$undangan->id}/amplop/{$amplop->id}")
+            ->delete("/dashboard/undangan/{$undangan->id}/amplop/{$amplop->id}")
             ->assertRedirect();
         $this->assertDatabaseMissing('amplop_digital', ['id' => $amplop->id]);
     }
@@ -195,19 +195,19 @@ class Tahap4DasborAdminWebpTest extends TestCase
 
         // Unggahan ke-11 harus ditolak
         $this->actingAs($client)
-            ->from("/dasbor/undangan/{$undangan->id}/kelola")
-            ->post("/dasbor/undangan/{$undangan->id}/galeri", [
+            ->from("/dashboard/undangan/{$undangan->id}/kelola")
+            ->post("/dashboard/undangan/{$undangan->id}/galeri", [
                 'foto' => $this->buatGambarPngDummy('ke11.png', 400, 400),
             ])
-            ->assertRedirect("/dasbor/undangan/{$undangan->id}/kelola")
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola")
             ->assertSessionHasErrors('foto');
 
         $this->assertSame(10, $undangan->daftarGaleri()->count());
 
         // Client tidak bisa mengubah slug undangan yang sudah aktif
         $this->actingAs($client)
-            ->from("/dasbor/undangan/{$undangan->id}/kelola")
-            ->put("/dasbor/undangan/{$undangan->id}", [
+            ->from("/dashboard/undangan/{$undangan->id}/kelola")
+            ->put("/dashboard/undangan/{$undangan->id}", [
                 'bagian' => 'tema',
                 'tema_id' => $tema->id,
                 'slug' => 'slug-baru-terlarang',
@@ -280,7 +280,7 @@ class Tahap4DasborAdminWebpTest extends TestCase
 
         // Admin dapat mengubah slug undangan milik client (Paket Terima Beres)
         $this->actingAs($admin)
-            ->put("/dasbor/undangan/{$draft->id}", [
+            ->put("/dashboard/undangan/{$draft->id}", [
                 'bagian' => 'tema',
                 'tema_id' => $tema->id,
                 'slug' => 'ali-zahra-resmi',
@@ -337,7 +337,7 @@ class Tahap4DasborAdminWebpTest extends TestCase
         ]);
 
         $this->actingAs($client)
-            ->put("/dasbor/undangan/{$undangan->id}", [
+            ->put("/dashboard/undangan/{$undangan->id}", [
                 'bagian' => 'tema',
                 'tema_id' => $tema->id,
                 'slug' => 'bagas-tiara',

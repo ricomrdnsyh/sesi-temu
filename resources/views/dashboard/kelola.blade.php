@@ -123,7 +123,7 @@
     <header class="bg-white/95 backdrop-blur-md border-b border-champagne/20 sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 h-14 md:h-16 flex items-center justify-between gap-2.5 sm:gap-4">
             <div class="flex items-center gap-2 sm:gap-3 min-w-0">
-                <a href="{{ auth()->user()->adalahAdmin() ? route('admin.undangan.index') : route('dasbor.index') }}" class="rounded-xl border border-charcoal/15 px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-charcoal hover:bg-ivory transition shrink-0">
+                <a href="{{ auth()->user()->adalahAdmin() ? route('admin.undangan.index') : route('dashboard.undangan.index') }}" class="rounded-xl border border-charcoal/15 px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-charcoal hover:bg-ivory transition shrink-0">
                     ← <span class="hidden sm:inline">Kembali</span>
                 </a>
                 <a href="{{ route('beranda') }}" title="Beranda SesiTemu" class="hidden sm:inline-flex items-center shrink-0">
@@ -134,7 +134,7 @@
                     >
                 </a>
                 <div class="min-w-0">
-                    <h1 class="font-serif text-base sm:text-xl font-bold text-charcoal truncate">
+                    <h1 class="font-logo text-base sm:text-xl font-bold text-charcoal tracking-tight truncate">
                         {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}
                     </h1>
                     <p class="text-[11px] sm:text-xs font-mono text-sage truncate">sesitemu.id/{{ $undangan->slug }}</p>
@@ -219,11 +219,11 @@
 
         {{-- TAB 1: Tema & Pengaturan Link --}}
         <section x-show="tab === 'tema'" x-cloak class="rounded-2xl bg-white p-4 sm:p-8 shadow-sm ring-1 ring-champagne/20">
-            <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Tema, Musik &amp; Pengaturan Link</h2>
+            <h2 class="font-logo text-xl sm:text-2xl font-bold text-charcoal tracking-tight">Tema, Musik &amp; Pengaturan Link</h2>
             <p class="mt-1 text-sm text-charcoal/65">Ganti tema kapan saja tanpa kehilangan data yang sudah diisi.</p>
 
             <form
-                action="{{ route('dasbor.undangan.perbarui', $undangan) }}"
+                action="{{ route('dashboard.undangan.perbarui', $undangan) }}"
                 method="POST"
                 class="mt-6 space-y-6"
                 data-swal-loading
@@ -346,7 +346,7 @@
                         <span>&bull;</span>
                         <span>Profil Pasangan</span>
                     </div>
-                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Data Kedua Mempelai &amp; Kutipan Doa</h2>
+                    <h2 class="font-logo text-xl sm:text-2xl font-bold text-charcoal tracking-tight">Data Kedua Mempelai &amp; Kutipan Doa</h2>
                     <p class="mt-1 text-sm text-charcoal/65">Foto yang diunggah langsung tampil di pratinjau dan otomatis dikompresi ke format <span class="font-mono font-semibold text-sage">.webp</span> hemat kuota.</p>
                 </div>
 
@@ -359,7 +359,7 @@
             </div>
 
             <form
-                action="{{ route('dasbor.undangan.perbarui', $undangan) }}"
+                action="{{ route('dashboard.undangan.perbarui', $undangan) }}"
                 method="POST"
                 enctype="multipart/form-data"
                 class="mt-6 space-y-6 sm:space-y-8"
@@ -377,12 +377,12 @@
                         <div class="flex items-center justify-between border-b border-champagne/20 pb-3.5">
                             <div>
                                 <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-sage">Calon Pengantin Pria</p>
-                                <h3 class="font-serif text-xl font-bold text-charcoal mt-0.5" x-text="namaPriaLive || 'Mempelai Pria'">{{ $undangan->nama_panggilan_pria }}</h3>
+                                <h3 class="font-logo text-xl font-bold text-charcoal tracking-tight mt-0.5" x-text="namaPriaLive || 'Mempelai Pria'">{{ $undangan->nama_panggilan_pria }}</h3>
                             </div>
-                            <span class="rounded-full bg-sage/10 px-3 py-1 text-xs font-serif font-bold text-sage">Putra</span>
+                            <span class="rounded-full bg-sage/10 px-3 py-1 text-xs font-sans font-bold text-sage">Putra</span>
                         </div>
 
-                        @include('dasbor._input-foto-pratinjau', [
+                        @include('dashboard._input-foto-pratinjau', [
                             'name' => 'foto_pria',
                             'varian' => 'lingkaran',
                             'label' => 'Foto Mempelai Pria',
@@ -420,12 +420,12 @@
                         <div class="flex items-center justify-between border-b border-champagne/20 pb-3.5">
                             <div>
                                 <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-champagne">Calon Pengantin Wanita</p>
-                                <h3 class="font-serif text-xl font-bold text-charcoal mt-0.5" x-text="namaWanitaLive || 'Mempelai Wanita'">{{ $undangan->nama_panggilan_wanita }}</h3>
+                                <h3 class="font-logo text-xl font-bold text-charcoal tracking-tight mt-0.5" x-text="namaWanitaLive || 'Mempelai Wanita'">{{ $undangan->nama_panggilan_wanita }}</h3>
                             </div>
-                            <span class="rounded-full bg-champagne/15 px-3 py-1 text-xs font-serif font-bold text-champagne">Putri</span>
+                            <span class="rounded-full bg-champagne/15 px-3 py-1 text-xs font-sans font-bold text-champagne">Putri</span>
                         </div>
 
-                        @include('dasbor._input-foto-pratinjau', [
+                        @include('dashboard._input-foto-pratinjau', [
                             'name' => 'foto_wanita',
                             'varian' => 'lingkaran',
                             'label' => 'Foto Mempelai Wanita',
@@ -463,7 +463,7 @@
                 <div class="rounded-2xl bg-gradient-to-br from-ivory to-champagne/[0.06] p-5 sm:p-6 ring-1 ring-champagne/25 space-y-4">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div>
-                            <h3 class="font-serif text-lg sm:text-xl font-bold text-charcoal">Foto Sampul Gerbang Undangan <span class="text-xs font-sans font-semibold text-charcoal/55">(Opsional)</span></h3>
+                            <h3 class="font-logo text-lg sm:text-xl font-bold text-charcoal tracking-tight">Foto Sampul Gerbang Undangan <span class="text-xs font-sans font-semibold tracking-normal text-charcoal/55">(Opsional)</span></h3>
                             <p class="text-xs text-charcoal/65 mt-0.5">
                                 Foto potret pasangan yang muncul sebagai layar sambutan awal sebelum tamu menekan tombol <em>Buka Undangan</em>. Jika dikosongkan, sistem otomatis memakai foto pertama Galeri atau foto mempelai.
                             </p>
@@ -473,12 +473,12 @@
                         </span>
                     </div>
 
-                    @include('dasbor._input-foto-pratinjau', [
+                    @include('dashboard._input-foto-pratinjau', [
                         'name' => 'foto_sampul',
                         'varian' => 'sampul',
                         'label' => 'Foto Sampul Gerbang',
                         'petunjuk' => 'Seret & lepas atau klik untuk pilih foto potret (JPG/PNG/WebP maks. 5 MB)',
-                        'urlAwal' => $undangan->urlFotoSampulKhususDasbor(),
+                        'urlAwal' => $undangan->urlFotoSampulKhususDashboard(),
                         'hapusNama' => 'hapus_foto_sampul',
                         'hapusLabel' => 'Hapus foto sampul khusus',
                     ])
@@ -488,7 +488,7 @@
                 <div class="rounded-2xl bg-ivory/75 p-5 sm:p-6 ring-1 ring-champagne/25 space-y-3">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div>
-                            <label for="kutipan_ayat" class="block font-serif text-lg font-bold text-charcoal">Kutipan Ayat / Doa / Kata Mutiara</label>
+                            <label for="kutipan_ayat" class="block font-logo text-lg font-bold text-charcoal tracking-tight">Kutipan Ayat / Doa / Kata Mutiara</label>
                             <p class="text-xs text-charcoal/60 mt-0.5">Tulis kutipan pilihan sendiri atau pakai salah satu inspirasi cepat di sebelah kanan.</p>
                         </div>
                         <div class="flex flex-wrap gap-1.5">
@@ -540,7 +540,7 @@
                             <span>&bull;</span>
                             <span>Jadwal &amp; Lokasi</span>
                         </div>
-                        <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal" x-text="acaraEdit ? ('Edit Acara: ' + acaraEdit.nama_acara) : 'Tambah Jadwal Acara'"></h2>
+                        <h2 class="font-logo text-xl sm:text-2xl font-bold text-charcoal tracking-tight" x-text="acaraEdit ? ('Edit Acara: ' + acaraEdit.nama_acara) : 'Tambah Jadwal Acara'"></h2>
                         <p class="mt-1 text-sm text-charcoal/65">Tambahkan satu atau beberapa rangkaian acara seperti Akad Nikah, Pemberkatan, maupun Resepsi.</p>
                     </div>
                     <button type="button" x-show="acaraEdit" x-cloak @click="acaraEdit = null" class="self-start sm:self-auto rounded-xl border border-champagne/50 bg-ivory px-3.5 py-2 text-xs font-semibold text-charcoal hover:bg-champagne/15 transition cursor-pointer shrink-0">
@@ -549,7 +549,7 @@
                 </div>
 
                 <form
-                    action="{{ route('dasbor.acara.simpan', $undangan) }}"
+                    action="{{ route('dashboard.acara.simpan', $undangan) }}"
                     method="POST"
                     class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
                     data-swal-loading
@@ -634,9 +634,9 @@
             {{-- Daftar Kartu Rangkaian Acara --}}
             <div class="space-y-3">
                 <div class="flex items-center justify-between px-1">
-                    <h3 class="font-serif text-lg sm:text-xl font-bold text-charcoal">
+                    <h3 class="font-logo text-lg sm:text-xl font-bold text-charcoal tracking-tight">
                         Daftar Jadwal Terpasang
-                        <span class="ml-1.5 inline-flex items-center rounded-full bg-sage/10 px-2.5 py-0.5 font-sans text-xs font-bold text-sage">
+                        <span class="ml-1.5 inline-flex items-center rounded-full bg-sage/10 px-2.5 py-0.5 font-sans tabular-nums text-xs font-bold tracking-normal text-sage">
                             {{ $undangan->daftarAcara->count() }} Acara
                         </span>
                     </h3>
@@ -668,10 +668,10 @@
                                             <div class="bg-black/20 py-1 text-[10px] font-bold uppercase tracking-[0.2em]">
                                                 {{ $bulanSingkat }}
                                             </div>
-                                            <div class="pt-1.5 font-serif text-2xl font-bold leading-none">
+                                            <div class="pt-1.5 font-sans tabular-nums text-2xl font-bold leading-none">
                                                 {{ $acara->tanggal_acara->format('d') }}
                                             </div>
-                                            <div class="pb-1.5 pt-0.5 text-[10px] font-semibold text-[#F3E5AB]">
+                                            <div class="pb-1.5 pt-0.5 font-sans tabular-nums text-[10px] font-semibold text-[#F3E5AB]">
                                                 {{ $acara->tanggal_acara->format('Y') }}
                                             </div>
                                         </div>
@@ -686,7 +686,7 @@
                                                 </span>
                                             </div>
 
-                                            <h4 class="font-serif text-xl sm:text-[1.35rem] font-bold text-charcoal leading-snug">
+                                            <h4 class="font-logo text-xl sm:text-[1.35rem] font-bold text-charcoal tracking-tight leading-snug">
                                                 {{ $acara->nama_acara }}
                                             </h4>
 
@@ -774,7 +774,7 @@
                                         </button>
 
                                         <form
-                                            action="{{ route('dasbor.acara.hapus', [$undangan, $acara]) }}"
+                                            action="{{ route('dashboard.acara.hapus', [$undangan, $acara]) }}"
                                             method="POST"
                                             data-swal-title="Hapus Jadwal Acara?"
                                             data-swal-confirm="Yakin ingin menghapus acara {{ $acara->nama_acara }}?"
@@ -809,7 +809,7 @@
                                     <line x1="3" x2="21" y1="10" y2="10"/>
                                 </svg>
                             </div>
-                            <p class="font-serif text-lg font-bold text-charcoal">Belum Ada Rangkaian Acara</p>
+                            <p class="font-logo text-lg font-bold text-charcoal tracking-tight">Belum Ada Rangkaian Acara</p>
                             <p class="text-sm text-charcoal/65 max-w-md mx-auto">Tambahkan jadwal seperti Akad Nikah atau Resepsi lewat formulir di atas agar langsung tampil di undangan tamu.</p>
                         </div>
                     @endforelse
@@ -839,7 +839,7 @@
                             <span>&bull;</span>
                             <span>Galeri &amp; Cerita</span>
                         </div>
-                        <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Galeri Foto Prewedding</h2>
+                        <h2 class="font-logo text-xl sm:text-2xl font-bold text-charcoal tracking-tight">Galeri Foto Prewedding</h2>
                         <p class="mt-1 text-sm text-charcoal/65">Semua foto otomatis dikompresi ke format <span class="font-mono font-semibold text-sage">.webp</span> agar undangan cepat dibuka.</p>
                     </div>
 
@@ -855,7 +855,7 @@
                 </div>
 
                 <form
-                    action="{{ route('dasbor.galeri.unggah', $undangan) }}"
+                    action="{{ route('dashboard.galeri.unggah', $undangan) }}"
                     method="POST"
                     enctype="multipart/form-data"
                     @submit="if (!$el.querySelector('input[type=file]')?.files?.length) { $event.preventDefault(); window.Swal?.fire({ icon: 'warning', title: 'Pilih Foto Dulu', text: 'Silakan pilih file foto prewedding yang ingin diunggah.', confirmButtonColor: '#4B6358' }); }"
@@ -866,7 +866,7 @@
                 >
                     @csrf
                     <div class="lg:col-span-6 flex">
-                        @include('dasbor._input-foto-pratinjau', [
+                        @include('dashboard._input-foto-pratinjau', [
                             'name' => 'foto',
                             'varian' => 'galeri',
                             'label' => 'Pilih atau Seret Foto Prewedding',
@@ -952,7 +952,7 @@
                                             {{ $galeri->keterangan ?: 'Foto #'.$galeri->urutan }}
                                         </span>
                                         <form
-                                            action="{{ route('dasbor.galeri.hapus', [$undangan, $galeri]) }}"
+                                            action="{{ route('dashboard.galeri.hapus', [$undangan, $galeri]) }}"
                                             method="POST"
                                             data-swal-title="Hapus Foto Galeri?"
                                             data-swal-confirm="Yakin ingin menghapus foto ini dari galeri undangan?"
@@ -983,7 +983,7 @@
                             <span>&bull;</span>
                             <span x-text="daftarCerita.length + ' Bab'"></span>
                         </div>
-                        <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Cerita Cinta &amp; Live Streaming</h2>
+                        <h2 class="font-logo text-xl sm:text-2xl font-bold text-charcoal tracking-tight">Cerita Cinta &amp; Live Streaming</h2>
                         <p class="mt-1 text-sm text-charcoal/65">Rangkai babak perjalanan cinta Anda — lihat langsung tampilannya pada pratinjau linimasa di sebelah kanan.</p>
                     </div>
                     <button type="button" @click="tambahCerita()" class="self-start sm:self-auto inline-flex items-center gap-1.5 rounded-xl bg-sage px-4 py-2 text-xs font-semibold text-white hover:bg-sage/90 transition cursor-pointer shadow-xs shrink-0">
@@ -992,7 +992,7 @@
                 </div>
 
                 <form
-                    action="{{ route('dasbor.undangan.perbarui', $undangan) }}"
+                    action="{{ route('dashboard.undangan.perbarui', $undangan) }}"
                     method="POST"
                     class="mt-6 space-y-6"
                     data-swal-loading
@@ -1015,7 +1015,7 @@
                                         <div class="flex items-center justify-between gap-2 pb-2.5 border-b border-champagne/15">
                                             <div class="min-w-0 flex items-center gap-2">
                                                 <span class="text-[11px] font-bold uppercase tracking-wider text-champagne" x-text="'Bab ' + String(idx + 1).padStart(2, '0')"></span>
-                                                <span class="text-xs font-serif font-bold text-charcoal truncate" x-text="item.judul ? ('• ' + item.judul) : '• Momen Baru'"></span>
+                                                <span class="text-xs font-sans font-semibold text-charcoal truncate" x-text="item.judul ? ('• ' + item.judul) : '• Momen Baru'"></span>
                                             </div>
 
                                             <div class="flex items-center gap-1 shrink-0">
@@ -1114,7 +1114,7 @@
                                 <div class="flex items-center justify-between border-b border-champagne/25 pb-3.5">
                                     <div>
                                         <p class="text-[10px] font-bold uppercase tracking-[0.28em] text-champagne">Pratinjau Tampilan Tamu</p>
-                                        <h3 class="font-serif text-lg font-bold text-charcoal mt-0.5">
+                                        <h3 class="font-logo text-lg font-bold text-charcoal tracking-tight mt-0.5">
                                             Kisah <span x-text="namaPriaLive || @js($undangan->nama_panggilan_pria)"></span>
                                             <span class="text-champagne">&amp;</span>
                                             <span x-text="namaWanitaLive || @js($undangan->nama_panggilan_wanita)"></span>
@@ -1137,7 +1137,7 @@
                                                     x-text="item.tanggal"
                                                 ></span>
                                             </div>
-                                            <h4 class="font-serif text-base font-bold text-charcoal mt-1" x-text="item.judul || 'Judul Momen ' + (idx + 1)"></h4>
+                                            <h4 class="font-logo text-base font-bold text-charcoal tracking-tight mt-1" x-text="item.judul || 'Judul Momen ' + (idx + 1)"></h4>
                                             <p class="mt-1 text-xs leading-relaxed text-charcoal/70" x-text="item.cerita || 'Deskripsi kisah akan tampil di sini saat Anda mengetik...'"></p>
                                         </div>
                                     </template>
@@ -1158,7 +1158,7 @@
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <h3 class="font-serif text-lg font-bold text-charcoal">Fitur Live Streaming Pernikahan</h3>
+                                        <h3 class="font-logo text-lg font-bold text-charcoal tracking-tight">Fitur Live Streaming Pernikahan</h3>
                                         <span
                                             :class="liveAktifLive ? 'bg-sage/15 text-sage' : 'bg-charcoal/10 text-charcoal/60'"
                                             class="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase"
@@ -1234,7 +1234,7 @@
                             <span>&bull;</span>
                             <span>Hadiah &amp; Tanda Kasih</span>
                         </div>
-                        <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Rekening Bank &amp; E-Wallet Amplop Digital</h2>
+                        <h2 class="font-logo text-xl sm:text-2xl font-bold text-charcoal tracking-tight">Rekening Bank &amp; E-Wallet Amplop Digital</h2>
                         <p class="mt-1 text-sm text-charcoal/65">Desain kartu otomatis menyesuaikan ciri khas bank atau dompet digital yang Anda pilih.</p>
                     </div>
                     <span class="self-start sm:self-auto rounded-full bg-ivory px-3.5 py-1.5 text-xs font-bold text-sage ring-1 ring-champagne/30 shrink-0">
@@ -1245,7 +1245,7 @@
                 {{-- Form + Pratinjau Kartu ATM Live --}}
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center rounded-2xl bg-ivory/75 p-4 sm:p-6 ring-1 ring-champagne/25">
                     <form
-                        action="{{ route('dasbor.amplop.simpan', $undangan) }}"
+                        action="{{ route('dashboard.amplop.simpan', $undangan) }}"
                         method="POST"
                         class="lg:col-span-7 space-y-4"
                         data-swal-loading
@@ -1325,17 +1325,17 @@
                                 Otomatis
                             </span>
                         </div>
-                        @include('dasbor._kartu-bank-digital', ['modeLive' => true])
+                        @include('dashboard._kartu-bank-digital', ['modeLive' => true])
                     </div>
                 </div>
 
                 {{-- Daftar Kartu ATM / E-Wallet Tersimpan --}}
                 @if ($undangan->daftarAmplop->isNotEmpty())
                     <div class="space-y-3 pt-2">
-                        <h3 class="font-serif text-lg font-bold text-charcoal">Koleksi Kartu Rekening Tersimpan</h3>
+                        <h3 class="font-logo text-lg font-bold text-charcoal tracking-tight">Koleksi Kartu Rekening Tersimpan</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                             @foreach ($undangan->daftarAmplop as $amplop)
-                                @include('dasbor._kartu-bank-digital', [
+                                @include('dashboard._kartu-bank-digital', [
                                     'modeLive' => false,
                                     'amplop' => $amplop,
                                     'undangan' => $undangan,
@@ -1345,7 +1345,7 @@
                     </div>
                 @else
                     <div class="rounded-2xl border border-dashed border-champagne/40 bg-ivory/40 p-8 text-center space-y-1.5">
-                        <p class="font-serif text-base font-bold text-charcoal">Belum Ada Kartu Amplop Digital</p>
+                        <p class="font-logo text-base font-bold text-charcoal tracking-tight">Belum Ada Kartu Amplop Digital</p>
                         <p class="text-xs text-charcoal/65">Pilih bank/e-wallet dan isi nomor rekening di atas agar tampil sebagai kartu amplop digital di sini.</p>
                     </div>
                 @endif
@@ -1362,12 +1362,12 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="font-serif text-lg sm:text-xl font-bold text-charcoal">Alamat Pengiriman Kado Fisik</h3>
+                        <h3 class="font-logo text-lg sm:text-xl font-bold text-charcoal tracking-tight">Alamat Pengiriman Kado Fisik</h3>
                         <p class="text-xs text-charcoal/65">Opsional — tampil bagi tamu yang ingin mengirimkan bingkisan langsung ke alamat Anda.</p>
                     </div>
                 </div>
                 <form
-                    action="{{ route('dasbor.undangan.perbarui', $undangan) }}"
+                    action="{{ route('dashboard.undangan.perbarui', $undangan) }}"
                     method="POST"
                     class="mt-4 space-y-4"
                     data-swal-loading
@@ -1398,7 +1398,7 @@
             <div class="rounded-2xl bg-white p-4 sm:p-8 shadow-sm ring-1 ring-champagne/20">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                        <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Generator Link Tamu WhatsApp</h2>
+                        <h2 class="font-logo text-xl sm:text-2xl font-bold text-charcoal tracking-tight">Generator Link Tamu WhatsApp</h2>
                         <p class="mt-1 text-sm text-charcoal/65">Tulis daftar nama tamu (satu nama per baris) untuk menghasilkan link personal &amp; pesan undangan WhatsApp.</p>
                     </div>
                     @if (! $undanganSiapDisebar)
@@ -1509,24 +1509,24 @@
 
             {{-- Rekapitulasi Kehadiran & Daftar Ucapan --}}
             <div class="rounded-2xl bg-white p-4 sm:p-8 shadow-sm ring-1 ring-champagne/20">
-                <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Rekapitulasi Kehadiran &amp; Buku Tamu</h2>
+                <h2 class="font-logo text-xl sm:text-2xl font-bold text-charcoal tracking-tight">Rekapitulasi Kehadiran &amp; Buku Tamu</h2>
 
                 <div class="mt-4 sm:mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                     <div class="rounded-xl bg-sage/10 p-3.5 sm:p-4">
                         <p class="text-xs text-charcoal/70">Konfirmasi Hadir</p>
-                        <p class="mt-1 font-serif text-2xl sm:text-3xl font-bold text-sage">{{ $rekapRsvp['hadir'] }}</p>
+                        <p class="mt-1 font-sans tabular-nums text-2xl sm:text-3xl font-bold text-sage">{{ $rekapRsvp['hadir'] }}</p>
                     </div>
                     <div class="rounded-xl bg-amber-50 p-3.5 sm:p-4">
                         <p class="text-xs text-charcoal/70">Masih Ragu</p>
-                        <p class="mt-1 font-serif text-2xl sm:text-3xl font-bold text-amber-700">{{ $rekapRsvp['ragu'] }}</p>
+                        <p class="mt-1 font-sans tabular-nums text-2xl sm:text-3xl font-bold text-amber-700">{{ $rekapRsvp['ragu'] }}</p>
                     </div>
                     <div class="rounded-xl bg-red-50 p-3.5 sm:p-4">
                         <p class="text-xs text-charcoal/70">Tidak Hadir</p>
-                        <p class="mt-1 font-serif text-2xl sm:text-3xl font-bold text-red-700">{{ $rekapRsvp['tidak_hadir'] }}</p>
+                        <p class="mt-1 font-sans tabular-nums text-2xl sm:text-3xl font-bold text-red-700">{{ $rekapRsvp['tidak_hadir'] }}</p>
                     </div>
                     <div class="rounded-xl bg-champagne/15 p-3.5 sm:p-4">
                         <p class="text-xs text-charcoal/70">Estimasi Orang Hadir</p>
-                        <p class="mt-1 font-serif text-2xl sm:text-3xl font-bold text-charcoal">{{ $rekapRsvp['total_orang_hadir'] }}</p>
+                        <p class="mt-1 font-sans tabular-nums text-2xl sm:text-3xl font-bold text-charcoal">{{ $rekapRsvp['total_orang_hadir'] }}</p>
                     </div>
                 </div>
 
@@ -1546,7 +1546,7 @@
                             <p class="text-xs text-charcoal/80 leading-relaxed">{{ $ucapan->ucapan_doa }}</p>
                             <div class="flex justify-end pt-1">
                                 <form
-                                    action="{{ route('dasbor.ucapan.hapus', [$undangan, $ucapan]) }}"
+                                    action="{{ route('dashboard.ucapan.hapus', [$undangan, $ucapan]) }}"
                                     method="POST"
                                     data-swal-title="Hapus Ucapan Tamu?"
                                     data-swal-confirm="Yakin ingin menghapus ucapan dari {{ $ucapan->nama_tamu }}?"
@@ -1592,7 +1592,7 @@
                                     <td class="py-3 pr-4 text-charcoal/80">{{ $ucapan->ucapan_doa }}</td>
                                     <td class="py-3 text-right">
                                         <form
-                                            action="{{ route('dasbor.ucapan.hapus', [$undangan, $ucapan]) }}"
+                                            action="{{ route('dashboard.ucapan.hapus', [$undangan, $ucapan]) }}"
                                             method="POST"
                                             data-swal-title="Hapus Ucapan Tamu?"
                                             data-swal-confirm="Yakin ingin menghapus ucapan dari {{ $ucapan->nama_tamu }}?"
@@ -1701,7 +1701,7 @@
                                     || document.querySelector('meta[name=csrf-token]')?.content
                                     || '';
 
-                                const respon = await fetch(@js(route('dasbor.transaksi.cek-promo', $undangan)), {
+                                const respon = await fetch(@js(route('dashboard.transaksi.cek-promo', $undangan)), {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
@@ -1803,13 +1803,13 @@
                     }"
                     class="order-2 lg:order-1 rounded-2xl bg-white p-4 sm:p-8 shadow-sm ring-1 ring-champagne/20 flex flex-col"
                 >
-                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Ajukan Pembayaran Aktivasi</h2>
+                    <h2 class="font-logo text-xl sm:text-2xl font-bold text-charcoal tracking-tight">Ajukan Pembayaran Aktivasi</h2>
                     <p class="mt-1 text-sm text-charcoal/65">
                         Masa aktif standar undangan adalah <strong>{{ $durasiAktifBulan ?? 3 }} bulan</strong> sejak diverifikasi lunas oleh Admin.
                     </p>
 
                     <form
-                        action="{{ route('dasbor.transaksi.ajukan', $undangan) }}"
+                        action="{{ route('dashboard.transaksi.ajukan', $undangan) }}"
                         method="POST"
                         enctype="multipart/form-data"
                         class="mt-5 flex-1 flex flex-col justify-between gap-4"
@@ -1915,7 +1915,7 @@
                             <div class="pt-2 border-t border-champagne/25 flex items-center justify-between">
                                 <span class="font-bold text-charcoal text-xs sm:text-sm">Total yang Harus Ditransfer</span>
                                 <span
-                                    class="font-serif text-lg font-bold text-sage"
+                                    class="font-sans tabular-nums text-lg font-bold tracking-tight text-sage"
                                     x-text="totalBayar() === 0 ? 'Rp 0 (Gratis)' : formatRp(totalBayar())"
                                 ></span>
                             </div>
@@ -2060,7 +2060,7 @@
                         <div class="flex flex-wrap items-start justify-between gap-2">
                             <div>
                                 <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-champagne">Tujuan Pembayaran Resmi</p>
-                                <h3 class="mt-0.5 font-serif text-xl sm:text-2xl font-bold text-charcoal">Transfer ke Rekening Resmi</h3>
+                                <h3 class="mt-0.5 font-logo text-xl sm:text-2xl font-bold text-charcoal tracking-tight">Transfer ke Rekening Resmi</h3>
                             </div>
                             <span class="inline-flex items-center gap-1 rounded-full bg-sage/10 px-3 py-1 text-[11px] font-semibold text-sage ring-1 ring-sage/25">
                                 <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -2074,7 +2074,7 @@
                         {{-- Kartu Bank Bergaya ATM Proporsional Sesuai Konfigurasi Bank Resmi --}}
                         <div class="rounded-2xl bg-ivory/80 px-4 py-3.5 ring-1 ring-champagne/25">
                             <div class="max-w-[330px] mx-auto w-full">
-                                @include('dasbor._kartu-bank-digital', [
+                                @include('dashboard._kartu-bank-digital', [
                                     'tanpaHapus' => true,
                                     'namaBank' => $infoRekening['bank'],
                                     'nomorRekening' => $infoRekening['rekening'],
@@ -2173,7 +2173,7 @@
             </div>
 
             <div class="rounded-2xl bg-white p-4 sm:p-6 shadow-sm ring-1 ring-champagne/20">
-                <h3 class="text-base font-bold text-charcoal mb-4">Riwayat Invoice Undangan Ini</h3>
+                <h3 class="font-logo text-lg font-bold text-charcoal tracking-tight mb-4">Riwayat Invoice Undangan Ini</h3>
 
                 {{-- Riwayat Invoice Mobile (Kartu) --}}
                 <div class="space-y-3 md:hidden">
@@ -2188,12 +2188,12 @@
                                     {{ $trx->labelStatus() }}
                                 </span>
                             </div>
-                            <p class="text-sm font-bold text-charcoal">{{ \App\Models\Tema::formatRupiah($trx->total_bayar) }}</p>
+                            <p class="font-sans tabular-nums text-sm font-bold text-charcoal">{{ \App\Models\Tema::formatRupiah($trx->total_bayar) }}</p>
                             @if ($trx->catatan_admin)
                                 <p class="text-xs text-charcoal/65">{{ $trx->catatan_admin }}</p>
                             @endif
                             <div class="pt-1">
-                                @include('dasbor._aksi-bukti-invoice', ['trx' => $trx, 'mode' => 'mobile'])
+                                @include('dashboard._aksi-bukti-invoice', ['trx' => $trx, 'mode' => 'mobile'])
                             </div>
                         </div>
                     @empty
@@ -2221,7 +2221,7 @@
                                         <p class="font-medium">{{ $trx->labelPaket() }}</p>
                                         <p class="text-xs text-charcoal/60">{{ $trx->tema?->nama_tema }}</p>
                                     </td>
-                                    <td class="py-3 pr-4 font-bold text-charcoal">{{ \App\Models\Tema::formatRupiah($trx->total_bayar) }}</td>
+                                    <td class="py-3 pr-4 font-sans tabular-nums font-bold text-charcoal">{{ \App\Models\Tema::formatRupiah($trx->total_bayar) }}</td>
                                     <td class="py-3 pr-4">
                                         <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $trx->status === 'lunas' ? 'bg-sage/15 text-sage' : ($trx->status === 'ditolak' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-800') }}">
                                             {{ $trx->labelStatus() }}
@@ -2231,7 +2231,7 @@
                                         @endif
                                     </td>
                                     <td class="py-3 text-right">
-                                        @include('dasbor._aksi-bukti-invoice', ['trx' => $trx, 'mode' => 'desktop'])
+                                        @include('dashboard._aksi-bukti-invoice', ['trx' => $trx, 'mode' => 'desktop'])
                                     </td>
                                 </tr>
                             @empty

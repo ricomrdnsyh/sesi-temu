@@ -45,7 +45,7 @@ class AutentikasiController extends Controller
             return redirect()->intended('/admin');
         }
 
-        return redirect()->intended('/dasbor');
+        return redirect()->intended('/dashboard');
     }
 
     public function formDaftar(Request $request): View
@@ -115,7 +115,7 @@ class AutentikasiController extends Controller
 
         $request->session()->forget('draft_awal');
 
-        return redirect('/dasbor')->with('sukses', 'Selamat datang di SesiTemu! Akun Anda berhasil dibuat.');
+        return redirect('/dashboard')->with('sukses', 'Selamat datang di SesiTemu! Akun Anda berhasil dibuat.');
     }
 
     public function keluar(Request $request): RedirectResponse

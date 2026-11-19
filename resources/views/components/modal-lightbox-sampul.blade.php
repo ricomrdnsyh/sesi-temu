@@ -96,7 +96,7 @@
                                 </button>
                             @else
                                 <a
-                                    href="{{ auth()->check() ? route('dasbor.katalog', ['pakai' => $temaLightbox->id]) : route('daftar', ['tema' => $temaLightbox->id]) }}"
+                                    href="{{ auth()->check() ? route('dashboard.katalog', ['pakai' => $temaLightbox->id]) : route('daftar', ['tema' => $temaLightbox->id]) }}"
                                     class="inline-flex items-center justify-center rounded-xl bg-sage hover:bg-sage/90 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition"
                                 >
                                     Pakai Tema Ini

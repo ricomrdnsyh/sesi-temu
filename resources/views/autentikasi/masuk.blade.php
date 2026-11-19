@@ -40,7 +40,7 @@
         class="space-y-3.5"
         data-swal-loading
         data-swal-loading-title="Memverifikasi Akun..."
-        data-swal-loading-text="Sedang masuk ke dasbor Anda..."
+        data-swal-loading-text="Sedang masuk ke dashboard Anda..."
     >
         @csrf
 

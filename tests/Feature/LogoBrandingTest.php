@@ -29,7 +29,7 @@ class LogoBrandingTest extends TestCase
     }
 
     /**
-     * Memastikan logo dan favicon tampil di halaman publik utama, autentikasi, dasbor, admin, dan demo tema.
+     * Memastikan logo dan favicon tampil di halaman publik utama, autentikasi, dashboard, admin, dan demo tema.
      */
     public function test_logo_baru_terpasang_pada_seluruh_halaman_utama(): void
     {
@@ -75,16 +75,45 @@ class LogoBrandingTest extends TestCase
             ->assertSee('Logo SesiTemu', false);
 
         $this->actingAs($client)
-            ->get('/dasbor')
+            ->get('/dashboard')
             ->assertOk()
             ->assertSee('favicon.png', false)
-            ->assertSee('logo/logo-horizontal.webp', false);
+            ->assertSee('logo/logo-horizontal.webp', false)
+            ->assertSee('font-logo text-lg sm:text-xl font-bold text-charcoal tracking-tight', false)
+            ->assertSee('Lanjutkan Undangan Terakhir')
+            ->assertSee('font-sans tabular-nums text-lg sm:text-2xl font-bold text-charcoal', false);
 
         $this->actingAs($client)
-            ->get(route('dasbor.undangan.kelola', $undangan))
+            ->get('/dashboard/undangan')
             ->assertOk()
             ->assertSee('favicon.png', false)
-            ->assertSee('logo/logo-ikon.webp', false);
+            ->assertSee('logo/logo-horizontal.webp', false)
+            ->assertSee('font-sans text-[1.35rem] sm:text-[1.85rem] font-bold text-white leading-snug tracking-tight', false)
+            ->assertSee('Undangan Saya')
+            ->assertSee('Kelengkapan Undangan')
+            ->assertSee('Salin Link');
+
+        $this->actingAs($client)
+            ->get('/dashboard/katalog')
+            ->assertOk()
+            ->assertSee('font-sans text-lg sm:text-2xl font-bold text-charcoal tracking-tight', false)
+            ->assertSee('Katalog Tema Undangan')
+            ->assertSee('font-sans tabular-nums text-base sm:text-lg font-bold tracking-tight', false);
+
+        $this->actingAs($client)
+            ->get('/dashboard/profil')
+            ->assertOk()
+            ->assertSee('font-sans text-base sm:text-lg font-bold text-charcoal tracking-tight', false)
+            ->assertSee('Data Profil Saya')
+            ->assertSee('font-sans tabular-nums text-lg sm:text-xl font-bold text-charcoal leading-none', false);
+
+        $this->actingAs($client)
+            ->get(route('dashboard.undangan.kelola', $undangan))
+            ->assertOk()
+            ->assertSee('favicon.png', false)
+            ->assertSee('logo/logo-ikon.webp', false)
+            ->assertSee('font-logo text-xl sm:text-2xl font-bold text-charcoal tracking-tight">Tema, Musik &amp; Pengaturan Link</h2>', false)
+            ->assertSee('font-sans tabular-nums text-2xl sm:text-3xl font-bold text-sage', false);
 
         $this->actingAs($admin)
             ->get('/admin')
@@ -137,11 +166,11 @@ class LogoBrandingTest extends TestCase
                 $this->assertStringContainsString('Administrator', $cocokHeader[0]);
                 $this->assertStringContainsString('Keluar', $cocokHeader[0]);
                 $this->assertStringNotContainsString('Lihat Beranda', $cocokHeader[0]);
-                $this->assertMatchesRegularExpression('/<button[^>]*aria-label="Menu profil admin"[^>]*>.*?'.preg_quote($admin->nama, '/').'.*?<\/button>/s', $cocokHeader[0]);
-                $this->assertMatchesRegularExpression('/<button[^>]*aria-label="Menu profil admin"[^>]*>.*?'.preg_quote($admin->nama, '/').'.*?<\/button>/s', $cocokHeader[0]);
+                $this->assertMatchesRegularExpression('/<button[^>]*aria-label="Menu profil admin"[^>]*>.*?' . preg_quote($admin->nama, '/') . '.*?<\/button>/s', $cocokHeader[0]);
+                $this->assertMatchesRegularExpression('/<button[^>]*aria-label="Menu profil admin"[^>]*>.*?' . preg_quote($admin->nama, '/') . '.*?<\/button>/s', $cocokHeader[0]);
                 $this->assertStringNotContainsString('M19 9l-7 7-7-7', $cocokHeader[0]);
             } else {
-                $this->fail('Header panel admin tidak ditemukan pada '.$ruteAdmin);
+                $this->fail('Header panel admin tidak ditemukan pada ' . $ruteAdmin);
             }
 
             if (preg_match('/<aside\b[^>]*aria-label="Navigasi Panel Admin".*?<\/aside>/s', $konten, $cocokSidebar)) {
@@ -160,7 +189,7 @@ class LogoBrandingTest extends TestCase
                 $this->assertStringNotContainsString('>Ringkasan<', $cocokSidebar[0]);
                 $this->assertStringNotContainsString('Pintasan', $cocokSidebar[0]);
                 $this->assertStringNotContainsString('Lihat Beranda', $cocokSidebar[0]);
-                $this->assertStringNotContainsString('Dasbor Client', $cocokSidebar[0]);
+                $this->assertStringNotContainsString('Dashboard Client', $cocokSidebar[0]);
                 $this->assertStringNotContainsString('menuProfilTerbuka', $cocokSidebar[0]);
                 $this->assertStringContainsString('h-16 shrink-0 px-5 border-b border-champagne/25 flex items-center justify-center', $cocokSidebar[0]);
                 $this->assertStringContainsString('Keluar', $cocokSidebar[0]);
@@ -168,7 +197,7 @@ class LogoBrandingTest extends TestCase
                 $this->assertStringNotContainsString($admin->email, $cocokSidebar[0]);
                 $this->assertStringNotContainsString('rounded-md bg-champagne/15', $cocokSidebar[0]);
             } else {
-                $this->fail('Sidebar panel admin tidak ditemukan pada '.$ruteAdmin);
+                $this->fail('Sidebar panel admin tidak ditemukan pada ' . $ruteAdmin);
             }
         }
 

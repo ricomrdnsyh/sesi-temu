@@ -34,7 +34,7 @@
                     placeholder="6281234567890"
                     class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm font-mono focus:border-champagne focus:outline-none"
                 >
-                <p class="mt-1 text-[11px] text-charcoal/55">Format 628... (otomatis terhubung ke Beranda &amp; Dasbor Client).</p>
+                <p class="mt-1 text-[11px] text-charcoal/55">Format 628... (otomatis terhubung ke Beranda &amp; Dashboard Client).</p>
             </div>
 
             <div>
@@ -110,7 +110,7 @@
         </div>
 
         <div>
-            <label for="catatan_pembayaran" class="block text-xs font-semibold text-charcoal/75 mb-1">Petunjuk Pembayaran (Tampil di Dasbor Client)</label>
+            <label for="catatan_pembayaran" class="block text-xs font-semibold text-charcoal/75 mb-1">Petunjuk Pembayaran (Tampil di Dashboard Client)</label>
             <textarea
                 id="catatan_pembayaran"
                 name="catatan_pembayaran"

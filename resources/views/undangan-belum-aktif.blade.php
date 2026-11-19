@@ -23,7 +23,7 @@
             </span>
         </div>
 
-        <h1 class="font-serif text-3xl font-bold text-charcoal">Undangan Belum Dapat Diakses</h1>
+        <h1 class="font-logo text-3xl font-bold text-charcoal tracking-tight">Undangan Belum Dapat Diakses</h1>
 
         <p class="text-sm text-charcoal/70 leading-relaxed">
             Mohon maaf, undangan digital untuk pasangan
@@ -42,8 +42,8 @@
             </a>
 
             @auth
-                <a href="{{ route('dasbor.index') }}" class="rounded-xl bg-sage px-5 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 transition">
-                    Buka Dasbor Saya
+                <a href="{{ route('dashboard.index') }}" class="rounded-xl bg-sage px-5 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 transition">
+                    Buka Dashboard Saya
                 </a>
             @else
                 <a href="{{ route('login') }}" class="rounded-xl bg-sage px-5 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 transition">

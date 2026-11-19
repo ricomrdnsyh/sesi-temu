@@ -121,7 +121,7 @@
                 <div class="relative z-10 h-full flex flex-col justify-between p-3 text-center text-white">
                     <div class="pt-1 space-y-0.5">
                         <p class="text-[8px] uppercase tracking-[0.25em] text-[#F3E5AB]">The Wedding Of</p>
-                        <p class="font-serif text-sm font-bold leading-tight drop-shadow">
+                        <p class="font-logo text-sm font-bold leading-tight drop-shadow">
                             <span x-text="namaPriaLive || @js($undangan->nama_panggilan_pria)"></span>
                             <span class="text-[#F3E5AB]">&amp;</span>
                             <span x-text="namaWanitaLive || @js($undangan->nama_panggilan_wanita)"></span>
@@ -272,7 +272,7 @@
                         <img :src="gambarTampil" alt="{{ $label }}" class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
                     </template>
                     <template x-if="!gambarTampil">
-                        <span class="font-serif text-3xl font-bold text-champagne">{{ $inisial }}</span>
+                        <span class="font-logo text-3xl font-bold text-champagne">{{ $inisial }}</span>
                     </template>
                 </div>
 

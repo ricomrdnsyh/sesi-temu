@@ -740,7 +740,7 @@
                 </div>
 
                 <p class="text-xs text-charcoal/60 bg-ivory/70 rounded-xl px-3.5 py-2.5 border border-champagne/15">
-                    Harga setelah diskon otomatis ditampilkan sebagai harga coret di Beranda, Dasbor Client, serta dihitung ke order/transaksi baru.
+                    Harga setelah diskon otomatis ditampilkan sebagai harga coret di Beranda, Dashboard Client, serta dihitung ke order/transaksi baru.
                 </p>
 
                 <div class="pt-3 flex items-center justify-end gap-2.5">

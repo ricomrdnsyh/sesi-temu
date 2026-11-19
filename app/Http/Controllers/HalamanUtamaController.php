@@ -68,7 +68,7 @@ class HalamanUtamaController extends Controller
 
         if ($request->user()) {
             return redirect()
-                ->route('dasbor.index', ['buat' => 1, 'slug' => $slug])
+                ->route('dashboard.index', ['buat' => 1, 'slug' => $slug])
                 ->with('sukses', "Kabar baik! Link sesitemu.id/{$slug} masih tersedia. Lengkapi draft undangan Anda di bawah ini.");
         }
 
@@ -120,20 +120,20 @@ class HalamanUtamaController extends Controller
                     'judul' => '1. Data yang Kami Kumpulkan',
                     'isi' => [
                         'Saat Anda mendaftar dan menyusun undangan di SesiTemu, kami mengumpulkan data akun (nama lengkap, alamat email, nomor WhatsApp, dan kata sandi terenkripsi) serta konten undangan yang Anda masukkan secara sukarela seperti nama mempelai, nama orang tua, jadwal dan lokasi acara, cerita cinta, nomor rekening amplop digital, alamat pengiriman kado, serta foto galeri.',
-                        'Ketika tamu mengisi formulir Buku Tamu & RSVP pada undangan aktif, sistem menyimpan nama tamu, status kehadiran, jumlah tamu, serta pesan doa restu untuk ditampilkan pada undangan dan dasbor pemilik undangan.',
+                        'Ketika tamu mengisi formulir Buku Tamu & RSVP pada undangan aktif, sistem menyimpan nama tamu, status kehadiran, jumlah tamu, serta pesan doa restu untuk ditampilkan pada undangan dan dashboard pemilik undangan.',
                     ],
                 ],
                 [
                     'judul' => '2. Penggunaan Informasi',
                     'isi' => [
-                        'Data Anda digunakan semata-mata untuk menampilkan halaman undangan digital pada link pilihan Anda, menyediakan dasbor pengelolaan undangan, memproses verifikasi pembayaran aktivasi, serta memberikan dukungan layanan melalui WhatsApp Admin.',
+                        'Data Anda digunakan semata-mata untuk menampilkan halaman undangan digital pada link pilihan Anda, menyediakan dashboard pengelolaan undangan, memproses verifikasi pembayaran aktivasi, serta memberikan dukungan layanan melalui WhatsApp Admin.',
                         'Kami tidak pernah menjual, menyewakan, atau membagikan data pribadi Anda kepada pihak ketiga untuk keperluan pemasaran di luar layanan SesiTemu.',
                     ],
                 ],
                 [
                     'judul' => '3. Privasi Foto & Mode Tanpa Foto (TF)',
                     'isi' => [
-                        'Seluruh foto yang diunggah dioptimalkan otomatis ke format WebP agar ringan diakses tamu. Anda memegang kendali penuh atas foto yang ingin ditampilkan atau dihapus kapan saja melalui dasbor.',
+                        'Seluruh foto yang diunggah dioptimalkan otomatis ke format WebP agar ringan diakses tamu. Anda memegang kendali penuh atas foto yang ingin ditampilkan atau dihapus kapan saja melalui dashboard.',
                         'Bagi pasangan yang mengutamakan privasi atau konsep syar\'i, SesiTemu menyediakan Mode Tanpa Foto (TF / Monogram) yang menyembunyikan foto sampul, potret mempelai, dan galeri dari tampilan publik undangan.',
                     ],
                 ],
@@ -180,7 +180,7 @@ class HalamanUtamaController extends Controller
                     'judul' => '3. Masa Aktif & Perubahan Tema',
                     'isi' => [
                         "Setiap undangan yang telah diverifikasi memiliki masa aktif selama {$durasiBulan} bulan penuh sejak aktivasi, lengkap dengan akses editor untuk revisi teks, jadwal acara, galeri foto, dan pengelolaan daftar tamu tanpa batas.",
-                        'Anda bebas berganti ke tema lain yang setara maupun melakukan peningkatan tier kapan saja melalui Dasbor Client tanpa kehilangan data undangan yang sudah diisi.',
+                        'Anda bebas berganti ke tema lain yang setara maupun melakukan peningkatan tier kapan saja melalui Dashboard Client tanpa kehilangan data undangan yang sudah diisi.',
                     ],
                 ],
                 [
