@@ -8,11 +8,65 @@ window.Swal = Swal;
 
 Alpine.start();
 
+const escapeHtml = (teks) => String(teks)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
 document.addEventListener('DOMContentLoaded', () => {
+    const flashErrors = document.querySelector('[data-swal-errors]');
+    let daftarGalat = [];
+    if (flashErrors?.dataset.swalErrors) {
+        try {
+            const hasil = JSON.parse(flashErrors.dataset.swalErrors);
+            if (Array.isArray(hasil)) {
+                daftarGalat = hasil
+                    .map((item) => String(item ?? '').trim())
+                    .filter((item) => item.length > 0);
+            }
+        } catch {
+            const mentah = flashErrors.dataset.swalErrors.trim();
+            if (mentah) {
+                daftarGalat = [mentah];
+            }
+        }
+    }
+
+    const flashWarning = document.querySelector('[data-swal-warning]');
+    const pesanPeringatan = flashWarning?.dataset.swalWarning?.trim();
+
     const flashSuccess = document.querySelector('[data-swal-success]');
     const pesanSukses = flashSuccess?.dataset.swalSuccess?.trim();
 
-    if (pesanSukses) {
+    if (daftarGalat.length === 1) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Terjadi Kesalahan',
+            text: daftarGalat[0],
+            confirmButtonText: 'Mengerti',
+            confirmButtonColor: '#4B6358',
+        });
+    } else if (daftarGalat.length > 1) {
+        const daftarHtml = `<ul class="text-left list-disc list-inside space-y-1">${daftarGalat.map((pesan) => `<li>${escapeHtml(pesan)}</li>`).join('')}</ul>`;
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Periksa Kembali Data Anda',
+            html: daftarHtml,
+            confirmButtonText: 'Mengerti',
+            confirmButtonColor: '#4B6358',
+        });
+    } else if (pesanPeringatan) {
+        Swal.fire({
+            icon: 'warning',
+            title: flashWarning?.dataset.swalWarningTitle?.trim() || 'Perhatian',
+            text: pesanPeringatan,
+            confirmButtonText: 'Mengerti',
+            confirmButtonColor: '#4B6358',
+        });
+    } else if (pesanSukses) {
         Swal.fire({
             icon: 'success',
             title: 'Berhasil!',

@@ -23,6 +23,6 @@ class UndanganPolicy
 
     public function hapus(Pengguna $pengguna, Undangan $undangan): bool
     {
-        return $pengguna->id === $undangan->pengguna_id && ! $undangan->status_publikasi;
+        return $pengguna->id === $undangan->pengguna_id && $undangan->bolehDihapusClient();
     }
 }

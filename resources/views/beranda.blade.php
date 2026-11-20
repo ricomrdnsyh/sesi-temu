@@ -1408,20 +1408,6 @@
                                 <span>Cek &amp; Amankan Link</span>
                             </button>
                         </form>
-
-                        @if (session('saran_link'))
-                            <div
-                                class="mt-2.5 rounded-xl bg-amber-50 border border-amber-200 px-4 py-2.5 text-left text-sm text-amber-800">
-                                {{ session('saran_link') }}
-                            </div>
-                        @endif
-
-                        @error('slug')
-                            <div
-                                class="mt-2.5 rounded-xl bg-red-50 border border-red-200 px-4 py-2.5 text-left text-sm text-red-700">
-                                {{ $message }}
-                            </div>
-                        @enderror
                     </div>
 
                     <div class="pt-1 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -1572,8 +1558,8 @@
         {{-- Bottom Sheet Mobile "+ Buat" (Cek Link, Buat Draft Gratis, Konsultasi WA) --}}
         <div x-show="sheetBuatTerbuka" x-cloak
             class="md:hidden fixed inset-0 z-50 flex items-end justify-center bg-charcoal/55 backdrop-blur-xs"
-            @keydown.escape.window="sheetBuatTerbuka = false">
-            <div @click.away="sheetBuatTerbuka = false"
+            @keydown.escape.window="if (!window.Swal?.isVisible()) sheetBuatTerbuka = false">
+            <div @click.away="if (!window.Swal?.isVisible() && !$event.target?.closest('.swal2-container')) sheetBuatTerbuka = false"
                 x-transition:enter="transition ease-out duration-250"
                 x-transition:enter-start="translate-y-full"
                 x-transition:enter-end="translate-y-0"
@@ -1621,18 +1607,6 @@
                             <span>Cek Ketersediaan Link</span>
                         </button>
                     </form>
-
-                    @if (session('saran_link'))
-                        <div class="rounded-xl bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
-                            {{ session('saran_link') }}
-                        </div>
-                    @endif
-
-                    @error('slug')
-                        <div class="rounded-xl bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
-                            {{ $message }}
-                        </div>
-                    @enderror
                 </div>
 
                 {{-- Aksi Tambahan --}}

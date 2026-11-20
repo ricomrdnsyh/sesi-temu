@@ -1,14 +1,25 @@
 @extends('layouts.aplikasi')
 
-@section('judul', 'Undangan Saya — Client SesiTemu')
+@section('judul', 'Undangan Saya | SesiTemu')
 
 @section('konten')
     @php
+        $pengguna = auth()->user();
         $jumlahSemua = $daftarUndangan->count();
         $jumlahAktif = $daftarUndangan->filter(fn($u) => $u->statusKode() === 'aktif')->count();
         $jumlahDraft = $daftarUndangan->filter(fn($u) => $u->statusKode() === 'draft')->count();
         $jumlahKedaluwarsa = $daftarUndangan->filter(fn($u) => $u->statusKode() === 'kedaluwarsa')->count();
+        $totalTamuHadir = $daftarUndangan->sum(fn($u) => $u->bukuTamu->where('status_kehadiran', 'hadir')->count());
         $temaDefaultId = (string) old('tema_id', (string) ($daftarTema->first()?->id ?? ''));
+
+        $jamSekarang = now()->hour;
+        $sapaanWaktu = match (true) {
+            $jamSekarang >= 4 && $jamSekarang < 11 => 'Selamat Pagi',
+            $jamSekarang >= 11 && $jamSekarang < 15 => 'Selamat Siang',
+            $jamSekarang >= 15 && $jamSekarang < 18 => 'Selamat Sore',
+            default => 'Selamat Malam',
+        };
+        $namaTampilAkun = trim((string) $pengguna->nama);
 
         $daftarFilterJson = $daftarUndangan
             ->map(
@@ -50,113 +61,89 @@
             this.kataCari = '';
         }
     }" class="min-h-screen flex flex-col bg-ivory">
-        @include('dashboard._top-nav', ['halamanAktif' => 'undangan'])
+        @include('dashboard._top-nav', ['halamanAktif' => 'dashboard'])
 
         <main id="halaman-undangan-saya"
             class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-28 md:py-8 space-y-5 md:space-y-6">
-            @if ($errors->any())
-                <div class="rounded-2xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                    <ul class="list-disc list-inside space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            {{-- Unified Sage Hero Header Card (Identik dengan Warna Hijau Tombol) --}}
+            {{-- Hero Banner Hijau Sage + Overlapping Floating White Summary Dock --}}
             <section>
                 <div
-                    class="relative overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-sage via-[#445B50] to-[#3b5047] text-ivory p-5 sm:p-7 shadow-lg ring-1 ring-sage/30">
-                    {{-- Dekorasi Ambient Halus --}}
+                    class="relative overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-[#354A40] via-sage to-[#445B50] text-ivory px-5 sm:px-7 pt-5 sm:pt-6 pb-12 sm:pb-14 shadow-md ring-1 ring-sage/30">
+                    {{-- Dekorasi Geometris & Ambient Halus --}}
                     <div aria-hidden="true"
-                        class="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-champagne/20 blur-3xl">
+                        class="pointer-events-none absolute -right-12 -top-16 h-52 w-52 sm:h-64 sm:w-64 rounded-full bg-champagne/25 blur-2xl">
                     </div>
                     <div aria-hidden="true"
-                        class="pointer-events-none absolute -left-10 -bottom-12 h-36 w-36 rounded-full bg-white/10 blur-2xl">
+                        class="pointer-events-none absolute right-6 -top-10 h-36 w-36 rounded-full border border-white/10">
+                    </div>
+                    <div aria-hidden="true"
+                        class="pointer-events-none absolute -left-10 -bottom-12 h-36 w-36 rounded-full bg-black/15 blur-2xl">
                     </div>
 
-                    <div class="relative z-10 space-y-5">
+                    <div class="relative z-10 space-y-3.5">
+                        {{-- Baris Atas: Pill Sapaan --}}
+                        <div class="flex items-center">
+                            <span
+                                class="inline-flex min-w-0 max-w-full items-center gap-2 rounded-full bg-white/15 backdrop-blur-xs px-3 py-1 text-[11px] font-medium tracking-wide text-ivory ring-1 ring-white/20">
+                                <span class="h-1.5 w-1.5 rounded-full bg-[#F5E3B8] shrink-0"></span>
+                                <span class="truncate">{{ $sapaanWaktu }}, {{ $namaTampilAkun }}</span>
+                            </span>
+                        </div>
+
+                        {{-- Judul, Deskripsi & Tombol CTA Desktop --}}
                         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                             <div class="space-y-1.5 max-w-xl">
                                 <h1
                                     class="font-sans text-[1.35rem] sm:text-[1.85rem] font-bold text-white leading-snug tracking-tight">
-                                    Undangan Saya
+                                    {{ $jumlahSemua > 0 ? 'Kelola Undangan Pernikahan Anda' : 'Wujudkan Undangan Digital Impian' }}
                                 </h1>
                                 <p class="text-xs sm:text-sm text-white/85 leading-relaxed">
-                                    @if ($jumlahSemua > 0)
-                                        Kelola <strong class="font-sans tabular-nums text-white">{{ $jumlahSemua }}</strong>
-                                        undangan digital, pantau kelengkapan isi, dan salin tautan siap sebar.
-                                    @else
-                                        Semua draft dan undangan pernikahan aktif Anda akan tersimpan rapi di sini.
-                                    @endif
+                                    {{ $jumlahSemua > 0
+                                        ? 'Pantau kehadiran tamu, atur acara & galeri, atau perbarui tema kapan saja.'
+                                        : 'Susun draft undangan gratis dalam hitungan menit, bagikan dengan mudah saat siap disebar.' }}
                                 </p>
                             </div>
 
-                            @if ($jumlahSemua > 0)
-                                <div class="flex items-center gap-2.5 shrink-0">
-                                    <a href="{{ route('dashboard.katalog') }}"
-                                        class="hidden sm:inline-flex items-center justify-center gap-1.5 rounded-2xl bg-white/15 hover:bg-white/20 px-4 py-3 text-sm font-semibold text-ivory ring-1 ring-white/20 active:scale-95 transition">
-                                        <span>Katalog Tema</span>
-                                    </a>
-                                    <button type="button" @click="modalBuatBaru = true"
-                                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-champagne px-5 py-3 text-xs sm:text-sm font-bold text-charcoal shadow-md hover:bg-[#d1b26d] active:scale-95 transition cursor-pointer">
-                                        <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
-                                            stroke-linejoin="round" aria-hidden="true">
-                                            <path d="M12 5v14" />
-                                            <path d="M5 12h14" />
-                                        </svg>
-                                        <span>Buat Draft Baru</span>
-                                    </button>
-                                </div>
-                            @endif
+                            <button type="button" @click="modalBuatBaru = true"
+                                class="hidden sm:inline-flex items-center justify-center gap-2 rounded-2xl bg-champagne px-5 py-3 text-sm font-bold text-charcoal shadow-md hover:bg-[#d1b26d] active:scale-95 transition cursor-pointer shrink-0">
+                                <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M12 5v14" />
+                                    <path d="M5 12h14" />
+                                </svg>
+                                <span>Buat Draft</span>
+                            </button>
                         </div>
+                    </div>
+                </div>
 
-                        {{-- 3 Kartu Metrik Frosted Glass di Dalam Hero --}}
-                        <div class="pt-4 border-t border-white/15 grid grid-cols-3 gap-2.5 sm:gap-3.5 text-center">
-                            @if ($jumlahSemua > 0)
-                                <button type="button" @click="statusFilter = 'semua'"
-                                    :class="statusFilter === 'semua' ? 'bg-black/25 ring-[#F5E3B8]/65' : 'bg-black/15 hover:bg-black/20 ring-white/15'"
-                                    class="rounded-2xl ring-1 px-2.5 py-3.5 sm:py-4 active:scale-[0.98] transition cursor-pointer">
-                                    <p class="font-sans tabular-nums text-xl sm:text-2xl font-bold text-white leading-none">
-                                        {{ $jumlahSemua }}</p>
-                                    <p class="mt-1.5 text-[11px] sm:text-xs font-medium text-white/80">Semua</p>
-                                </button>
-                                <button type="button" @click="statusFilter = 'aktif'"
-                                    :class="statusFilter === 'aktif' ? 'bg-black/25 ring-[#F5E3B8]/65' : 'bg-black/15 hover:bg-black/20 ring-white/15'"
-                                    class="rounded-2xl ring-1 px-2.5 py-3.5 sm:py-4 active:scale-[0.98] transition cursor-pointer">
-                                    <p
-                                        class="font-sans tabular-nums text-xl sm:text-2xl font-bold text-[#F5E3B8] leading-none">
-                                        {{ $jumlahAktif }}</p>
-                                    <p class="mt-1.5 text-[11px] sm:text-xs font-medium text-white/80">Aktif</p>
-                                </button>
-                                <button type="button" @click="statusFilter = 'draft'"
-                                    :class="statusFilter === 'draft' ? 'bg-black/25 ring-[#F5E3B8]/65' : 'bg-black/15 hover:bg-black/20 ring-white/15'"
-                                    class="rounded-2xl ring-1 px-2.5 py-3.5 sm:py-4 active:scale-[0.98] transition cursor-pointer">
-                                    <p class="font-sans tabular-nums text-xl sm:text-2xl font-bold text-white leading-none">
-                                        {{ $jumlahDraft }}</p>
-                                    <p class="mt-1.5 text-[11px] sm:text-xs font-medium text-white/80">Draft</p>
-                                </button>
-                            @else
-                                <div class="rounded-2xl bg-black/15 ring-1 ring-white/15 px-2.5 py-3.5 sm:py-4">
-                                    <p class="font-sans tabular-nums text-xl sm:text-2xl font-bold text-white leading-none">
-                                        0</p>
-                                    <p class="mt-1.5 text-[11px] sm:text-xs font-medium text-white/80">Semua</p>
-                                </div>
-                                <div class="rounded-2xl bg-black/15 ring-1 ring-white/15 px-2.5 py-3.5 sm:py-4">
-                                    <p
-                                        class="font-sans tabular-nums text-xl sm:text-2xl font-bold text-[#F5E3B8] leading-none">
-                                        0</p>
-                                    <p class="mt-1.5 text-[11px] sm:text-xs font-medium text-white/80">Aktif</p>
-                                </div>
-                                <div class="rounded-2xl bg-black/15 ring-1 ring-white/15 px-2.5 py-3.5 sm:py-4">
-                                    <p class="font-sans tabular-nums text-xl sm:text-2xl font-bold text-white leading-none">
-                                        0</p>
-                                    <p class="mt-1.5 text-[11px] sm:text-xs font-medium text-white/80">Draft</p>
-                                </div>
-                            @endif
-                        </div>
+                {{-- Overlapping Floating White Summary Dock --}}
+                <div class="relative z-20 mx-3 sm:mx-6 -mt-8 sm:-mt-9">
+                    <div
+                        class="rounded-2xl bg-white px-2 sm:px-4 py-3.5 sm:py-4 shadow-md ring-1 ring-champagne/30 grid grid-cols-3 divide-x divide-champagne/25 text-center">
+                        <button type="button" @click="statusFilter = 'semua'"
+                            class="group px-2 flex flex-col items-center justify-center active:scale-95 transition cursor-pointer">
+                            <p
+                                class="font-sans tabular-nums text-lg sm:text-2xl font-bold text-charcoal group-hover:text-sage transition-colors leading-none">
+                                {{ $jumlahSemua }}</p>
+                            <p class="mt-1.5 text-[11px] sm:text-xs font-medium text-charcoal/60">Undangan</p>
+                        </button>
+
+                        <button type="button" @click="statusFilter = 'aktif'"
+                            class="group px-2 flex flex-col items-center justify-center active:scale-95 transition cursor-pointer">
+                            <p
+                                class="font-sans tabular-nums text-lg sm:text-2xl font-bold text-sage group-hover:scale-105 transition-transform leading-none">
+                                {{ $jumlahAktif }}</p>
+                            <p class="mt-1.5 text-[11px] sm:text-xs font-medium text-charcoal/60">Aktif</p>
+                        </button>
+
+                        <a href="{{ route('dashboard.tamu.index', ['subtab' => 'rsvp']) }}"
+                            class="group px-2 flex flex-col items-center justify-center active:scale-95 transition">
+                            <p
+                                class="font-sans tabular-nums text-lg sm:text-2xl font-bold text-[#8A6D33] group-hover:scale-105 transition-transform leading-none">
+                                {{ $totalTamuHadir }}</p>
+                            <p class="mt-1.5 text-[11px] sm:text-xs font-medium text-charcoal/60">Tamu Hadir</p>
+                        </a>
                     </div>
                 </div>
             </section>
@@ -238,7 +225,7 @@
                             $thumbnail = $undangan->urlFotoSampul() ?? $undangan->tema?->urlGambarPratinjau();
                             $transaksiTerakhir = $undangan->transaksi->first();
                             $sedangVerifikasi = $transaksiTerakhir?->status === 'menunggu_verifikasi';
-                            $pesanWaAktivasi = "Halo Admin SesiTemu, saya ingin mengaktifkan undangan saya dengan link sesitemu.id/{$undangan->slug} (ID Undangan #{$undangan->id}).";
+                            $bolehHapusDraft = $undangan->bolehDihapusClient();
                             $kataKunciKartu = strtolower(
                                 trim(
                                     $undangan->nama_panggilan_pria .
@@ -314,12 +301,43 @@
                                             @endif
                                         </div>
 
-                                        @if ($badgeHari)
-                                            <span
-                                                class="rounded-full bg-charcoal/75 backdrop-blur-md px-2.5 py-0.5 font-sans tabular-nums text-[10px] font-bold text-champagne ring-1 ring-champagne/35 shrink-0">
-                                                {{ $badgeHari }}
-                                            </span>
-                                        @endif
+                                        <div class="flex items-center gap-1.5 shrink-0">
+                                            @if ($badgeHari)
+                                                <span
+                                                    class="rounded-full bg-charcoal/75 backdrop-blur-md px-2.5 py-0.5 font-sans tabular-nums text-[10px] font-bold text-champagne ring-1 ring-champagne/35 shrink-0">
+                                                    {{ $badgeHari }}
+                                                </span>
+                                            @endif
+
+                                            @if ($bolehHapusDraft)
+                                                <form action="{{ route('dashboard.undangan.hapus', $undangan) }}" method="POST"
+                                                    data-swal-confirm="Yakin ingin menghapus draft undangan sesitemu.id/{{ $undangan->slug }}? Seluruh data, acara, dan foto draft ini akan dihapus permanen."
+                                                    data-swal-title="Hapus Draft Undangan?"
+                                                    data-swal-icon="warning"
+                                                    data-swal-confirm-button="Ya, Hapus Draft"
+                                                    data-swal-confirm-color="#DC2626"
+                                                    data-swal-loading-title="Menghapus Draft..."
+                                                    data-swal-loading-text="Sedang menghapus draft undangan dan berkas terkait...">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                        title="Hapus Draft"
+                                                        aria-label="Hapus Draft"
+                                                        class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-charcoal/65 backdrop-blur-md text-white/95 ring-1 ring-white/25 hover:bg-red-600 hover:text-white hover:ring-red-400 active:scale-95 transition cursor-pointer shadow-xs">
+                                                        <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round" aria-hidden="true">
+                                                            <path d="M3 6h18" />
+                                                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                                            <line x1="10" x2="10" y1="11" y2="17" />
+                                                            <line x1="14" x2="14" y1="11" y2="17" />
+                                                        </svg>
+                                                        <span class="sr-only">Hapus Draft</span>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
                                     </div>
 
                                     {{-- Nama Pasangan & Info Tanggal/Status Bawah Banner --}}
@@ -437,18 +455,18 @@
                             <div
                                 class="px-4 sm:px-5 pb-4 sm:pb-5 pt-1 grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
                                 <a href="{{ route('dashboard.undangan.kelola', $undangan) }}"
-                                    class="col-span-2 sm:col-span-1 sm:flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-sage px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-2xs hover:bg-[#3b5047] active:scale-[0.98] transition">
+                                    class="col-span-2 sm:col-span-1 sm:flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-sage px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-white whitespace-nowrap shadow-2xs hover:bg-[#3b5047] active:scale-[0.98] transition">
                                     <svg class="h-4 w-4 text-champagne shrink-0" viewBox="0 0 24 24" fill="none"
                                         stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round" aria-hidden="true">
                                         <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                                         <path d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z" />
                                     </svg>
-                                    <span>Kelola Undangan</span>
+                                    <span>{{ $statusKode === 'aktif' ? 'Kelola Undangan' : 'Lanjut Kelola' }}</span>
                                 </a>
 
                                 <a href="{{ $urlPublik }}" target="_blank"
-                                    class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-charcoal/15 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-charcoal hover:bg-ivory active:scale-[0.98] transition">
+                                    class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-charcoal/15 bg-white px-3 py-2.5 text-xs sm:text-sm font-semibold text-charcoal whitespace-nowrap hover:bg-ivory active:scale-[0.98] transition">
                                     <svg class="h-4 w-4 text-sage shrink-0" viewBox="0 0 24 24" fill="none"
                                         stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round" aria-hidden="true">
@@ -459,30 +477,28 @@
                                 </a>
 
                                 @if ($statusKode === 'aktif')
-                                    <a href="{{ route('dashboard.undangan.kelola', [$undangan, 'tab' => 'tamu']) }}"
-                                        class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-sage/30 bg-sage/10 px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-sage hover:bg-sage/15 active:scale-[0.98] transition">
+                                    <a href="{{ route('dashboard.undangan.tamu', $undangan) }}"
+                                        class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-sage/30 bg-sage/10 px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-sage whitespace-nowrap hover:bg-sage/15 active:scale-[0.98] transition">
                                         <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                             stroke-linejoin="round" aria-hidden="true">
-                                            <path d="m22 2-7 20-4-9-9-4Z" />
-                                            <path d="M22 2 11 13" />
+                                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                                            <circle cx="9" cy="7" r="4" />
+                                            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                                         </svg>
-                                        <span>Sebar WA</span>
+                                        <span>Tamu &amp; RSVP</span>
                                     </a>
                                 @elseif (!auth()->user()->adalahAdmin())
                                     <a href="{{ route('dashboard.undangan.kelola', [$undangan, 'tab' => 'aktivasi']) }}"
-                                        class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-champagne px-3.5 py-2.5 text-xs sm:text-sm font-bold text-charcoal hover:bg-[#d1b26d] active:scale-[0.98] transition">
-                                        <span>{{ $statusKode === 'kedaluwarsa' ? 'Perpanjang' : 'Bayar & Aktifkan' }}</span>
-                                    </a>
-                                    <a href="{{ \App\Support\PengaturanSesiTemu::urlWaAdmin($pesanWaAktivasi) }}"
-                                        target="_blank" rel="noopener"
-                                        class="col-span-2 sm:col-span-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-champagne/60 bg-white px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-charcoal hover:bg-champagne/10 active:scale-[0.98] transition">
-                                        <svg class="h-4 w-4 text-sage shrink-0" viewBox="0 0 24 24" fill="currentColor"
-                                            aria-hidden="true">
-                                            <path
-                                                d="M12.031 2c-5.516 0-9.969 4.453-9.969 9.969 0 1.766.469 3.484 1.344 5l-1.406 5.156 5.281-1.375c1.469.797 3.109 1.219 4.75 1.219 5.516 0 9.969-4.453 9.969-9.969S17.547 2 12.031 2Zm5.813 14.125c-.25.703-1.438 1.344-2 1.422-.516.078-1.172.109-1.891-.125-.438-.141-1-.328-1.719-.641-3.016-1.313-4.984-4.359-5.141-4.563-.156-.203-1.234-1.641-1.234-3.125s.781-2.219 1.063-2.516c.281-.297.609-.375.813-.375.203 0 .406 0 .578.016.188.016.438-.078.688.531.25.609.859 2.094.938 2.25.078.156.125.344.016.547-.109.203-.156.344-.313.516-.156.172-.328.391-.469.516-.156.156-.313.328-.141.641.172.313.781 1.297 1.672 2.094 1.156 1.031 2.125 1.344 2.438 1.5.313.156.484.125.672-.078.188-.203.781-.906.984-1.219.203-.313.406-.266.688-.156.281.109 1.797.844 2.109 1 .313.156.516.234.594.359.078.125.078.734-.172 1.438Z" />
+                                        class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-champagne px-3.5 py-2.5 text-xs sm:text-sm font-bold text-charcoal whitespace-nowrap hover:bg-[#d1b26d] active:scale-[0.98] transition">
+                                        <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round" aria-hidden="true">
+                                            <rect width="20" height="14" x="2" y="5" rx="2" />
+                                            <line x1="2" x2="22" y1="10" y2="10" />
                                         </svg>
-                                        <span>Chat Admin</span>
+                                        <span>{{ $statusKode === 'kedaluwarsa' ? 'Perpanjang' : 'Bayar & Aktifkan' }}</span>
                                     </a>
                                 @endif
                             </div>
@@ -552,7 +568,7 @@
             @endif
         </main>
 
-        @include('dashboard._bottom-nav', ['halamanAktif' => 'undangan', 'modalBuatOnPage' => true])
+        @include('dashboard._bottom-nav', ['halamanAktif' => 'dashboard', 'modalBuatOnPage' => true])
 
         @include('dashboard._modal-buat-draft')
     </div>

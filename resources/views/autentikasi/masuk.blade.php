@@ -8,31 +8,6 @@
     judul-halaman="Selamat Datang Kembali"
     subjudul="Masuk untuk mengelola undangan digital dan memantau RSVP tamu Anda."
 >
-    @if (session('sukses'))
-        <div class="mb-5 flex items-start gap-2.5 rounded-2xl bg-sage/10 border border-sage/25 px-4 py-3 text-xs sm:text-sm text-sage">
-            <svg class="w-4 h-4 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
-                <path d="m9 12 2 2 4-4" />
-            </svg>
-            <span>{{ session('sukses') }}</span>
-        </div>
-    @endif
-
-    @if ($errors->any())
-        <div class="mb-5 flex items-start gap-2.5 rounded-2xl bg-rose-50/90 border border-rose-200/80 px-4 py-3 text-xs sm:text-sm text-rose-700">
-            <svg class="w-4 h-4 mt-0.5 shrink-0 text-rose-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" x2="12" y1="8" y2="12" />
-                <line x1="12" x2="12.01" y1="16" y2="16" />
-            </svg>
-            <ul class="space-y-0.5">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
     <form
         x-data="{ lihatSandi: false, capsLockAktif: false }"
         action="{{ route('masuk.proses') }}"

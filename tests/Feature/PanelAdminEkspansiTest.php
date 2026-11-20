@@ -98,7 +98,12 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSee('Aktifkan Undangan (6 Bulan)');
 
         $this->actingAs($client)
-            ->get('/dashboard')
+            ->get("/dashboard/undangan/{$undangan->id}/kelola")
+            ->assertOk()
+            ->assertSee('6281122334455');
+
+        $this->actingAs($client)
+            ->get('/dashboard/profil')
             ->assertOk()
             ->assertSee('6281122334455');
 
@@ -622,6 +627,7 @@ class PanelAdminEkspansiTest extends TestCase
         ]);
 
         $this->get('/dashboard/undangan')->assertRedirect('/masuk');
+        $this->get('/dashboard/tamu')->assertRedirect('/masuk');
 
         $this->actingAs($client)
             ->get('/dashboard')
@@ -630,25 +636,40 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSee('md:hidden fixed bottom-0', false)
             ->assertSee('pb-28 md:py-8', false)
             ->assertSee('font-logo', false)
-            ->assertSee('Lanjutkan Undangan Terakhir')
-            ->assertSee('Pilihan Tema Favorit')
+            ->assertSee('Undangan Saya')
+            ->assertSee('Kelola Undangan Pernikahan Anda')
+            ->assertSee('mobile-nav-uji')
+            ->assertSee('Kelengkapan Undangan')
+            ->assertSee('Salin Link')
+            ->assertSee('Bayar &amp; Aktifkan', false)
+            ->assertSee('Hapus Draft')
+            ->assertDontSee('Pilihan Tema Favorit')
             ->assertSee('Buat Draft')
-            ->assertSee('data-client-nav="beranda"', false)
-            ->assertSee('data-client-nav="undangan"', false)
+            ->assertSee('data-client-nav="dashboard"', false)
+            ->assertDontSee('data-client-nav="tamu"', false)
             ->assertSee('data-client-nav="buat"', false)
             ->assertSee('data-client-nav="katalog"', false)
             ->assertSee('data-client-nav="profil"', false);
 
+        // Rute lama /dashboard/undangan diarahkan ke /dashboard tanpa duplikasi halaman
         $this->actingAs($client)
             ->get('/dashboard/undangan')
+            ->assertRedirect('/dashboard');
+
+        // Rute /dashboard/tamu otomatis mengarahkan ke ruang kerja Tamu & RSVP milik undangan client
+        $this->actingAs($client)
+            ->get('/dashboard/tamu')
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/tamu");
+
+        // Menu Dashboard, Undangan & Tamu & RSVP tampil di dalam ruang kerja saat mengelola undangan (termasuk saat masih draft)
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/tamu")
             ->assertOk()
-            ->assertSee('data-client-bottom-nav', false)
-            ->assertSee('data-client-nav="undangan"', false)
-            ->assertSee('Undangan Saya')
-            ->assertSee('mobile-nav-uji')
-            ->assertSee('Kelengkapan Undangan')
-            ->assertSee('Salin Link')
-            ->assertSee('Bayar &amp; Aktifkan', false);
+            ->assertSee('Dashboard')
+            ->assertSee('data-workspace-menu="undangan"', false)
+            ->assertSee('data-workspace-menu="tamu"', false)
+            ->assertSee('Tamu &amp; RSVP', false)
+            ->assertSee('Daftar Tamu');
 
         $clientKosong = Pengguna::factory()->create([
             'peran' => 'client',
@@ -659,21 +680,9 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertOk()
             ->assertSee('Dimas Pratama Pamungkas Putra')
             ->assertSee('Wujudkan Undangan Digital Impian')
-            ->assertSee('Mulai dalam 3 Langkah Mudah')
-            ->assertSee('Pilih Tema Desain')
-            ->assertSee('font-sans text-base sm:text-lg font-bold text-charcoal tracking-tight', false)
-            ->assertSee('Pilihan Tema Favorit')
-            ->assertSee('scroll-px-4', false)
-            ->assertSee('Lihat Sampul')
-            ->assertSee('Pakai Foto')
-            ->assertSee('Tanpa Foto')
-            ->assertSee('Pakai Tema Ini');
-
-        $this->actingAs($clientKosong)
-            ->get('/dashboard/undangan')
-            ->assertOk()
             ->assertSee('Belum Ada Undangan Tersimpan')
-            ->assertSee('Buat Draft Undangan Pertama');
+            ->assertSee('Buat Draft Undangan Pertama')
+            ->assertDontSee('Pilihan Tema Favorit');
 
         $this->actingAs($client)
             ->get('/dashboard/profil')
@@ -693,7 +702,7 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSee('data-mobile-tab="acara"', false)
             ->assertSee('data-mobile-tab="galeri"', false)
             ->assertSee('data-mobile-tab="amplop"', false)
-            ->assertSee('data-mobile-tab="tamu"', false)
+            ->assertDontSee('data-mobile-tab="tamu"', false)
             ->assertSee('data-mobile-tab="aktivasi"', false);
     }
 
@@ -955,9 +964,41 @@ class PanelAdminEkspansiTest extends TestCase
         $this->assertSame('menunggu_verifikasi', $transaksiGratis->status);
         $this->assertNull($transaksiGratis->bukti_pembayaran);
 
-        // Ajukan transaksi berbayar beserta bukti transfer -> riwayat invoice hanya menampilkan Lihat Bukti (bukan form upload ulang)
+        // Saat sudah ada pengajuan menunggu verifikasi, form unggah dikunci dan pengajuan ganda ditolak
         Storage::fake('public');
         $bukti = UploadedFile::fake()->create('bukti-bayar.png', 100, 'image/png');
+        $this->actingAs($client)
+            ->from("/dashboard/undangan/{$undangan->id}/kelola?tab=aktivasi")
+            ->post("/dashboard/undangan/{$undangan->id}/transaksi", [
+                'paket' => 'mandiri',
+                'bukti_pembayaran' => $bukti,
+            ])
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola?tab=aktivasi")
+            ->assertSessionHasErrors('pembayaran');
+
+        $this->assertSame(1, Transaksi::where('undangan_id', $undangan->id)->count());
+
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=aktivasi")
+            ->assertOk()
+            ->assertSee('Bukti Pembayaran Sudah Dikirim')
+            ->assertDontSee('Pilih atau Seret Foto Bukti Transfer');
+
+        // Setelah pengajuan pertama ditolak Admin, form terbuka kembali agar client dapat unggah bukti baru
+        $admin = Pengguna::factory()->admin()->create();
+        $this->actingAs($admin)
+            ->patch("/admin/transaksi/{$transaksiGratis->id}/tolak", [
+                'catatan_admin' => 'Voucher khusus acara tertentu.',
+            ])
+            ->assertRedirect();
+
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=aktivasi")
+            ->assertOk()
+            ->assertSee('Pilih atau Seret Foto Bukti Transfer')
+            ->assertSee('Voucher khusus acara tertentu.');
+
+        // Ajukan transaksi berbayar beserta bukti transfer -> langsung terkunci lagi menunggu verifikasi
         $this->actingAs($client)
             ->post("/dashboard/undangan/{$undangan->id}/transaksi", [
                 'paket' => 'mandiri',
@@ -969,13 +1010,41 @@ class PanelAdminEkspansiTest extends TestCase
             ->where('total_bayar', '>', 0)
             ->firstOrFail();
 
+        // Unggah ulang ke invoice yang sudah memiliki bukti juga ditolak
+        $this->actingAs($client)
+            ->post("/dashboard/transaksi/{$transaksiBerbayar->id}/unggah-bukti", [
+                'bukti_pembayaran' => UploadedFile::fake()->create('bukti-ulang.png', 100, 'image/png'),
+            ])
+            ->assertSessionHasErrors('bukti_pembayaran');
+
         $this->actingAs($client)
             ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=aktivasi")
             ->assertOk()
+            ->assertSee('Bukti Pembayaran Sudah Dikirim')
+            ->assertSee('Lihat Bukti Terkirim')
             ->assertSee('Gratis via Voucher')
             ->assertSee('Lihat Bukti')
             ->assertSee((string) $transaksiBerbayar->urlBukti(), false)
+            ->assertDontSee('Pilih atau Seret Foto Bukti Transfer')
             ->assertDontSee('Pilih Foto Bukti')
             ->assertDontSee('/unggah-bukti');
+
+        // Setelah diverifikasi lunas oleh Admin, undangan aktif & pengajuan pembayaran baru tetap terkunci
+        $this->actingAs($admin)
+            ->patch("/admin/transaksi/{$transaksiBerbayar->id}/verifikasi")
+            ->assertRedirect();
+
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=aktivasi")
+            ->assertOk()
+            ->assertSee('Undangan Sudah Aktif')
+            ->assertDontSee('Pilih atau Seret Foto Bukti Transfer');
+
+        $this->actingAs($client)
+            ->post("/dashboard/undangan/{$undangan->id}/transaksi", [
+                'paket' => 'mandiri',
+                'bukti_pembayaran' => UploadedFile::fake()->create('bukti-lagi.png', 100, 'image/png'),
+            ])
+            ->assertSessionHasErrors('pembayaran');
     }
 }

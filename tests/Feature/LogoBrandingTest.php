@@ -79,19 +79,25 @@ class LogoBrandingTest extends TestCase
             ->assertOk()
             ->assertSee('favicon.png', false)
             ->assertSee('logo/logo-horizontal.webp', false)
-            ->assertSee('font-logo text-lg sm:text-xl font-bold text-charcoal tracking-tight', false)
-            ->assertSee('Lanjutkan Undangan Terakhir')
+            ->assertSee('font-sans text-[1.35rem] sm:text-[1.85rem] font-bold text-white leading-snug tracking-tight', false)
+            ->assertSee('Kelola Undangan Pernikahan Anda')
+            ->assertSee('Kelengkapan Undangan')
+            ->assertSee('Salin Link')
             ->assertSee('font-sans tabular-nums text-lg sm:text-2xl font-bold text-charcoal', false);
 
         $this->actingAs($client)
             ->get('/dashboard/undangan')
+            ->assertRedirect('/dashboard');
+
+        $this->actingAs($client)
+            ->get(route('dashboard.undangan.tamu', $undangan))
             ->assertOk()
             ->assertSee('favicon.png', false)
-            ->assertSee('logo/logo-horizontal.webp', false)
-            ->assertSee('font-sans text-[1.35rem] sm:text-[1.85rem] font-bold text-white leading-snug tracking-tight', false)
-            ->assertSee('Undangan Saya')
-            ->assertSee('Kelengkapan Undangan')
-            ->assertSee('Salin Link');
+            ->assertSee('logo/logo-ikon.webp', false)
+            ->assertSee('data-workspace-sidebar', false)
+            ->assertSee('font-sans text-xl sm:text-2xl font-bold text-charcoal tracking-tight', false)
+            ->assertSee('Tamu &amp; RSVP', false)
+            ->assertSee('font-sans tabular-nums text-2xl font-bold text-sage', false);
 
         $this->actingAs($client)
             ->get('/dashboard/katalog')
@@ -112,8 +118,10 @@ class LogoBrandingTest extends TestCase
             ->assertOk()
             ->assertSee('favicon.png', false)
             ->assertSee('logo/logo-ikon.webp', false)
-            ->assertSee('font-logo text-xl sm:text-2xl font-bold text-charcoal tracking-tight">Tema, Musik &amp; Pengaturan Link</h2>', false)
-            ->assertSee('font-sans tabular-nums text-2xl sm:text-3xl font-bold text-sage', false);
+            ->assertSee('data-workspace-sidebar', false)
+            ->assertSee('Edit Undangan')
+            ->assertSee('iframePreview', false)
+            ->assertSee('font-sans text-lg sm:text-2xl font-bold text-charcoal tracking-tight">Tema, Musik &amp; Pengaturan Link</h2>', false);
 
         $this->actingAs($admin)
             ->get('/admin')

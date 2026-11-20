@@ -204,7 +204,7 @@
             }
         },
     }"
-    @keydown.escape.window="tutupModal()"
+    @keydown.escape.window="if (!window.Swal?.isVisible()) tutupModal()"
     class="space-y-6"
 >
     <script type="application/json" id="tema-modal-init">{!! json_encode($modalInit, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>

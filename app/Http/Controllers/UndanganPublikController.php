@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\BukuTamu;
+use App\Models\TamuUndangan;
 use App\Models\Undangan;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -29,9 +31,30 @@ class UndanganPublikController extends Controller
             ]);
         }
 
+        $kodeTamu = trim((string) $request->query('g', ''));
         $namaTamu = trim((string) $request->query('to', ''));
+
+        $tamuTerdeteksi = null;
+        if ($kodeTamu !== '') {
+            $tamuTerdeteksi = TamuUndangan::where('undangan_id', $undangan->id)
+                ->where('kode_tamu', $kodeTamu)
+                ->first();
+        } elseif ($namaTamu !== '') {
+            $tamuTerdeteksi = TamuUndangan::where('undangan_id', $undangan->id)
+                ->whereRaw('LOWER(nama_tamu) = ?', [Str::lower($namaTamu)])
+                ->first();
+        }
+
+        if ($namaTamu === '' && $tamuTerdeteksi !== null) {
+            $namaTamu = $tamuTerdeteksi->nama_tamu;
+        }
+
         if ($namaTamu === '') {
             $namaTamu = 'Tamu Undangan';
+        }
+
+        if ($tamuTerdeteksi !== null && $undangan->sudahAktifPublik() && ! $this->adalahBotPratinjau($request->userAgent())) {
+            $tamuTerdeteksi->catatkanDibuka();
         }
 
         $lokasiView = $undangan->tema?->lokasi_view ?: 'tema.rustic-floral.index';
@@ -42,6 +65,35 @@ class UndanganPublikController extends Controller
             'modeDemo' => false,
             'modePratinjau' => ! $undangan->status_publikasi,
         ]);
+    }
+
+    private function adalahBotPratinjau(?string $userAgent): bool
+    {
+        if (! is_string($userAgent) || trim($userAgent) === '') {
+            return false;
+        }
+
+        $ua = Str::lower($userAgent);
+        foreach ([
+            'whatsapp',
+            'facebookexternalhit',
+            'facebot',
+            'twitterbot',
+            'telegrambot',
+            'discordbot',
+            'slackbot',
+            'linkedinbot',
+            'googlebot',
+            'bingbot',
+            'crawler',
+            'spider',
+        ] as $tandaBot) {
+            if (str_contains($ua, $tandaBot)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function simpanUcapan(string $slug, Request $request): RedirectResponse

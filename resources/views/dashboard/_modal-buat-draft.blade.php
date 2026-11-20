@@ -3,9 +3,9 @@
     x-show="modalBuatBaru"
     x-cloak
     class="fixed inset-0 z-50 flex items-center justify-center bg-charcoal/60 backdrop-blur-sm p-4"
-    @keydown.escape.window="modalBuatBaru = false"
+    @keydown.escape.window="if (!window.Swal?.isVisible()) modalBuatBaru = false"
 >
-    <div @click.away="modalBuatBaru = false" class="w-full max-w-lg rounded-3xl sm:rounded-2xl bg-white p-5 sm:p-6 shadow-2xl ring-1 ring-champagne/30 max-h-[88dvh] overflow-y-auto">
+    <div @click.away="if (!window.Swal?.isVisible() && !$event.target?.closest('.swal2-container')) modalBuatBaru = false" class="w-full max-w-lg rounded-3xl sm:rounded-2xl bg-white p-5 sm:p-6 shadow-2xl ring-1 ring-champagne/30 max-h-[88dvh] overflow-y-auto">
         <div class="flex items-start justify-between gap-3">
             <div>
                 <p class="text-[11px] font-bold uppercase tracking-wider text-sage">Draft Gratis</p>
@@ -41,7 +41,7 @@
 
             <div>
                 <label for="slug_baru" class="block text-sm font-medium text-charcoal">Link Undangan</label>
-                <div class="mt-1.5 flex items-center rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 focus-within:border-champagne focus-within:bg-white">
+                <div class="mt-1.5 flex items-center rounded-xl border @error('slug') border-rose-400 ring-2 ring-rose-500/15 @else border-charcoal/15 @enderror bg-ivory/60 px-3.5 py-2.5 focus-within:border-champagne focus-within:bg-white">
                     <span class="text-sm text-charcoal/50">sesitemu.id/</span>
                     <input id="slug_baru" name="slug" type="text" value="{{ old('slug', request()->query('slug', '')) }}" required placeholder="raka-maya" class="w-full bg-transparent text-sm font-semibold focus:outline-none ml-0.5">
                 </div>

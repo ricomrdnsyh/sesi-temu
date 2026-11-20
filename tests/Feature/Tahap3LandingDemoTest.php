@@ -121,10 +121,12 @@ class Tahap3LandingDemoTest extends TestCase
         ]);
 
         $response = $this->from('/')
+            ->followingRedirects()
             ->post('/cek-link', ['slug' => 'Dimas Rani']);
 
-        $response->assertRedirect('/');
-        $response->assertSessionHas('saran_link');
+        $response->assertOk()
+            ->assertSee('data-swal-warning', false)
+            ->assertSee('dimas-rani');
     }
 
     public function test_demo_tema_berjalan_in_memory_tanpa_menyimpan_ke_database(): void

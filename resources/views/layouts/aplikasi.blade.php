@@ -17,6 +17,18 @@
     @if (session('sukses'))
         <div data-swal-success="{{ session('sukses') }}" hidden aria-hidden="true"></div>
     @endif
+    @if (session('saran_link'))
+        <div data-swal-warning="{{ session('saran_link') }}" data-swal-warning-title="Link Sudah Digunakan" hidden aria-hidden="true"></div>
+    @endif
+    @if (session('peringatan'))
+        <div data-swal-warning="{{ session('peringatan') }}" hidden aria-hidden="true"></div>
+    @endif
+    @if (session('error'))
+        <div data-swal-errors="{{ json_encode([session('error')], JSON_UNESCAPED_UNICODE) }}" hidden aria-hidden="true"></div>
+    @endif
+    @if ($errors->any())
+        <div data-swal-errors="{{ json_encode($errors->all(), JSON_UNESCAPED_UNICODE) }}" hidden aria-hidden="true"></div>
+    @endif
     @yield('konten')
     @stack('skrip')
 </body>

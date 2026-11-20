@@ -39,13 +39,16 @@ Route::post('/keluar', [AutentikasiController::class, 'keluar'])
 Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(function (): void {
     Route::get('/', [DashboardUndanganController::class, 'index'])->name('index');
     Route::get('/undangan', [DashboardUndanganController::class, 'daftarUndangan'])->name('undangan.index');
+    Route::get('/tamu', [DashboardUndanganController::class, 'tamu'])->name('tamu.index');
     Route::get('/katalog', [DashboardUndanganController::class, 'katalog'])->name('katalog');
     Route::post('/katalog/terapkan-tema', [DashboardUndanganController::class, 'terapkanTema'])->name('katalog.terapkan');
     Route::get('/profil', [DashboardUndanganController::class, 'profil'])->name('profil.tampil');
     Route::put('/profil', [DashboardUndanganController::class, 'perbaruiProfil'])->name('profil.perbarui');
     Route::post('/undangan', [DashboardUndanganController::class, 'simpanUndanganBaru'])->name('undangan.simpan');
     Route::get('/undangan/{undangan}/kelola', [DashboardUndanganController::class, 'kelola'])->name('undangan.kelola');
+    Route::get('/undangan/{undangan}/tamu', [DashboardUndanganController::class, 'tamuUndangan'])->name('undangan.tamu');
     Route::put('/undangan/{undangan}', [DashboardUndanganController::class, 'perbaruiDataUtama'])->name('undangan.perbarui');
+    Route::delete('/undangan/{undangan}', [DashboardUndanganController::class, 'hapusUndangan'])->name('undangan.hapus');
 
     // Sub-fitur di dalam pengelolaan undangan
     Route::post('/undangan/{undangan}/acara', [DashboardUndanganController::class, 'simpanAcara'])->name('acara.simpan');
@@ -56,6 +59,11 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
 
     Route::post('/undangan/{undangan}/amplop', [DashboardUndanganController::class, 'simpanAmplop'])->name('amplop.simpan');
     Route::delete('/undangan/{undangan}/amplop/{amplop}', [DashboardUndanganController::class, 'hapusAmplop'])->name('amplop.hapus');
+
+    Route::post('/undangan/{undangan}/tamu', [DashboardUndanganController::class, 'simpanTamu'])->name('tamu.simpan');
+    Route::put('/undangan/{undangan}/tamu/{tamu}', [DashboardUndanganController::class, 'perbaruiTamu'])->name('tamu.perbarui');
+    Route::patch('/undangan/{undangan}/tamu/{tamu}/status-kirim', [DashboardUndanganController::class, 'tandaiStatusKirimTamu'])->name('tamu.status-kirim');
+    Route::delete('/undangan/{undangan}/tamu/{tamu}', [DashboardUndanganController::class, 'hapusTamu'])->name('tamu.hapus');
 
     Route::delete('/undangan/{undangan}/buku-tamu/{ucapan}', [DashboardUndanganController::class, 'hapusUcapan'])->name('ucapan.hapus');
 

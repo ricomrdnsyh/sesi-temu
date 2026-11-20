@@ -8,6 +8,7 @@ use App\Models\BukuTamu;
 use App\Models\GaleriUndangan;
 use App\Models\Pengguna;
 use App\Models\Tema;
+use App\Models\Transaksi;
 use App\Models\Undangan;
 use App\Services\PengolahGambarService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -88,9 +89,16 @@ class Tahap4DashboardAdminWebpTest extends TestCase
         $undangan = Undangan::where('slug', 'raka-maya')->firstOrFail();
         $this->assertSame($clientA->id, $undangan->pengguna_id);
 
-        // Client A buka dashboard dan halaman kelola
+        // Client A buka dashboard, ruang kerja undangan, dan menu Tamu & RSVP di dalamnya
         $this->actingAs($clientA)->get('/dashboard')->assertOk()->assertSee('raka-maya');
-        $this->actingAs($clientA)->get("/dashboard/undangan/{$undangan->id}/kelola")->assertOk()->assertSee('Generator Link Tamu WhatsApp');
+        $this->actingAs($clientA)
+            ->get("/dashboard/undangan/{$undangan->id}/kelola")
+            ->assertOk()
+            ->assertSee('data-workspace-menu="undangan"', false)
+            ->assertSee('data-workspace-menu="tamu"', false)
+            ->assertSee('data-workspace-menu="rsvp"', false)
+            ->assertSee('Edit Undangan');
+        $this->actingAs($clientA)->get("/dashboard/undangan/{$undangan->id}/tamu")->assertOk()->assertSee('Daftar Tamu');
 
         // Client B tidak boleh kelola undangan Client A
         $this->actingAs($clientB)
@@ -370,5 +378,138 @@ class Tahap4DashboardAdminWebpTest extends TestCase
             'slug' => 'starry-ballroom',
             'kategori' => 'luxury',
         ]);
+    }
+
+    public function test_client_hanya_dapat_menghapus_draft_belum_aktif_dan_tidak_bisa_hapus_undangan_aktif(): void
+    {
+        Storage::fake('public');
+
+        $client = Pengguna::factory()->create(['peran' => 'client']);
+        $clientLain = Pengguna::factory()->create(['peran' => 'client']);
+        $tema = $this->buatTema();
+
+        $draft = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $tema->id,
+            'slug' => 'uji-coba-draft',
+            'nama_panggilan_pria' => 'Raka',
+            'nama_lengkap_pria' => 'Raka Wijaya',
+            'nama_panggilan_wanita' => 'Sinta',
+            'nama_lengkap_wanita' => 'Sinta Dewi',
+            'pengaturan' => Undangan::pengaturanBawaan(),
+            'status_publikasi' => false,
+        ]);
+
+        $pathFotoPria = "undangan/{$draft->id}/pria.webp";
+        $pathGaleri = "undangan/{$draft->id}/galeri-1.webp";
+        Storage::disk('public')->put($pathFotoPria, 'dummy-pria');
+        Storage::disk('public')->put($pathGaleri, 'dummy-galeri');
+
+        $draft->update(['foto_pria' => $pathFotoPria]);
+        GaleriUndangan::create([
+            'undangan_id' => $draft->id,
+            'lokasi_foto' => $pathGaleri,
+            'urutan' => 1,
+        ]);
+
+        $aktif = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $tema->id,
+            'slug' => 'undangan-sudah-aktif',
+            'nama_panggilan_pria' => 'Budi',
+            'nama_lengkap_pria' => 'Budi Santoso',
+            'nama_panggilan_wanita' => 'Laras',
+            'nama_lengkap_wanita' => 'Laras Putri',
+            'pengaturan' => Undangan::pengaturanBawaan(),
+            'status_publikasi' => true,
+            'berlaku_sampai' => now()->addMonths(12),
+        ]);
+
+        $menungguVerifikasi = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $tema->id,
+            'slug' => 'draft-tunggu-verifikasi',
+            'nama_panggilan_pria' => 'Dika',
+            'nama_lengkap_pria' => 'Dika Saputra',
+            'nama_panggilan_wanita' => 'Nadia',
+            'nama_lengkap_wanita' => 'Nadia Sari',
+            'pengaturan' => Undangan::pengaturanBawaan(),
+            'status_publikasi' => false,
+        ]);
+
+        Transaksi::create([
+            'kode_invoice' => 'INV-TEST-001',
+            'undangan_id' => $menungguVerifikasi->id,
+            'pengguna_id' => $client->id,
+            'tema_id' => $tema->id,
+            'paket' => 'mandiri',
+            'harga_tema' => 59000,
+            'biaya_jasa' => 0,
+            'potongan_promo' => 0,
+            'total_bayar' => 59000,
+            'status' => 'menunggu_verifikasi',
+        ]);
+
+        // Tombol Hapus Draft tampil pada draft, tidak tampil pada undangan aktif maupun yang sedang diverifikasi
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$draft->id}/kelola")
+            ->assertOk()
+            ->assertSee('Hapus Draft');
+
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$aktif->id}/kelola")
+            ->assertOk()
+            ->assertDontSee('Hapus Draft');
+
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$menungguVerifikasi->id}/kelola")
+            ->assertOk()
+            ->assertDontSee('Hapus Draft');
+
+        // Client lain tidak boleh menghapus draft orang lain
+        $this->actingAs($clientLain)
+            ->delete("/dashboard/undangan/{$draft->id}")
+            ->assertForbidden();
+
+        // Client tidak boleh menghapus undangan yang sudah aktif
+        $this->actingAs($client)
+            ->delete("/dashboard/undangan/{$aktif->id}")
+            ->assertForbidden();
+
+        // Client tidak boleh menghapus draft yang sedang menunggu verifikasi pembayaran
+        $this->actingAs($client)
+            ->delete("/dashboard/undangan/{$menungguVerifikasi->id}")
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('undangan', ['id' => $aktif->id]);
+        $this->assertDatabaseHas('undangan', ['id' => $menungguVerifikasi->id]);
+
+        // Client berhasil menghapus draft miliknya yang belum aktif, beserta file storage terkait
+        $this->actingAs($client)
+            ->delete("/dashboard/undangan/{$draft->id}", ['kembali_ke' => 'beranda'])
+            ->assertRedirect('/dashboard')
+            ->assertSessionHas('sukses');
+
+        $this->assertDatabaseMissing('undangan', ['id' => $draft->id]);
+        $this->assertDatabaseMissing('galeri_undangan', ['undangan_id' => $draft->id]);
+        Storage::disk('public')->assertMissing($pathFotoPria);
+        Storage::disk('public')->assertMissing($pathGaleri);
+
+        // Galat validasi (misal link sudah dipakai) dirender lewat hook SweetAlert2, bukan alert kotak merah inline
+        $this->actingAs($client)
+            ->from('/dashboard')
+            ->followingRedirects()
+            ->post('/dashboard/undangan', [
+                'tema_id' => $tema->id,
+                'slug' => 'undangan-sudah-aktif',
+                'nama_panggilan_pria' => 'Baru',
+                'nama_lengkap_pria' => 'Baru Lengkap',
+                'nama_panggilan_wanita' => 'Coba',
+                'nama_lengkap_wanita' => 'Coba Lengkap',
+            ])
+            ->assertOk()
+            ->assertSee('data-swal-errors', false)
+            ->assertSee('sudah dipakai')
+            ->assertDontSee('rounded-2xl bg-red-50 border border-red-200', false);
     }
 }

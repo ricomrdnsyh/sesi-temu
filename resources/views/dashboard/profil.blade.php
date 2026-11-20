@@ -11,16 +11,6 @@
         @include('dashboard._top-nav', ['halamanAktif' => 'profil'])
 
         <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-28 md:py-8 space-y-5 sm:space-y-6">
-            @if ($errors->any())
-                <div class="rounded-2xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                    <ul class="list-disc list-inside space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
             {{-- Kartu Profil Bergaya Centered Floating Card & Geometric Backdrop --}}
             <section
                 class="relative overflow-hidden rounded-[1.75rem] bg-ivory/90 shadow-xs ring-1 ring-champagne/25 pb-4 sm:pb-6">
@@ -241,7 +231,7 @@
                     </div>
 
                     <div class="flex-1 flex flex-col justify-between p-3.5 sm:p-4 gap-2.5">
-                        <a href="{{ route('dashboard.undangan.index') }}"
+                        <a href="{{ route('dashboard.index') }}"
                             class="group flex items-center justify-between gap-3 rounded-2xl bg-ivory/65 px-3.5 py-3 ring-1 ring-champagne/20 hover:bg-sage/[0.08] hover:ring-sage/35 hover:-translate-y-0.5 hover:shadow-xs active:scale-[0.99] transition-all duration-200">
                             <div class="flex items-center gap-3.5 min-w-0">
                                 <span

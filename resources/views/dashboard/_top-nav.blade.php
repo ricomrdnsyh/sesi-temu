@@ -1,5 +1,5 @@
 @php
-    $halamanAktif = $halamanAktif ?? 'beranda';
+    $halamanAktif = $halamanAktif ?? 'dashboard';
     $judulMobile = $judulMobile ?? null;
     $lebarKontainer = $lebarKontainer ?? 'max-w-7xl';
     $penggunaAktif = auth()->user();
@@ -37,16 +37,11 @@
             <nav aria-label="Navigasi Dashboard Client" class="hidden md:flex items-center gap-1.5">
                 <a
                     href="{{ route('dashboard.index') }}"
-                    class="rounded-xl px-3.5 py-1.5 text-sm font-semibold transition {{ $halamanAktif === 'beranda' ? 'bg-sage/12 text-sage' : 'text-charcoal/70 hover:bg-ivory hover:text-charcoal' }}"
-                >
-                    Beranda
-                </a>
-                <a
-                    href="{{ route('dashboard.undangan.index') }}"
-                    class="rounded-xl px-3.5 py-1.5 text-sm font-semibold transition {{ $halamanAktif === 'undangan' ? 'bg-sage/12 text-sage' : 'text-charcoal/70 hover:bg-ivory hover:text-charcoal' }}"
+                    class="rounded-xl px-3.5 py-1.5 text-sm font-semibold transition {{ in_array($halamanAktif, ['dashboard', 'undangan', 'beranda'], true) ? 'bg-sage/12 text-sage' : 'text-charcoal/70 hover:bg-ivory hover:text-charcoal' }}"
                 >
                     Undangan Saya
                 </a>
+
                 <a
                     href="{{ route('dashboard.katalog') }}"
                     class="rounded-xl px-3.5 py-1.5 text-sm font-semibold transition {{ $halamanAktif === 'katalog' ? 'bg-sage/12 text-sage' : 'text-charcoal/70 hover:bg-ivory hover:text-charcoal' }}"

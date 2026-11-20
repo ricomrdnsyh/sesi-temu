@@ -77,19 +77,11 @@
 
         <div class="mt-8 {{ $kelasRadiusBesar }} p-6 sm:p-8 kartu-3d masuk-3d {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
             @if (session('sukses_ucapan'))
-                <div class="mb-5 rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-800">
-                    {{ session('sukses_ucapan') }}
-                </div>
+                <div data-swal-success="{{ session('sukses_ucapan') }}" hidden aria-hidden="true"></div>
             @endif
 
             @if ($errors->any())
-                <div class="mb-5 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                    <ul class="list-disc list-inside space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+                <div data-swal-errors="{{ json_encode($errors->all(), JSON_UNESCAPED_UNICODE) }}" hidden aria-hidden="true"></div>
             @endif
 
             @if (!empty($modeDemo))

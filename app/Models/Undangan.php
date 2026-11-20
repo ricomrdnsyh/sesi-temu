@@ -208,6 +208,11 @@ class Undangan extends Model
         return $this->hasMany(BukuTamu::class, 'undangan_id')->latest();
     }
 
+    public function daftarTamu(): HasMany
+    {
+        return $this->hasMany(TamuUndangan::class, 'undangan_id')->latest();
+    }
+
     public function transaksi(): HasMany
     {
         return $this->hasMany(Transaksi::class, 'undangan_id')->latest();
@@ -234,6 +239,46 @@ class Undangan extends Model
         }
 
         return 'draft';
+    }
+
+    public function memilikiTransaksiTerkunci(): bool
+    {
+        $statusTerkunci = ['menunggu_verifikasi', 'lunas'];
+
+        if ($this->relationLoaded('transaksi')) {
+            return $this->transaksi->contains(
+                static fn (Transaksi $transaksi): bool => in_array($transaksi->status, $statusTerkunci, true)
+            );
+        }
+
+        return $this->transaksi()
+            ->whereIn('status', $statusTerkunci)
+            ->exists();
+    }
+
+    public function transaksiMenungguVerifikasi(): ?Transaksi
+    {
+        if ($this->relationLoaded('transaksi')) {
+            return $this->transaksi->firstWhere('status', 'menunggu_verifikasi');
+        }
+
+        return $this->transaksi()
+            ->where('status', 'menunggu_verifikasi')
+            ->latest()
+            ->first();
+    }
+
+    public function bolehAjukanPembayaran(): bool
+    {
+        return ! $this->sudahAktifPublik()
+            && $this->transaksiMenungguVerifikasi() === null;
+    }
+
+    public function bolehDihapusClient(): bool
+    {
+        return ! $this->status_publikasi
+            && ! $this->sudahKedaluwarsa()
+            && ! $this->memilikiTransaksiTerkunci();
     }
 
     public function acaraTerdekat(): ?AcaraUndangan

@@ -233,6 +233,10 @@ div.dt-container .dt-paging .dt-paging-button.disabled:hover {
 }
 
 /* SesiTemu SweetAlert2 Theme */
+.swal2-container {
+    z-index: 10050 !important;
+}
+
 .swal2-popup {
     font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif !important;
     border-radius: 1rem !important;

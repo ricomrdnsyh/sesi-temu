@@ -101,16 +101,6 @@
         @include('dashboard._top-nav', ['halamanAktif' => 'katalog'])
 
         <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-28 md:py-8 space-y-5 md:space-y-6">
-            @if ($errors->any())
-                <div class="rounded-2xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                    <ul class="list-disc list-inside space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
             {{-- Header & Filter Katalog Terpadu (Light Surface Command Bar + Filter Tier Landing Page) --}}
             <section class="rounded-[1.5rem] bg-white p-4 sm:p-5 shadow-xs ring-1 ring-champagne/25 space-y-4">
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5">
@@ -514,8 +504,8 @@
         {{-- Modal Floating Lanjut Pakai Tema Ini --}}
         <div x-show="modalPakaiTerbuka" x-cloak data-modal-pakai-tema
             class="fixed inset-0 z-50 flex items-center justify-center bg-charcoal/60 backdrop-blur-sm p-4"
-            @keydown.escape.window="modalPakaiTerbuka = false">
-            <div @click.away="modalPakaiTerbuka = false"
+            @keydown.escape.window="if (!window.Swal?.isVisible()) modalPakaiTerbuka = false">
+            <div @click.away="if (!window.Swal?.isVisible() && !$event.target?.closest('.swal2-container')) modalPakaiTerbuka = false"
                 class="w-full max-w-lg rounded-3xl sm:rounded-2xl bg-white p-5 sm:p-6 shadow-2xl ring-1 ring-champagne/30 max-h-[88dvh] overflow-y-auto space-y-5">
                 <div class="flex items-start justify-between gap-3">
                     <div>

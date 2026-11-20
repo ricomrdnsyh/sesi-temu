@@ -407,14 +407,14 @@ class TierDanHargaTemaTest extends TestCase
             ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola")
             ->assertSessionHas('tab_aktif', 'amplop');
 
-        // Tab 5 (kado_fisik) -> Tab 6 (tamu)
+        // Tab 5 (kado_fisik) -> Tab 6 (aktivasi)
         $this->actingAs($client)
             ->put("/dashboard/undangan/{$undangan->id}", [
                 'bagian' => 'kado_fisik',
                 'alamat_kado_fisik' => 'Jl. Merdeka No. 10, Jakarta',
             ])
             ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola")
-            ->assertSessionHas('tab_aktif', 'tamu');
+            ->assertSessionHas('tab_aktif', 'aktivasi');
 
         // Halaman kelola menampilkan dropzone pratinjau foto mempelai, mockup sampul, & template kutipan cepat
         $this->actingAs($client)
@@ -519,30 +519,35 @@ class TierDanHargaTemaTest extends TestCase
             ->assertSee('Menyimpan Cerita Cinta...')
             ->assertSee('Menambahkan Kartu Rekening...')
             ->assertSee('Menghapus Rekening...')
-            ->assertSee('Mode Simulasi — Aktifkan Undangan untuk Menyebar Link WA')
-            ->assertSee('Bayar &amp; Aktifkan Undangan', false)
-            ->assertDontSee(':href="tamu.waUrl"', false)
             ->assertDontSee('onsubmit="return confirm', false);
 
-        // Setelah undangan diaktifkan, tombol Salin Teks & Kirim WA pada Tab 6 terbuka
+        // Halaman Tamu & RSVP dalam mode draft mengunci tombol Kirim WA
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/tamu")
+            ->assertOk()
+            ->assertSee('Mode Simulasi — Aktifkan Undangan untuk Menyebar Link WA')
+            ->assertSee('Bayar &amp; Aktifkan Undangan', false)
+            ->assertDontSee(':href="tamu.waUrl"', false);
+
+        // Setelah undangan diaktifkan, tombol Salin & Kirim WA pada halaman Tamu & RSVP terbuka
         $undangan->update([
             'status_publikasi' => true,
             'berlaku_sampai' => now()->addMonths(3),
         ]);
 
         $this->actingAs($client)
-            ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=tamu")
+            ->get("/dashboard/undangan/{$undangan->id}/tamu")
             ->assertOk()
             ->assertDontSee('Mode Simulasi — Aktifkan Undangan untuk Menyebar Link WA')
             ->assertSee(':href="tamu.waUrl"', false);
 
-        // Jika masa aktif sudah habis, Kirim WA & Salin Teks kembali dikunci
+        // Jika masa aktif sudah habis, Kirim WA kembali dikunci
         $undangan->update([
             'berlaku_sampai' => now()->subDay(),
         ]);
 
         $this->actingAs($client)
-            ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=tamu")
+            ->get("/dashboard/undangan/{$undangan->id}/tamu")
             ->assertOk()
             ->assertSee('Kirim WA Dikunci — Masa Aktif Undangan Berakhir')
             ->assertDontSee(':href="tamu.waUrl"', false);
