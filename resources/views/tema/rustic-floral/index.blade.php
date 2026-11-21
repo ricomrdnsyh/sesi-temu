@@ -1,41 +1,71 @@
-@include('komponen-undangan.kerangka-tema', [
-    'undangan' => $undangan,
-    'namaTamu' => $namaTamu,
-    'modeDemo' => $modeDemo ?? false,
-    'modePratinjau' => $modePratinjau ?? false,
-    'slugTema' => 'rustic-floral',
-    'tierBawaan' => 'basic',
-    'gayaTataLetak' => 'klasik',
-    'animasiSampul' => 'halaman-editorial-3d',
-    'gayaGaleri' => 'grid',
-    'gelap' => false,
-    'kelasTeksSampul' => 'text-[#1F2937]',
-    'kelasBody' => 'bg-[#FDFBF7] text-[#1F2937]',
-    'kelasAksen' => 'text-[#BFA15F]',
-    'kelasAksenKartu' => 'text-[#8E7142]',
-    'kelasSubAksen' => 'text-[#4B6358]',
-    'kelasKartu' => 'bg-white/92 backdrop-blur-md border border-[#BFA15F]/35 text-[#1F2937]',
-    'kelasTombol' => 'bg-[#4B6358] text-white hover:bg-[#3A4D44]',
-    'kelasBandCountdown' => 'bg-gradient-to-b from-[#4B6358] to-[#394D44] text-white',
-    'kelasKotakCountdown' => 'bg-white/95 text-[#1F2937] shadow-sm',
-    'kelasTombolCountdown' => 'bg-white text-[#2F4037] hover:bg-[#FDFBF7] shadow-sm',
-    'kelasBadge' => 'bg-[#BFA15F]/15 text-[#8A6E32] border border-[#BFA15F]/30',
-    'kelasBatas' => 'border-[#BFA15F]/35',
-    'subjudulPanggung' => 'The Wedding Of',
-    'taglineSampul' => 'The Wedding Of',
-    'sapaanSampul' => 'Kepada Yth. Bapak/Ibu/Saudara/i',
-    'sapaanHero' => 'Undangan Pernikahan',
-    'labelPutra' => 'Putra dari',
-    'labelPutri' => 'Putri dari',
-    'labelAcara' => 'Rangkaian Acara',
-    'subLabelAcara' => 'Save The Date',
-    'labelCerita' => 'Cerita Cinta',
-    'subLabelCerita' => 'Kisah Kami',
-    'labelGaleri' => 'Potret Kebahagiaan',
-    'subLabelGaleri' => 'Galeri Momen',
-    'footerTeks' => 'Dibuat penuh cinta melalui',
-    'ornamenUrl' => asset('aset-tema/rustic-floral/ornamen-sudut.webp'),
-    'efekMotion' => 'kelopak',
-    'bingkaiFoto' => 'bulat',
-    'polaTekstur' => 'floral',
-])
+@php
+    $asetRustic = [
+        'latar' => asset('aset-tema/rustic-floral/latar-utama.webp'),
+        'sudut' => asset('aset-tema/rustic-floral/ornamen-sudut.webp'),
+    ];
+
+    $dataTema = \App\Support\DataTemaUndangan::siapkan(
+        $undangan,
+        $modeDemo ?? false,
+        $modePratinjau ?? false,
+        'basic',
+        $asetRustic['latar'],
+    );
+    extract($dataTema, EXTR_SKIP);
+@endphp
+
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+
+<head>
+    @include('komponen-undangan.meta-opengraph')
+    <style>
+        .rustic-tombol-sage {
+            background: linear-gradient(135deg, #4B6358 0%, #3A4D44 60%, #2F4037 100%);
+            color: #FDFBF7;
+            box-shadow: 0 10px 20px -10px rgba(75, 99, 88, 0.55);
+        }
+
+        .rustic-tombol-sage:hover {
+            filter: brightness(1.07);
+        }
+    </style>
+</head>
+
+<body x-data="temaUndangan()" :class="undanganTerbuka ? 'overflow-x-hidden' : 'overflow-hidden h-screen'"
+    class="bg-[#EFE6DA] text-[#1F2937] antialiased relative">
+    @include('komponen-undangan.bar-pratinjau-demo')
+
+    <div class="min-h-screen w-full lg:flex">
+        {{-- PANGGUNG VISUAL DESKTOP KIRI (WARM LINEN & BOTANICAL SCRAPBOOK) --}}
+        @include('tema.rustic-floral.partials._panggung-desktop')
+
+        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST --}}
+        <div
+            class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-2xl border-l border-[#BFA15F]/35 bg-[#FDFBF7]">
+            {{-- Jendela Latar Linen Terpin --}}
+            <div aria-hidden="true"
+                class="pointer-events-none fixed top-0 bottom-0 right-0 w-full lg:w-[460px] xl:w-[490px] z-0 overflow-hidden bg-[#FDFBF7]">
+                <img src="{{ $urlFotoLatar }}" alt="" class="w-full h-full object-cover object-center opacity-22">
+                <div class="absolute inset-0 bg-gradient-to-b from-[#FDFBF7]/78 via-[#FDFBF7]/50 to-[#F4ECE1]/82"></div>
+            </div>
+
+            {{-- SAMPUL PEMBUKA FADE HALUS --}}
+            @include('tema.rustic-floral.partials._sampul')
+
+            {{-- KONTEN UTAMA RUSTIC FLORAL SCRAPBOOK --}}
+            <main data-panggung-3d class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
+                @include('tema.rustic-floral.partials._hero-dan-pembuka')
+                @include('tema.rustic-floral.partials._konten-utama')
+                @include('tema.rustic-floral.partials._penutup-dan-rsvp')
+            </main>
+        </div>
+    </div>
+
+    @include('komponen-undangan.kontrol-sinema')
+    @include('komponen-undangan.pemutar-musik')
+    @include('komponen-undangan.modal-galeri')
+    @include('komponen-undangan.skrip-tema')
+</body>
+
+</html>

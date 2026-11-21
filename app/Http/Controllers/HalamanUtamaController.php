@@ -220,6 +220,22 @@ class HalamanUtamaController extends Controller
                 'gaya_font' => $gayaFont,
                 'tanpa_foto' => $tanpaFoto,
                 'foto_sampul' => $tanpaFoto ? null : $dataDemo['foto_sampul'],
+                'foto_pembuka' => $tanpaFoto ? null : ($dataDemo['foto_pembuka'] ?? null),
+                'foto_penutup' => $tanpaFoto ? null : ($dataDemo['foto_penutup'] ?? null),
+                'foto_latar_tema' => null,
+                'hashtag' => $dataDemo['hashtag'] ?? '',
+                'sosial_media' => $dataDemo['sosial_media'] ?? [
+                    'instagram_pria' => '',
+                    'instagram_wanita' => '',
+                ],
+                'dress_code' => $dataDemo['dress_code'] ?? [
+                    'catatan' => '',
+                    'warna' => [],
+                ],
+                'turut_mengundang' => $dataDemo['turut_mengundang'] ?? [
+                    'pihak_wanita' => '',
+                    'pihak_pria' => '',
+                ],
                 'cerita_cinta' => $dataDemo['cerita_cinta'],
                 'live_streaming' => $dataDemo['live_streaming'],
                 'alamat_kado_fisik' => $dataDemo['alamat_kado_fisik'],

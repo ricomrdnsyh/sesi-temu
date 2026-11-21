@@ -40,22 +40,37 @@ class KatalogKontenDemo
                 'foto_sampul' => 'aset-demo/sampul-rustic.webp',
                 'musik_latar' => 'musik/romantis-akustik.mp3',
                 'hari_lagi' => 21,
+                'sosial_media' => [
+                    'instagram_pria' => 'dimas.pratama',
+                    'instagram_wanita' => 'rani.kusuma',
+                ],
+                'dress_code' => [
+                    'catatan' => 'Warm Garden Linen — Hijau Sage, Terakota Hangat, Krem Linen, atau Cokelat Muda.',
+                    'warna' => ['#4B6358', '#B86B4B', '#E5D5C0', '#FDFBF7'],
+                ],
+                'turut_mengundang' => [
+                    'pihak_wanita' => "Keluarga Besar Bpk. Bambang Sutrisno\nKeluarga Besar Ibu Sri Wahyuni",
+                    'pihak_pria' => "Keluarga Besar Bpk. Hendra Wijaya\nKeluarga Besar Ibu Ratna Sari",
+                ],
                 'kutipan_ayat' => 'Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan hidup dari jenismu sendiri, supaya kamu merasa tenteram di sampingnya. (QS. Ar-Rum: 21)',
                 'cerita_cinta' => [
                     [
                         'judul' => 'Pertemuan Pertama',
                         'tanggal' => 'Oktober 2023',
                         'cerita' => 'Dipertemukan di sebuah kafe taman rindang kawasan Kemang saat diskusi proyek kreatif, lalu tumbuh menjadi sahabat berbagi cerita.',
+                        'foto' => 'aset-demo/galeri-1.webp',
                     ],
                     [
                         'judul' => 'Momen Lamaran',
                         'tanggal' => 'Januari 2026',
                         'cerita' => 'Di bawah cahaya senja yang hangat, kedua keluarga besar duduk bersama mengikat niat suci menuju pelaminan.',
+                        'foto' => 'aset-demo/galeri-2.webp',
                     ],
                     [
                         'judul' => 'Menuju Hari Bahagia',
                         'tanggal' => '2026',
                         'cerita' => 'Dengan doa dan restu orang tua serta sahabat, kami siap melangkah membangun rumah tangga penuh cinta.',
+                        'foto' => 'aset-demo/galeri-3.webp',
                     ],
                 ],
                 'live_streaming' => [
@@ -115,22 +130,37 @@ class KatalogKontenDemo
                 'foto_sampul' => 'aset-demo/sampul-jawa.webp',
                 'musik_latar' => 'musik/gamelan-lembut.mp3',
                 'hari_lagi' => 35,
-                'kutipan_ayat' => 'Mugi Gusti Kang Murbeng Dumadi tansah paring berkah katresnan, guyub rukun, saha katentreman tumrap kulawarga ingkang badhe kabangun. (Pitutur Luhur Jawi & QS. Ar-Rum: 21)',
+                'sosial_media' => [
+                    'instagram_pria' => 'akmal.hadiningrat',
+                    'instagram_wanita' => 'aisyah.kusumo',
+                ],
+                'dress_code' => [
+                    'catatan' => 'Kami mengharapkan kehadiran Bapak/Ibu/Saudara/i dengan busana bernuansa Batik Sogan, Emas Sampanye, atau Gading Hangat.',
+                    'warna' => ['#472A1C', '#D7BB83', '#F5E9D6'],
+                ],
+                'turut_mengundang' => [
+                    'pihak_wanita' => "Keluarga Besar Bpk. H. Suryono Kusumo\nKeluarga Besar Ibu Hj. Endang Larasati\nKeluarga Ndalem Kusuman Yogyakarta",
+                    'pihak_pria' => "Keluarga Besar K.R.T. Darmawan Hadiningrat\nKeluarga Besar R.Ay. Sekar Tanjung\nTrah Agung Hadiningrat Surakarta",
+                ],
+                'kutipan_ayat' => 'Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang. (QS. Ar-Rum: 21)',
                 'cerita_cinta' => [
                     [
                         'judul' => 'Kawiwitan ing Yogyakarta',
                         'tanggal' => 'Agustus 2022',
                         'cerita' => 'Kisah kami bersemi saat pameran pusaka & arsitektur keraton di Ndalem Pujokusuman, Yogyakarta.',
+                        'foto' => 'aset-demo/sampul-jawa.webp',
                     ],
                     [
                         'judul' => 'Paningsetan & Lamaran',
                         'tanggal' => 'Desember 2025',
                         'cerita' => 'Keluarga besar berhimpun dalam prosesi srah-srahan dan paningset penuh khidmat di Pendopo Agung.',
+                        'foto' => 'aset-demo/galeri-cincin-mawar.webp',
                     ],
                     [
                         'judul' => 'Pinanganten Agung',
                         'tanggal' => '2026',
                         'cerita' => 'Menyatukan dua trah dalam upacara panggih adat Mataram dengan iringan gending karawitan.',
+                        'foto' => 'aset-demo/galeri-lampu-senja.webp',
                     ],
                 ],
                 'live_streaming' => [
@@ -163,6 +193,7 @@ class KatalogKontenDemo
                     ['lokasi_foto' => 'aset-demo/sampul-jawa.webp', 'keterangan' => 'Busana Beludru Hitam Adat Jawa di Gebyok Ukir'],
                     ['lokasi_foto' => 'aset-demo/galeri-cincin-mawar.webp', 'keterangan' => 'Kalpika & Kembang Setaman Peningset'],
                     ['lokasi_foto' => 'aset-demo/galeri-lampu-senja.webp', 'keterangan' => 'Sorot Lentera Malam Midodareni'],
+                    ['lokasi_foto' => 'aset-demo/galeri-nikah-pelaminan.webp', 'keterangan' => 'Singgasana Pelaminan Pahargyan Agung'],
                 ],
                 'amplop' => [
                     ['nama_bank' => 'BSI', 'nomor_rekening' => '7182930456', 'atas_nama' => 'Akmal Wirawan Hadiningrat'],
@@ -190,22 +221,37 @@ class KatalogKontenDemo
                 'foto_sampul' => 'aset-demo/sampul-sunda.webp',
                 'musik_latar' => 'musik/gamelan-lembut.mp3',
                 'hari_lagi' => 28,
+                'sosial_media' => [
+                    'instagram_pria' => 'bagja.natawijaya',
+                    'instagram_wanita' => 'nenden.ratnadewi',
+                ],
+                'dress_code' => [
+                    'catatan' => 'Disarankan mengenakan kebaya krem, batik Priangan, atau sentuhan marun dan emas hangat.',
+                    'warna' => ['#5A1E1E', '#C59B43', '#FAF4E8'],
+                ],
+                'turut_mengundang' => [
+                    'pihak_wanita' => "Keluarga Besar Bpk. Usep Suryadi\nKeluarga Besar Ibu Tati Rohayati\nSesepuh Paguyuban Priangan",
+                    'pihak_pria' => "Keluarga Besar Bpk. H. Dadan Natawijaya\nKeluarga Besar Ibu Hj. Euis Kartika\nKeluarga Agung Natawijaya Bandung",
+                ],
                 'kutipan_ayat' => 'Silih asah, silih asih, silih asuh. Mugia rumah tangga salawasna dipaparin kabagjaan, kasalametan, tur barokah ti Gusti Nu Maha Suci.',
                 'cerita_cinta' => [
                     [
                         'judul' => 'Tepang di Kota Kembang',
                         'tanggal' => 'Mei 2023',
                         'cerita' => 'Bermula dari kolaborasi pelestarian bangunan cagar budaya di Jalan Braga, Bandung.',
+                        'foto' => 'aset-demo/sampul-sunda.webp',
                     ],
                     [
                         'judul' => 'Neundeun Omong & Seserahan',
                         'tanggal' => 'Februari 2026',
                         'cerita' => 'Tali asih keluarga terjalin hangat dalam tradisi neundeun omong dan ngeuyeuk seureuh.',
+                        'foto' => 'aset-demo/galeri-cincin-mawar.webp',
                     ],
                     [
                         'judul' => 'Sawer Panganten',
                         'tanggal' => '2026',
                         'cerita' => 'Melangkah menuju pelaminan berbusana siger Sunda dengan iringan kacapi suling nan syahdu.',
+                        'foto' => 'aset-demo/galeri-nikah-pelaminan.webp',
                     ],
                 ],
                 'live_streaming' => [
@@ -265,22 +311,37 @@ class KatalogKontenDemo
                 'foto_sampul' => 'aset-demo/sampul-editorial.webp',
                 'musik_latar' => 'musik/romantis-akustik.mp3',
                 'hari_lagi' => 42,
+                'sosial_media' => [
+                    'instagram_pria' => 'arsen.tanoto',
+                    'instagram_wanita' => 'kaira.halim',
+                ],
+                'dress_code' => [
+                    'catatan' => 'Monochrome Editorial — Hitam Pekat, Putih Gading, Abu Arang, atau Tailored Suit.',
+                    'warna' => ['#111113', '#3F3F46', '#A1A1AA', '#FAF9F6'],
+                ],
+                'turut_mengundang' => [
+                    'pihak_wanita' => "Keluarga Besar Bpk. Erwin Halim\nKeluarga Besar Ibu Maya Puspita",
+                    'pihak_pria' => "Keluarga Besar Bpk. Gunawan Tanoto\nKeluarga Besar Ibu Claire Wijaya",
+                ],
                 'kutipan_ayat' => 'Two quiet souls, one shared architecture — building a lifetime of calm mornings, honest conversations, and timeless grace.',
                 'cerita_cinta' => [
                     [
                         'judul' => 'First Gallery Vernissage',
                         'tanggal' => 'November 2022',
                         'cerita' => 'Dipertemukan di ruang pamer fotografi monokrom di Jakarta Selatan, terpikat pada komposisi yang sama.',
+                        'foto' => 'aset-demo/sampul-editorial.webp',
                     ],
                     [
                         'judul' => 'Studio Proposal',
                         'tanggal' => 'Januari 2026',
                         'cerita' => 'Dalam hening cahaya pagi studio pribadi, sebuah janji sederhana diucapkan tanpa gegap gempita.',
+                        'foto' => 'aset-demo/galeri-editorial-1.webp',
                     ],
                     [
                         'judul' => 'The Editorial Vows',
                         'tanggal' => '2026',
                         'cerita' => 'Merayakan cinta dalam garis minimalis hitam-putih yang abadi melampaui pergantian musim.',
+                        'foto' => 'aset-demo/galeri-editorial-2.webp',
                     ],
                 ],
                 'live_streaming' => [
@@ -340,22 +401,37 @@ class KatalogKontenDemo
                 'foto_sampul' => 'aset-demo/sampul-luxury.webp',
                 'musik_latar' => 'musik/romantis-akustik.mp3',
                 'hari_lagi' => 49,
+                'sosial_media' => [
+                    'instagram_pria' => 'alvaro.dirgantara',
+                    'instagram_wanita' => 'clarissa.aurelia',
+                ],
+                'dress_code' => [
+                    'catatan' => 'Black-Tie & Champagne Gala Attire — Tuxedo hitam, gaun malam obsidian, atau sentuhan emas sampanye.',
+                    'warna' => ['#09090D', '#23202A', '#D4AF37', '#F3E5AB'],
+                ],
+                'turut_mengundang' => [
+                    'pihak_wanita' => "Keluarga Besar Bpk. Ferdinand Hartono\nKeluarga Besar Ibu Priscilla Tan",
+                    'pihak_pria' => "Keluarga Besar Bpk. Handoko Dirgantara\nKeluarga Besar Ibu Helena Kusuma",
+                ],
                 'kutipan_ayat' => 'And suddenly all the golden lights fell quiet — choosing you tonight, tomorrow, and for every midnight waltz ahead.',
                 'cerita_cinta' => [
                     [
                         'judul' => 'An Evening at the Gala',
                         'tanggal' => 'Desember 2022',
                         'cerita' => 'Saling bertukar sapa di bawah kilau lampu kristal acara amal tahunan di Jakarta Pusat.',
+                        'foto' => 'aset-demo/sampul-luxury.webp',
                     ],
                     [
                         'judul' => 'Lake Como Engagement',
                         'tanggal' => 'September 2025',
                         'cerita' => 'Diiringi denting orkestra kecil tepi danau senja, cincin berlian melingkar di jari manis.',
+                        'foto' => 'aset-demo/galeri-buket-malam.webp',
                     ],
                     [
                         'judul' => 'Midnight Grand Banquet',
                         'tanggal' => '2026',
                         'cerita' => 'Mengundang sahabat dan kerabat terkasih merayakan malam istimewa dalam balutan black-tie.',
+                        'foto' => 'aset-demo/galeri-lampu-senja.webp',
                     ],
                 ],
                 'live_streaming' => [
@@ -415,22 +491,37 @@ class KatalogKontenDemo
                 'foto_sampul' => 'aset-demo/sampul-royal.webp',
                 'musik_latar' => 'musik/romantis-akustik.mp3',
                 'hari_lagi' => 33,
+                'sosial_media' => [
+                    'instagram_pria' => 'raka.bramantyo',
+                    'instagram_wanita' => 'drg.kirana',
+                ],
+                'dress_code' => [
+                    'catatan' => 'Royal Classic Formal — Nuansa Gading, Champagne, Cokelat Perunggu, atau Pastel Klasik.',
+                    'warna' => ['#58432B', '#9E7B4F', '#E5C99B', '#FBF8F3'],
+                ],
+                'turut_mengundang' => [
+                    'pihak_wanita' => "Keluarga Besar Bpk. Ir. Hendro Sudibyo\nKeluarga Besar Ibu Ratna Dewi Pertiwi",
+                    'pihak_pria' => "Keluarga Besar Bpk. Drs. Wahyu Bramantyo\nKeluarga Besar Ibu Dra. Widya Prameswari",
+                ],
                 'kutipan_ayat' => 'Dengan memohon rahmat dan rida Tuhan Yang Maha Esa, kami melangkah memasuki babak kehidupan baru dengan penuh cinta, hormat, dan rasa syukur.',
                 'cerita_cinta' => [
                     [
                         'judul' => 'Kampus Menteng',
                         'tanggal' => 'Mei 2021',
                         'cerita' => 'Saling mengenal sejak kepanitiaan bakti sosial alumni hingga berbagi impian di ruang baca klasik.',
+                        'foto' => 'aset-demo/sampul-royal.webp',
                     ],
                     [
                         'judul' => 'Pertunangan Keluarga',
                         'tanggal' => 'November 2025',
                         'cerita' => 'Di ruang tengah bernuansa gading yang hangat, kedua orang tua merestui langkah menuju altar.',
+                        'foto' => 'aset-demo/galeri-arsitektur.webp',
                     ],
                     [
                         'judul' => 'Royal Ivory Reception',
                         'tanggal' => '2026',
                         'cerita' => 'Menyambut tamu kehormatan dalam perjamuan agung bergaya klasik abadi.',
+                        'foto' => 'aset-demo/galeri-2.webp',
                     ],
                 ],
                 'live_streaming' => [
@@ -490,22 +581,37 @@ class KatalogKontenDemo
                 'foto_sampul' => 'aset-demo/sampul-garden.webp',
                 'musik_latar' => 'musik/romantis-akustik.mp3',
                 'hari_lagi' => 19,
+                'sosial_media' => [
+                    'instagram_pria' => 'narendra.senoaji',
+                    'instagram_wanita' => 'seruni.ayuningtyas',
+                ],
+                'dress_code' => [
+                    'catatan' => 'Botanical Twilight Garden — Hijau Zamrud, Sage Lembut, Gading Hangat, atau Sentuhan Emas Antik.',
+                    'warna' => ['#132623', '#3E5A5C', '#C8A464', '#FDFBF7'],
+                ],
+                'turut_mengundang' => [
+                    'pihak_wanita' => "Keluarga Besar Bpk. Agus Purnomo\nKeluarga Besar Ibu Lilis Sulistiani",
+                    'pihak_pria' => "Keluarga Besar Bpk. Prasetyo Senoaji\nKeluarga Besar Ibu Indriani Putri",
+                ],
                 'kutipan_ayat' => 'Seperti lentera senja di bawah kanopi zamrud dan mekarnya wisteria, cinta kami bertumbuh lembut di setiap musim kehidupan.',
                 'cerita_cinta' => [
                     [
                         'judul' => 'Konservatori Kebun Raya',
                         'tanggal' => 'April 2023',
                         'cerita' => 'Saling bertukar sketsa botani anggrek di rumah kaca tua yang dipenuhi embun pagi.',
+                        'foto' => 'aset-demo/sampul-garden.webp',
                     ],
                     [
                         'judul' => 'Janji di Bawah Pergola',
                         'tanggal' => 'Januari 2026',
                         'cerita' => 'Cahaya kunang-kunang dan lentera taman menjadi saksi ikatan pertunangan hangat kami.',
+                        'foto' => 'aset-demo/galeri-rumput-renda.webp',
                     ],
                     [
                         'judul' => 'Twilight Garden Wedding',
                         'tanggal' => '2026',
                         'cerita' => 'Berjanji setia di taman kaca berbalut nuansa beludru zamrud dan mawar dusty rose.',
+                        'foto' => 'aset-demo/galeri-3.webp',
                     ],
                 ],
                 'live_streaming' => [
@@ -565,22 +671,37 @@ class KatalogKontenDemo
                 'foto_sampul' => 'aset-demo/sampul-islami.webp',
                 'musik_latar' => 'musik/instrumen-islami.mp3',
                 'hari_lagi' => 24,
+                'sosial_media' => [
+                    'instagram_pria' => 'zayd.alfaruq',
+                    'instagram_wanita' => 'fatimah.azzahra',
+                ],
+                'dress_code' => [
+                    'catatan' => 'Busana Muslim/Muslimah Syar’i bernuansa Putih Suci, Hijau Zamrud, atau Zaitun Lembut.',
+                    'warna' => ['#184D47', '#3D7A6E', '#BFA15F', '#F4FAF6'],
+                ],
+                'turut_mengundang' => [
+                    'pihak_wanita' => "Keluarga Besar Bpk. H. Abdul Malik\nKeluarga Besar Ibu Hj. Khadijah",
+                    'pihak_pria' => "Keluarga Besar Bpk. KH. Ahmad Syauqi\nKeluarga Besar Ibu Umi Salamah",
+                ],
                 'kutipan_ayat' => 'Baarakallahu laka wa baaraka ‘alaika wa jama’a bainakuma fii khair. Semoga Allah menghimpun kalian berdua dalam kebaikan, keberkahan, dan ketaatan hingga surga-Nya. (HR. Abu Dawud)',
                 'cerita_cinta' => [
                     [
                         'judul' => 'Ta’aruf atas Saran Guru',
                         'tanggal' => 'Rajab 1447 H',
                         'cerita' => 'Berawal dari proses ta’aruf syar’i yang dijembatani murobbi serta kedua keluarga dengan bertukar biodata.',
+                        'foto' => 'aset-demo/sampul-islami.webp',
                     ],
                     [
                         'judul' => 'Nadhor & Khitbah',
                         'tanggal' => 'Sya’ban 1447 H',
                         'cerita' => 'Melalui shalat istikharah dan pertemuan keluarga yang penuh adab, niat ibadah pernikahan pun dimantapkan.',
+                        'foto' => 'aset-demo/galeri-2.webp',
                     ],
                     [
                         'judul' => 'Menuju Mitsaqan Ghalizha',
                         'tanggal' => '2026',
                         'cerita' => 'Memohon doa restu kaum muslimin untuk menyempurnakan separuh agama dalam ikatan halal.',
+                        'foto' => 'aset-demo/galeri-nikah-pelaminan.webp',
                     ],
                 ],
                 'live_streaming' => [
@@ -640,22 +761,37 @@ class KatalogKontenDemo
                 'foto_sampul' => 'aset-demo/sampul-islamic-heavenly.webp',
                 'musik_latar' => 'musik/instrumen-islami.mp3',
                 'hari_lagi' => 45,
+                'sosial_media' => [
+                    'instagram_pria' => 'dr.farhanhakim',
+                    'instagram_wanita' => 'hanahumaira.r',
+                ],
+                'dress_code' => [
+                    'catatan' => 'Disarankan busana sopan bernuansa Biru Malam (Midnight Navy), Emas Sampanye, atau Putih Gading.',
+                    'warna' => ['#091322', '#1C3554', '#D9B664', '#F3E5AB'],
+                ],
+                'turut_mengundang' => [
+                    'pihak_wanita' => "Keluarga Besar Bpk. H. Ridwan Kamiluddin\nKeluarga Besar Ibu Hj. Nurhayati",
+                    'pihak_pria' => "Keluarga Besar Bpk. H. Taufiq Hidayat\nKeluarga Besar Ibu Hj. Aminah Mansyur",
+                ],
                 'kutipan_ayat' => 'Dan segala sesuatu Kami ciptakan berpasang-pasangan supaya kamu mengingat akan kebesaran Allah. (QS. Adz-Dzariyat: 49)',
                 'cerita_cinta' => [
                     [
                         'judul' => 'Misi Kemanusiaan',
                         'tanggal' => 'Ramadan 2024',
                         'cerita' => 'Dipertemukan saat kegiatan sosial pengobatan dan pendidikan anak yatim di Jakarta Pusat.',
+                        'foto' => 'aset-demo/sampul-islamic-heavenly.webp',
                     ],
                     [
                         'judul' => 'Khitbah di Bawah Cahaya Senja',
                         'tanggal' => 'Desember 2025',
                         'cerita' => 'Bersama kedua orang tua berikrar menjaga kehormatan cinta hingga tiba waktu halal.',
+                        'foto' => 'aset-demo/galeri-lampu-senja.webp',
                     ],
                     [
                         'judul' => 'Sakinah Malam Berkah',
                         'tanggal' => '2026',
                         'cerita' => 'Melangkah di bawah naungan doa dan keberkahan langit menuju rumah tangga idaman.',
+                        'foto' => 'aset-demo/galeri-nikah-pelaminan.webp',
                     ],
                 ],
                 'live_streaming' => [

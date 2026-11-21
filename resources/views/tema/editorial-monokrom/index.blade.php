@@ -1,46 +1,92 @@
-@include('komponen-undangan.kerangka-tema', [
-    'undangan' => $undangan,
-    'namaTamu' => $namaTamu,
-    'modeDemo' => $modeDemo ?? false,
-    'modePratinjau' => $modePratinjau ?? false,
-    'slugTema' => 'editorial-monokrom',
-    'tierBawaan' => 'premium',
-    'gayaTataLetak' => 'editorial',
-    'animasiSampul' => 'halaman-editorial-3d',
-    'gayaGaleri' => 'editorial',
-    'tampilMarquee' => true,
-    'tampilScrollProgress' => true,
-    'tampilTimelineCerita' => true,
-    'kelasProgres' => 'bg-[#18181B]',
-    'gelap' => false,
-    'kelasTeksSampul' => 'text-[#18181B]',
-    'kelasBody' => 'bg-[#FAF9F6] text-[#18181B]',
-    'kelasAksen' => 'text-[#52525B]',
-    'kelasSubAksen' => 'text-[#18181B]',
-    'kelasKartu' => 'bg-white/95 backdrop-blur-md border border-[#18181B]/20 text-[#18181B]',
-    'kelasTombol' => 'bg-[#18181B] text-white hover:bg-[#3F3F46]',
-    'kelasBandCountdown' => 'bg-[#18181B] text-[#FAF9F6]',
-    'kelasKotakCountdown' => 'bg-[#FAF9F6] text-[#18181B]',
-    'kelasTombolCountdown' => 'bg-[#FAF9F6] text-[#18181B] hover:bg-white',
-    'kelasBadge' => 'bg-[#18181B]/10 text-[#18181B] border border-[#18181B]/20',
-    'kelasBatas' => 'border-[#18181B]/20',
-    'subjudulPanggung' => 'The Wedding Edition',
-    'taglineSampul' => 'The Wedding Edition',
-    'sapaanSampul' => 'Tamu Kehormatan',
-    'sapaanHero' => 'Editorial Invitation',
-    'labelPutra' => 'Putra dari',
-    'labelPutri' => 'Putri dari',
-    'labelAcara' => 'Agenda Pernikahan',
-    'subLabelAcara' => '02 / Save The Date',
-    'labelCerita' => 'Kisah Kami',
-    'subLabelCerita' => '03 / Storyline',
-    'labelGaleri' => 'Editorial Galeri',
-    'subLabelGaleri' => '04 / Portraits',
-    'footerTeks' => 'Editorial Monokrom oleh',
-    'ornamenUrl' => asset('aset-tema/editorial-monokrom/ornamen-bingkai.webp'),
-    'efekMotion' => 'halus',
-    'bingkaiFoto' => 'kotak-editorial',
-    'polaTekstur' => 'editorial',
-    'modeMonokrom' => true,
-    'editionHeader' => 'The Wedding Edition',
-])
+@php
+    $asetEditorial = [
+        'latar' => asset('aset-tema/editorial-monokrom/latar-utama.webp'),
+        'bingkai' => asset('aset-tema/editorial-monokrom/ornamen-bingkai.webp'),
+    ];
+
+    $dataTema = \App\Support\DataTemaUndangan::siapkan(
+        $undangan,
+        $modeDemo ?? false,
+        $modePratinjau ?? false,
+        'premium',
+        $asetEditorial['latar'],
+    );
+    extract($dataTema, EXTR_SKIP);
+    $tahunAcara = $acaraPertama?->tanggal_acara?->format('Y') ?? now()->format('Y');
+@endphp
+
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+
+<head>
+    @include('komponen-undangan.meta-opengraph')
+    <link href="https://fonts.googleapis.com/css2?family=Gilda+Display&display=swap" rel="stylesheet">
+    <style>
+        .ed-serif {
+            font-family: 'Gilda Display', Georgia, serif;
+        }
+
+        @keyframes edSpreadMasuk {
+            0% {
+                opacity: 0;
+                transform: translate3d(0, 18px, 0);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+
+        .ed-spread-masuk {
+            animation: edSpreadMasuk 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+            will-change: transform, opacity;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .ed-spread-masuk {
+                animation: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body x-data="temaUndangan()" :class="undanganTerbuka ? 'overflow-x-hidden' : 'overflow-hidden h-screen'"
+    class="bg-[#111113] text-[#18181B] antialiased relative">
+    @include('komponen-undangan.bar-pratinjau-demo')
+
+    <div class="min-h-screen w-full lg:flex">
+        {{-- PANGGUNG VISUAL DESKTOP KIRI (VOGUE MONOCHROME SPREAD) --}}
+        @include('tema.editorial-monokrom.partials._panggung-desktop')
+
+        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST (ZERO ROUNDED CORNERS) --}}
+        <div
+            class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-2xl border-l border-[#18181B]/25 bg-[#FAF9F6]">
+            {{-- Progres Baca Hitam Tajam --}}
+            <div aria-hidden="true" x-show="undanganTerbuka" x-cloak
+                class="fixed top-0 lg:left-auto lg:w-[460px] xl:w-[490px] left-0 right-0 z-[60] h-[3px] bg-black/15">
+                <div class="h-full transition-all duration-150 bg-[#18181B]" :style="'width: ' + scrollPersen + '%'">
+                </div>
+            </div>
+
+            {{-- SAMPUL PEMBUKA FADE HALUS (VOGUE COVER) --}}
+            @include('tema.editorial-monokrom.partials._sampul')
+
+            {{-- KONTEN UTAMA EDITORIAL MONOKROM --}}
+            <main data-panggung-3d class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
+                @include('tema.editorial-monokrom.partials._hero-dan-pembuka')
+                @include('tema.editorial-monokrom.partials._konten-utama')
+                @include('tema.editorial-monokrom.partials._penutup-dan-rsvp')
+            </main>
+        </div>
+    </div>
+
+    @include('komponen-undangan.kontrol-sinema')
+    @include('komponen-undangan.pemutar-musik')
+    @include('komponen-undangan.modal-galeri')
+    @include('komponen-undangan.skrip-tema')
+</body>
+
+</html>

@@ -61,6 +61,18 @@
 
         <span class="absolute top-[18%] left-[16%] w-3 h-3 rounded-full bg-[#EEDAD4]/55 blur-[1px] animasi-melayang"></span>
         <span class="absolute top-[42%] right-[22%] w-3.5 h-3.5 rounded-full bg-[#C8A464]/55 blur-[1px] animasi-melayang" style="animation-delay: 1.5s;"></span>
+
+        {{-- Kupu-kupu 3D Melintas Taman --}}
+        <div class="absolute top-[36%] left-0 animasi-kupu-3d text-[#F3DFA2]/90" style="animation-delay: 0.6s;">
+            <svg class="w-7 h-6 animasi-sayap-kupu drop-shadow-md" viewBox="0 0 32 26" fill="currentColor" aria-hidden="true">
+                <path d="M16 12 C11 2, 2 3, 3 11 C4 16, 10 16, 15 14 C10 16, 5 21, 9 24 C13 26, 15 20, 16 16 C17 20, 19 26, 23 24 C27 21, 22 16, 17 14 C22 16, 28 16, 29 11 C30 3, 21 2, 16 12 Z"/>
+            </svg>
+        </div>
+        <div class="absolute top-[58%] left-0 animasi-kupu-3d text-[#EEDAD4]/85" style="animation-delay: 6.2s; animation-duration: 16s;">
+            <svg class="w-5 h-5 animasi-sayap-kupu drop-shadow" viewBox="0 0 32 26" fill="currentColor" aria-hidden="true">
+                <path d="M16 12 C11 2, 2 3, 3 11 C4 16, 10 16, 15 14 C10 16, 5 21, 9 24 C13 26, 15 20, 16 16 C17 20, 19 26, 23 24 C27 21, 22 16, 17 14 C22 16, 28 16, 29 11 C30 3, 21 2, 16 12 Z"/>
+            </svg>
+        </div>
     </div>
 @elseif ($efekMotion === 'debu-emas')
     <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden lapis-3d" style="--depth: 20px; --pz: 26px;">
@@ -106,6 +118,12 @@
             <div class="absolute top-[28%] left-0 animasi-burung text-[#F3E5AB]/60" style="animation-delay: 4.5s; animation-duration: 21s;">
                 <svg class="w-6 h-4 animasi-kepak drop-shadow" viewBox="0 0 36 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
                     <path d="M2 12 Q10 2 18 10 Q26 2 34 12" />
+                </svg>
+            </div>
+            {{-- Kupu-kupu Emas Heritage 3D --}}
+            <div class="absolute top-[44%] left-0 animasi-kupu-3d text-[#E8A550]/90" style="animation-delay: 1.2s;">
+                <svg class="w-7 h-6 animasi-sayap-kupu drop-shadow-md" viewBox="0 0 32 26" fill="currentColor" aria-hidden="true">
+                    <path d="M16 12 C11 2, 2 3, 3 11 C4 16, 10 16, 15 14 C10 16, 5 21, 9 24 C13 26, 15 20, 16 16 C17 20, 19 26, 23 24 C27 21, 22 16, 17 14 C22 16, 28 16, 29 11 C30 3, 21 2, 16 12 Z"/>
                 </svg>
             </div>
         @endif

@@ -17,9 +17,20 @@
 @section('konten')
 @php
     $pengaturan = array_replace_recursive(\App\Models\Undangan::pengaturanBawaan(), $undangan->pengaturan ?? []);
-    $ceritaAwal = $pengaturan['cerita_cinta'] ?? [];
+    $ceritaAwal = collect($pengaturan['cerita_cinta'] ?? [])->map(static function (array $item): array {
+        $jalurFoto = is_string($item['foto'] ?? null) ? trim($item['foto']) : '';
+
+        return [
+            'judul' => (string) ($item['judul'] ?? ''),
+            'tanggal' => (string) ($item['tanggal'] ?? ''),
+            'cerita' => (string) ($item['cerita'] ?? ''),
+            'foto' => $jalurFoto,
+            'foto_url' => $jalurFoto !== '' ? (\App\Support\MediaPublik::url($jalurFoto) ?? '') : '',
+            'hapus_foto' => false,
+        ];
+    })->values()->all();
     if (empty($ceritaAwal)) {
-        $ceritaAwal = [['judul' => '', 'tanggal' => '', 'cerita' => '']];
+        $ceritaAwal = [['judul' => '', 'tanggal' => '', 'cerita' => '', 'foto' => '', 'foto_url' => '', 'hapus_foto' => false]];
     }
     $urlPublik = Route::has('undangan.tampil') ? route('undangan.tampil', $undangan->slug) : url('/'.$undangan->slug);
     $pesanWaAktivasi = "Halo Admin SesiTemu, saya ingin mengaktifkan undangan sesitemu.id/{$undangan->slug}.";
@@ -297,7 +308,7 @@
             });
         },
         tambahCerita() {
-            this.daftarCerita.push({ judul: '', tanggal: '', cerita: '' });
+            this.daftarCerita.push({ judul: '', tanggal: '', cerita: '', foto: '', foto_url: '', hapus_foto: false });
         },
         tambahCeritaPreset(judul, tanggal, cerita) {
             const barisKosong = this.daftarCerita.length === 1
@@ -305,11 +316,27 @@
                 && !this.daftarCerita[0].cerita?.trim();
 
             if (barisKosong) {
-                this.daftarCerita[0] = { judul, tanggal, cerita };
+                this.daftarCerita[0] = { judul, tanggal, cerita, foto: '', foto_url: '', hapus_foto: false };
                 return;
             }
 
-            this.daftarCerita.push({ judul, tanggal, cerita });
+            this.daftarCerita.push({ judul, tanggal, cerita, foto: '', foto_url: '', hapus_foto: false });
+        },
+        pilihFotoCerita(index, acara) {
+            const file = acara.target?.files?.[0];
+            if (!file || !this.daftarCerita[index]) {
+                return;
+            }
+            this.daftarCerita[index].foto_url = URL.createObjectURL(file);
+            this.daftarCerita[index].hapus_foto = false;
+        },
+        hapusFotoCerita(index) {
+            if (!this.daftarCerita[index]) {
+                return;
+            }
+            this.daftarCerita[index].foto = '';
+            this.daftarCerita[index].foto_url = '';
+            this.daftarCerita[index].hapus_foto = true;
         },
         pindahCerita(index, arah) {
             const target = index + arah;
@@ -1039,6 +1066,14 @@
                                     <input type="text" name="nama_ibu_pria" value="{{ old('nama_ibu_pria', $undangan->nama_ibu_pria) }}" placeholder="Ibu ..." class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2.5 text-sm focus:border-sage focus:ring-2 focus:ring-sage/15 focus:outline-none transition">
                                 </div>
                             </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/75">Instagram Pria <span class="font-normal normal-case text-charcoal/50">(Opsional)</span></label>
+                                <div class="mt-1.5 flex items-center rounded-xl border border-charcoal/15 bg-white focus-within:border-sage focus-within:ring-2 focus-within:ring-sage/15 transition overflow-hidden">
+                                    <span class="pl-3.5 pr-1.5 text-sm font-semibold text-charcoal/45 select-none">@</span>
+                                    <input type="text" name="instagram_pria" value="{{ old('instagram_pria', $undangan->instagramPria()) }}" placeholder="username_pria" class="w-full border-0 bg-transparent py-2.5 pr-3.5 text-sm focus:outline-none">
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -1082,33 +1117,85 @@
                                     <input type="text" name="nama_ibu_wanita" value="{{ old('nama_ibu_wanita', $undangan->nama_ibu_wanita) }}" placeholder="Ibu ..." class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2.5 text-sm focus:border-champagne focus:ring-2 focus:ring-champagne/20 focus:outline-none transition">
                                 </div>
                             </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/75">Instagram Wanita <span class="font-normal normal-case text-charcoal/50">(Opsional)</span></label>
+                                <div class="mt-1.5 flex items-center rounded-xl border border-charcoal/15 bg-white focus-within:border-champagne focus-within:ring-2 focus-within:ring-champagne/20 transition overflow-hidden">
+                                    <span class="pl-3.5 pr-1.5 text-sm font-semibold text-charcoal/45 select-none">@</span>
+                                    <input type="text" name="instagram_wanita" value="{{ old('instagram_wanita', $undangan->instagramWanita()) }}" placeholder="username_wanita" class="w-full border-0 bg-transparent py-2.5 pr-3.5 text-sm focus:outline-none">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Foto Sampul Gerbang Undangan dengan Pratinjau Mockup Live --}}
-                <div class="rounded-2xl bg-gradient-to-br from-ivory to-champagne/[0.06] p-5 sm:p-6 ring-1 ring-champagne/25 space-y-4">
+                {{-- Kustomisasi Semua Slot Foto Tema & Hashtag (Opsional) --}}
+                <div class="rounded-2xl bg-gradient-to-br from-ivory to-champagne/[0.06] p-5 sm:p-6 ring-1 ring-champagne/25 space-y-5">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div>
-                            <h3 class="font-sans text-base sm:text-lg font-bold text-charcoal tracking-tight">Foto Sampul Gerbang Undangan <span class="text-xs font-semibold text-charcoal/50">(Opsional)</span></h3>
+                            <h3 class="font-sans text-base sm:text-lg font-bold text-charcoal tracking-tight">Kustomisasi Foto di Dalam Tema <span class="text-xs font-semibold text-charcoal/50">(Opsional)</span></h3>
                             <p class="text-xs text-charcoal/65 mt-0.5 leading-relaxed">
-                                Tampil sebagai layar pembuka sebelum tamu menekan <em>Buka Undangan</em>. Jika kosong, otomatis memakai foto pertama Galeri atau foto mempelai.
+                                Ganti foto sampul, foto pembuka ayat, foto penutup, hingga latar belakang tema sesuai keinginan Anda. Jika dikosongkan, otomatis memakai foto sampul atau ilustrasi bawaan tema.
                             </p>
                         </div>
                         <span class="self-start sm:self-auto rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-champagne ring-1 ring-champagne/30 shrink-0">
-                            Rasio 3:4 / 9:16
+                            Otomatis WebP
                         </span>
                     </div>
 
-                    @include('dashboard._input-foto-pratinjau', [
-                        'name' => 'foto_sampul',
-                        'varian' => 'sampul',
-                        'label' => 'Foto Sampul Gerbang',
-                        'petunjuk' => 'Seret & lepas atau klik untuk pilih foto potret (JPG/PNG/WebP maks. 5 MB)',
-                        'urlAwal' => $undangan->urlFotoSampulKhususDashboard(),
-                        'hapusNama' => 'hapus_foto_sampul',
-                        'hapusLabel' => 'Hapus foto sampul khusus',
-                    ])
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        @include('dashboard._input-foto-pratinjau', [
+                            'name' => 'foto_sampul',
+                            'varian' => 'sampul',
+                            'label' => '1. Foto Sampul Gerbang',
+                            'petunjuk' => 'Layar pertama sebelum tamu klik Buka Undangan (3:4 / 9:16)',
+                            'urlAwal' => $undangan->urlFotoSampulKhususDashboard(),
+                            'hapusNama' => 'hapus_foto_sampul',
+                            'hapusLabel' => 'Hapus foto sampul khusus',
+                        ])
+
+                        @include('dashboard._input-foto-pratinjau', [
+                            'name' => 'foto_pembuka',
+                            'varian' => 'sampul',
+                            'label' => '2. Foto Pembuka / Seksi Ayat',
+                            'petunjuk' => 'Tampil di kartu kutipan ayat (jika kosong pakai Foto Sampul)',
+                            'urlAwal' => $undangan->urlFotoPembukaKhususDashboard(),
+                            'hapusNama' => 'hapus_foto_pembuka',
+                            'hapusLabel' => 'Hapus foto pembuka',
+                        ])
+
+                        @include('dashboard._input-foto-pratinjau', [
+                            'name' => 'foto_penutup',
+                            'varian' => 'sampul',
+                            'label' => '3. Foto Penutup Undangan',
+                            'petunjuk' => 'Tampil di kapsul ucapan terima kasih akhir (jika kosong pakai Foto Sampul)',
+                            'urlAwal' => $undangan->urlFotoPenutupKhususDashboard(),
+                            'hapusNama' => 'hapus_foto_penutup',
+                            'hapusLabel' => 'Hapus foto penutup',
+                        ])
+
+                        @include('dashboard._input-foto-pratinjau', [
+                            'name' => 'foto_latar_tema',
+                            'varian' => 'sampul',
+                            'label' => '4. Foto Latar Belakang Custom',
+                            'petunjuk' => 'Opsional: timpa ilustrasi latar bawaan tema dengan foto Anda sendiri',
+                            'urlAwal' => $undangan->urlFotoLatarCustomKhususDashboard(),
+                            'hapusNama' => 'hapus_foto_latar_tema',
+                            'hapusLabel' => 'Kembalikan ke ilustrasi bawaan tema',
+                        ])
+                    </div>
+
+                    <div class="pt-2 border-t border-champagne/20">
+                        <label for="hashtag" class="block text-xs font-semibold uppercase tracking-wider text-charcoal/75">Hashtag Pernikahan <span class="font-normal normal-case text-charcoal/50">(Opsional)</span></label>
+                        <input
+                            id="hashtag"
+                            type="text"
+                            name="hashtag"
+                            value="{{ old('hashtag', data_get($pengaturan, 'hashtag', '')) }}"
+                            placeholder="Contoh: #{{ \Illuminate\Support\Str::studly($undangan->nama_panggilan_pria.$undangan->nama_panggilan_wanita) }}Forever"
+                            class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-white px-4 py-2.5 text-sm focus:border-sage focus:ring-2 focus:ring-sage/15 focus:outline-none transition"
+                        >
+                    </div>
                 </div>
 
                 {{-- Kutipan Ayat / Doa dengan Pilihan Cepat --}}
@@ -1664,10 +1751,11 @@
                 <form
                     action="{{ route('dashboard.undangan.perbarui', $undangan) }}"
                     method="POST"
+                    enctype="multipart/form-data"
                     class="mt-6 space-y-6"
                     data-swal-loading
                     data-swal-loading-title="Menyimpan Cerita Cinta..."
-                    data-swal-loading-text="Menyimpan linimasa cerita &amp; pengaturan live streaming..."
+                    data-swal-loading-text="Menyimpan linimasa cerita, foto bab &amp; pengaturan tambahan..."
                 >
                     @csrf
                     @method('PUT')
@@ -1752,6 +1840,36 @@
                                                     class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm leading-relaxed focus:border-sage focus:ring-2 focus:ring-sage/15 focus:outline-none transition"
                                                 ></textarea>
                                             </div>
+                                            <div class="sm:col-span-12 pt-1">
+                                                <label class="block text-[11px] font-semibold uppercase tracking-wider text-charcoal/70">Foto Momen <span class="font-normal normal-case text-charcoal/45">(Opsional — tampil di bab cerita)</span></label>
+                                                <input type="hidden" :name="`cerita_cinta[${idx}][foto]`" :value="item.foto || ''">
+                                                <input type="hidden" :name="`cerita_cinta[${idx}][hapus_foto]`" :value="item.hapus_foto ? '1' : '0'">
+                                                <div class="mt-1.5 flex flex-wrap items-center gap-3">
+                                                    <template x-if="item.foto_url">
+                                                        <div class="relative h-14 w-14 rounded-xl overflow-hidden ring-1 ring-champagne/45 shrink-0 bg-ivory">
+                                                            <img :src="item.foto_url" alt="Pratinjau foto bab" class="h-full w-full object-cover">
+                                                        </div>
+                                                    </template>
+                                                    <label class="inline-flex items-center gap-1.5 rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-xs font-semibold text-charcoal/80 hover:border-sage hover:text-sage cursor-pointer transition">
+                                                        <span x-text="item.foto_url ? 'Ganti Foto Bab' : '+ Pilih Foto Bab'"></span>
+                                                        <input
+                                                            type="file"
+                                                            accept="image/jpeg,image/png,image/webp"
+                                                            :name="`cerita_cinta[${idx}][foto_file]`"
+                                                            @change="pilihFotoCerita(idx, $event)"
+                                                            class="sr-only"
+                                                        >
+                                                    </label>
+                                                    <button
+                                                        type="button"
+                                                        x-show="item.foto_url"
+                                                        @click="hapusFotoCerita(idx)"
+                                                        class="text-xs font-semibold text-rose-600 hover:underline cursor-pointer"
+                                                    >
+                                                        Hapus Foto
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </template>
@@ -1808,6 +1926,11 @@
                                                 ></span>
                                             </div>
                                             <h4 class="font-logo text-base font-bold text-charcoal tracking-tight mt-1" x-text="item.judul || 'Judul Momen ' + (idx + 1)"></h4>
+                                            <template x-if="item.foto_url">
+                                                <div class="mt-2 overflow-hidden rounded-xl border border-champagne/30 max-w-[200px]">
+                                                    <img :src="item.foto_url" alt="Foto momen" class="w-full aspect-[16/10] object-cover object-center">
+                                                </div>
+                                            </template>
                                             <p class="mt-1 text-xs leading-relaxed text-charcoal/70" x-text="item.cerita || 'Deskripsi kisah akan tampil di sini saat Anda mengetik...'"></p>
                                         </div>
                                     </template>
@@ -1883,6 +2006,124 @@
                                     placeholder="https://youtube.com/live/..."
                                     class="w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2.5 text-sm focus:border-sage focus:outline-none"
                                 >
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Dress Code & Palet Warna Tamu (Opsional) --}}
+                    <div
+                        x-data="{
+                            warnaList: @js(old('dress_code_warna', $undangan->dressCodeWarna())),
+                            tambahWarna(hex = '#D7BB83') {
+                                if (this.warnaList.length < 5) {
+                                    this.warnaList.push(hex);
+                                }
+                            },
+                            hapusWarna(idx) {
+                                this.warnaList.splice(idx, 1);
+                            },
+                            pakaiPreset(daftar) {
+                                this.warnaList = [...daftar];
+                            }
+                        }"
+                        class="rounded-2xl bg-gradient-to-br from-ivory to-champagne/[0.06] p-5 ring-1 ring-champagne/25 space-y-4"
+                    >
+                        <input type="hidden" name="dress_code_disertakan" value="1">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <div>
+                                <h3 class="font-sans text-sm sm:text-base font-bold text-charcoal tracking-tight">Dress Code &amp; Palet Warna <span class="text-xs font-medium text-charcoal/50">(Opsional)</span></h3>
+                                <p class="text-xs text-charcoal/65 mt-0.5">Panduan nuansa busana untuk tamu undangan. Kosongkan jika tidak ingin ditampilkan.</p>
+                            </div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button
+                                    type="button"
+                                    @click="pakaiPreset(['#472A1C', '#D7BB83', '#F5E9D6'])"
+                                    class="rounded-full bg-white px-2.5 py-1 text-[10px] font-semibold text-sage ring-1 ring-sage/25 hover:bg-sage hover:text-white transition cursor-pointer"
+                                >
+                                    Preset Jawa Sogan
+                                </button>
+                                <button
+                                    type="button"
+                                    @click="pakaiPreset(['#2F4F4F', '#C8A464', '#FDFBF7'])"
+                                    class="rounded-full bg-white px-2.5 py-1 text-[10px] font-semibold text-sage ring-1 ring-sage/25 hover:bg-sage hover:text-white transition cursor-pointer"
+                                >
+                                    Preset Sage Ivory
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/75">Catatan Dress Code</label>
+                            <input
+                                type="text"
+                                name="dress_code_catatan"
+                                value="{{ old('dress_code_catatan', $undangan->dressCodeCatatan()) }}"
+                                placeholder="Contoh: Busana bernuansa Batik Sogan, Emas Sampanye, atau Krem Hangat"
+                                class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2.5 text-sm focus:border-sage focus:outline-none"
+                            >
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/75">Swatches Warna (Maks. 5)</label>
+                                <button
+                                    type="button"
+                                    @click="tambahWarna()"
+                                    x-show="warnaList.length < 5"
+                                    class="rounded-full bg-sage/10 px-3 py-1 text-[11px] font-semibold text-sage hover:bg-sage hover:text-white transition cursor-pointer"
+                                >
+                                    + Tambah Warna
+                                </button>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-2.5">
+                                <template x-for="(hex, idx) in warnaList" :key="idx">
+                                    <div class="inline-flex items-center gap-2 rounded-full bg-white pl-2 pr-2.5 py-1.5 ring-1 ring-charcoal/15 shadow-xs">
+                                        <input
+                                            type="color"
+                                            :name="'dress_code_warna[' + idx + ']'"
+                                            x-model="warnaList[idx]"
+                                            class="h-6 w-6 rounded-full border-0 bg-transparent cursor-pointer p-0"
+                                        >
+                                        <span class="font-mono text-[11px] font-semibold uppercase text-charcoal/75" x-text="hex"></span>
+                                        <button
+                                            type="button"
+                                            @click="hapusWarna(idx)"
+                                            class="text-charcoal/45 hover:text-rose-600 text-xs font-bold leading-none cursor-pointer"
+                                            title="Hapus warna"
+                                        >&times;</button>
+                                    </div>
+                                </template>
+                                <p x-show="warnaList.length === 0" class="text-xs italic text-charcoal/50">Belum ada warna swatch ditambahkan.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Turut Mengundang (Opsional) --}}
+                    <div class="rounded-2xl bg-gradient-to-br from-ivory to-champagne/[0.06] p-5 ring-1 ring-champagne/25 space-y-4">
+                        <div>
+                            <h3 class="font-sans text-sm sm:text-base font-bold text-charcoal tracking-tight">Daftar Turut Mengundang <span class="text-xs font-medium text-charcoal/50">(Opsional)</span></h3>
+                            <p class="text-xs text-charcoal/65 mt-0.5">Tuliskan 1 nama keluarga per baris. Kosongkan jika tidak diperlukan.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/75">Pihak Mempelai Wanita</label>
+                                <textarea
+                                    name="turut_mengundang_wanita"
+                                    rows="4"
+                                    placeholder="Keluarga Besar Bpk. ...&#10;Keluarga Besar Ibu ..."
+                                    class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2.5 text-sm leading-relaxed focus:border-sage focus:outline-none"
+                                >{{ old('turut_mengundang_wanita', data_get($pengaturan, 'turut_mengundang.pihak_wanita', '')) }}</textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal/75">Pihak Mempelai Pria</label>
+                                <textarea
+                                    name="turut_mengundang_pria"
+                                    rows="4"
+                                    placeholder="Keluarga Besar Bpk. ...&#10;Keluarga Besar Ibu ..."
+                                    class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2.5 text-sm leading-relaxed focus:border-sage focus:outline-none"
+                                >{{ old('turut_mengundang_pria', data_get($pengaturan, 'turut_mengundang.pihak_pria', '')) }}</textarea>
                             </div>
                         </div>
                     </div>

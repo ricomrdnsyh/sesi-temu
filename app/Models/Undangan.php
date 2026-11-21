@@ -31,6 +31,13 @@ class Undangan extends Model
             'aksen_css' => "'Great Vibes', cursive",
             'google_families' => ['Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400', 'Great+Vibes', 'Poppins:wght@300;400;500;600;700'],
         ],
+        'java_heritage' => [
+            'label' => 'Cormorant Infant & Pinyon Script (Java Heritage Keraton)',
+            'judul_css' => "'Cormorant Infant', 'Playfair Display', Georgia, serif",
+            'isi_css' => "'Poppins', ui-sans-serif, system-ui, sans-serif",
+            'aksen_css' => "'Pinyon Script', 'Great Vibes', cursive",
+            'google_families' => ['Cormorant+Infant:ital,wght@0,500;0,600;0,700;1,400', 'Playfair+Display:ital,wght@0,500;0,600;0,700;1,400', 'Pinyon+Script', 'Great+Vibes', 'Poppins:wght@300;400;500;600;700'],
+        ],
         'berkshire_adat' => [
             'label' => 'Berkshire Swash & Marcellus (Etnik Klasik TemuWaktu)',
             'judul_css' => "'Berkshire Swash', 'Marcellus', Georgia, serif",
@@ -93,7 +100,7 @@ class Undangan extends Model
         'luxury-noir' => 'ningrat_cinzel',
         'royal-ivory' => 'royal_playfair',
         'velvet-garden' => 'editorial_gilda',
-        'adat-jawa' => 'berkshire_adat',
+        'adat-jawa' => 'java_heritage',
         'sunda-heritage' => 'berkshire_adat',
         'islami-syari' => 'arabesque_amiri',
         'islamic-heavenly' => 'arabesque_amiri',
@@ -157,6 +164,22 @@ class Undangan extends Model
             'gaya_font' => 'bawaan',
             'tanpa_foto' => false,
             'foto_sampul' => null,
+            'foto_pembuka' => null,
+            'foto_penutup' => null,
+            'foto_latar_tema' => null,
+            'hashtag' => '',
+            'sosial_media' => [
+                'instagram_pria' => '',
+                'instagram_wanita' => '',
+            ],
+            'dress_code' => [
+                'catatan' => '',
+                'warna' => [],
+            ],
+            'turut_mengundang' => [
+                'pihak_wanita' => '',
+                'pihak_pria' => '',
+            ],
             'cerita_cinta' => [],
             'live_streaming' => [
                 'aktif' => false,
@@ -500,6 +523,168 @@ class Undangan extends Model
         return (is_string($fotoSampul) && $fotoSampul !== '')
             ? $this->resolveUrlMedia($fotoSampul)
             : null;
+    }
+
+    public function urlFotoPembuka(): ?string
+    {
+        if ($this->modeTanpaFoto()) {
+            return null;
+        }
+
+        $fotoPembuka = data_get($this->pengaturan, 'foto_pembuka');
+        if (is_string($fotoPembuka) && $fotoPembuka !== '') {
+            return $this->resolveUrlMedia($fotoPembuka);
+        }
+
+        return $this->urlFotoSampul();
+    }
+
+    public function urlFotoPembukaKhususDashboard(): ?string
+    {
+        $fotoPembuka = data_get($this->pengaturan, 'foto_pembuka');
+
+        return (is_string($fotoPembuka) && $fotoPembuka !== '')
+            ? $this->resolveUrlMedia($fotoPembuka)
+            : null;
+    }
+
+    public function urlFotoPenutup(): ?string
+    {
+        if ($this->modeTanpaFoto()) {
+            return null;
+        }
+
+        $fotoPenutup = data_get($this->pengaturan, 'foto_penutup');
+        if (is_string($fotoPenutup) && $fotoPenutup !== '') {
+            return $this->resolveUrlMedia($fotoPenutup);
+        }
+
+        return $this->urlFotoSampul();
+    }
+
+    public function urlFotoPenutupKhususDashboard(): ?string
+    {
+        $fotoPenutup = data_get($this->pengaturan, 'foto_penutup');
+
+        return (is_string($fotoPenutup) && $fotoPenutup !== '')
+            ? $this->resolveUrlMedia($fotoPenutup)
+            : null;
+    }
+
+    public function urlFotoLatarCustom(): ?string
+    {
+        if ($this->modeTanpaFoto()) {
+            return null;
+        }
+
+        $fotoLatar = data_get($this->pengaturan, 'foto_latar_tema');
+
+        return (is_string($fotoLatar) && $fotoLatar !== '')
+            ? $this->resolveUrlMedia($fotoLatar)
+            : null;
+    }
+
+    public function urlFotoLatarCustomKhususDashboard(): ?string
+    {
+        $fotoLatar = data_get($this->pengaturan, 'foto_latar_tema');
+
+        return (is_string($fotoLatar) && $fotoLatar !== '')
+            ? $this->resolveUrlMedia($fotoLatar)
+            : null;
+    }
+
+    public function hashtagPasangan(): string
+    {
+        $custom = trim((string) data_get($this->pengaturan, 'hashtag', ''));
+        if ($custom !== '') {
+            $tanpaPagar = ltrim($custom, '# ');
+            if ($tanpaPagar !== '') {
+                return '#'.$tanpaPagar;
+            }
+        }
+
+        return '#'.Str::studly($this->nama_panggilan_pria.$this->nama_panggilan_wanita).'Together';
+    }
+
+    public static function bersihkanUsernameInstagram(?string $nilai): string
+    {
+        $teks = trim((string) $nilai);
+        if ($teks === '') {
+            return '';
+        }
+
+        $teks = preg_replace('#^https?://(www\.)?instagram\.com/#i', '', $teks) ?? $teks;
+        $teks = trim(explode('?', $teks)[0], " \t\n\r\0\x0B/@");
+
+        return preg_replace('/[^A-Za-z0-9._]/', '', $teks) ?? '';
+    }
+
+    public function instagramPria(): string
+    {
+        return self::bersihkanUsernameInstagram((string) data_get($this->pengaturan, 'sosial_media.instagram_pria', ''));
+    }
+
+    public function instagramWanita(): string
+    {
+        return self::bersihkanUsernameInstagram((string) data_get($this->pengaturan, 'sosial_media.instagram_wanita', ''));
+    }
+
+    public function dressCodeCatatan(): string
+    {
+        return trim((string) data_get($this->pengaturan, 'dress_code.catatan', ''));
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function dressCodeWarna(): array
+    {
+        $mentah = (array) data_get($this->pengaturan, 'dress_code.warna', []);
+        $bersih = [];
+
+        foreach ($mentah as $hex) {
+            $kode = strtoupper(trim((string) $hex));
+            if (preg_match('/^#[0-9A-F]{6}$/', $kode) === 1 && ! in_array($kode, $bersih, true)) {
+                $bersih[] = $kode;
+            }
+            if (count($bersih) >= 5) {
+                break;
+            }
+        }
+
+        return $bersih;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function turutMengundangWanita(): array
+    {
+        return $this->pecahBarisTeks((string) data_get($this->pengaturan, 'turut_mengundang.pihak_wanita', ''));
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function turutMengundangPria(): array
+    {
+        return $this->pecahBarisTeks((string) data_get($this->pengaturan, 'turut_mengundang.pihak_pria', ''));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function pecahBarisTeks(string $teks): array
+    {
+        $hasil = [];
+        foreach (preg_split('/\r\n|\r|\n/', $teks) ?: [] as $baris) {
+            $bersih = trim($baris);
+            if ($bersih !== '') {
+                $hasil[] = $bersih;
+            }
+        }
+
+        return $hasil;
     }
 
     private function resolveUrlMedia(?string $path): ?string

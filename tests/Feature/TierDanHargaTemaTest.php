@@ -173,19 +173,20 @@ class TierDanHargaTemaTest extends TestCase
 
         $this->get('/demo/adat-jawa')
             ->assertOk()
-            ->assertSee('rotateY(-112deg)')
-            ->assertSee('animasi-marquee');
+            ->assertSee('tirai-fade-halus')
+            ->assertSee('jawa-bingkai-masuk')
+            ->assertSee('jawa-sapu-kiri');
 
         $this->get('/demo/sunda-heritage')
             ->assertOk()
             ->assertSee('animasi-kelopak-3d')
             ->assertSee('animasi-awan')
-            ->assertSee('rotateY(-112deg)');
+            ->assertSee('tirai-fade-halus');
 
         $this->get('/demo/royal-ivory')
             ->assertOk()
             ->assertSee('animasi-segel')
-            ->assertSee('rotateX(78deg)');
+            ->assertSee('tirai-fade-halus');
 
         // Eksklusif: tirai sinematik + partikel kaya + orbit crest + shimmer kartu + galeri unggulan
         $this->get('/demo/luxury-noir')
@@ -260,10 +261,14 @@ class TierDanHargaTemaTest extends TestCase
         $this->seed(DatabaseSeeder::class);
 
         foreach (['adat-jawa', 'luxury-noir', 'islami-syari'] as $slugTema) {
+            $latarDiharapkan = $slugTema === 'adat-jawa'
+                ? 'aset-tema/adat-jawa/latar-hutan-jawa.webp'
+                : "aset-tema/{$slugTema}/latar-utama.webp";
+
             $this->get("/demo/{$slugTema}?tf=1")
                 ->assertOk()
                 ->assertSee('Mode: Tanpa Foto (TF)')
-                ->assertSee("aset-tema/{$slugTema}/latar-utama.webp")
+                ->assertSee($latarDiharapkan)
                 ->assertDontSee('sampul-')
                 ->assertDontSee('mempelai-pria.webp')
                 ->assertDontSee('mempelai-wanita.webp')
