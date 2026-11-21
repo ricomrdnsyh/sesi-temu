@@ -373,7 +373,7 @@
             </section>
 
             {{-- KONTEN UTAMA UNDANGAN --}}
-            <main data-panggung-3d class="panggung-3d relative z-10 {{ !empty($modeDemo) ? 'pt-14' : '' }}">
+            <main data-panggung-3d class="panggung-3d relative z-10 {{ (!empty($modeDemo) && !request()->boolean('embed')) ? 'pt-14' : '' }}">
                 <section data-aos="fade-up" data-aos-duration="1000" class="px-5 pt-6 pb-8">
                     <div class="relative h-[28rem] sm:h-[31rem] {{ $heroBingkaiClass }} {{ $kelasBatas }} overflow-hidden shadow-2xl kartu-3d {{ $ekstraKartu }}">
                         <img

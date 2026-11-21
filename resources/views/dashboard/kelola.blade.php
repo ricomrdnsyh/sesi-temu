@@ -2,6 +2,18 @@
 
 @section('judul', 'Kelola Undangan — '.$undangan->nama_panggilan_pria.' & '.$undangan->nama_panggilan_wanita)
 
+@push('kepala')
+<style>
+    @media (min-width: 1024px) {
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+    }
+</style>
+@endpush
+
 @section('konten')
 @php
     $pengaturan = array_replace_recursive(\App\Models\Undangan::pengaturanBawaan(), $undangan->pengaturan ?? []);
@@ -17,8 +29,32 @@
     $sedangVerifikasiEditor = $undangan->transaksi->contains('status', 'menunggu_verifikasi');
     $temaAktifEditor = $undangan->tema;
     $hargaTemaEditor = (int) ($temaAktifEditor?->hargaNominal() ?? 0);
-    $hargaAsliEditor = (int) ($temaAktifEditor?->harga_asli ?? 0);
+    $hargaAsliEditor = (int) ($temaAktifEditor?->hargaAsliNominal() ?? 0);
     $persenDiskonEditor = $temaAktifEditor?->persenDiskon() ?? 0;
+    $bolehGantiTema = $undangan->bolehGantiTemaOleh(auth()->user());
+    $temaTerkunciClient = ! $bolehGantiTema;
+    $alasanTemaTerkunci = $undangan->alasanTemaTerkunci();
+    $pesanWaGantiTema = "Halo Admin SesiTemu, saya ingin mengganti atau upgrade tema untuk undangan sesitemu.id/{$undangan->slug}.";
+    $urlWaGantiTema = \App\Support\PengaturanSesiTemu::urlWaAdmin($pesanWaGantiTema);
+
+    $temaAwalStudioPayload = $temaAktifEditor
+        ? [
+            'id' => $temaAktifEditor->id,
+            'slug' => $temaAktifEditor->slug,
+            'nama_tema' => $temaAktifEditor->nama_tema,
+            'tier' => $temaAktifEditor->tierLabel(),
+            'tier_kode' => $temaAktifEditor->tierKode(),
+            'ringkasan_tier' => $temaAktifEditor->infoTier()['ringkasan'],
+            'deskripsi' => $temaAktifEditor->infoDesain()['deskripsi'],
+            'harga_nominal' => $temaAktifEditor->hargaNominal(),
+            'harga' => $temaAktifEditor->hargaFormatted(),
+            'harga_asli' => $temaAktifEditor->adaDiskon() ? $temaAktifEditor->hargaAsliFormatted() : null,
+            'badge_diskon' => $temaAktifEditor->labelBadgeDiskon(),
+            'url_pratinjau' => route('dashboard.undangan.pratinjau-tema', ['undangan' => $undangan, 'tema' => $temaAktifEditor, 'embed' => 1]),
+            'url_demo_embed' => route('tema.demo', ['slugTema' => $temaAktifEditor->slug, 'embed' => 1]),
+            'url_demo' => route('tema.demo', ['slugTema' => $temaAktifEditor->slug]),
+        ]
+        : null;
 
     $tabSelesai = [
         'tema' => true,
@@ -50,6 +86,10 @@
         modePreview: 'mobile',
         previewKey: 1,
         previewMemuat: true,
+        previewScale: 0.9,
+        previewStudioScale: 0.56,
+        previewObserver: null,
+        previewStudioObserver: null,
         namaPriaLive: @js(old('nama_panggilan_pria', $undangan->nama_panggilan_pria)),
         namaWanitaLive: @js(old('nama_panggilan_wanita', $undangan->nama_panggilan_wanita)),
         tanpaFotoAktif: @js($undangan->modeTanpaFoto()),
@@ -66,6 +106,17 @@
         atasNamaBaru: '',
         acaraEdit: null,
         galeriLightbox: null,
+        drawerTemaTerbuka: false,
+        tierDrawerTema: 'semua',
+        cariDrawerTema: '',
+        tabMobileStudio: 'daftar',
+        sumberPreviewStudio: 'undangan',
+        previewStudioMemuat: false,
+        temaAktifEditorId: @js((int) $undangan->tema_id),
+        hargaTemaAktifEditor: @js($hargaTemaEditor),
+        temaAwalStudio: @js($temaAwalStudioPayload),
+        temaPreviewStudio: @js($temaAwalStudioPayload),
+        temaKonfirmasi: null,
         init() {
             if (this.tab) {
                 this.$nextTick(() => {
@@ -73,7 +124,55 @@
                     el?.scrollIntoView({ behavior: 'auto', block: 'nearest' });
                 });
             }
+            this.$nextTick(() => {
+                this.hitungSkalaPreview();
+                this.hitungSkalaPreviewStudio();
+                if (typeof ResizeObserver !== 'undefined') {
+                    if (this.$refs.stagePreview) {
+                        this.previewObserver = new ResizeObserver(() => this.hitungSkalaPreview());
+                        this.previewObserver.observe(this.$refs.stagePreview);
+                    }
+                    const stageStudio = this.$el.querySelector('[data-stage-preview-studio]');
+                    if (stageStudio) {
+                        this.previewStudioObserver = new ResizeObserver(() => this.hitungSkalaPreviewStudio());
+                        this.previewStudioObserver.observe(stageStudio);
+                    }
+                }
+            });
+            window.addEventListener('resize', () => {
+                this.hitungSkalaPreview();
+                this.hitungSkalaPreviewStudio();
+            });
             setTimeout(() => { this.previewMemuat = false; }, 2500);
+        },
+        previewVirtualW() {
+            return this.modePreview === 'mobile' ? 390 : 1280;
+        },
+        previewVirtualH() {
+            return this.modePreview === 'mobile' ? 780 : 800;
+        },
+        hitungSkalaPreview() {
+            const stage = this.$refs.stagePreview;
+            if (!stage || stage.clientWidth === 0 || stage.clientHeight === 0) return;
+            const padX = this.modePreview === 'mobile' ? 40 : 32;
+            const padY = this.modePreview === 'mobile' ? 44 : 32;
+            const tersediaW = Math.max(180, stage.clientWidth - padX);
+            const tersediaH = Math.max(240, stage.clientHeight - padY);
+            const batasMaks = this.modePreview === 'mobile' ? 1.55 : 1.25;
+            const skala = Math.min(tersediaW / this.previewVirtualW(), tersediaH / this.previewVirtualH(), batasMaks);
+            this.previewScale = Math.max(0.28, Number(skala.toFixed(4)));
+        },
+        hitungSkalaPreviewStudio() {
+            const stage = this.$el.querySelector('[data-stage-preview-studio]');
+            if (!stage || stage.clientWidth === 0 || stage.clientHeight === 0) return;
+            const tersediaW = Math.max(160, stage.clientWidth - 28);
+            const tersediaH = Math.max(220, stage.clientHeight - 24);
+            const skala = Math.min(tersediaW / 390, tersediaH / 780, 1.0);
+            this.previewStudioScale = Math.max(0.28, Number(skala.toFixed(4)));
+        },
+        ubahModePreview(mode) {
+            this.modePreview = mode;
+            this.$nextTick(() => this.hitungSkalaPreview());
         },
         urlPreviewAktif() {
             const pemisah = this.urlPublikPreview.includes('?') ? '&' : '?';
@@ -106,6 +205,65 @@
         },
         pilihTab(kodeTab) {
             this.bukaBagian(kodeTab);
+        },
+        bukaDrawerTema() {
+            this.temaPreviewStudio = this.temaAwalStudio;
+            this.sumberPreviewStudio = 'undangan';
+            this.tabMobileStudio = 'daftar';
+            this.previewStudioMemuat = true;
+            this.drawerTemaTerbuka = true;
+            this.temaKonfirmasi = null;
+            this.$nextTick(() => this.hitungSkalaPreviewStudio());
+            setTimeout(() => { this.previewStudioMemuat = false; }, 2500);
+        },
+        tutupDrawerTema() {
+            this.drawerTemaTerbuka = false;
+            this.temaKonfirmasi = null;
+        },
+        pilihTemaStudio(payload) {
+            if (!payload) return;
+            if (this.temaPreviewStudio?.id !== payload.id) {
+                this.previewStudioMemuat = true;
+                setTimeout(() => { this.previewStudioMemuat = false; }, 2500);
+            }
+            this.temaPreviewStudio = payload;
+        },
+        ubahSumberPreviewStudio(sumber) {
+            if (this.sumberPreviewStudio === sumber) return;
+            this.sumberPreviewStudio = sumber;
+            this.previewStudioMemuat = true;
+            setTimeout(() => { this.previewStudioMemuat = false; }, 2500);
+        },
+        urlPreviewStudio() {
+            if (!this.drawerTemaTerbuka || !this.temaPreviewStudio) {
+                return 'about:blank';
+            }
+            return this.sumberPreviewStudio === 'demo'
+                ? this.temaPreviewStudio.url_demo_embed
+                : this.temaPreviewStudio.url_pratinjau;
+        },
+        selisihHargaStudio() {
+            if (!this.temaPreviewStudio) {
+                return { teks: '', kelas: '' };
+            }
+            const selisih = Number(this.temaPreviewStudio.harga_nominal || 0) - Number(this.hargaTemaAktifEditor || 0);
+            if (selisih === 0) {
+                return { teks: 'Harga Sama', kelas: 'bg-ivory text-charcoal/70 ring-1 ring-champagne/30' };
+            }
+            const nominal = 'Rp ' + Math.abs(selisih).toLocaleString('id-ID');
+            if (selisih > 0) {
+                return { teks: '+' + nominal, kelas: 'bg-amber-50 text-amber-800 ring-1 ring-amber-200' };
+            }
+            return { teks: 'Hemat ' + nominal, kelas: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200' };
+        },
+        pilihTemaKonfirmasi(payload) {
+            this.temaKonfirmasi = payload;
+        },
+        temaCocokDrawer(tier, teks) {
+            const cocokTier = this.tierDrawerTema === 'semua' || this.tierDrawerTema === tier;
+            const q = this.cariDrawerTema.trim().toLowerCase();
+            const cocokCari = !q || teks.toLowerCase().includes(q);
+            return cocokTier && cocokCari;
         },
         urlMusikAktif() {
             return this.musikDipilih ? (this.daftarUrlMusik[this.musikDipilih] || '') : '';
@@ -192,13 +350,13 @@
             return bersih;
         }
     }"
-    class="min-h-screen lg:h-screen lg:overflow-hidden flex bg-[#F2F1EC]"
+    class="relative min-h-screen lg:h-screen lg:overflow-hidden flex bg-[#F2F1EC]"
 >
     {{-- 1. Sidebar Vertikal Ramping Desktop + Bottom Bar Mobile --}}
     @include('dashboard._workspace-sidebar', ['undangan' => $undangan, 'menuAktif' => 'undangan'])
 
     {{-- 2. Panel Kiri: Studio Editor Accordion --}}
-    <div class="w-full lg:w-[460px] xl:w-[500px] shrink-0 bg-white lg:border-r lg:border-champagne/25 flex flex-col lg:h-screen">
+    <div class="relative w-full lg:w-[44%] xl:w-[42%] lg:min-w-[440px] lg:max-w-[960px] shrink-0 bg-white lg:border-r lg:border-champagne/25 flex flex-col lg:h-screen min-h-0">
         {{-- Header Sticky Panel Kiri --}}
         <div class="px-4 sm:px-5 py-3.5 border-b border-champagne/20 bg-white flex items-center justify-between gap-3 shrink-0 sticky top-0 z-20 lg:static">
             <div class="min-w-0">
@@ -224,7 +382,7 @@
         </div>
 
         {{-- Body Scrollable Panel Kiri --}}
-        <div x-ref="panelKiri" class="flex-1 lg:overflow-y-auto px-4 sm:px-5 py-4 pb-28 lg:pb-8 space-y-3.5">
+        <div x-ref="panelKiri" data-select2-parent class="relative flex-1 min-h-0 lg:overflow-y-auto px-4 sm:px-5 py-4 pb-28 lg:pb-8 space-y-3.5">
             {{-- Kartu Status / Aktivasi Ringkas --}}
             @if ($statusKodeEditor === 'aktif')
                 <div class="rounded-2xl bg-emerald-50/80 px-4 py-3 ring-1 ring-emerald-200/80 flex items-center justify-between gap-3">
@@ -303,7 +461,8 @@
                             </button>
                             <button
                                 type="button"
-                                @click="bukaBagian('tema')"
+                                @click="bukaDrawerTema()"
+                                data-buka-drawer-tema
                                 class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-white px-3.5 py-2.5 text-xs font-semibold text-charcoal ring-1 ring-champagne/45 hover:bg-champagne/10 active:scale-[0.98] transition cursor-pointer"
                             >
                                 <span>Ganti Tema</span>
@@ -312,7 +471,11 @@
                     @endif
 
                     <p class="text-[11px] text-charcoal/55 leading-relaxed">
-                        Draft tersimpan aman. Bebas lengkapi data &amp; ganti tema kapan saja sebelum aktivasi.
+                        @if ($sedangVerifikasiEditor)
+                            Bukti pembayaran sedang diverifikasi Admin. Tema dikunci sementara hingga verifikasi selesai.
+                        @else
+                            Draft tersimpan aman. Bebas lengkapi data &amp; ganti tema kapan saja sebelum aktivasi.
+                        @endif
                     </p>
                 </div>
             @endif
@@ -387,19 +550,31 @@
                                 <h2 class="font-sans text-lg sm:text-2xl font-bold text-charcoal tracking-tight">Tema, Musik &amp; Pengaturan Link</h2>
                                 <p class="mt-0.5 text-xs text-charcoal/60">Atur tema, link, font, musik latar, dan fitur aktif.</p>
                             </div>
-                            <a
-                                href="{{ route('dashboard.katalog') }}"
-                                class="inline-flex items-center gap-1 rounded-xl bg-ivory px-2.5 py-1.5 text-[11px] font-semibold text-sage ring-1 ring-champagne/35 hover:bg-sage hover:text-white transition shrink-0"
-                            >
-                                <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <rect width="7" height="7" x="3" y="3" rx="1.5"/>
-                                    <rect width="7" height="7" x="14" y="3" rx="1.5"/>
-                                    <rect width="7" height="7" x="14" y="14" rx="1.5"/>
-                                    <rect width="7" height="7" x="3" y="14" rx="1.5"/>
-                                </svg>
-                    <span>Lihat Katalog Visual</span>
-                </a>
-            </div>
+                            @if ($bolehGantiTema)
+                                <button
+                                    type="button"
+                                    @click="bukaDrawerTema()"
+                                    data-buka-drawer-tema
+                                    class="inline-flex items-center gap-1 rounded-xl bg-ivory px-2.5 py-1.5 text-[11px] font-semibold text-sage ring-1 ring-champagne/35 hover:bg-sage hover:text-white transition shrink-0 cursor-pointer"
+                                >
+                                    <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <rect width="7" height="7" x="3" y="3" rx="1.5"/>
+                                        <rect width="7" height="7" x="14" y="3" rx="1.5"/>
+                                        <rect width="7" height="7" x="14" y="14" rx="1.5"/>
+                                        <rect width="7" height="7" x="3" y="14" rx="1.5"/>
+                                    </svg>
+                                    <span>Ganti Tema</span>
+                                </button>
+                            @else
+                                <span class="inline-flex items-center gap-1 rounded-xl bg-amber-50 px-2.5 py-1.5 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200 shrink-0">
+                                    <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                    </svg>
+                                    <span>Tema Terkunci</span>
+                                </span>
+                            @endif
+                        </div>
 
             <form
                 action="{{ route('dashboard.undangan.perbarui', $undangan) }}"
@@ -435,14 +610,74 @@
 
                     <div class="grid grid-cols-1 gap-3.5">
                         <div>
-                            <label for="tema_id" class="block text-xs font-semibold text-charcoal/80 mb-1.5">Tema Undangan</label>
-                            <select id="tema_id" name="tema_id" class="w-full rounded-xl border border-charcoal/15 bg-white px-4 py-2.5 text-sm focus:border-champagne focus:outline-none">
-                                @foreach ($daftarTema as $tema)
-                                    <option value="{{ $tema->id }}" @selected($undangan->tema_id === $tema->id)>
-                                        {{ $tema->nama_tema }} ({{ $tema->kategoriLabel() }} • {{ $tema->tierLabel() }} — {{ $tema->hargaFormatted() }})
-                                    </option>
-                                @endforeach
-                            </select>
+                            <input type="hidden" name="tema_id" value="{{ $undangan->tema_id }}">
+                            <div class="flex items-center justify-between gap-2 mb-1.5">
+                                <span class="block text-xs font-semibold text-charcoal/80">Tema Undangan</span>
+                                @if ($temaTerkunciClient)
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 ring-1 ring-amber-200">
+                                        {{ $sedangVerifikasiEditor ? 'Terkunci (Verifikasi)' : 'Terkunci (Aktif)' }}
+                                    </span>
+                                @elseif (auth()->user()->adalahAdmin() && $undangan->temaTerkunciUntukClient())
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-sage/10 px-2 py-0.5 text-[10px] font-semibold text-sage ring-1 ring-sage/25">
+                                        Mode Admin
+                                    </span>
+                                @endif
+                            </div>
+
+                            <div class="rounded-2xl bg-white p-3 ring-1 {{ $temaTerkunciClient ? 'ring-amber-200/80' : 'ring-champagne/30' }} flex items-center gap-3">
+                                @if ($temaAktifEditor)
+                                    <div class="h-16 w-16 rounded-xl overflow-hidden shrink-0 ring-1 ring-champagne/25 bg-ivory">
+                                        <x-poster-sampul-tema :tema="$temaAktifEditor" />
+                                    </div>
+                                @endif
+
+                                <div class="min-w-0 flex-1">
+                                    <span class="inline-flex items-center rounded-full bg-ivory px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#8A6D33] ring-1 ring-champagne/35">
+                                        Tier {{ $temaAktifEditor?->tierLabel() }}
+                                    </span>
+                                    <p class="mt-1 font-sans text-sm font-bold text-charcoal truncate">
+                                        {{ $temaAktifEditor?->nama_tema ?? 'Rustic Floral' }}
+                                    </p>
+                                    <div class="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 font-sans tabular-nums text-xs">
+                                        @if ($temaAktifEditor?->adaDiskon())
+                                            <span class="text-charcoal/45 line-through text-[11px]">{{ $temaAktifEditor->hargaAsliFormatted() }}</span>
+                                        @endif
+                                        <span class="font-bold text-sage">{{ $temaAktifEditor?->hargaFormatted() }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="shrink-0">
+                                    @if ($bolehGantiTema)
+                                        <button
+                                            type="button"
+                                            @click="bukaDrawerTema()"
+                                            data-buka-drawer-tema
+                                            class="inline-flex items-center gap-1.5 rounded-xl bg-[#3B4F45] px-3 py-2 text-xs font-semibold text-white hover:bg-sage active:scale-95 transition cursor-pointer"
+                                        >
+                                            <span>Ganti</span>
+                                        </button>
+                                    @else
+                                        <a
+                                            href="{{ $urlWaGantiTema }}"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="inline-flex items-center gap-1 rounded-xl bg-amber-50 px-2.5 py-2 text-[11px] font-semibold text-amber-800 ring-1 ring-amber-200 hover:bg-amber-100 transition"
+                                        >
+                                            <span>Hubungi Admin</span>
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+
+                            @if ($temaTerkunciClient)
+                                <p class="mt-1.5 text-[11px] text-amber-700 leading-relaxed">
+                                    {{ $alasanTemaTerkunci }}
+                                </p>
+                            @else
+                                <p class="mt-1.5 text-[11px] text-charcoal/55">
+                                    Klik <strong class="text-charcoal">Ganti</strong> untuk memilih tema dari galeri pratinjau visual.
+                                </p>
+                            @endif
                         </div>
 
                         <div>
@@ -2672,7 +2907,7 @@
         {{-- Toolbar Atas Kanvas Preview --}}
         <div class="px-5 py-3.5 flex items-center justify-between gap-3 shrink-0">
             {{-- Pill Tema Aktif + Ganti Tema --}}
-            <div class="inline-flex items-center gap-2 rounded-full bg-white pl-3.5 pr-1.5 py-1.5 shadow-xs ring-1 ring-champagne/30">
+            <div class="inline-flex items-center gap-2 rounded-full bg-white pl-3.5 pr-1.5 py-1.5 shadow-xs ring-1 ring-champagne/30 min-w-0 max-w-[60%]">
                 <svg class="h-4 w-4 text-sage shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
                     <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
@@ -2680,14 +2915,29 @@
                     <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
                     <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
                 </svg>
-                <span class="text-xs font-semibold text-charcoal">{{ $temaAktifEditor?->nama_tema ?? 'Rustic Floral' }}</span>
-                <button
-                    type="button"
-                    @click="bukaBagian('tema')"
-                    class="rounded-full bg-[#3B4F45] px-3 py-1 text-[11px] font-semibold text-white hover:bg-sage active:scale-95 transition cursor-pointer"
-                >
-                    Ganti Tema
-                </button>
+                <span class="text-xs font-semibold text-charcoal truncate">{{ $temaAktifEditor?->nama_tema ?? 'Rustic Floral' }}</span>
+                @if ($bolehGantiTema)
+                    <button
+                        type="button"
+                        @click="bukaDrawerTema()"
+                        data-buka-drawer-tema
+                        class="rounded-full bg-[#3B4F45] px-3 py-1 text-[11px] font-semibold text-white hover:bg-sage active:scale-95 transition cursor-pointer shrink-0 whitespace-nowrap"
+                    >
+                        Ganti Tema
+                    </button>
+                @else
+                    <span
+                        title="{{ $alasanTemaTerkunci }}"
+                        data-tema-terkunci-badge
+                        class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200 shrink-0 whitespace-nowrap"
+                    >
+                        <svg class="h-3 w-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                        <span>{{ $sedangVerifikasiEditor ? 'Verifikasi' : 'Terkunci' }}</span>
+                    </span>
+                @endif
             </div>
 
             {{-- Kontrol Kanan: Refresh, Buka Tab Baru, Toggle Desktop/Mobile --}}
@@ -2731,7 +2981,7 @@
                 >
                     <button
                         type="button"
-                        @click="modePreview = 'desktop'"
+                        @click="ubahModePreview('desktop')"
                         title="Tampilan Desktop"
                         aria-label="Tampilan Desktop"
                         :class="modePreview === 'desktop' ? 'bg-[#3B4F45] text-white shadow-xs' : 'text-charcoal/60 hover:text-charcoal'"
@@ -2745,7 +2995,7 @@
                     </button>
                     <button
                         type="button"
-                        @click="modePreview = 'mobile'"
+                        @click="ubahModePreview('mobile')"
                         title="Tampilan HP"
                         aria-label="Tampilan HP"
                         :class="modePreview === 'mobile' ? 'bg-[#3B4F45] text-white shadow-xs' : 'text-charcoal/60 hover:text-charcoal'"
@@ -2760,13 +3010,12 @@
             </div>
         </div>
 
-        {{-- Stage Pratinjau Iframe Langsung --}}
-        <div class="flex-1 flex items-center justify-center px-5 pb-6 pt-1 overflow-hidden">
+        {{-- Stage Pratinjau Iframe Langsung (Skala Proporsional Tahan Zoom Browser) --}}
+        <div x-ref="stagePreview" class="flex-1 min-h-0 flex items-center justify-center p-4 overflow-hidden">
             <div
-                :class="modePreview === 'mobile'
-                    ? 'w-[390px] max-w-full rounded-[2rem]'
-                    : 'w-full rounded-2xl'"
-                class="relative h-full max-h-[820px] bg-white shadow-[0_24px_60px_-15px_rgba(31,41,55,0.22)] ring-1 ring-charcoal/10 overflow-hidden transition-all duration-300"
+                :style="`width: ${Math.round(previewVirtualW() * previewScale)}px; height: ${Math.round(previewVirtualH() * previewScale)}px;`"
+                :class="modePreview === 'mobile' ? 'rounded-[1.85rem]' : 'rounded-2xl'"
+                class="relative bg-white shadow-[0_24px_56px_-16px_rgba(31,41,55,0.22)] ring-1 ring-charcoal/12 overflow-hidden shrink-0"
             >
                 <div
                     x-show="previewMemuat"
@@ -2782,13 +3031,18 @@
                 <iframe
                     x-ref="iframePreview"
                     :src="urlPreviewAktif()"
+                    :style="`width: ${previewVirtualW()}px; height: ${previewVirtualH()}px; transform: scale(${previewScale}); transform-origin: top left;`"
                     title="Pratinjau Langsung Undangan {{ $undangan->nama_panggilan_pria }} & {{ $undangan->nama_panggilan_wanita }}"
-                    class="w-full h-full border-0 bg-white"
+                    class="block border-0 bg-white"
                     @load="previewMemuat = false"
                 ></iframe>
             </div>
         </div>
     </div>
+
+    @if ($bolehGantiTema)
+        @include('dashboard._drawer-ganti-tema')
+    @endif
 
     {{-- Lightbox Pratinjau Penuh Foto Galeri --}}
     <div

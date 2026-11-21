@@ -274,6 +274,34 @@ class Undangan extends Model
             && $this->transaksiMenungguVerifikasi() === null;
     }
 
+    public function temaTerkunciUntukClient(): bool
+    {
+        return $this->sudahAktifPublik()
+            || $this->transaksiMenungguVerifikasi() !== null;
+    }
+
+    public function bolehGantiTemaOleh(?Pengguna $pengguna): bool
+    {
+        if ($pengguna !== null && $pengguna->adalahAdmin()) {
+            return true;
+        }
+
+        return ! $this->temaTerkunciUntukClient();
+    }
+
+    public function alasanTemaTerkunci(): ?string
+    {
+        if ($this->sudahAktifPublik()) {
+            return 'Tema undangan yang sudah aktif dikunci otomatis. Hubungi Admin jika ingin mengganti atau upgrade tema.';
+        }
+
+        if ($this->transaksiMenungguVerifikasi() !== null) {
+            return 'Tema sedang dikunci sementara karena bukti pembayaran Anda sedang menunggu verifikasi Admin.';
+        }
+
+        return null;
+    }
+
     public function bolehDihapusClient(): bool
     {
         return ! $this->status_publikasi

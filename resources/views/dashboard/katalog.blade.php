@@ -14,6 +14,10 @@
             'nama_lengkap_wanita',
         ]);
         $punyaUndanganSebelumnya = $daftarUndanganSaya->isNotEmpty();
+        $daftarUndanganBolehGanti = $daftarUndanganSaya->filter(
+            fn (\App\Models\Undangan $item): bool => $item->bolehGantiTemaOleh(auth()->user())
+        );
+        $adaUndanganBolehGanti = $daftarUndanganBolehGanti->isNotEmpty();
 
         $temaInitial = $temaPrepilih
             ? [
@@ -42,7 +46,7 @@
         fontDemo: 'bawaan',
         tanpaFotoDemo: false,
         modalPakaiTerbuka: {{ $temaInitial !== null ? 'true' : 'false' }},
-        alurPakai: '{{ $adaGalatModalPakai && !old('undangan_id') ? 'buat' : ($punyaUndanganSebelumnya ? 'terapkan' : 'buat') }}',
+        alurPakai: '{{ old('undangan_id') ? 'terapkan' : 'buat' }}',
         temaDipilih: @js(
     $temaInitial ?? [
         'id' => null,
@@ -77,7 +81,7 @@
         },
         bukaModalPakai(payload) {
             this.temaDipilih = payload;
-            this.alurPakai = {{ $punyaUndanganSebelumnya ? 'true' : 'false' }} ? 'terapkan' : 'buat';
+            this.alurPakai = 'buat';
             this.modalPakaiTerbuka = true;
         },
         temaCocok(tier, nama = '') {
@@ -97,10 +101,13 @@
         tutupLightboxSampul() {
             this.sampulLightboxSlug = null;
         }
-    }" class="min-h-screen flex flex-col bg-ivory">
-        @include('dashboard._top-nav', ['halamanAktif' => 'katalog'])
+    }" class="min-h-screen flex bg-ivory">
+        @include('dashboard._client-sidebar', ['halamanAktif' => 'katalog'])
 
-        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-28 md:py-8 space-y-5 md:space-y-6">
+        <div class="flex-1 min-w-0 flex flex-col">
+            @include('dashboard._top-nav', ['halamanAktif' => 'katalog'])
+
+            <main class="flex-1 w-full px-4 sm:px-6 lg:px-8 xl:px-10 pt-4 sm:pt-6 pb-28 md:py-8 space-y-5 md:space-y-6">
             {{-- Header & Filter Katalog Terpadu (Light Surface Command Bar + Filter Tier Landing Page) --}}
             <section class="rounded-[1.5rem] bg-white p-4 sm:p-5 shadow-xs ring-1 ring-champagne/25 space-y-4">
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5">
@@ -257,7 +264,7 @@
             </section>
 
             {{-- Daftar Kartu Tema --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
                 @forelse ($daftarTema as $tema)
                     @php
                         $infoDesain = $tema->infoDesain();
@@ -443,7 +450,8 @@
                     </div>
                 @endforelse
             </div>
-        </main>
+            </main>
+        </div>
 
         @include('dashboard._bottom-nav', ['halamanAktif' => 'katalog', 'modalBuatOnPage' => false])
 
@@ -581,17 +589,34 @@
                             <label for="katalog_undangan_id" class="block text-sm font-medium text-charcoal">Pilih
                                 Undangan Anda</label>
                             <select id="katalog_undangan_id" name="undangan_id" required
-                                class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none">
+                                @disabled(! $adaUndanganBolehGanti)
+                                class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed">
                                 @foreach ($daftarUndanganSaya as $itemUndangan)
-                                    <option value="{{ $itemUndangan->id }}" @selected((int) old('undangan_id') === $itemUndangan->id)>
+                                    @php
+                                        $bolehGantiItem = $itemUndangan->bolehGantiTemaOleh(auth()->user());
+                                        $labelKunciItem = $itemUndangan->sudahAktifPublik()
+                                            ? 'Terkunci — Aktif'
+                                            : 'Terkunci — Verifikasi';
+                                    @endphp
+                                    <option
+                                        value="{{ $itemUndangan->id }}"
+                                        @selected((int) old('undangan_id') === $itemUndangan->id)
+                                        @disabled(! $bolehGantiItem)
+                                    >
                                         {{ $itemUndangan->nama_panggilan_pria }} &amp;
                                         {{ $itemUndangan->nama_panggilan_wanita }} (sesitemu.id/{{ $itemUndangan->slug }})
-                                        — {{ $itemUndangan->tema?->nama_tema }}
+                                        — {{ $itemUndangan->tema?->nama_tema }}{{ $bolehGantiItem ? '' : " [{$labelKunciItem}]" }}
                                     </option>
                                 @endforeach
                             </select>
-                            <p class="mt-1.5 text-xs text-charcoal/60">Data mempelai, acara, foto, dan tamu Anda aman dan
-                                tidak akan terhapus.</p>
+                            @if ($adaUndanganBolehGanti)
+                                <p class="mt-1.5 text-xs text-charcoal/60">Data mempelai, acara, foto, dan tamu Anda aman dan
+                                    tidak akan terhapus. Undangan yang sudah aktif terkunci otomatis.</p>
+                            @else
+                                <p class="mt-1.5 rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-800 ring-1 ring-amber-200">
+                                    Seluruh undangan Anda saat ini berstatus aktif atau sedang diverifikasi sehingga temanya dikunci otomatis. Hubungi Admin jika ingin mengganti tema, atau pilih <strong>Buat Draft Baru</strong>.
+                                </p>
+                            @endif
                         </div>
 
                         <div class="pt-1 flex justify-end gap-2.5">
@@ -600,7 +625,8 @@
                                 Batal
                             </button>
                             <button type="submit"
-                                class="flex-1 sm:flex-none rounded-xl bg-sage px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-95 transition cursor-pointer">
+                                @disabled(! $adaUndanganBolehGanti)
+                                class="flex-1 sm:flex-none rounded-xl bg-sage px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-95 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                                 Terapkan &amp; Lanjut Kelola →
                             </button>
                         </div>

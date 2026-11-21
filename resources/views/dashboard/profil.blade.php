@@ -7,10 +7,13 @@
         $pesanWaBantuan = "Halo Admin SesiTemu, saya {$pengguna->nama} ({$pengguna->email}) butuh bantuan terkait akun saya.";
     @endphp
 
-    <div class="min-h-screen flex flex-col bg-ivory">
-        @include('dashboard._top-nav', ['halamanAktif' => 'profil'])
+    <div class="min-h-screen flex bg-ivory">
+        @include('dashboard._client-sidebar', ['halamanAktif' => 'profil'])
 
-        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-28 md:py-8 space-y-5 sm:space-y-6">
+        <div class="flex-1 min-w-0 flex flex-col">
+            @include('dashboard._top-nav', ['halamanAktif' => 'profil'])
+
+            <main class="flex-1 w-full px-4 sm:px-6 lg:px-8 xl:px-10 pt-4 sm:pt-6 pb-28 md:py-8 space-y-5 sm:space-y-6">
             {{-- Kartu Profil Bergaya Centered Floating Card & Geometric Backdrop --}}
             <section
                 class="relative overflow-hidden rounded-[1.75rem] bg-ivory/90 shadow-xs ring-1 ring-champagne/25 pb-4 sm:pb-6">
@@ -575,7 +578,8 @@
                     </div>
                 </section>
             </div>
-        </main>
+            </main>
+        </div>
 
         @include('dashboard._bottom-nav', ['halamanAktif' => 'profil', 'modalBuatOnPage' => false])
     </div>

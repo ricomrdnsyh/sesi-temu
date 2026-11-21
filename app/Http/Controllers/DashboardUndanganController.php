@@ -123,7 +123,7 @@ class DashboardUndanganController extends Controller
         $ringkasanTier = Tema::ringkasanTier($daftarTema);
         $daftarUndanganSaya = $request->user()
             ->undangan()
-            ->with('tema')
+            ->with(['tema', 'transaksi'])
             ->latest()
             ->get();
 
@@ -152,12 +152,78 @@ class DashboardUndanganController extends Controller
         $undangan = Undangan::findOrFail((int) $tervalidasi['undangan_id']);
         Gate::authorize('kelola', $undangan);
 
+        if (! $undangan->bolehGantiTemaOleh($request->user())) {
+            return back()
+                ->withErrors([
+                    'undangan_id' => $undangan->alasanTemaTerkunci() ?? 'Tema undangan yang sudah aktif tidak dapat diubah oleh client.',
+                ])
+                ->withInput();
+        }
+
         $tema = Tema::findOrFail((int) $tervalidasi['tema_id']);
         $undangan->update(['tema_id' => $tema->id]);
 
         return redirect()
             ->route('dashboard.undangan.kelola', [$undangan, 'tab' => 'tema'])
             ->with('sukses', "Tema \"{$tema->nama_tema}\" berhasil diterapkan ke undangan {$undangan->nama_panggilan_pria} & {$undangan->nama_panggilan_wanita}. Lanjutkan melengkapi data undangan!");
+    }
+
+    public function pratinjauTema(Request $request, Undangan $undangan, Tema $tema): View
+    {
+        Gate::authorize('kelola', $undangan);
+
+        if (! $tema->aktif && (int) $undangan->tema_id !== (int) $tema->id) {
+            abort(404);
+        }
+
+        $undangan->load(['daftarAcara', 'daftarGaleri', 'daftarAmplop', 'bukuTamu']);
+
+        $pratinjau = clone $undangan;
+        $pratinjau->tema_id = $tema->id;
+        $pratinjau->setRelation('tema', $tema);
+
+        $lokasiView = $tema->lokasi_view ?: 'tema.rustic-floral.index';
+
+        return view($lokasiView, [
+            'undangan' => $pratinjau,
+            'namaTamu' => 'Tamu Undangan',
+            'modeDemo' => false,
+            'modePratinjau' => false,
+        ]);
+    }
+
+    public function gantiTema(Request $request, Undangan $undangan): RedirectResponse
+    {
+        Gate::authorize('kelola', $undangan);
+
+        $tabKembali = (string) $request->input('tab_kembali', 'tema');
+        if (! in_array($tabKembali, ['', 'tema', 'mempelai', 'acara', 'galeri', 'amplop', 'aktivasi'], true)) {
+            $tabKembali = 'tema';
+        }
+
+        if (! $undangan->bolehGantiTemaOleh($request->user())) {
+            return redirect()
+                ->route('dashboard.undangan.kelola', $undangan)
+                ->with('tab_aktif', $tabKembali)
+                ->withErrors([
+                    'tema_id' => $undangan->alasanTemaTerkunci() ?? 'Tema undangan yang sudah aktif tidak dapat diubah oleh client.',
+                ]);
+        }
+
+        $tervalidasi = $request->validate([
+            'tema_id' => ['required', 'integer', Rule::exists('tema', 'id')->where('aktif', true)],
+        ], [
+            'tema_id.required' => 'Silakan pilih tema terlebih dahulu.',
+            'tema_id.exists' => 'Tema tidak valid atau sedang tidak aktif.',
+        ]);
+
+        $tema = Tema::findOrFail((int) $tervalidasi['tema_id']);
+        $undangan->update(['tema_id' => $tema->id]);
+
+        return redirect()
+            ->route('dashboard.undangan.kelola', $undangan)
+            ->with('tab_aktif', $tabKembali)
+            ->with('sukses', "Tema berhasil diganti ke \"{$tema->nama_tema}\". Seluruh data undangan Anda tetap tersimpan aman.");
     }
 
     public function profil(Request $request): View
@@ -386,7 +452,7 @@ class DashboardUndanganController extends Controller
 
         if ($bagian === 'tema' || $bagian === 'semua') {
             $tervalidasi = $request->validate([
-                'tema_id' => ['required', 'exists:tema,id'],
+                'tema_id' => ['nullable', 'integer', 'exists:tema,id'],
                 'slug' => ['nullable', 'string', 'max:100'],
                 'musik_latar' => ['nullable', 'string', 'max:255'],
                 'gaya_font' => ['nullable', Rule::in(array_keys(Undangan::GAYA_FONT_TERSEDIA))],
@@ -420,7 +486,27 @@ class DashboardUndanganController extends Controller
                 }
             }
 
-            $undangan->tema_id = (int) $tervalidasi['tema_id'];
+            if (isset($tervalidasi['tema_id'])) {
+                $temaBaruId = (int) $tervalidasi['tema_id'];
+
+                if ($temaBaruId !== (int) $undangan->tema_id) {
+                    if (! $undangan->bolehGantiTemaOleh($request->user())) {
+                        return back()
+                            ->withErrors([
+                                'tema_id' => $undangan->alasanTemaTerkunci() ?? 'Tema undangan yang sudah aktif tidak dapat diubah oleh client.',
+                            ])
+                            ->with('tab_aktif', 'tema');
+                    }
+
+                    if (! Tema::where('id', $temaBaruId)->where('aktif', true)->exists()) {
+                        return back()
+                            ->withErrors(['tema_id' => 'Tema yang dipilih sedang tidak aktif.'])
+                            ->with('tab_aktif', 'tema');
+                    }
+
+                    $undangan->tema_id = $temaBaruId;
+                }
+            }
             if ($request->has('musik_latar')) {
                 $undangan->musik_latar = ($tervalidasi['musik_latar'] ?? null) ?: null;
             }

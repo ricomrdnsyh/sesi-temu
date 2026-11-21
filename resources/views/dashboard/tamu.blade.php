@@ -284,7 +284,7 @@
         ])
 
         <main class="flex-1 min-w-0">
-            <div class="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-28 lg:py-7 space-y-5">
+            <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-10 pt-5 pb-28 lg:py-7 space-y-5">
             {{-- Header Halaman & Tombol Tambah Tamu --}}
             <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
                 <div class="space-y-1 min-w-0">

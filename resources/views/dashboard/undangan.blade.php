@@ -60,11 +60,14 @@
             this.statusFilter = 'semua';
             this.kataCari = '';
         }
-    }" class="min-h-screen flex flex-col bg-ivory">
-        @include('dashboard._top-nav', ['halamanAktif' => 'dashboard'])
+    }" class="min-h-screen flex bg-ivory">
+        @include('dashboard._client-sidebar', ['halamanAktif' => 'dashboard'])
 
-        <main id="halaman-undangan-saya"
-            class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-28 md:py-8 space-y-5 md:space-y-6">
+        <div class="flex-1 min-w-0 flex flex-col">
+            @include('dashboard._top-nav', ['halamanAktif' => 'dashboard'])
+
+            <main id="halaman-undangan-saya"
+                class="flex-1 w-full px-4 sm:px-6 lg:px-8 xl:px-10 pt-4 sm:pt-6 pb-28 md:py-8 space-y-5 md:space-y-6">
             {{-- Hero Banner Hijau Sage + Overlapping Floating White Summary Dock --}}
             <section>
                 <div
@@ -104,15 +107,17 @@
                                 </p>
                             </div>
 
-                            <button type="button" @click="modalBuatBaru = true"
-                                class="hidden sm:inline-flex items-center justify-center gap-2 rounded-2xl bg-champagne px-5 py-3 text-sm font-bold text-charcoal shadow-md hover:bg-[#d1b26d] active:scale-95 transition cursor-pointer shrink-0">
+                            <a href="{{ route('dashboard.katalog') }}"
+                                class="hidden sm:inline-flex items-center justify-center gap-2 rounded-2xl bg-champagne px-5 py-3 text-sm font-bold text-charcoal shadow-md hover:bg-[#d1b26d] active:scale-95 transition shrink-0">
                                 <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M12 5v14" />
-                                    <path d="M5 12h14" />
+                                    stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8" />
+                                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                                    <path d="M19 16v6" />
+                                    <path d="M16 19h6" />
                                 </svg>
-                                <span>Buat Draft</span>
-                            </button>
+                                <span>Buat Baru</span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -199,7 +204,7 @@
                 </section>
 
                 {{-- Grid Kartu Undangan --}}
-                <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+                <section class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 sm:gap-5">
                     @foreach ($daftarUndangan as $undangan)
                         @php
                             $statusKode = $undangan->statusKode();
@@ -549,24 +554,23 @@
                         </p>
                     </div>
                     <div class="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-1">
-                        <button type="button" @click="modalBuatBaru = true"
-                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-sage px-6 py-3 text-xs sm:text-sm font-semibold text-white shadow-xs hover:bg-[#3b5047] active:scale-95 transition cursor-pointer">
+                        <a href="{{ route('dashboard.katalog') }}"
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-sage px-6 py-3 text-xs sm:text-sm font-semibold text-white shadow-xs hover:bg-[#3b5047] active:scale-95 transition">
                             <svg class="h-4 w-4 text-champagne shrink-0" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"
+                                stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
                                 aria-hidden="true">
-                                <path d="M12 5v14" />
-                                <path d="M5 12h14" />
+                                <path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8" />
+                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                                <path d="M19 16v6" />
+                                <path d="M16 19h6" />
                             </svg>
                             <span>Buat Draft Undangan Pertama</span>
-                        </button>
-                        <a href="{{ route('dashboard.katalog') }}"
-                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-champagne/45 bg-ivory px-6 py-3 text-xs sm:text-sm font-semibold text-charcoal hover:bg-champagne/10 active:scale-95 transition">
-                            <span>Jelajahi Katalog Tema</span>
                         </a>
                     </div>
                 </section>
             @endif
-        </main>
+            </main>
+        </div>
 
         @include('dashboard._bottom-nav', ['halamanAktif' => 'dashboard', 'modalBuatOnPage' => true])
 

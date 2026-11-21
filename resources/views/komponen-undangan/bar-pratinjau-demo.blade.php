@@ -1,4 +1,6 @@
-@if (!empty($modeDemo))
+@if (request()->boolean('embed'))
+    {{-- Mode embed di dalam Studio Ganti Tema: kanvas tema bersih tanpa bar melayang --}}
+@elseif (!empty($modeDemo))
     @php
         $demoTanpaFoto = $undangan->modeTanpaFoto();
         $demoFontTerpilih = $undangan->kodeGayaFontTerpilih();

@@ -1,6 +1,5 @@
 @php
     $halamanAktif = $halamanAktif ?? 'dashboard';
-    $modalBuatOnPage = $modalBuatOnPage ?? false;
     $undanganKonteks = $undanganKonteks ?? null;
     $dashboardAktifNav = in_array($halamanAktif, ['dashboard', 'undangan', 'beranda'], true);
 @endphp
@@ -10,7 +9,7 @@
     data-client-bottom-nav
     class="md:hidden fixed bottom-0 inset-x-0 z-40 rounded-t-2xl bg-white/96 backdrop-blur-lg border-t border-champagne/25 shadow-[0_-10px_30px_-12px_rgba(31,41,55,0.14)] pb-[env(safe-area-inset-bottom)]"
 >
-    <div class="max-w-lg mx-auto grid grid-cols-4 h-[66px] px-2 items-center">
+    <div class="max-w-lg mx-auto grid grid-cols-3 h-[66px] px-2 items-center">
         <a
             href="{{ route('dashboard.index') }}"
             data-client-nav="dashboard"
@@ -19,7 +18,7 @@
             @if ($dashboardAktifNav)
                 <span class="pointer-events-none absolute -top-1.5 h-1 w-6 rounded-b-full bg-sage"></span>
             @endif
-            <span class="inline-flex items-center justify-center rounded-full px-3.5 py-1 transition-all duration-200 {{ $dashboardAktifNav ? 'bg-sage/15 text-sage ring-1 ring-sage/20 shadow-2xs' : 'group-hover:bg-sage/10 group-hover:text-sage group-hover:-translate-y-0.5' }}">
+            <span class="inline-flex items-center justify-center rounded-full px-4 py-1 transition-all duration-200 {{ $dashboardAktifNav ? 'bg-sage/15 text-sage ring-1 ring-sage/20 shadow-2xs' : 'group-hover:bg-sage/10 group-hover:text-sage group-hover:-translate-y-0.5' }}">
                 @if ($undanganKonteks)
                     <svg class="h-[19px] w-[19px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $dashboardAktifNav ? '2.2' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -35,37 +34,6 @@
             <span class="text-[10px] leading-none transition-colors duration-200 group-hover:font-semibold">{{ $undanganKonteks ? 'Dashboard' : 'Undangan' }}</span>
         </a>
 
-        @if ($modalBuatOnPage)
-            <button
-                type="button"
-                @click="modalBuatBaru = true"
-                data-client-nav="buat"
-                class="group flex flex-col items-center justify-center gap-1 py-1 text-sage font-bold cursor-pointer active:scale-95 transition-all duration-200"
-            >
-                <span class="inline-flex items-center justify-center rounded-full bg-sage px-4 py-1 text-white shadow-sm group-hover:bg-[#3b5047] transition-all duration-200">
-                    <svg class="h-[19px] w-[19px] transition-transform duration-200 group-hover:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <line x1="12" x2="12" y1="5" y2="19" />
-                        <line x1="5" x2="19" y1="12" y2="12" />
-                    </svg>
-                </span>
-                <span class="text-[10px] leading-none">Buat Draft</span>
-            </button>
-        @else
-            <a
-                href="{{ route('dashboard.index', ['buat' => 1]) }}"
-                data-client-nav="buat"
-                class="group flex flex-col items-center justify-center gap-1 py-1 text-sage font-bold active:scale-95 transition-all duration-200"
-            >
-                <span class="inline-flex items-center justify-center rounded-full bg-sage px-4 py-1 text-white shadow-sm group-hover:bg-[#3b5047] transition-all duration-200">
-                    <svg class="h-[19px] w-[19px] transition-transform duration-200 group-hover:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <line x1="12" x2="12" y1="5" y2="19" />
-                        <line x1="5" x2="19" y1="12" y2="12" />
-                    </svg>
-                </span>
-                <span class="text-[10px] leading-none">Buat Draft</span>
-            </a>
-        @endif
-
         <a
             href="{{ route('dashboard.katalog') }}"
             data-client-nav="katalog"
@@ -74,16 +42,15 @@
             @if ($halamanAktif === 'katalog')
                 <span class="pointer-events-none absolute -top-1.5 h-1 w-6 rounded-b-full bg-sage"></span>
             @endif
-            <span class="inline-flex items-center justify-center rounded-full px-3.5 py-1 transition-all duration-200 {{ $halamanAktif === 'katalog' ? 'bg-sage/15 text-sage ring-1 ring-sage/20 shadow-2xs' : 'group-hover:bg-sage/10 group-hover:text-sage group-hover:-translate-y-0.5' }}">
-                <svg class="h-[19px] w-[19px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $halamanAktif === 'katalog' ? '2.2' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
-                    <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
-                    <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
-                    <circle cx="6.5" cy="12.5" r=".5" fill="currentColor" />
-                    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
+            <span class="inline-flex items-center justify-center rounded-full px-4 py-1 transition-all duration-200 {{ $halamanAktif === 'katalog' ? 'bg-sage text-white shadow-sm ring-1 ring-sage' : 'bg-sage/12 text-sage group-hover:bg-sage group-hover:text-white group-hover:-translate-y-0.5' }}">
+                <svg class="h-[19px] w-[19px] transition-transform duration-200 group-hover:scale-105" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $halamanAktif === 'katalog' ? '2.2' : '2' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8" />
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                    <path d="M19 16v6" />
+                    <path d="M16 19h6" />
                 </svg>
             </span>
-            <span class="text-[10px] leading-none transition-colors duration-200 group-hover:font-semibold">Katalog</span>
+            <span class="text-[10px] leading-none transition-colors duration-200 group-hover:font-semibold">Buat Baru</span>
         </a>
 
         <a
@@ -94,7 +61,7 @@
             @if ($halamanAktif === 'profil')
                 <span class="pointer-events-none absolute -top-1.5 h-1 w-6 rounded-b-full bg-sage"></span>
             @endif
-            <span class="inline-flex items-center justify-center rounded-full px-3.5 py-1 transition-all duration-200 {{ $halamanAktif === 'profil' ? 'bg-sage/15 text-sage ring-1 ring-sage/20 shadow-2xs' : 'group-hover:bg-sage/10 group-hover:text-sage group-hover:-translate-y-0.5' }}">
+            <span class="inline-flex items-center justify-center rounded-full px-4 py-1 transition-all duration-200 {{ $halamanAktif === 'profil' ? 'bg-sage/15 text-sage ring-1 ring-sage/20 shadow-2xs' : 'group-hover:bg-sage/10 group-hover:text-sage group-hover:-translate-y-0.5' }}">
                 <svg class="h-[19px] w-[19px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $halamanAktif === 'profil' ? '2.2' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <circle cx="12" cy="8" r="4" />
                     <path d="M20 21a8 8 0 0 0-16 0" />
