@@ -9,6 +9,12 @@
             galeriAktifKeterangan: '',
             rekeningTersalin: null,
             scrollPersen: 0,
+            teksHeroTampil: true,
+            videoHeroSedangIntro: false,
+            videoHeroGagal: false,
+            videoHeroSelesai: false,
+            timerAutoScrollHero: null,
+            timerWatchdogHero: null,
             autoScrollAktif: false,
             autoScrollPanelTerbuka: false,
             autoScrollToast: false,
@@ -21,6 +27,26 @@
             autoScrollJedaManual: false,
             init() {
                 document.body.classList.add('siap-3d');
+
+                if (this.$refs.heroVideo) {
+                    const kurangiGerak = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                    const modeEmbed = new URLSearchParams(window.location.search).get('embed') === '1';
+                    this.teksHeroTampil = kurangiGerak || modeEmbed;
+                    if (kurangiGerak || modeEmbed) {
+                        const vid = this.$refs.heroVideo;
+                        const lompatAkhir = () => {
+                            try {
+                                vid.currentTime = Math.min(15.5, (vid.duration || 16) - 0.5);
+                                vid.pause();
+                            } catch (e) {}
+                        };
+                        if (vid.readyState >= 1) {
+                            lompatAkhir();
+                        } else {
+                            vid.addEventListener('loadedmetadata', lompatAkhir, { once: true });
+                        }
+                    }
+                }
 
                 const panggungEls = Array.from(document.querySelectorAll('[data-panggung-3d]'));
                 const scrubEls = Array.from(document.querySelectorAll('[data-scroll-scrub]'));
@@ -82,8 +108,14 @@
                         if (this.$refs.pemutarAudio && this.musikBerputar) {
                             this.$refs.pemutarAudio.pause();
                         }
+                        if (this.$refs.heroVideo && !this.$refs.heroVideo.paused) {
+                            this.$refs.heroVideo.pause();
+                        }
                     } else if (this.$refs.pemutarAudio && this.musikBerputar && this.undanganTerbuka) {
                         this.$refs.pemutarAudio.play().catch(() => {});
+                    }
+                    if (!document.hidden && this.$refs.heroVideo && this.undanganTerbuka && this.videoHeroSedangIntro && !this.videoHeroSelesai) {
+                        this.$refs.heroVideo.play().catch(() => {});
                     }
                 });
 
@@ -246,16 +278,129 @@
                     }
                 }, 380);
 
-                // Aktifkan mode Auto-Scroll Cinema silky 60fps setelah koreografi diorama 3D selesai
+                // Aktifkan pemutaran video motion hero jika tersedia, lalu jadwalkan Auto-Scroll Cinema
                 const kurangiGerak = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
                 const modeEmbed = new URLSearchParams(window.location.search).get('embed') === '1';
-                if (!kurangiGerak && !modeEmbed) {
-                    window.setTimeout(() => {
-                        if (this.undanganTerbuka && !this.autoScrollJedaManual && window.scrollY < 40) {
-                            this.mulaiAutoScroll();
+
+                if (this.$refs.heroVideo && !this.videoHeroGagal) {
+                    const vid = this.$refs.heroVideo;
+                    this.videoHeroSelesai = false;
+
+                    if (kurangiGerak || modeEmbed) {
+                        this.teksHeroTampil = true;
+                        this.videoHeroSedangIntro = false;
+                        try {
+                            vid.currentTime = Math.min(15.5, (vid.duration || 16) - 0.5);
+                            vid.pause();
+                        } catch (e) {}
+                    } else {
+                        this.teksHeroTampil = false;
+                        this.videoHeroSedangIntro = true;
+                        try {
+                            vid.currentTime = 0;
+                        } catch (e) {}
+
+                        const janjiPutar = vid.play();
+                        if (janjiPutar && typeof janjiPutar.catch === 'function') {
+                            janjiPutar.catch(() => {
+                                this.videoHeroGagal = true;
+                                this.teksHeroTampil = true;
+                                this.videoHeroSedangIntro = false;
+                                this.jadwalkanAutoScrollSetelahVideo(3800);
+                            });
                         }
-                    }, 3800);
+
+                        if (this.timerWatchdogHero) {
+                            window.clearTimeout(this.timerWatchdogHero);
+                        }
+                        this.timerWatchdogHero = window.setTimeout(() => {
+                            if (!this.teksHeroTampil) {
+                                this.teksHeroTampil = true;
+                                this.videoHeroSedangIntro = false;
+                                this.jadwalkanAutoScrollSetelahVideo(3400);
+                            }
+                        }, 14800);
+                    }
+                } else if (!kurangiGerak && !modeEmbed) {
+                    this.jadwalkanAutoScrollSetelahVideo(3800);
                 }
+            },
+            pantauVideoHero(acara) {
+                const vid = acara?.target;
+                if (!vid || this.teksHeroTampil) {
+                    return;
+                }
+                const ambang = Number.parseFloat(vid.dataset.revealAt || '13.15');
+                if (vid.currentTime >= ambang) {
+                    this.teksHeroTampil = true;
+                    this.videoHeroSedangIntro = false;
+                    if (this.timerWatchdogHero) {
+                        window.clearTimeout(this.timerWatchdogHero);
+                        this.timerWatchdogHero = null;
+                    }
+                    this.jadwalkanAutoScrollSetelahVideo(3400);
+                }
+            },
+            selesaiVideoHero() {
+                this.teksHeroTampil = true;
+                this.videoHeroSedangIntro = false;
+                this.videoHeroSelesai = true;
+                if (this.timerWatchdogHero) {
+                    window.clearTimeout(this.timerWatchdogHero);
+                    this.timerWatchdogHero = null;
+                }
+            },
+            lewatiIntroVideo() {
+                const vid = this.$refs.heroVideo;
+                if (vid) {
+                    try {
+                        const titikSettled = Number.parseFloat(vid.dataset.settledAt || '14.5');
+                        vid.currentTime = Math.min(titikSettled, Math.max(0, (vid.duration || 19) - 0.5));
+                        vid.play().catch(() => {});
+                    } catch (e) {}
+                }
+                this.teksHeroTampil = true;
+                this.videoHeroSedangIntro = false;
+                if (this.timerWatchdogHero) {
+                    window.clearTimeout(this.timerWatchdogHero);
+                    this.timerWatchdogHero = null;
+                }
+                this.jadwalkanAutoScrollSetelahVideo(3200);
+            },
+            putarUlangVideoHero() {
+                const vid = this.$refs.heroVideo;
+                if (!vid) {
+                    return;
+                }
+                this.hentikanAutoScroll(true);
+                this.teksHeroTampil = false;
+                this.videoHeroSedangIntro = true;
+                this.videoHeroSelesai = false;
+                try {
+                    vid.currentTime = 0;
+                    vid.play().catch(() => {
+                        this.teksHeroTampil = true;
+                        this.videoHeroSedangIntro = false;
+                    });
+                } catch (e) {
+                    this.teksHeroTampil = true;
+                    this.videoHeroSedangIntro = false;
+                }
+            },
+            jadwalkanAutoScrollSetelahVideo(jedaMs = 3400) {
+                const kurangiGerak = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const modeEmbed = new URLSearchParams(window.location.search).get('embed') === '1';
+                if (kurangiGerak || modeEmbed) {
+                    return;
+                }
+                if (this.timerAutoScrollHero) {
+                    window.clearTimeout(this.timerAutoScrollHero);
+                }
+                this.timerAutoScrollHero = window.setTimeout(() => {
+                    if (this.undanganTerbuka && !this.autoScrollJedaManual && window.scrollY < 40) {
+                        this.mulaiAutoScroll();
+                    }
+                }, jedaMs);
             },
             mulaiAutoScroll() {
                 if (this.autoScrollAktif) {

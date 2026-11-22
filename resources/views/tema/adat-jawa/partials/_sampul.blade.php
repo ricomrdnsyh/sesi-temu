@@ -1,7 +1,7 @@
 {{-- SEKSI 1: SAMPUL FULL-BLEED BERSIH DENGAN TRANSISI FADE HALUS (TANPA BUKA BUKU) --}}
 <section
     data-transisi-sampul="fade-halus"
-    class="tirai-fade-halus fixed inset-0 mx-auto h-dvh w-full lg:w-[460px] xl:w-[490px] z-40 {{ $tampilBarDemo ? 'pt-28 sm:pt-20 lg:pt-14' : '' }}"
+    class="tirai-fade-halus tirai-jawa-cepat fixed inset-0 mx-auto h-dvh w-full lg:w-[460px] xl:w-[490px] z-40 {{ $tampilBarDemo ? 'pt-28 sm:pt-20 lg:pt-14' : '' }}"
     style="height: 100dvh;"
     :class="undanganTerbuka ? 'tirai-terbuka pointer-events-none' : ''"
 >

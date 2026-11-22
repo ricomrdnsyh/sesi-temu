@@ -11,6 +11,7 @@
         'kawungAtas' => asset('aset-tema/adat-jawa/motif-kawung-atas.webp'),
         'kawungBawah' => asset('aset-tema/adat-jawa/motif-kawung-bawah.webp'),
         'gununganKecil' => asset('aset-tema/adat-jawa/ornamen-gunungan.webp'),
+        'videoHero' => asset('aset-tema/adat-jawa/jawa-motion-hero.mp4'),
     ];
 
     $acaraPertama = $undangan->daftarAcara->first();
@@ -119,16 +120,16 @@
 
     $daftarUcapanAwal = $undangan->bukuTamu
         ->values()
-        ->map(static fn ($ucapan, int $idx) => [
-            'id' => 'awal-' . ($ucapan->id ?? ($idx + 1)),
-            'nama_tamu' => (string) $ucapan->nama_tamu,
-            'status_kehadiran' => (string) $ucapan->status_kehadiran,
-            'jumlah_tamu' => (int) ($ucapan->jumlah_tamu ?? 1),
-            'ucapan_doa' => (string) $ucapan->ucapan_doa,
-            'waktu' => $ucapan->created_at
-                ? $ucapan->created_at->locale('id')->diffForHumans()
-                : 'Baru saja',
-        ])
+        ->map(
+            static fn($ucapan, int $idx) => [
+                'id' => 'awal-' . ($ucapan->id ?? $idx + 1),
+                'nama_tamu' => (string) $ucapan->nama_tamu,
+                'status_kehadiran' => (string) $ucapan->status_kehadiran,
+                'jumlah_tamu' => (int) ($ucapan->jumlah_tamu ?? 1),
+                'ucapan_doa' => (string) $ucapan->ucapan_doa,
+                'waktu' => $ucapan->created_at ? $ucapan->created_at->locale('id')->diffForHumans() : 'Baru saja',
+            ],
+        )
         ->all();
 
     $tampilBarDemo = !empty($modeDemo) && !request()->boolean('embed');
@@ -142,6 +143,40 @@
 <head>
     @include('komponen-undangan.meta-opengraph')
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Hero Video Motion Pas 1 Layar HP & Desktop Anti-Zoom */
+        .jawa-hero-layar-penuh {
+            height: 100svh;
+            height: 100dvh;
+            min-height: 600px;
+        }
+        .jawa-hero-layar-penuh.dengan-bar-demo {
+            height: calc(100svh - 3.5rem);
+            height: calc(100dvh - 3.5rem);
+        }
+        html.desktop-triptych [data-kolom-undangan] .jawa-hero-layar-penuh {
+            height: var(--tinggi-tirai-dalam-inv, 100dvh) !important;
+            min-height: var(--tinggi-tirai-dalam-inv, 100dvh) !important;
+        }
+
+        /* Sampul Membuka Cepat & Halus Agar Gerbang Gunungan Video Langsung Terlihat Dari Detik 00:00 */
+        .tirai-fade-halus.tirai-jawa-cepat {
+            transition: opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0s;
+        }
+        .tirai-fade-halus.tirai-jawa-cepat.tirai-terbuka {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0.54s;
+        }
+
+        /* Kemunculan Tipografi Mempelai Tepat Di Dalam Bingkai Emas Video */
+        .jawa-video-teks {
+            transition:
+                opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 1.15s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: opacity, transform;
+        }
+    </style>
 </head>
 
 <body x-data="temaUndangan()" :class="undanganTerbuka ? 'overflow-x-hidden' : 'overflow-hidden h-screen'"
