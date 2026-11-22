@@ -35,14 +35,14 @@
 >
     @include('komponen-undangan.bar-pratinjau-demo')
 
-    <div class="min-h-screen w-full lg:flex">
+    <div data-tata-letak-tema class="min-h-screen w-full lg:flex">
         {{-- PANGGUNG VISUAL DESKTOP KIRI (SANCTUARY EMERALD SYAR'I) --}}
         @include('tema.islami-syari.partials._panggung-desktop')
 
-        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST --}}
-        <div class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-2xl border-l border-[#184D47]/20 bg-[#F4FAF6]">
+        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST (TERPUSAT DI TENGAH WEB) --}}
+        <div data-kolom-undangan class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-[0_0_70px_rgba(0,0,0,0.45)] lg:border-x border-[#BFA15F]/40 bg-[#F4FAF6]">
             {{-- Jendela Latar Sunlit Emerald Terpin --}}
-            <div aria-hidden="true" class="pointer-events-none fixed top-0 bottom-0 right-0 w-full lg:w-[460px] xl:w-[490px] z-0 overflow-hidden bg-[#F4FAF6]">
+            <div data-latar-undangan aria-hidden="true" class="pointer-events-none fixed inset-y-0 inset-x-0 mx-auto w-full lg:w-[460px] xl:w-[490px] z-0 overflow-hidden bg-[#F4FAF6]">
                 <img src="{{ $urlFotoLatar }}" alt="" class="w-full h-full object-cover object-center opacity-20">
                 <div class="absolute inset-0 bg-gradient-to-b from-[#F4FAF6]/80 via-[#F4FAF6]/55 to-[#E8F3EC]/85"></div>
             </div>
@@ -57,6 +57,9 @@
                 @include('tema.islami-syari.partials._penutup-dan-rsvp')
             </main>
         </div>
+
+        {{-- PANGGUNG VISUAL DESKTOP KANAN (SANCTUARY EMERALD KEEPSAKE) --}}
+        @include('tema.islami-syari.partials._panggung-desktop-kanan')
     </div>
 
     @include('komponen-undangan.kontrol-sinema')

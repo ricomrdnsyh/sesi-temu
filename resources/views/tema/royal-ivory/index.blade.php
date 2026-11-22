@@ -47,19 +47,19 @@
 >
     @include('komponen-undangan.bar-pratinjau-demo')
 
-    <div class="min-h-screen w-full lg:flex">
+    <div data-tata-letak-tema class="min-h-screen w-full lg:flex">
         {{-- PANGGUNG VISUAL DESKTOP KIRI (ROYAL CATHEDRAL LETTERPRESS) --}}
         @include('tema.royal-ivory.partials._panggung-desktop')
 
-        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST --}}
-        <div class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-2xl border-l border-[#9E7B4F]/35 bg-[#FBF8F3]">
+        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST (TERPUSAT DI TENGAH WEB) --}}
+        <div data-kolom-undangan class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-[0_0_70px_rgba(0,0,0,0.45)] lg:border-x border-[#9E7B4F]/45 bg-[#FBF8F3]">
             {{-- Progres Baca Perunggu --}}
-            <div aria-hidden="true" x-show="undanganTerbuka" x-cloak class="fixed top-0 lg:left-auto lg:w-[460px] xl:w-[490px] left-0 right-0 z-[60] h-[3px] bg-black/15">
+            <div data-progres-undangan aria-hidden="true" x-show="undanganTerbuka" x-cloak class="fixed top-0 inset-x-0 mx-auto w-full lg:w-[460px] xl:w-[490px] z-[60] h-[3px] bg-black/15">
                 <div class="h-full transition-all duration-150 bg-gradient-to-r from-[#9E7B4F] via-[#E5C99B] to-[#9E7B4F]" :style="'width: ' + scrollPersen + '%'"></div>
             </div>
 
             {{-- Jendela Kertas Surat Terpin --}}
-            <div aria-hidden="true" class="pointer-events-none fixed top-0 bottom-0 right-0 w-full lg:w-[460px] xl:w-[490px] z-0 overflow-hidden bg-[#FBF8F3]">
+            <div data-latar-undangan aria-hidden="true" class="pointer-events-none fixed inset-y-0 inset-x-0 mx-auto w-full lg:w-[460px] xl:w-[490px] z-0 overflow-hidden bg-[#FBF8F3]">
                 <img src="{{ $urlFotoLatar }}" alt="" class="w-full h-full object-cover object-center opacity-22">
                 <div class="absolute inset-0 bg-gradient-to-b from-[#FBF8F3]/75 via-[#FBF8F3]/50 to-[#EFE7DA]/80"></div>
             </div>
@@ -74,6 +74,9 @@
                 @include('tema.royal-ivory.partials._penutup-dan-rsvp')
             </main>
         </div>
+
+        {{-- PANGGUNG VISUAL DESKTOP KANAN (ROYAL CATHEDRAL KEEPSAKE) --}}
+        @include('tema.royal-ivory.partials._panggung-desktop-kanan')
     </div>
 
     @include('komponen-undangan.kontrol-sinema')

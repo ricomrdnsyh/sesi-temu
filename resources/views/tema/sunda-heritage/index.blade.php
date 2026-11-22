@@ -112,23 +112,24 @@
     class="bg-[#4A1717] text-[#4A2020] antialiased relative">
     @include('komponen-undangan.bar-pratinjau-demo')
 
-    <div class="min-h-screen w-full lg:flex">
+    <div data-tata-letak-tema class="min-h-screen w-full lg:flex">
         {{-- PANGGUNG VISUAL DESKTOP KIRI (PRIANGAN HERITAGE) --}}
         @include('tema.sunda-heritage.partials._panggung-desktop')
 
-        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST --}}
+        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST (TERPUSAT DI TENGAH WEB) --}}
         <div
-            class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-2xl border-l border-[#C59B43]/40 bg-[#FAF4E8]">
+            data-kolom-undangan
+            class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-[0_0_70px_rgba(0,0,0,0.5)] lg:border-x border-[#C59B43]/45 bg-[#FAF4E8]">
             {{-- Progres Baca Emas-Marun --}}
-            <div aria-hidden="true" x-show="undanganTerbuka" x-cloak
-                class="fixed top-0 lg:left-auto lg:w-[460px] xl:w-[490px] left-0 right-0 z-[60] h-[3px] bg-black/20">
+            <div data-progres-undangan aria-hidden="true" x-show="undanganTerbuka" x-cloak
+                class="fixed top-0 inset-x-0 mx-auto w-full lg:w-[460px] xl:w-[490px] z-[60] h-[3px] bg-black/20">
                 <div class="h-full transition-all duration-150 bg-gradient-to-r from-[#6E2C2C] via-[#C59B43] to-[#F3E5AB]"
                     :style="'width: ' + scrollPersen + '%'"></div>
             </div>
 
             {{-- Jendela Latar Terpin Priangan --}}
-            <div aria-hidden="true"
-                class="pointer-events-none fixed top-0 bottom-0 right-0 w-full lg:w-[460px] xl:w-[490px] z-0 overflow-hidden bg-[#F3E8D6]">
+            <div data-latar-undangan aria-hidden="true"
+                class="pointer-events-none fixed inset-y-0 inset-x-0 mx-auto w-full lg:w-[460px] xl:w-[490px] z-0 overflow-hidden bg-[#F3E8D6]">
                 <img src="{{ $urlFotoLatar }}" alt=""
                     class="w-full h-full object-cover object-center opacity-28">
                 <div class="absolute inset-0 bg-gradient-to-b from-[#FAF4E8]/70 via-[#FAF4E8]/45 to-[#FAF4E8]/75"></div>
@@ -144,6 +145,9 @@
                 @include('tema.sunda-heritage.partials._penutup-dan-rsvp')
             </main>
         </div>
+
+        {{-- PANGGUNG VISUAL DESKTOP KANAN (KEEPSAKE PRIANGAN HERITAGE) --}}
+        @include('tema.sunda-heritage.partials._panggung-desktop-kanan')
     </div>
 
     @include('komponen-undangan.kontrol-sinema')

@@ -57,16 +57,17 @@
     class="bg-[#111113] text-[#18181B] antialiased relative">
     @include('komponen-undangan.bar-pratinjau-demo')
 
-    <div class="min-h-screen w-full lg:flex">
+    <div data-tata-letak-tema class="min-h-screen w-full lg:flex">
         {{-- PANGGUNG VISUAL DESKTOP KIRI (VOGUE MONOCHROME SPREAD) --}}
         @include('tema.editorial-monokrom.partials._panggung-desktop')
 
-        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST (ZERO ROUNDED CORNERS) --}}
+        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST (TERPUSAT DI TENGAH WEB — ZERO ROUNDED CORNERS) --}}
         <div
-            class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-2xl border-l border-[#18181B]/25 bg-[#FAF9F6]">
+            data-kolom-undangan
+            class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-[0_0_70px_rgba(0,0,0,0.65)] lg:border-x border-white/25 bg-[#FAF9F6]">
             {{-- Progres Baca Hitam Tajam --}}
-            <div aria-hidden="true" x-show="undanganTerbuka" x-cloak
-                class="fixed top-0 lg:left-auto lg:w-[460px] xl:w-[490px] left-0 right-0 z-[60] h-[3px] bg-black/15">
+            <div data-progres-undangan aria-hidden="true" x-show="undanganTerbuka" x-cloak
+                class="fixed top-0 inset-x-0 mx-auto w-full lg:w-[460px] xl:w-[490px] z-[60] h-[3px] bg-black/15">
                 <div class="h-full transition-all duration-150 bg-[#18181B]" :style="'width: ' + scrollPersen + '%'">
                 </div>
             </div>
@@ -81,6 +82,9 @@
                 @include('tema.editorial-monokrom.partials._penutup-dan-rsvp')
             </main>
         </div>
+
+        {{-- PANGGUNG VISUAL DESKTOP KANAN (VOGUE MONOCHROME PROGRAM & PASS) --}}
+        @include('tema.editorial-monokrom.partials._panggung-desktop-kanan')
     </div>
 
     @include('komponen-undangan.kontrol-sinema')

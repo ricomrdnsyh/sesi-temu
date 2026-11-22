@@ -5,7 +5,7 @@
         $demoTanpaFoto = $undangan->modeTanpaFoto();
         $demoFontTerpilih = $undangan->kodeGayaFontTerpilih();
     @endphp
-    <div class="fixed top-0 inset-x-0 z-50 bg-charcoal/95 text-ivory border-b border-champagne/40 px-4 py-2 shadow-md">
+    <div data-bar-pratinjau class="fixed top-0 inset-x-0 z-50 bg-charcoal/95 text-ivory border-b border-champagne/40 px-4 py-2 shadow-md">
         <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
             <div class="flex flex-wrap items-center gap-2">
                 <a href="{{ route('beranda') }}" title="SesiTemu" class="inline-flex items-center rounded-full bg-[#FBF3E6] px-2.5 py-1 text-charcoal shrink-0">
@@ -63,7 +63,7 @@
         </div>
     </div>
 @elseif (!empty($modePratinjau) || ! $undangan->status_publikasi)
-    <div class="fixed top-0 inset-x-0 z-50 bg-amber-600 text-white px-4 py-2.5 shadow-md text-center text-xs sm:text-sm font-semibold tracking-wide">
+    <div data-bar-pratinjau class="fixed top-0 inset-x-0 z-50 bg-amber-600 text-white px-4 py-2.5 shadow-md text-center text-xs sm:text-sm font-semibold tracking-wide">
         <span>MODE PRATINJAU SESITEMU.ID — UNDANGAN BELUM AKTIF</span>
         <span class="hidden sm:inline font-normal opacity-95"> • Hanya terlihat oleh pemilik &amp; admin, tamu belum dapat mengakses link ini</span>
     </div>

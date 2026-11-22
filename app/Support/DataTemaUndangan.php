@@ -54,6 +54,29 @@ class DataTemaUndangan
         $turutPria = $undangan->turutMengundangPria();
         $adaTurutMengundang = ! empty($turutWanita) || ! empty($turutPria);
 
+        $galeriPanggungKanan = collect();
+        if (! $tanpaFoto) {
+            $galeriPanggungKanan = $undangan->daftarGaleri
+                ->take(3)
+                ->map(static fn ($item) => [
+                    'url' => $item->urlFoto(),
+                    'keterangan' => (string) ($item->keterangan ?? ''),
+                ])
+                ->filter(static fn ($item) => ! empty($item['url']))
+                ->values();
+
+            if ($galeriPanggungKanan->isEmpty()) {
+                foreach ([$urlFotoPembuka, $urlFotoPenutup] as $fotoAlternatif) {
+                    if (! empty($fotoAlternatif)) {
+                        $galeriPanggungKanan->push([
+                            'url' => $fotoAlternatif,
+                            'keterangan' => "{$undangan->nama_panggilan_pria} & {$undangan->nama_panggilan_wanita}",
+                        ]);
+                    }
+                }
+            }
+        }
+
         $isoTarget = null;
         $googleCalUrl = null;
         if ($acaraPertama) {
@@ -76,14 +99,14 @@ class DataTemaUndangan
             };
             $mulaiUtc = Carbon::parse("{$tanggalStr} {$waktuMulai}", $tz)->utc();
             $selesaiUtc = $acaraPertama->waktu_selesai
-                ? Carbon::parse("{$tanggalStr} ".$acaraPertama->waktu_selesai, $tz)->utc()
+                ? Carbon::parse("{$tanggalStr} " . $acaraPertama->waktu_selesai, $tz)->utc()
                 : $mulaiUtc->copy()->addHours(2);
 
             $googleCalUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
-                .'&text='.urlencode("Pernikahan {$undangan->nama_panggilan_pria} & {$undangan->nama_panggilan_wanita} ({$acaraPertama->nama_acara})")
-                .'&dates='.$mulaiUtc->format('Ymd\THis\Z').'/'.$selesaiUtc->format('Ymd\THis\Z')
-                .'&details='.urlencode("Undangan Pernikahan {$undangan->nama_lengkap_pria} & {$undangan->nama_lengkap_wanita} via SesiTemu.id")
-                .'&location='.urlencode($acaraPertama->nama_tempat.', '.$acaraPertama->alamat_lengkap);
+                . '&text=' . urlencode("Pernikahan {$undangan->nama_panggilan_pria} & {$undangan->nama_panggilan_wanita} ({$acaraPertama->nama_acara})")
+                . '&dates=' . $mulaiUtc->format('Ymd\THis\Z') . '/' . $selesaiUtc->format('Ymd\THis\Z')
+                . '&details=' . urlencode("Undangan Pernikahan {$undangan->nama_lengkap_pria} & {$undangan->nama_lengkap_wanita} via SesiTemu.id")
+                . '&location=' . urlencode($acaraPertama->nama_tempat . ', ' . $acaraPertama->alamat_lengkap);
         }
 
         return [
@@ -112,6 +135,7 @@ class DataTemaUndangan
             'turutWanita' => $turutWanita,
             'turutPria' => $turutPria,
             'adaTurutMengundang' => $adaTurutMengundang,
+            'galeriPanggungKanan' => $galeriPanggungKanan,
             'isoTarget' => $isoTarget,
             'googleCalUrl' => $googleCalUrl,
             'tampilBarDemo' => $modeDemo && ! request()->boolean('embed'),

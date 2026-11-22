@@ -1,7 +1,7 @@
 {{-- SAMPUL PEMBUKA ISLAMIC HEAVENLY (FADE HALUS) --}}
 <section
     data-transisi-sampul="fade-halus"
-    class="tirai-fade-halus fixed inset-0 h-dvh lg:left-auto lg:w-[460px] xl:w-[490px] z-40 {{ $tampilBarDemo ? 'pt-28 sm:pt-20 lg:pt-14' : '' }}"
+    class="tirai-fade-halus fixed inset-0 mx-auto h-dvh w-full lg:w-[460px] xl:w-[490px] z-40 {{ $tampilBarDemo ? 'pt-28 sm:pt-20 lg:pt-14' : '' }}"
     style="height: 100dvh;"
     :class="undanganTerbuka ? 'tirai-terbuka pointer-events-none' : ''"
 >

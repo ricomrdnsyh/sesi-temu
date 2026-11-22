@@ -55,7 +55,9 @@
                     if (!rafScroll) {
                         rafScroll = window.requestAnimationFrame(perbaruiScroll);
                     }
-                }, { passive: true });
+                }, {
+                    passive: true
+                });
                 perbaruiScroll();
 
                 // Jeda auto-scroll secara sopan bila tamu menggulir manual (wheel/sentuh)
@@ -64,8 +66,12 @@
                         this.hentikanAutoScroll(true);
                     }
                 };
-                window.addEventListener('wheel', jedaKarenaInteraksi, { passive: true });
-                window.addEventListener('touchstart', jedaKarenaInteraksi, { passive: true });
+                window.addEventListener('wheel', jedaKarenaInteraksi, {
+                    passive: true
+                });
+                window.addEventListener('touchstart', jedaKarenaInteraksi, {
+                    passive: true
+                });
 
                 // Jeda audio & auto-scroll otomatis saat pindah tab
                 document.addEventListener('visibilitychange', () => {
@@ -87,7 +93,8 @@
                 this.inisialisasiFxReveal();
             },
             inisialisasiParallax3D() {
-                const mediaKurangiGerak = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const mediaKurangiGerak = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)')
+                    .matches;
                 const mendukungHover = window.matchMedia && window.matchMedia('(hover: hover)').matches;
                 if (mediaKurangiGerak || !mendukungHover) {
                     return;
@@ -115,7 +122,9 @@
                                 panggung.style.setProperty('--py', targetY.toFixed(3));
                             });
                         }
-                    }, { passive: true });
+                    }, {
+                        passive: true
+                    });
 
                     panggung.addEventListener('pointerleave', () => {
                         panggung.style.setProperty('--px', '0');
@@ -144,7 +153,9 @@
                         kartu.classList.add('sedang-tilt');
                         kartu.style.setProperty('--rx', `${(-dy * 4.5).toFixed(2)}deg`);
                         kartu.style.setProperty('--ry', `${(dx * 5.2).toFixed(2)}deg`);
-                    }, { passive: true });
+                    }, {
+                        passive: true
+                    });
 
                     kartu.addEventListener('pointerleave', () => {
                         kartu.style.setProperty('--rx', '0deg');
@@ -167,12 +178,16 @@
                             observer.unobserve(entry.target);
                         }
                     });
-                }, { threshold: 0.08, rootMargin: '0px 0px -16px 0px' });
+                }, {
+                    threshold: 0.08,
+                    rootMargin: '0px 0px -16px 0px'
+                });
 
                 elemen.forEach((el) => observer.observe(el));
             },
             inisialisasiFxReveal() {
-                const selektor = '.fx-rise, .fx-rise-down, .fx-scale-in, .fx-scale-out, .fx-slide-left, .fx-slide-right, .fx-flip-in';
+                const selektor =
+                    '.fx-rise, .fx-rise-down, .fx-scale-in, .fx-scale-out, .fx-slide-left, .fx-slide-right, .fx-flip-in';
                 const elemen = document.querySelectorAll(selektor);
 
                 if (!('IntersectionObserver' in window)) {
@@ -192,7 +207,10 @@
                             observer.unobserve(entry.target);
                         }
                     });
-                }, { threshold: 0.08, rootMargin: '0px 0px -18px 0px' });
+                }, {
+                    threshold: 0.08,
+                    rootMargin: '0px 0px -18px 0px'
+                });
 
                 elemen.forEach((el) => observer.observe(el));
             },
@@ -215,7 +233,9 @@
                             el.classList.add('terlihat');
                         }
                     });
-                    document.querySelectorAll('.fx-rise, .fx-rise-down, .fx-scale-in, .fx-scale-out, .fx-slide-left, .fx-slide-right, .fx-flip-in').forEach((el) => {
+                    document.querySelectorAll(
+                        '.fx-rise, .fx-rise-down, .fx-scale-in, .fx-scale-out, .fx-slide-left, .fx-slide-right, .fx-flip-in'
+                    ).forEach((el) => {
                         const rect = el.getBoundingClientRect();
                         if (rect.top < window.innerHeight * 1.15) {
                             el.classList.add('active');
@@ -255,7 +275,11 @@
                 this.tampilkanToastAutoScroll();
 
                 // Kecepatan dalam piksel per detik (bebas jitter di layar 60Hz, 120Hz, maupun 144Hz)
-                const kecepatanPxPerDetik = { 1: 38, 2: 68, 3: 112 };
+                const kecepatanPxPerDetik = {
+                    1: 38,
+                    2: 68,
+                    3: 112
+                };
                 const langkah = (sekarang) => {
                     if (!this.autoScrollAktif) {
                         return;
@@ -274,7 +298,8 @@
 
                     this.autoScrollPosY = Math.min(
                         batasBawah,
-                        this.autoScrollPosY + (kecepatanPxPerDetik[this.kecepatanScroll] || 68) * faktorHalus * dt
+                        this.autoScrollPosY + (kecepatanPxPerDetik[this.kecepatanScroll] || 68) * faktorHalus *
+                        dt
                     );
                     window.scrollTo(0, this.autoScrollPosY);
                     this.autoScrollRaf = window.requestAnimationFrame(langkah);
@@ -300,7 +325,10 @@
                 } else {
                     const batasBawah = document.documentElement.scrollHeight - window.innerHeight - 10;
                     if (window.scrollY >= batasBawah) {
-                        window.scrollTo({ top: 0, behavior: 'auto' });
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'auto'
+                        });
                     }
                     this.mulaiAutoScroll();
                 }
@@ -323,7 +351,10 @@
             },
             gulirKeAtas() {
                 this.hentikanAutoScroll(true);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
             },
             toggleMusik() {
                 if (!this.$refs.pemutarAudio) {
@@ -353,6 +384,56 @@
                         this.rekeningTersalin = null;
                     }
                 }, 2500);
+            }
+        };
+    }
+
+    function galeriPanggung(daftarFoto = []) {
+        return {
+            daftar: Array.isArray(daftarFoto) ? daftarFoto : [],
+            indeks: 0,
+            init() {
+                if (this.daftar.length > 1) {
+                    window.setInterval(() => {
+                        if (!document.hidden) {
+                            this.indeks = (this.indeks + 1) % this.daftar.length;
+                        }
+                    }, 5500);
+                }
+            },
+            pilih(i) {
+                if (i >= 0 && i < this.daftar.length) {
+                    this.indeks = i;
+                }
+            },
+            aktif() {
+                return this.daftar[this.indeks] || null;
+            }
+        };
+    }
+
+    function hitungMundurPanggung(isoTarget) {
+        return {
+            targetMs: isoTarget ? new Date(isoTarget).getTime() : 0,
+            hari: '00',
+            jam: '00',
+            menit: '00',
+            detik: '00',
+            perbarui() {
+                if (!this.targetMs || Number.isNaN(this.targetMs)) {
+                    return;
+                }
+                const selisih = Math.max(0, this.targetMs - Date.now());
+                this.hari = String(Math.floor(selisih / 86400000)).padStart(2, '0');
+                this.jam = String(Math.floor((selisih % 86400000) / 3600000)).padStart(2, '0');
+                this.menit = String(Math.floor((selisih % 3600000) / 60000)).padStart(2, '0');
+                this.detik = String(Math.floor((selisih % 60000) / 1000)).padStart(2, '0');
+            },
+            init() {
+                this.perbarui();
+                if (this.targetMs && !Number.isNaN(this.targetMs)) {
+                    window.setInterval(() => this.perbarui(), 1000);
+                }
             }
         };
     }

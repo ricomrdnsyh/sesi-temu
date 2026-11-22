@@ -36,16 +36,17 @@
     class="bg-[#EFE6DA] text-[#1F2937] antialiased relative">
     @include('komponen-undangan.bar-pratinjau-demo')
 
-    <div class="min-h-screen w-full lg:flex">
+    <div data-tata-letak-tema class="min-h-screen w-full lg:flex">
         {{-- PANGGUNG VISUAL DESKTOP KIRI (WARM LINEN & BOTANICAL SCRAPBOOK) --}}
         @include('tema.rustic-floral.partials._panggung-desktop')
 
-        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST --}}
+        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST (TERPUSAT DI TENGAH WEB) --}}
         <div
-            class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-2xl border-l border-[#BFA15F]/35 bg-[#FDFBF7]">
+            data-kolom-undangan
+            class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-[0_0_70px_rgba(0,0,0,0.45)] lg:border-x border-[#BFA15F]/45 bg-[#FDFBF7]">
             {{-- Jendela Latar Linen Terpin --}}
-            <div aria-hidden="true"
-                class="pointer-events-none fixed top-0 bottom-0 right-0 w-full lg:w-[460px] xl:w-[490px] z-0 overflow-hidden bg-[#FDFBF7]">
+            <div data-latar-undangan aria-hidden="true"
+                class="pointer-events-none fixed inset-y-0 inset-x-0 mx-auto w-full lg:w-[460px] xl:w-[490px] z-0 overflow-hidden bg-[#FDFBF7]">
                 <img src="{{ $urlFotoLatar }}" alt="" class="w-full h-full object-cover object-center opacity-22">
                 <div class="absolute inset-0 bg-gradient-to-b from-[#FDFBF7]/78 via-[#FDFBF7]/50 to-[#F4ECE1]/82"></div>
             </div>
@@ -60,6 +61,9 @@
                 @include('tema.rustic-floral.partials._penutup-dan-rsvp')
             </main>
         </div>
+
+        {{-- PANGGUNG VISUAL DESKTOP KANAN (WARM LINEN & BOTANICAL KEEPSAKE) --}}
+        @include('tema.rustic-floral.partials._panggung-desktop-kanan')
     </div>
 
     @include('komponen-undangan.kontrol-sinema')

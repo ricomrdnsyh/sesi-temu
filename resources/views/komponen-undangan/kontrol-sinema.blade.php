@@ -12,7 +12,7 @@
     x-transition:leave="transition ease-in duration-200"
     x-transition:leave-start="opacity-100 translate-y-0"
     x-transition:leave-end="opacity-0 translate-y-2"
-    class="fixed bottom-5 left-1/2 -translate-x-1/2 lg:left-auto lg:translate-x-0 lg:right-[145px] xl:right-[160px] z-40"
+    class="fixed bottom-5 left-1/2 -translate-x-1/2 z-40"
 >
     <button
         type="button"

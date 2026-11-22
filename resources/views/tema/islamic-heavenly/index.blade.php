@@ -103,23 +103,24 @@
     class="bg-[#091322] text-[#E6EEF8] antialiased relative">
     @include('komponen-undangan.bar-pratinjau-demo')
 
-    <div class="min-h-screen w-full lg:flex">
+    <div data-tata-letak-tema class="min-h-screen w-full lg:flex">
         {{-- PANGGUNG VISUAL DESKTOP KIRI (CELESTIAL NIGHT SANCTUARY) --}}
         @include('tema.islamic-heavenly.partials._panggung-desktop')
 
-        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST --}}
+        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST (TERPUSAT DI TENGAH WEB) --}}
         <div
-            class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-2xl border-l border-[#D9B664]/35 bg-[#091322]">
+            data-kolom-undangan
+            class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-[0_0_70px_rgba(0,0,0,0.55)] lg:border-x border-[#D9B664]/40 bg-[#091322]">
             {{-- Progres Baca Emas Bintang --}}
-            <div aria-hidden="true" x-show="undanganTerbuka" x-cloak
-                class="fixed top-0 lg:left-auto lg:w-[460px] xl:w-[490px] left-0 right-0 z-[60] h-[3px] bg-black/40">
+            <div data-progres-undangan aria-hidden="true" x-show="undanganTerbuka" x-cloak
+                class="fixed top-0 inset-x-0 mx-auto w-full lg:w-[460px] xl:w-[490px] z-[60] h-[3px] bg-black/40">
                 <div class="h-full transition-all duration-150 bg-gradient-to-r from-[#B8903D] via-[#F3E5AB] to-[#D9B664]"
                     :style="'width: ' + scrollPersen + '%'"></div>
             </div>
 
             {{-- Jendela Langit Bintang Terpin --}}
-            <div aria-hidden="true"
-                class="pointer-events-none fixed top-0 bottom-0 right-0 w-full lg:w-[460px] xl:w-[490px] z-0 overflow-hidden bg-[#091322]">
+            <div data-latar-undangan aria-hidden="true"
+                class="pointer-events-none fixed inset-y-0 inset-x-0 mx-auto w-full lg:w-[460px] xl:w-[490px] z-0 overflow-hidden bg-[#091322]">
                 <img src="{{ $urlFotoLatar }}" alt=""
                     class="w-full h-full object-cover object-center opacity-35">
                 <div class="absolute inset-0 bg-gradient-to-b from-[#091322]/75 via-[#0E1B2A]/55 to-[#091322]/85"></div>
@@ -135,6 +136,9 @@
                 @include('tema.islamic-heavenly.partials._penutup-dan-rsvp')
             </main>
         </div>
+
+        {{-- PANGGUNG VISUAL DESKTOP KANAN (CELESTIAL NIGHT KEEPSAKE) --}}
+        @include('tema.islamic-heavenly.partials._panggung-desktop-kanan')
     </div>
 
     @include('komponen-undangan.kontrol-sinema')

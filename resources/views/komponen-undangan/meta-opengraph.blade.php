@@ -1290,4 +1290,221 @@
             transform: none !important;
         }
     }
+
+    /* === KUNCI SKALA ANTI-ZOOM KOLOM UNDANGAN TENGAH (TAMPILAN WEB/DESKTOP) === */
+    html.desktop-triptych [data-tata-letak-tema] {
+        display: flex !important;
+    }
+
+    html.desktop-triptych [data-tata-letak-tema] > aside {
+        display: flex !important;
+        flex: 1 1 0% !important;
+        min-width: 0 !important;
+        position: sticky !important;
+        top: 0 !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding-top: var(--tinggi-bar-demo-viewport, 0px) !important;
+    }
+
+    /* Kolom luar tidak memakai zoom agar elemen position:fixed di dalamnya tidak terkena bug koordinat Chrome 128+ */
+    html.desktop-triptych [data-kolom-undangan] {
+        box-sizing: content-box !important;
+        width: var(--lebar-kolom-viewport, 460px) !important;
+        flex-shrink: 0 !important;
+        border-left-width: 1px !important;
+        border-right-width: 1px !important;
+    }
+
+    html.desktop-triptych [data-kolom-undangan] > [data-progres-undangan] {
+        width: var(--lebar-kolom-viewport, 460px) !important;
+        left: 0 !important;
+        right: 0 !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    html.desktop-triptych [data-kolom-undangan] > [data-latar-undangan] {
+        width: var(--lebar-kolom-viewport, 460px) !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    html.desktop-triptych [data-kolom-undangan] > [data-latar-undangan] > [data-latar-zoom] {
+        width: var(--lebar-kolom-undangan, 460px) !important;
+        height: var(--tinggi-layar-inv, 100dvh) !important;
+        zoom: var(--inv-zoom, 1);
+    }
+
+    html.desktop-triptych [data-kolom-undangan] > [data-transisi-sampul] {
+        width: var(--lebar-kolom-viewport, 460px) !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        height: auto !important;
+        padding-top: var(--tinggi-bar-demo-viewport, 0px) !important;
+    }
+
+    html.desktop-triptych [data-kolom-undangan] > [data-transisi-sampul] > div {
+        width: var(--lebar-kolom-undangan, 460px) !important;
+        height: var(--tinggi-sampul-dalam-inv, 100%) !important;
+        zoom: var(--inv-zoom, 1);
+    }
+
+    html.desktop-triptych [data-kolom-undangan] > main[data-panggung-3d] {
+        width: var(--lebar-kolom-undangan, 460px) !important;
+        zoom: var(--inv-zoom, 1);
+        padding-top: var(--tinggi-bar-demo-inv, 0px) !important;
+    }
+
+    /* Jaga tinggi hero diorama tetap proporsional 1 layar normal saat browser di-zoom in/out */
+    html.desktop-triptych [data-kolom-undangan] section[data-diorama-3d].h-dvh {
+        height: var(--tinggi-layar-inv, 100dvh) !important;
+    }
+
+    html.desktop-triptych [data-kolom-undangan] section[data-diorama-3d][class*="min-h-[96dvh]"] {
+        min-height: calc(var(--tinggi-layar-inv, 100dvh) * 0.96) !important;
+    }
+
+    html.desktop-triptych [data-kolom-undangan] section[data-diorama-3d][class*="min-h-[96dvh]"] > div {
+        min-height: calc(var(--tinggi-layar-inv, 100dvh) * 0.96 - 2rem) !important;
+    }
 </style>
+<script>
+    (function () {
+        if (window.self !== window.top) {
+            return;
+        }
+
+        const root = document.documentElement;
+        const KUNCI_OS_DPR = 'sesitemu_os_dpr_v1';
+
+        function hitungSkalaOs(dpr, lebarLuar, lebarDalam) {
+            if (lebarLuar > 0 && lebarDalam > 0) {
+                const rasioLuar = lebarLuar / lebarDalam;
+                if (Math.abs(rasioLuar - 1) <= 0.03) {
+                    return dpr;
+                }
+                const estimasi = dpr / rasioLuar;
+                const dibulatkan = Math.round(estimasi * 4) / 4;
+                if (dibulatkan >= 1 && dibulatkan <= 3 && Math.abs(estimasi - dibulatkan) <= 0.14) {
+                    return dibulatkan;
+                }
+            }
+            return null;
+        }
+
+        function ambilSkalaOs(dpr, lebarLuar, lebarDalam) {
+            const terhitung = hitungSkalaOs(dpr, lebarLuar, lebarDalam);
+            if (terhitung !== null) {
+                try {
+                    sessionStorage.setItem(KUNCI_OS_DPR, String(terhitung));
+                } catch (e) {}
+                return terhitung;
+            }
+            try {
+                const tersimpan = Number.parseFloat(sessionStorage.getItem(KUNCI_OS_DPR) || '');
+                if (Number.isFinite(tersimpan) && tersimpan >= 1 && tersimpan <= 3) {
+                    return tersimpan;
+                }
+            } catch (e) {}
+            return 1;
+        }
+
+        function sinkronkanSkalaUndangan() {
+            const lebarDalam = window.innerWidth || root.clientWidth || 0;
+            const lebarKlien = root.clientWidth || lebarDalam;
+            const tinggiDalam = window.innerHeight || root.clientHeight || 0;
+            const dpr = window.devicePixelRatio || 1;
+
+            let lebarLuar = window.outerWidth || 0;
+            const availW = window.screen && window.screen.availWidth ? window.screen.availWidth : 0;
+            if (availW > 0 && lebarLuar > availW && lebarLuar - availW <= 32) {
+                lebarLuar = availW;
+            }
+
+            const osDpr = ambilSkalaOs(dpr, lebarLuar, lebarDalam);
+            let browserZoom = osDpr > 0 ? dpr / osDpr : 1;
+
+            if (Math.abs(browserZoom - 1) < 0.015) {
+                browserZoom = 1;
+            }
+            browserZoom = Math.max(0.25, Math.min(4, browserZoom));
+
+            const lebarTanpaZoom = lebarDalam * browserZoom;
+            const tinggiTanpaZoom = tinggiDalam * browserZoom;
+
+            if (lebarTanpaZoom >= 1024) {
+                const invZoom = Number((1 / browserZoom).toFixed(4));
+                const kolomEl = document.querySelector('[data-kolom-undangan]');
+                const lebarLg = Number.parseInt(kolomEl?.dataset.lebarLg || '460', 10) || 460;
+                const lebarXl = Number.parseInt(kolomEl?.dataset.lebarXl || '490', 10) || 490;
+                const lebarKolom = lebarTanpaZoom >= 1280 ? lebarXl : lebarLg;
+                const lebarViewport = Math.min(Math.max(320, lebarKlien - 2), lebarKolom * invZoom);
+
+                const barEl = document.querySelector('[data-bar-pratinjau]');
+                const tinggiBarViewport = barEl ? Math.ceil(barEl.getBoundingClientRect().height) : 0;
+                const tinggiBarInv = tinggiBarViewport / invZoom;
+                const tinggiSampulDalam = Math.max(320, (tinggiDalam - tinggiBarViewport) / invZoom);
+
+                root.classList.add('desktop-triptych');
+                root.style.setProperty('--browser-zoom', browserZoom.toFixed(4));
+                root.style.setProperty('--inv-zoom', String(invZoom));
+                root.style.setProperty('--lebar-kolom-undangan', `${lebarKolom}px`);
+                root.style.setProperty('--lebar-kolom-viewport', `${lebarViewport.toFixed(2)}px`);
+                root.style.setProperty('--tinggi-layar-inv', `${Math.round(tinggiTanpaZoom)}px`);
+                root.style.setProperty('--tinggi-bar-demo-viewport', `${tinggiBarViewport}px`);
+                root.style.setProperty('--tinggi-bar-demo-inv', `${tinggiBarInv.toFixed(2)}px`);
+                root.style.setProperty('--tinggi-sampul-dalam-inv', `${tinggiSampulDalam.toFixed(2)}px`);
+            } else {
+                root.classList.remove('desktop-triptych');
+                root.style.removeProperty('--browser-zoom');
+                root.style.removeProperty('--inv-zoom');
+                root.style.removeProperty('--lebar-kolom-undangan');
+                root.style.removeProperty('--lebar-kolom-viewport');
+                root.style.removeProperty('--tinggi-layar-inv');
+                root.style.removeProperty('--tinggi-bar-demo-viewport');
+                root.style.removeProperty('--tinggi-bar-demo-inv');
+                root.style.removeProperty('--tinggi-sampul-dalam-inv');
+            }
+        }
+
+        sinkronkanSkalaUndangan();
+        window.addEventListener('resize', sinkronkanSkalaUndangan, { passive: true });
+        window.addEventListener('load', sinkronkanSkalaUndangan);
+        document.addEventListener('DOMContentLoaded', () => {
+            sinkronkanSkalaUndangan();
+            const barEl = document.querySelector('[data-bar-pratinjau]');
+            if (barEl && 'ResizeObserver' in window) {
+                new ResizeObserver(sinkronkanSkalaUndangan).observe(barEl);
+            }
+        });
+
+        let mediaDpr = null;
+        function pantauDpr() {
+            if (mediaDpr && mediaDpr.removeEventListener) {
+                mediaDpr.removeEventListener('change', saatDprBerubah);
+            }
+            if (window.matchMedia) {
+                mediaDpr = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+                if (mediaDpr.addEventListener) {
+                    mediaDpr.addEventListener('change', saatDprBerubah);
+                }
+            }
+        }
+        function saatDprBerubah() {
+            sinkronkanSkalaUndangan();
+            pantauDpr();
+        }
+        pantauDpr();
+    })();
+</script>

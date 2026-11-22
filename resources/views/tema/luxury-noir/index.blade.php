@@ -86,23 +86,24 @@
     class="bg-[#09090D] text-[#F5EFE6] antialiased relative">
     @include('komponen-undangan.bar-pratinjau-demo')
 
-    <div class="min-h-screen w-full lg:flex">
+    <div data-tata-letak-tema class="min-h-screen w-full lg:flex">
         {{-- PANGGUNG VISUAL DESKTOP KIRI (BLACK-TIE ART DECO GALA) --}}
         @include('tema.luxury-noir.partials._panggung-desktop')
 
-        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST --}}
+        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST (TERPUSAT DI TENGAH WEB) --}}
         <div
-            class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-2xl border-l border-[#D4AF37]/35 bg-[#0B0B0F]">
+            data-kolom-undangan
+            class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-[0_0_70px_rgba(0,0,0,0.65)] lg:border-x border-[#D4AF37]/40 bg-[#0B0B0F]">
             {{-- Progres Baca Emas Art Deco --}}
-            <div aria-hidden="true" x-show="undanganTerbuka" x-cloak
-                class="fixed top-0 lg:left-auto lg:w-[460px] xl:w-[490px] left-0 right-0 z-[60] h-[3px] bg-black/50">
+            <div data-progres-undangan aria-hidden="true" x-show="undanganTerbuka" x-cloak
+                class="fixed top-0 inset-x-0 mx-auto w-full lg:w-[460px] xl:w-[490px] z-[60] h-[3px] bg-black/50">
                 <div class="h-full transition-all duration-150 bg-gradient-to-r from-[#B88928] via-[#F3E5AB] to-[#D4AF37]"
                     :style="'width: ' + scrollPersen + '%'"></div>
             </div>
 
             {{-- Jendela Latar Marmer Hitam Terpin --}}
-            <div aria-hidden="true"
-                class="pointer-events-none fixed top-0 bottom-0 right-0 w-full lg:w-[460px] xl:w-[490px] z-0 overflow-hidden bg-[#09090D]">
+            <div data-latar-undangan aria-hidden="true"
+                class="pointer-events-none fixed inset-y-0 inset-x-0 mx-auto w-full lg:w-[460px] xl:w-[490px] z-0 overflow-hidden bg-[#09090D]">
                 <img src="{{ $urlFotoLatar }}" alt=""
                     class="w-full h-full object-cover object-center opacity-30">
                 <div class="absolute inset-0 bg-gradient-to-b from-[#09090D]/80 via-[#0B0B0F]/65 to-[#09090D]/90"></div>
@@ -118,6 +119,9 @@
                 @include('tema.luxury-noir.partials._penutup-dan-rsvp')
             </main>
         </div>
+
+        {{-- PANGGUNG VISUAL DESKTOP KANAN (BLACK-TIE ART DECO KEEPSAKE) --}}
+        @include('tema.luxury-noir.partials._panggung-desktop-kanan')
     </div>
 
     @include('komponen-undangan.kontrol-sinema')

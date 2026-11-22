@@ -75,19 +75,19 @@
 >
     @include('komponen-undangan.bar-pratinjau-demo')
 
-    <div class="min-h-screen w-full lg:flex">
+    <div data-tata-letak-tema class="min-h-screen w-full lg:flex">
         {{-- PANGGUNG VISUAL DESKTOP KIRI (VICTORIAN CONSERVATORY TWILIGHT) --}}
         @include('tema.velvet-garden.partials._panggung-desktop')
 
-        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST --}}
-        <div class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-2xl border-l border-[#C8A464]/35 bg-[#1D3532]">
+        {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST (TERPUSAT DI TENGAH WEB) --}}
+        <div data-kolom-undangan class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-[0_0_70px_rgba(0,0,0,0.55)] lg:border-x border-[#C8A464]/40 bg-[#1D3532]">
             {{-- Progres Baca Emas Botani --}}
-            <div aria-hidden="true" x-show="undanganTerbuka" x-cloak class="fixed top-0 lg:left-auto lg:w-[460px] xl:w-[490px] left-0 right-0 z-[60] h-[3px] bg-black/30">
+            <div data-progres-undangan aria-hidden="true" x-show="undanganTerbuka" x-cloak class="fixed top-0 inset-x-0 mx-auto w-full lg:w-[460px] xl:w-[490px] z-[60] h-[3px] bg-black/30">
                 <div class="h-full transition-all duration-150 bg-gradient-to-r from-[#8D6F3A] via-[#F3DFA2] to-[#C8A464]" :style="'width: ' + scrollPersen + '%'"></div>
             </div>
 
             {{-- Jendela Taman Kaca Terpin --}}
-            <div aria-hidden="true" class="pointer-events-none fixed top-0 bottom-0 right-0 w-full lg:w-[460px] xl:w-[490px] z-0 overflow-hidden bg-[#132623]">
+            <div data-latar-undangan aria-hidden="true" class="pointer-events-none fixed inset-y-0 inset-x-0 mx-auto w-full lg:w-[460px] xl:w-[490px] z-0 overflow-hidden bg-[#132623]">
                 <img src="{{ $urlFotoLatar }}" alt="" class="w-full h-full object-cover object-center opacity-32">
                 <div class="absolute inset-0 bg-gradient-to-b from-[#132623]/70 via-[#1D3532]/50 to-[#132623]/80"></div>
             </div>
@@ -102,6 +102,9 @@
                 @include('tema.velvet-garden.partials._penutup-dan-rsvp')
             </main>
         </div>
+
+        {{-- PANGGUNG VISUAL DESKTOP KANAN (VICTORIAN CONSERVATORY KEEPSAKE) --}}
+        @include('tema.velvet-garden.partials._panggung-desktop-kanan')
     </div>
 
     @include('komponen-undangan.kontrol-sinema')
