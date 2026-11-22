@@ -258,17 +258,20 @@
         <h2 class="scroll-scrub-kiri mt-1 ed-serif text-3xl uppercase tracking-wide text-white">Editorial Galeri</h2>
     </div>
 
-    <div class="max-w-md mx-auto grid grid-cols-2 gap-3">
+    <div class="max-w-md mx-auto grid grid-cols-12 items-stretch gap-3">
         @foreach ($undangan->daftarGaleri as $galeri)
+            @php
+                $kelasTile = \App\Support\DataTemaUndangan::kelasGridGaleri($loop->index, $loop->count, 'editorial');
+            @endphp
             <button
                 type="button"
                 @click="bukaGaleri(@js($galeri->urlFoto()), @js($galeri->keterangan))"
-                class="fx-scale-in group relative overflow-hidden rounded-none border border-white/25 bg-black cursor-pointer kartu-3d {{ $loop->odd ? 'aspect-[3/4]' : 'aspect-square' }}"
+                class="fx-scale-in group relative overflow-hidden rounded-none border border-white/25 bg-black cursor-pointer kartu-3d {{ $kelasTile }}"
             >
                 <img
                     src="{{ $galeri->urlFoto() }}"
                     alt="{{ $galeri->keterangan ?? 'Editorial Portrait' }}"
-                    class="w-full h-full object-cover object-center grayscale group-hover:grayscale-0 group-hover:scale-105 transition duration-700"
+                    class="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 group-hover:scale-105 transition duration-700"
                 >
                 @if ($galeri->keterangan)
                     <span class="pointer-events-none absolute inset-x-0 bottom-0 bg-black/75 px-3 py-2 text-left text-[10px] uppercase tracking-wider text-white/90">

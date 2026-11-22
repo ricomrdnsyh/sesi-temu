@@ -138,7 +138,9 @@ class LogoBrandingTest extends TestCase
             ->assertOk()
             ->assertSee('favicon.png', false)
             ->assertSee('logo/logo-horizontal.webp', false)
-            ->assertSee('logo/logo-ikon.webp', false);
+            ->assertSee('logo/logo-gelap.webp', false)
+            ->assertSee('Made with', false)
+            ->assertSee('Sesi Temu', false);
     }
 
     /**

@@ -208,12 +208,12 @@ class HalamanUtamaController extends Controller
             'nama_lengkap_pria' => $dataDemo['pria']['lengkap'],
             'nama_ayah_pria' => $dataDemo['pria']['ayah'],
             'nama_ibu_pria' => $dataDemo['pria']['ibu'],
-            'foto_pria' => $tanpaFoto ? null : 'aset-demo/mempelai-pria.webp',
+            'foto_pria' => $tanpaFoto ? null : ($dataDemo['foto_pria'] ?? 'aset-demo/mempelai-pria.webp'),
             'nama_panggilan_wanita' => $dataDemo['wanita']['panggilan'],
             'nama_lengkap_wanita' => $dataDemo['wanita']['lengkap'],
             'nama_ayah_wanita' => $dataDemo['wanita']['ayah'],
             'nama_ibu_wanita' => $dataDemo['wanita']['ibu'],
-            'foto_wanita' => $tanpaFoto ? null : 'aset-demo/mempelai-wanita.webp',
+            'foto_wanita' => $tanpaFoto ? null : ($dataDemo['foto_wanita'] ?? 'aset-demo/mempelai-wanita.webp'),
             'kutipan_ayat' => $dataDemo['kutipan_ayat'],
             'musik_latar' => $dataDemo['musik_latar'],
             'pengaturan' => [
@@ -236,7 +236,9 @@ class HalamanUtamaController extends Controller
                     'pihak_wanita' => '',
                     'pihak_pria' => '',
                 ],
-                'cerita_cinta' => $dataDemo['cerita_cinta'],
+                'cerita_cinta' => $tanpaFoto
+                    ? collect($dataDemo['cerita_cinta'])->map(static fn (array $bab): array => collect($bab)->except('foto')->all())->all()
+                    : $dataDemo['cerita_cinta'],
                 'live_streaming' => $dataDemo['live_streaming'],
                 'alamat_kado_fisik' => $dataDemo['alamat_kado_fisik'],
                 'fitur_aktif' => [
@@ -296,7 +298,7 @@ class HalamanUtamaController extends Controller
                 'jumlah_tamu' => $ucapan['jumlah_tamu'],
                 'ucapan_doa' => $ucapan['ucapan_doa'],
             ]);
-            $item->created_at = now()->subHours(5 - ($idx * 2));
+            $item->created_at = now()->subMinutes(18 + ($idx * 53));
 
             return $item;
         }));

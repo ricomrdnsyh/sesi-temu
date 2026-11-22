@@ -469,18 +469,26 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-2 gap-3">
+    <div class="grid grid-cols-12 items-stretch gap-3">
         @foreach ($undangan->daftarGaleri as $galeri)
+            @php
+                $kelasTile = \App\Support\DataTemaUndangan::kelasGridGaleri($loop->index, $loop->count, 'keraton');
+            @endphp
             <button
                 type="button"
                 @click="bukaGaleri(@js($galeri->urlFoto()), @js($galeri->keterangan))"
-                class="fx-scale-in group relative aspect-[3/4] overflow-hidden rounded-2xl border border-[#D7BB83]/50 bg-[#2B180F] shadow-xl cursor-pointer kartu-3d"
+                class="fx-scale-in group relative overflow-hidden border border-[#D7BB83]/55 bg-[#2B180F] shadow-xl cursor-pointer kartu-3d {{ $kelasTile }}"
             >
                 <img
                     src="{{ $galeri->urlFoto() }}"
                     alt="{{ $galeri->keterangan ?? 'Galeri Foto' }}"
-                    class="w-full h-full object-cover group-hover:scale-105 transition duration-700"
+                    class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-700"
                 >
+                @if ($galeri->keterangan)
+                    <span class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#2B180F]/90 via-[#2B180F]/35 to-transparent px-3 py-2 text-left text-[10.5px] font-medium text-[#F5E9D6] opacity-0 group-hover:opacity-100 transition duration-300">
+                        {{ $galeri->keterangan }}
+                    </span>
+                @endif
             </button>
         @endforeach
     </div>

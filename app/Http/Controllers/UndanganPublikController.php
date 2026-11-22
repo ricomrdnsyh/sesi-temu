@@ -111,11 +111,12 @@ class UndanganPublikController extends Controller
         $tervalidasi = $request->validate([
             'nama_tamu' => ['required', 'string', 'max:100'],
             'status_kehadiran' => ['required', Rule::in(['hadir', 'tidak_hadir', 'ragu'])],
-            'jumlah_tamu' => ['required', 'integer', 'min:1', 'max:20'],
+            'jumlah_tamu' => ['nullable', 'required_if:status_kehadiran,hadir', 'integer', 'min:1', 'max:20'],
             'ucapan_doa' => ['required', 'string', 'max:1000'],
         ], [
             'nama_tamu.required' => 'Nama tamu wajib diisi.',
             'status_kehadiran.required' => 'Konfirmasi kehadiran wajib dipilih.',
+            'jumlah_tamu.required_if' => 'Jumlah tamu wajib diisi jika memilih hadir.',
             'ucapan_doa.required' => 'Ucapan & doa restu wajib diisi.',
         ]);
 
@@ -123,7 +124,9 @@ class UndanganPublikController extends Controller
             'undangan_id' => $undangan->id,
             'nama_tamu' => $tervalidasi['nama_tamu'],
             'status_kehadiran' => $tervalidasi['status_kehadiran'],
-            'jumlah_tamu' => (int) $tervalidasi['jumlah_tamu'],
+            'jumlah_tamu' => $tervalidasi['status_kehadiran'] === 'hadir'
+                ? (int) ($tervalidasi['jumlah_tamu'] ?? 1)
+                : 0,
             'ucapan_doa' => $tervalidasi['ucapan_doa'],
         ]);
 

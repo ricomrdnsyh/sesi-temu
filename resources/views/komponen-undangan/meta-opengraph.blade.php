@@ -1291,6 +1291,28 @@
         }
     }
 
+    .buku-tamu-scroll {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(191, 161, 95, 0.48) transparent;
+    }
+
+    .buku-tamu-scroll::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .buku-tamu-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .buku-tamu-scroll::-webkit-scrollbar-thumb {
+        background: rgba(191, 161, 95, 0.42);
+        border-radius: 9999px;
+    }
+
+    .buku-tamu-scroll::-webkit-scrollbar-thumb:hover {
+        background: rgba(191, 161, 95, 0.72);
+    }
+
     /* === KUNCI SKALA ANTI-ZOOM KOLOM UNDANGAN TENGAH (TAMPILAN WEB/DESKTOP) === */
     html.desktop-triptych [data-tata-letak-tema] {
         display: flex !important;
@@ -1356,7 +1378,7 @@
 
     html.desktop-triptych [data-kolom-undangan] > [data-transisi-sampul] > div {
         width: var(--lebar-kolom-undangan, 460px) !important;
-        height: var(--tinggi-sampul-dalam-inv, 100%) !important;
+        height: var(--tinggi-tirai-dalam-inv, 100%) !important;
         zoom: var(--inv-zoom, 1);
     }
 
@@ -1464,7 +1486,7 @@
                 root.style.setProperty('--tinggi-layar-inv', `${Math.round(tinggiTanpaZoom)}px`);
                 root.style.setProperty('--tinggi-bar-demo-viewport', `${tinggiBarViewport}px`);
                 root.style.setProperty('--tinggi-bar-demo-inv', `${tinggiBarInv.toFixed(2)}px`);
-                root.style.setProperty('--tinggi-sampul-dalam-inv', `${tinggiSampulDalam.toFixed(2)}px`);
+                root.style.setProperty('--tinggi-tirai-dalam-inv', `${tinggiSampulDalam.toFixed(2)}px`);
             } else {
                 root.classList.remove('desktop-triptych');
                 root.style.removeProperty('--browser-zoom');
@@ -1474,7 +1496,7 @@
                 root.style.removeProperty('--tinggi-layar-inv');
                 root.style.removeProperty('--tinggi-bar-demo-viewport');
                 root.style.removeProperty('--tinggi-bar-demo-inv');
-                root.style.removeProperty('--tinggi-sampul-dalam-inv');
+                root.style.removeProperty('--tinggi-tirai-dalam-inv');
             }
         }
 

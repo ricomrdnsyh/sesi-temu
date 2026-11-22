@@ -438,6 +438,81 @@
         };
     }
 
+    function bukuTamuDemo(ucapanAwal = [], namaDefault = '') {
+        return {
+            daftarUcapan: Array.isArray(ucapanAwal) ? ucapanAwal.slice() : [],
+            namaTamu: namaDefault && namaDefault !== 'Tamu Undangan' ? namaDefault : '',
+            statusKehadiran: 'hadir',
+            jumlahTamu: 1,
+            ucapanDoa: '',
+            pesanSukses: '',
+            pesanGalat: '',
+            labelStatus(kode) {
+                const peta = {
+                    hadir: 'Hadir',
+                    ragu: 'Masih Ragu',
+                    tidak_hadir: 'Tidak Hadir',
+                };
+                return peta[kode] || String(kode || 'Hadir').replaceAll('_', ' ');
+            },
+            kelasStatus(kode, gelap = false, defaultKelas = '') {
+                if (kode === 'tidak_hadir') {
+                    return gelap
+                        ? 'bg-red-500/20 text-red-300 border border-red-400/45'
+                        : 'bg-red-100 text-red-700 border border-red-200';
+                }
+                if (kode === 'ragu') {
+                    return gelap
+                        ? 'bg-amber-400/20 text-amber-300 border border-amber-400/45'
+                        : 'bg-amber-100 text-amber-800 border border-amber-200';
+                }
+                return defaultKelas || (gelap
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
+                    : 'bg-emerald-100 text-emerald-800 border border-emerald-200');
+            },
+            kirimUcapanDemo() {
+                const nama = String(this.namaTamu || '').trim();
+                const doa = String(this.ucapanDoa || '').trim();
+                const statusTerpilih = this.$refs.selectKehadiran
+                    ? String(this.$refs.selectKehadiran.value || 'hadir')
+                    : String(this.statusKehadiran || 'hadir');
+                this.statusKehadiran = statusTerpilih;
+                const jumlah = statusTerpilih === 'hadir'
+                    ? Math.max(1, Math.min(20, Number.parseInt(this.jumlahTamu, 10) || 1))
+                    : 0;
+
+                if (!nama || !doa) {
+                    this.pesanGalat = 'Mohon isi nama tamu serta ucapan & doa terlebih dahulu.';
+                    this.pesanSukses = '';
+                    return;
+                }
+
+                this.daftarUcapan.unshift({
+                    id: `demo-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+                    nama_tamu: nama,
+                    status_kehadiran: statusTerpilih,
+                    jumlah_tamu: jumlah,
+                    ucapan_doa: doa,
+                    waktu: 'Baru saja',
+                    baru: true,
+                });
+
+                this.ucapanDoa = '';
+                this.pesanGalat = '';
+                this.pesanSukses = 'Ucapan berhasil ditambahkan.';
+
+                this.$nextTick(() => {
+                    if (this.$refs.daftarUcapanScroll) {
+                        this.$refs.daftarUcapanScroll.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            },
+        };
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         if (window.AOS && document.querySelector('[data-aos]')) {
             window.AOS.init({

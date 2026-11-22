@@ -206,21 +206,25 @@
         <h2 class="scroll-scrub-kiri mt-1.5 font-serif text-3xl font-bold">{{ $labelGaleri }}</h2>
     </div>
 
-    <div class="grid grid-cols-2 gap-3.5">
+    <div class="grid grid-cols-12 items-stretch gap-3">
         @foreach ($undangan->daftarGaleri as $galeri)
             @php
-                $adalahUnggulan = ($gayaGaleri === 'unggulan' && $loop->first)
-                    || ($gayaTataLetak === 'priangan' && ($loop->index % 3 === 0));
+                $polaGrid = match ($gayaTataLetak) {
+                    'editorial' => 'editorial',
+                    'keraton' => 'keraton',
+                    'priangan' => 'priangan',
+                    'mihrab', 'celestial', 'katedral' => 'mihrab',
+                    default => 'bento',
+                };
+                $kelasTile = \App\Support\DataTemaUndangan::kelasGridGaleri($loop->index, $loop->count, $polaGrid);
+                $adalahUnggulan = str_contains($kelasTile, 'col-span-12');
 
                 $bentukGaleri = match (true) {
-                    $gayaGaleri === 'unggulan' && $loop->first => 'col-span-2 aspect-[16/10] rounded-3xl',
-                    $gayaTataLetak === 'priangan' && ($loop->index % 3 === 0) => 'col-span-2 aspect-[16/10] rounded-t-[3.5rem] rounded-b-2xl',
-                    $gayaTataLetak === 'editorial' => $loop->odd ? 'aspect-[3/4] rounded-none' : 'aspect-square rounded-none',
-                    $gayaTataLetak === 'taman' => 'aspect-[4/5] rounded-2xl bg-white p-1.5 pb-6 shadow-xl '.($loop->odd ? 'polaroid-3d-kiri' : 'polaroid-3d-kanan'),
-                    $gayaTataLetak === 'katedral' => 'aspect-[4/5] rounded-t-[3.5rem] rounded-b-2xl border-2',
-                    $gayaTataLetak === 'celestial' => 'aspect-[4/5] rounded-t-[3rem] rounded-b-2xl border',
-                    $gayaTataLetak === 'keraton' => 'aspect-[4/5] rounded-2xl border-2 border-[#D7BB83]/65 bg-[#FCF7EB]/10 p-1',
-                    default => 'aspect-square rounded-2xl',
+                    $gayaTataLetak === 'taman' && ! $adalahUnggulan => $kelasTile.' rounded-2xl bg-white p-1.5 pb-6 shadow-xl '.($loop->odd ? 'polaroid-3d-kiri' : 'polaroid-3d-kanan'),
+                    $gayaTataLetak === 'keraton' => $kelasTile.' border-2 border-[#D7BB83]/65 bg-[#FCF7EB]/10 p-1',
+                    $gayaTataLetak === 'editorial' => $kelasTile,
+                    str_contains($kelasTile, 'rounded-') => $kelasTile,
+                    default => $kelasTile.' rounded-2xl',
                 };
             @endphp
 
@@ -232,7 +236,7 @@
                 <img
                     src="{{ $galeri->urlFoto() }}"
                     alt="{{ $galeri->keterangan ?? 'Galeri' }}"
-                    class="w-full h-full object-cover {{ $gayaTataLetak === 'taman' || $gayaTataLetak === 'keraton' ? 'rounded-xl' : '' }} group-hover:scale-105 transition duration-700 {{ $modeMonokrom ? 'grayscale group-hover:grayscale-0' : '' }}"
+                    class="w-full h-full object-cover object-top {{ $gayaTataLetak === 'taman' || $gayaTataLetak === 'keraton' ? 'rounded-xl' : '' }} group-hover:scale-105 transition duration-700 {{ $modeMonokrom ? 'grayscale group-hover:grayscale-0' : '' }}"
                 >
                 @if ($gayaTataLetak === 'taman' && ! $adalahUnggulan)
                     <span class="pointer-events-none absolute inset-x-2 bottom-1 text-center text-[10px] font-kaligrafi text-[#1F3431] truncate">

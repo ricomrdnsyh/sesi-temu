@@ -50,19 +50,21 @@
         : $undangan->daftarGaleri->take(3)->map(static fn($item) => $item->urlFoto())->filter()->values();
 
     $galeriPanggungKanan = collect();
-    if (! $tanpaFoto) {
+    if (!$tanpaFoto) {
         $galeriPanggungKanan = $undangan->daftarGaleri
             ->take(3)
-            ->map(static fn ($item) => [
-                'url' => $item->urlFoto(),
-                'keterangan' => (string) ($item->keterangan ?? ''),
-            ])
-            ->filter(static fn ($item) => ! empty($item['url']))
+            ->map(
+                static fn($item) => [
+                    'url' => $item->urlFoto(),
+                    'keterangan' => (string) ($item->keterangan ?? ''),
+                ],
+            )
+            ->filter(static fn($item) => !empty($item['url']))
             ->values();
 
         if ($galeriPanggungKanan->isEmpty()) {
             foreach ([$urlFotoPembuka, $urlFotoPenutup] as $fotoAlternatif) {
-                if (! empty($fotoAlternatif)) {
+                if (!empty($fotoAlternatif)) {
                     $galeriPanggungKanan->push([
                         'url' => $fotoAlternatif,
                         'keterangan' => "{$undangan->nama_panggilan_pria} & {$undangan->nama_panggilan_wanita}",
@@ -114,6 +116,20 @@
             '&location=' .
             urlencode($acaraPertama->nama_tempat . ', ' . $acaraPertama->alamat_lengkap);
     }
+
+    $daftarUcapanAwal = $undangan->bukuTamu
+        ->values()
+        ->map(static fn ($ucapan, int $idx) => [
+            'id' => 'awal-' . ($ucapan->id ?? ($idx + 1)),
+            'nama_tamu' => (string) $ucapan->nama_tamu,
+            'status_kehadiran' => (string) $ucapan->status_kehadiran,
+            'jumlah_tamu' => (int) ($ucapan->jumlah_tamu ?? 1),
+            'ucapan_doa' => (string) $ucapan->ucapan_doa,
+            'waktu' => $ucapan->created_at
+                ? $ucapan->created_at->locale('id')->diffForHumans()
+                : 'Baru saja',
+        ])
+        ->all();
 
     $tampilBarDemo = !empty($modeDemo) && !request()->boolean('embed');
     $modeDemo = $modeDemo ?? false;

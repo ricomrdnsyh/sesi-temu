@@ -80,60 +80,116 @@
         </div>
 
         @if (! empty($modeDemo))
-            <div class="rounded-2xl bg-[#FBF8F3] border border-[#9E7B4F]/40 px-4 py-3 text-center text-xs font-semibold text-[#58432B]">
-                Mode Live Demo — Formulir RSVP &amp; Ucapan aktif penuh setelah undangan dipublikasikan.
-            </div>
-        @elseif (! empty($modePratinjau) || ! $undangan->sudahAktifPublik())
-            <div class="rounded-2xl bg-[#FBF8F3] border border-[#9E7B4F]/40 px-4 py-3 text-center text-xs font-semibold text-[#58432B]">
-                Mode Pratinjau — Buku Tamu &amp; RSVP Dikunci
+            <div x-data="bukuTamuDemo(@js($daftarUcapanAwal), @js($namaTamu))" class="space-y-5">
+                <form @submit.prevent="kirimUcapanDemo()" class="space-y-3.5 text-left">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-[#58432B]/80">Nama Tamu</label>
+                        <input type="text" x-model="namaTamu" required placeholder="Masukkan nama Anda" class="mt-1 w-full rounded-xl border border-[#9E7B4F]/45 bg-[#FBF8F3] px-3.5 py-2.5 text-sm">
+                    </div>
+                    <div class="grid gap-3" :class="statusKehadiran === 'hadir' ? 'grid-cols-2' : 'grid-cols-1'">
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#58432B]/80">Kehadiran</label>
+                            <select x-ref="selectKehadiran" x-model="statusKehadiran" @change="statusKehadiran = $event.target.value" class="mt-1 w-full rounded-xl border border-[#9E7B4F]/45 bg-[#FBF8F3] px-3 py-2.5 text-sm">
+                                <option value="hadir">Hadir</option>
+                                <option value="ragu">Masih Ragu</option>
+                                <option value="tidak_hadir">Berhalangan</option>
+                            </select>
+                        </div>
+                        <div x-show="statusKehadiran === 'hadir'" x-cloak>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#58432B]/80">Jumlah</label>
+                            <input type="number" x-model.number="jumlahTamu" min="1" max="20" :required="statusKehadiran === 'hadir'" :disabled="statusKehadiran !== 'hadir'" class="mt-1 w-full rounded-xl border border-[#9E7B4F]/45 bg-[#FBF8F3] px-3.5 py-2.5 text-sm">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-[#58432B]/80">Ucapan &amp; Doa</label>
+                        <textarea x-model="ucapanDoa" rows="3" required placeholder="Tuliskan doa terbaik untuk kedua mempelai..." class="mt-1 w-full rounded-xl border border-[#9E7B4F]/45 bg-[#FBF8F3] px-3.5 py-2.5 text-sm"></textarea>
+                    </div>
+                    <button type="submit" class="royal-tombol w-full rounded-full py-3 text-xs font-bold uppercase tracking-wider transition cursor-pointer">
+                        Kirim Konfirmasi &amp; Doa
+                    </button>
+                    <p x-show="pesanGalat" x-cloak x-text="pesanGalat" class="text-xs font-semibold text-rose-700 text-center"></p>
+                    <p x-show="pesanSukses" x-cloak x-text="pesanSukses" class="rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2 text-[11px] font-semibold text-emerald-800 text-center"></p>
+                </form>
+
+                <div class="pt-4 border-t border-[#9E7B4F]/30 space-y-3">
+                    <div class="flex items-center justify-between gap-2">
+                        <h3 class="font-serif text-base font-bold text-[#3B2E25]">
+                            Doa &amp; Ucapan (<span x-text="daftarUcapan.length">{{ count($daftarUcapanAwal) }}</span>)
+                        </h3>
+                        <span class="text-[10px] uppercase tracking-wider text-[#9E7B4F]">Gulir untuk lainnya</span>
+                    </div>
+                    <div x-ref="daftarUcapanScroll" class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
+                        <template x-for="ucapan in daftarUcapan" :key="ucapan.id">
+                            <div
+                                class="rounded-2xl bg-[#FBF8F3] border p-3.5 space-y-1.5 transition"
+                                :class="ucapan.baru ? 'border-[#7B603F]/65 ring-1 ring-[#9E7B4F]/30' : 'border-[#9E7B4F]/25'"
+                            >
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="font-bold text-xs text-[#3B2E25]" x-text="ucapan.nama_tamu"></p>
+                                    <span class="shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-semibold" :class="kelasStatus(ucapan.status_kehadiran, false, 'bg-[#9E7B4F]/15 text-[#7B603F]')" x-text="labelStatus(ucapan.status_kehadiran)"></span>
+                                </div>
+                                <p class="text-xs text-[#3B2E25]/80 leading-relaxed" x-text="ucapan.ucapan_doa"></p>
+                                <p class="text-[10px] text-[#9E7B4F]/80" x-text="ucapan.waktu"></p>
+                            </div>
+                        </template>
+                    </div>
+                </div>
             </div>
         @else
-            <form method="POST" action="{{ route('undangan.ucapan', $undangan->slug) }}" class="space-y-3.5 text-left">
-                @csrf
-                <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-[#58432B]/80">Nama Tamu</label>
-                    <input type="text" name="nama_tamu" value="{{ old('nama_tamu', $namaTamu !== 'Tamu Undangan' ? $namaTamu : '') }}" required class="mt-1 w-full rounded-xl border border-[#9E7B4F]/45 bg-[#FBF8F3] px-3.5 py-2.5 text-sm">
+            @if (! empty($modePratinjau) || ! $undangan->sudahAktifPublik())
+                <div class="rounded-2xl bg-[#FBF8F3] border border-[#9E7B4F]/40 px-4 py-3 text-center text-xs font-semibold text-[#58432B]">
+                    Mode Pratinjau — Buku Tamu &amp; RSVP Dikunci
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+            @else
+                <form x-data="{ statusKehadiran: @js(old('status_kehadiran', 'hadir')) }" method="POST" action="{{ route('undangan.ucapan', $undangan->slug) }}" class="space-y-3.5 text-left">
+                    @csrf
                     <div>
-                        <label class="block text-[11px] font-bold uppercase tracking-wider text-[#58432B]/80">Kehadiran</label>
-                        <select name="status_kehadiran" class="mt-1 w-full rounded-xl border border-[#9E7B4F]/45 bg-[#FBF8F3] px-3 py-2.5 text-sm">
-                            <option value="hadir">Hadir</option>
-                            <option value="ragu">Masih Ragu</option>
-                            <option value="tidak_hadir">Berhalangan</option>
-                        </select>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-[#58432B]/80">Nama Tamu</label>
+                        <input type="text" name="nama_tamu" value="{{ old('nama_tamu', $namaTamu !== 'Tamu Undangan' ? $namaTamu : '') }}" required class="mt-1 w-full rounded-xl border border-[#9E7B4F]/45 bg-[#FBF8F3] px-3.5 py-2.5 text-sm">
+                    </div>
+                    <div class="grid gap-3" :class="statusKehadiran === 'hadir' ? 'grid-cols-2' : 'grid-cols-1'">
+                        <div>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#58432B]/80">Kehadiran</label>
+                            <select name="status_kehadiran" x-model="statusKehadiran" @change="statusKehadiran = $event.target.value" class="mt-1 w-full rounded-xl border border-[#9E7B4F]/45 bg-[#FBF8F3] px-3 py-2.5 text-sm">
+                                <option value="hadir" @selected(old('status_kehadiran', 'hadir') === 'hadir')>Hadir</option>
+                                <option value="ragu" @selected(old('status_kehadiran') === 'ragu')>Masih Ragu</option>
+                                <option value="tidak_hadir" @selected(old('status_kehadiran') === 'tidak_hadir')>Berhalangan</option>
+                            </select>
+                        </div>
+                        <div x-show="statusKehadiran === 'hadir'" x-cloak>
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#58432B]/80">Jumlah</label>
+                            <input type="number" name="jumlah_tamu" value="{{ old('jumlah_tamu', 1) }}" min="1" max="20" :required="statusKehadiran === 'hadir'" :disabled="statusKehadiran !== 'hadir'" class="mt-1 w-full rounded-xl border border-[#9E7B4F]/45 bg-[#FBF8F3] px-3.5 py-2.5 text-sm">
+                        </div>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold uppercase tracking-wider text-[#58432B]/80">Jumlah</label>
-                        <input type="number" name="jumlah_tamu" value="{{ old('jumlah_tamu', 1) }}" min="1" max="20" required class="mt-1 w-full rounded-xl border border-[#9E7B4F]/45 bg-[#FBF8F3] px-3.5 py-2.5 text-sm">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-[#58432B]/80">Ucapan &amp; Doa</label>
+                        <textarea name="ucapan_doa" rows="3" required placeholder="Tuliskan doa terbaik untuk kedua mempelai..." class="mt-1 w-full rounded-xl border border-[#9E7B4F]/45 bg-[#FBF8F3] px-3.5 py-2.5 text-sm">{{ old('ucapan_doa') }}</textarea>
                     </div>
-                </div>
-                <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-[#58432B]/80">Ucapan &amp; Doa</label>
-                    <textarea name="ucapan_doa" rows="3" required placeholder="Tuliskan doa terbaik untuk kedua mempelai..." class="mt-1 w-full rounded-xl border border-[#9E7B4F]/45 bg-[#FBF8F3] px-3.5 py-2.5 text-sm">{{ old('ucapan_doa') }}</textarea>
-                </div>
-                <button type="submit" class="royal-tombol w-full rounded-full py-3 text-xs font-bold uppercase tracking-wider transition cursor-pointer">
-                    Kirim Konfirmasi &amp; Doa
-                </button>
-            </form>
-        @endif
+                    <button type="submit" class="royal-tombol w-full rounded-full py-3 text-xs font-bold uppercase tracking-wider transition cursor-pointer">
+                        Kirim Konfirmasi &amp; Doa
+                    </button>
+                </form>
+            @endif
 
-        <div class="pt-4 border-t border-[#9E7B4F]/30 space-y-3">
-            <h3 class="font-serif text-base font-bold text-[#3B2E25]">Doa &amp; Ucapan ({{ $undangan->bukuTamu->count() }})</h3>
-            @forelse ($undangan->bukuTamu as $ucapan)
-                <div class="rounded-2xl bg-[#FBF8F3] border border-[#9E7B4F]/25 p-3.5 space-y-1">
-                    <div class="flex items-center justify-between gap-2">
-                        <p class="font-bold text-xs text-[#3B2E25]">{{ $ucapan->nama_tamu }}</p>
-                        <span class="rounded-full bg-[#9E7B4F]/15 px-2.5 py-0.5 text-[10px] font-semibold text-[#7B603F]">
-                            {{ str_replace('_', ' ', ucfirst($ucapan->status_kehadiran)) }}
-                        </span>
-                    </div>
-                    <p class="text-xs text-[#3B2E25]/80 leading-relaxed">{{ $ucapan->ucapan_doa }}</p>
+            <div class="pt-4 border-t border-[#9E7B4F]/30 space-y-3">
+                <h3 class="font-serif text-base font-bold text-[#3B2E25]">Doa &amp; Ucapan ({{ $undangan->bukuTamu->count() }})</h3>
+                <div class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
+                    @forelse ($undangan->bukuTamu as $ucapan)
+                        <div class="rounded-2xl bg-[#FBF8F3] border border-[#9E7B4F]/25 p-3.5 space-y-1">
+                            <div class="flex items-center justify-between gap-2">
+                                <p class="font-bold text-xs text-[#3B2E25]">{{ $ucapan->nama_tamu }}</p>
+                                <span class="rounded-full bg-[#9E7B4F]/15 px-2.5 py-0.5 text-[10px] font-semibold text-[#7B603F]">
+                                    {{ str_replace('_', ' ', ucfirst($ucapan->status_kehadiran)) }}
+                                </span>
+                            </div>
+                            <p class="text-xs text-[#3B2E25]/80 leading-relaxed">{{ $ucapan->ucapan_doa }}</p>
+                        </div>
+                    @empty
+                        <p class="text-xs text-[#3B2E25]/60 text-center">Jadilah yang pertama memberikan doa restu.</p>
+                    @endforelse
                 </div>
-            @empty
-                <p class="text-xs text-[#3B2E25]/60 text-center">Jadilah yang pertama memberikan doa restu.</p>
-            @endforelse
-        </div>
+            </div>
+        @endif
     </div>
 </section>
 @endif
@@ -168,7 +224,11 @@
     </div>
 </section>
 
-<footer class="bg-[#3B2E25] text-[#FAF6EE]/80 border-t border-[#9E7B4F]/35 pt-7 pb-24 px-16 text-center text-xs">
-    <img src="{{ asset('logo/logo-ikon-gelap.webp') }}" alt="Logo SesiTemu" class="mx-auto mb-2 h-8 w-8 object-contain">
-    <p>Luxury Royal Ivory oleh <a href="{{ route('beranda') }}" class="font-semibold text-[#E5C99B] hover:underline">SesiTemu.id</a></p>
-</footer>
+@include('komponen-undangan.footer-tema', [
+    'gelap' => true,
+    'warnaOrnamen' => '#E5C99B',
+    'kelasLatar' => 'bg-gradient-to-b from-[#3B2E25] via-[#2F241D] to-[#231B15] border-t border-[#C5A46D]/40',
+    'kelasTeks' => 'text-[#FAF6EE]/85',
+    'kelasAksen' => 'text-[#E5C99B]',
+    'kelasTombol' => 'bg-[#FAF6EE]/10 text-[#E5C99B] border border-[#E5C99B]/40 hover:-translate-y-0.5 hover:bg-[#E5C99B] hover:text-[#3B2E25]',
+])

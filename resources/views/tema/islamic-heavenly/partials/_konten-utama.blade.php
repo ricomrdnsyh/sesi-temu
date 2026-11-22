@@ -291,20 +291,23 @@
         <h2 class="scroll-scrub-kiri mt-1 font-serif text-3xl font-bold text-white">Momen Terindah</h2>
     </div>
 
-    <div class="max-w-md mx-auto grid grid-cols-2 gap-3">
+    <div class="max-w-md mx-auto grid grid-cols-12 items-stretch gap-3">
         @foreach ($undangan->daftarGaleri as $galeri)
+            @php
+                $kelasTile = \App\Support\DataTemaUndangan::kelasGridGaleri($loop->index, $loop->count, 'mihrab');
+            @endphp
             <button
                 type="button"
                 @click="bukaGaleri(@js($galeri->urlFoto()), @js($galeri->keterangan))"
-                class="fx-scale-in group relative overflow-hidden border border-[#D9B664]/55 bg-[#091322] cursor-pointer kartu-3d {{ $loop->first ? 'col-span-2 aspect-[16/10] rounded-3xl' : 'aspect-[4/5] rounded-t-[3.5rem] rounded-b-2xl' }}"
+                class="fx-scale-in group relative overflow-hidden border border-[#D9B664]/55 bg-[#091322] cursor-pointer kartu-3d {{ $kelasTile }}"
             >
                 <img
                     src="{{ $galeri->urlFoto() }}"
                     alt="{{ $galeri->keterangan ?? 'Galeri' }}"
-                    class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-700"
+                    class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-700"
                 >
                 @if ($galeri->keterangan)
-                    <span class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#091322]/90 to-transparent px-3 py-2 text-left text-[11px] font-medium text-[#F3E5AB]">
+                    <span class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#091322]/90 via-[#091322]/35 to-transparent px-3 py-2 text-left text-[10.5px] font-medium text-[#F3E5AB]">
                         {{ $galeri->keterangan }}
                     </span>
                 @endif

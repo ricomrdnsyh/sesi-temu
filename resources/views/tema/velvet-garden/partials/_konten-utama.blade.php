@@ -273,15 +273,19 @@
         <h2 class="scroll-scrub-kiri mt-1 font-serif text-3xl font-bold text-white">Potret Kebahagiaan</h2>
     </div>
 
-    <div class="max-w-md mx-auto grid grid-cols-2 gap-4">
+    <div class="max-w-md mx-auto grid grid-cols-12 items-stretch gap-3.5">
         @foreach ($undangan->daftarGaleri as $galeri)
-            @if ($loop->first)
+            @php
+                $kelasTile = \App\Support\DataTemaUndangan::kelasGridGaleri($loop->index, $loop->count, 'bento');
+                $adalahLebar = str_contains($kelasTile, 'col-span-12');
+            @endphp
+            @if ($adalahLebar)
                 <button
                     type="button"
                     @click="bukaGaleri(@js($galeri->urlFoto()), @js($galeri->keterangan))"
-                    class="fx-scale-in col-span-2 group relative aspect-[16/10] overflow-hidden rounded-3xl border-2 border-[#C8A464]/70 bg-[#0E1E18] shadow-2xl cursor-pointer kartu-3d"
+                    class="fx-scale-in group relative overflow-hidden rounded-3xl border-2 border-[#C8A464]/70 bg-[#0E1E18] shadow-2xl cursor-pointer kartu-3d {{ $kelasTile }}"
                 >
-                    <img src="{{ $galeri->urlFoto() }}" alt="{{ $galeri->keterangan ?? 'Galeri' }}" class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-700">
+                    <img src="{{ $galeri->urlFoto() }}" alt="{{ $galeri->keterangan ?? 'Galeri' }}" class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-700">
                     @if ($galeri->keterangan)
                         <span class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0E1E18]/85 to-transparent px-4 py-2.5 text-left text-xs font-medium text-[#FDFBF7]">
                             {{ $galeri->keterangan }}
@@ -292,9 +296,9 @@
                 <button
                     type="button"
                     @click="bukaGaleri(@js($galeri->urlFoto()), @js($galeri->keterangan))"
-                    class="fx-scale-in group relative aspect-[4/5] rounded-2xl bg-white p-1.5 pb-7 shadow-xl border border-[#C8A464]/45 cursor-pointer kartu-3d {{ $loop->odd ? 'polaroid-3d-kiri' : 'polaroid-3d-kanan' }}"
+                    class="fx-scale-in group relative rounded-2xl bg-white p-1.5 pb-7 shadow-xl border border-[#C8A464]/45 cursor-pointer kartu-3d {{ $kelasTile }} {{ $loop->odd ? 'polaroid-3d-kiri' : 'polaroid-3d-kanan' }}"
                 >
-                    <img src="{{ $galeri->urlFoto() }}" alt="{{ $galeri->keterangan ?? 'Galeri' }}" class="w-full h-full object-cover object-center rounded-xl group-hover:scale-105 transition duration-700">
+                    <img src="{{ $galeri->urlFoto() }}" alt="{{ $galeri->keterangan ?? 'Galeri' }}" class="w-full h-full object-cover object-top rounded-xl group-hover:scale-105 transition duration-700">
                     <span class="pointer-events-none absolute inset-x-2 bottom-1.5 text-center text-[11px] font-kaligrafi text-[#1F3431] truncate">
                         {{ $galeri->keterangan ?: ($undangan->nama_panggilan_pria.' & '.$undangan->nama_panggilan_wanita) }}
                     </span>

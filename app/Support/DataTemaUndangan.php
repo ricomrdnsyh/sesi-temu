@@ -58,11 +58,11 @@ class DataTemaUndangan
         if (! $tanpaFoto) {
             $galeriPanggungKanan = $undangan->daftarGaleri
                 ->take(3)
-                ->map(static fn ($item) => [
+                ->map(static fn($item) => [
                     'url' => $item->urlFoto(),
                     'keterangan' => (string) ($item->keterangan ?? ''),
                 ])
-                ->filter(static fn ($item) => ! empty($item['url']))
+                ->filter(static fn($item) => ! empty($item['url']))
                 ->values();
 
             if ($galeriPanggungKanan->isEmpty()) {
@@ -109,6 +109,20 @@ class DataTemaUndangan
                 . '&location=' . urlencode($acaraPertama->nama_tempat . ', ' . $acaraPertama->alamat_lengkap);
         }
 
+        $daftarUcapanAwal = $undangan->bukuTamu
+            ->values()
+            ->map(static fn($ucapan, int $idx) => [
+                'id' => 'awal-' . ($ucapan->id ?? ($idx + 1)),
+                'nama_tamu' => (string) $ucapan->nama_tamu,
+                'status_kehadiran' => (string) $ucapan->status_kehadiran,
+                'jumlah_tamu' => (int) ($ucapan->jumlah_tamu ?? 1),
+                'ucapan_doa' => (string) $ucapan->ucapan_doa,
+                'waktu' => $ucapan->created_at
+                    ? $ucapan->created_at->locale('id')->diffForHumans()
+                    : 'Baru saja',
+            ])
+            ->all();
+
         return [
             'acaraPertama' => $acaraPertama,
             'tanggalTitik' => $tanggalTitik,
@@ -136,11 +150,122 @@ class DataTemaUndangan
             'turutPria' => $turutPria,
             'adaTurutMengundang' => $adaTurutMengundang,
             'galeriPanggungKanan' => $galeriPanggungKanan,
+            'daftarUcapanAwal' => $daftarUcapanAwal,
             'isoTarget' => $isoTarget,
             'googleCalUrl' => $googleCalUrl,
             'tampilBarDemo' => $modeDemo && ! request()->boolean('embed'),
             'modeDemo' => $modeDemo,
             'modePratinjau' => $modePratinjau,
         ];
+    }
+
+    /**
+     * Menghasilkan kelas grid & rasio aspek bervariasi (editorial bento/mozaik) untuk galeri foto
+     * agar tidak seragam kotak semua dan tetap menutup baris rapi untuk jumlah foto 1–10.
+     */
+    public static function kelasGridGaleri(int $index, int $total, string $gaya = 'bento'): string
+    {
+        $isLast = ($index === $total - 1);
+
+        if ($gaya === 'artdeco') {
+            $slot = $index % 10;
+
+            return match ($slot) {
+                0 => 'col-span-2 aspect-[16/10] rounded-2xl',
+                1 => $isLast ? 'col-span-2 aspect-[16/10] rounded-2xl' : 'aspect-[3/4] rounded-xl',
+                2 => 'aspect-[3/4] rounded-xl',
+                3 => 'col-span-2 aspect-[4/3] rounded-2xl',
+                4 => $isLast ? 'col-span-2 aspect-[16/10] rounded-2xl' : 'aspect-[4/5] rounded-xl',
+                5 => 'aspect-[4/5] rounded-xl',
+                6 => 'col-span-2 aspect-[16/9] rounded-2xl',
+                7 => $isLast ? 'col-span-2 aspect-[16/10] rounded-2xl' : 'aspect-square rounded-xl',
+                8 => 'aspect-square rounded-xl',
+                default => 'col-span-2 aspect-[16/10] rounded-2xl',
+            };
+        }
+
+        if ($gaya === 'mihrab') {
+            $slot = $index % 10;
+
+            return match ($slot) {
+                0 => 'col-span-12 aspect-[16/10] rounded-3xl',
+                1 => $isLast ? 'col-span-12 aspect-[16/10] rounded-3xl' : 'col-span-7 aspect-[4/5] rounded-t-[4rem] rounded-b-2xl',
+                2 => 'col-span-5 h-full min-h-[190px] rounded-t-[3.25rem] rounded-b-2xl',
+                3 => 'col-span-12 aspect-[4/3] rounded-2xl',
+                4 => $isLast ? 'col-span-12 aspect-[16/10] rounded-3xl' : 'col-span-5 h-full min-h-[190px] rounded-2xl',
+                5 => 'col-span-7 aspect-[4/5] rounded-t-[4rem] rounded-b-2xl',
+                6 => 'col-span-12 aspect-[16/9] rounded-3xl',
+                7 => $isLast ? 'col-span-12 aspect-[16/10] rounded-3xl' : 'col-span-6 aspect-square rounded-2xl',
+                8 => 'col-span-6 aspect-square rounded-t-[3.5rem] rounded-b-2xl',
+                default => 'col-span-12 aspect-[16/10] rounded-t-[3.5rem] rounded-b-2xl',
+            };
+        }
+
+        if ($gaya === 'keraton') {
+            $slot = $index % 10;
+
+            return match ($slot) {
+                0 => 'col-span-12 aspect-[16/9] rounded-2xl',
+                1 => $isLast ? 'col-span-12 aspect-[16/10] rounded-2xl' : 'col-span-5 h-full min-h-[195px] rounded-2xl',
+                2 => 'col-span-7 aspect-[4/5] rounded-2xl',
+                3 => $isLast ? 'col-span-12 aspect-[4/3] rounded-2xl' : 'col-span-6 aspect-square rounded-2xl',
+                4 => 'col-span-6 aspect-square rounded-2xl',
+                5 => 'col-span-12 aspect-[4/3] rounded-2xl',
+                6 => $isLast ? 'col-span-12 aspect-[16/10] rounded-2xl' : 'col-span-7 aspect-[4/5] rounded-2xl',
+                7 => 'col-span-5 h-full min-h-[195px] rounded-2xl',
+                8 => $isLast ? 'col-span-12 aspect-[16/10] rounded-2xl' : 'col-span-6 aspect-[3/4] rounded-2xl',
+                default => 'col-span-6 aspect-[3/4] rounded-2xl',
+            };
+        }
+
+        if ($gaya === 'editorial') {
+            $slot = $index % 10;
+
+            return match ($slot) {
+                0 => 'col-span-12 aspect-[16/9] rounded-none',
+                1 => $isLast ? 'col-span-12 aspect-[16/10] rounded-none' : 'col-span-7 aspect-[3/4] rounded-none',
+                2 => 'col-span-5 h-full min-h-[200px] rounded-none',
+                3 => 'col-span-12 aspect-[4/3] rounded-none',
+                4 => $isLast ? 'col-span-12 aspect-[16/10] rounded-none' : 'col-span-6 aspect-square rounded-none',
+                5 => 'col-span-6 aspect-square rounded-none',
+                6 => 'col-span-12 aspect-[16/10] rounded-none',
+                7 => $isLast ? 'col-span-12 aspect-[16/10] rounded-none' : 'col-span-5 h-full min-h-[200px] rounded-none',
+                8 => 'col-span-7 aspect-[4/5] rounded-none',
+                default => 'col-span-12 aspect-[16/10] rounded-none',
+            };
+        }
+
+        if ($gaya === 'priangan') {
+            $slot = $index % 10;
+
+            return match ($slot) {
+                0 => 'col-span-12 aspect-[16/10] rounded-t-[3.5rem] rounded-b-2xl',
+                1 => $isLast ? 'col-span-12 aspect-[16/10] rounded-2xl' : 'col-span-7 aspect-[4/5] rounded-2xl',
+                2 => 'col-span-5 h-full min-h-[190px] rounded-t-[3rem] rounded-b-2xl',
+                3 => 'col-span-12 aspect-[4/3] rounded-2xl',
+                4 => $isLast ? 'col-span-12 aspect-[16/10] rounded-2xl' : 'col-span-5 h-full min-h-[190px] rounded-2xl',
+                5 => 'col-span-7 aspect-[4/5] rounded-t-[3.5rem] rounded-b-2xl',
+                6 => 'col-span-12 aspect-[16/9] rounded-2xl',
+                7 => $isLast ? 'col-span-12 aspect-[16/10] rounded-2xl' : 'col-span-6 aspect-square rounded-2xl',
+                8 => 'col-span-6 aspect-square rounded-2xl',
+                default => 'col-span-12 aspect-[16/10] rounded-t-[3.5rem] rounded-b-2xl',
+            };
+        }
+
+        // Default 'bento' (rustic-floral, royal-ivory, velvet-garden, fallback)
+        $slot = $index % 10;
+
+        return match ($slot) {
+            0 => 'col-span-12 aspect-[16/10]',
+            1 => $isLast ? 'col-span-12 aspect-[16/10]' : 'col-span-7 aspect-[4/5]',
+            2 => 'col-span-5 h-full min-h-[190px]',
+            3 => 'col-span-12 aspect-[4/3]',
+            4 => $isLast ? 'col-span-12 aspect-[16/10]' : 'col-span-5 h-full min-h-[190px]',
+            5 => 'col-span-7 aspect-[4/5]',
+            6 => 'col-span-12 aspect-[16/9]',
+            7 => $isLast ? 'col-span-12 aspect-[16/10]' : 'col-span-6 aspect-square',
+            8 => 'col-span-6 aspect-square',
+            default => 'col-span-12 aspect-[16/10]',
+        };
     }
 }

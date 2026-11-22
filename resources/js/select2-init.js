@@ -160,7 +160,16 @@ export const inisialisasiSelect2Element = (selectEl) => {
 
     $(selectEl).on('select2:select.sesitemu select2:clear.sesitemu', () => {
         if (!selectEl.closest('.dt-container') && !selectEl.getAttribute('onchange')) {
-            selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+            const kirimEventNative = () => {
+                selectEl.dispatchEvent(new Event('input', { bubbles: true }));
+                selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+            };
+
+            if (typeof queueMicrotask === 'function') {
+                queueMicrotask(kirimEventNative);
+            } else {
+                window.setTimeout(kirimEventNative, 0);
+            }
         }
     });
 

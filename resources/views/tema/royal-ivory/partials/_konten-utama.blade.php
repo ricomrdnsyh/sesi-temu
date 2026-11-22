@@ -265,14 +265,28 @@
         <h2 class="scroll-scrub-kiri mt-1 font-serif text-3xl font-bold text-[#3B2E25]">Galeri Kebahagiaan</h2>
     </div>
 
-    <div class="max-w-md mx-auto grid grid-cols-2 gap-3.5">
+    <div class="max-w-md mx-auto grid grid-cols-12 items-stretch gap-3">
         @foreach ($undangan->daftarGaleri as $galeri)
+            @php
+                $kelasTile = \App\Support\DataTemaUndangan::kelasGridGaleri($loop->index, $loop->count, 'mihrab');
+            @endphp
             <button
                 type="button"
                 @click="bukaGaleri(@js($galeri->urlFoto()), @js($galeri->keterangan))"
-                class="fx-scale-in group relative aspect-[4/5] overflow-hidden rounded-t-[4rem] rounded-b-2xl border-2 border-[#9E7B4F]/60 bg-white p-1 shadow-lg cursor-pointer kartu-3d"
+                class="fx-scale-in group relative overflow-hidden border-2 border-[#9E7B4F]/60 bg-white p-1 shadow-lg cursor-pointer kartu-3d {{ $kelasTile }}"
             >
-                <img src="{{ $galeri->urlFoto() }}" alt="{{ $galeri->keterangan ?? 'Galeri' }}" class="w-full h-full object-cover object-center rounded-t-[3.6rem] rounded-b-xl group-hover:scale-105 transition duration-700">
+                <div class="relative w-full h-full overflow-hidden rounded-[inherit]">
+                    <img
+                        src="{{ $galeri->urlFoto() }}"
+                        alt="{{ $galeri->keterangan ?? 'Galeri' }}"
+                        class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-700"
+                    >
+                    @if ($galeri->keterangan)
+                        <span class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#3B2E25]/85 via-[#3B2E25]/30 to-transparent px-3 py-2 text-left text-[10.5px] font-medium text-[#FAF6EE] opacity-0 group-hover:opacity-100 transition duration-300">
+                            {{ $galeri->keterangan }}
+                        </span>
+                    @endif
+                </div>
             </button>
         @endforeach
     </div>

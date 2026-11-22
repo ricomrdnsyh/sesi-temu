@@ -298,26 +298,23 @@
                     <div class="relative z-20 px-6 {{ $pakaiFotoSampul ? 'pb-5 sm:pb-7' : 'pb-6 sm:pb-8' }}">
                         <div
                             class="kartu-3d {{ $radiusKartuBesar }} {{ $pakaiFotoSampul ? 'p-4 sm:p-5 bg-black/50 border-[#F3E5AB]/40 text-white' : 'p-5 sm:p-6 ' . ($sampulPakaiModeGelap ? 'bg-black/60 border-[#D4AF37]/45 text-white' : 'bg-white/88 border-[#BFA15F]/45 text-[#1F2937]') }} text-center backdrop-blur-md shadow-2xl border {{ $ekstraKartu }} space-y-2.5">
-                            <p class="text-[10px] font-semibold uppercase tracking-[0.28em] opacity-80">
-                                {{ $sapaanSampul }}</p>
+                            <span class="sr-only">Kepada Yth. {{ $namaTamu }}</span>
+                            <p class="text-[10px] font-semibold uppercase tracking-[0.24em] opacity-85">
+                                Kepada Yth. Bapak/Ibu/Saudara/i</p>
                             <p
                                 class="font-serif text-xl sm:text-2xl font-bold {{ $sampulPakaiModeGelap ? 'text-[#F3E5AB]' : $kelasSubAksen }}">
-                                Kepada Yth. {{ $namaTamu }}
+                                {{ $namaTamu }}
                             </p>
-                            @if (!$pakaiFotoSampul)
-                                <p class="text-[11px] opacity-75">Tanpa mengurangi rasa hormat, kami mengundang Anda
-                                    untuk hadir di hari bahagia kami.</p>
-                            @endif
 
-                            <div class="pt-1">
+                            <div class="pt-1.5">
                                 <button type="button" @click="bukaUndangan()"
                                     class="w-full sm:w-auto {{ $radiusTombol }} px-8 py-3 text-xs sm:text-sm font-bold uppercase tracking-[0.18em] shadow-lg transition cursor-pointer {{ $kelasTombol }} {{ $isEksklusif ? 'animasi-segel' : '' }}">
                                     Buka Undangan
                                 </button>
                             </div>
 
-                            <p class="text-[10px] italic opacity-75">
-                                *Mohon maaf jika ada kesalahan dalam penulisan nama / gelar.
+                            <p class="text-[10px] italic opacity-75 pt-0.5 max-w-xs mx-auto leading-relaxed">
+                                Mohon maaf apabila ada kesalahan penulisan nama/gelar
                             </p>
                         </div>
                     </div>
@@ -390,12 +387,14 @@
                     'kelasEkstraKartu' => $ekstraKartu,
                 ])
 
-                <footer class="py-8 px-4 text-center text-xs opacity-85">
-                    <img src="{{ $gelap ? asset('logo/logo-ikon-gelap.webp') : asset('logo/logo-ikon.webp') }}"
-                        alt="Logo SesiTemu" class="mx-auto mb-2 h-8 w-8 object-contain">
-                    {{ $footerTeks }} &bull; <a href="{{ route('beranda') }}"
-                        class="font-semibold {{ $kelasAksen }} hover:underline">SesiTemu.id</a>
-                </footer>
+                @include('komponen-undangan.footer-tema', [
+                    'gelap' => $gelap,
+                    'sudutTajam' => $sudutEditorial,
+                    'warnaOrnamen' => $sudutEditorial ? '#FFFFFF' : ($gelap ? '#D4AF37' : '#BFA15F'),
+                    'kelasLatar' => $gelap ? 'bg-black/35 border-t border-white/15' : 'bg-gradient-to-b from-[#F5EDE1] to-[#EBE0CF] border-t border-[#BFA15F]/35',
+                    'kelasTeks' => $gelap ? 'text-white/80' : 'text-charcoal/80',
+                    'kelasAksen' => $kelasAksen,
+                ])
             </main>
         </div>
 
