@@ -1,7 +1,10 @@
 @php
+    $jalurVideoSyari = public_path('aset-tema/islami-syari/islami-syari-motion-hero.mp4');
     $asetSyari = [
         'latar' => asset('aset-tema/islami-syari/latar-utama.webp'),
         'arabesque' => asset('aset-tema/islami-syari/ornamen-arabesque.webp'),
+        'heroPoster' => asset('aset-tema/islami-syari/hero-poster.webp'),
+        'videoHero' => file_exists($jalurVideoSyari) ? asset('aset-tema/islami-syari/islami-syari-motion-hero.mp4?v=1') : null,
     ];
 
     $dataTema = \App\Support\DataTemaUndangan::siapkan(
@@ -23,6 +26,7 @@
         .syari-tombol {
             background: linear-gradient(135deg, #16524C 0%, #0E3A36 55%, #0A2B28 100%);
             color: #F7FBF8;
+            border: 1px solid rgba(197, 160, 89, 0.72);
             box-shadow: 0 12px 24px -10px rgba(14, 58, 54, 0.58);
         }
         .syari-tombol:hover {
@@ -30,41 +34,69 @@
         }
 
         .syari-tombol-emas {
-            background: linear-gradient(135deg, #EAD6A4 0%, #D4B56E 52%, #B99348 100%);
-            color: #0B2D2A;
-            box-shadow: 0 10px 22px -10px rgba(197, 160, 89, 0.65);
+            background: linear-gradient(135deg, #EFE0B4 0%, #D4B56E 52%, #B99348 100%);
+            color: #092623;
+            box-shadow: 0 10px 24px -10px rgba(197, 160, 89, 0.65);
         }
         .syari-tombol-emas:hover {
             filter: brightness(1.06);
         }
 
-        /* Transisi Sampul Scroll-Ke-Atas Khusus Islami Syar'i */
+        /* Hero Sinema Video Penuh 1 Layar HP, Tablet & Desktop Anti-Zoom */
+        .syari-hero-layar-penuh {
+            height: 100svh;
+            height: 100dvh;
+            min-height: 520px;
+        }
+        html.desktop-triptych [data-kolom-undangan] .syari-hero-layar-penuh,
+        html.tablet-stage [data-kolom-undangan] .syari-hero-layar-penuh {
+            height: var(--tinggi-tirai-dalam-inv, 100dvh) !important;
+            min-height: var(--tinggi-tirai-dalam-inv, 100dvh) !important;
+        }
+
+        /* Transisi Sampul Scroll-Ke-Atas 60fps Khusus Islami Syar'i */
         .tirai-fade-halus.tirai-gulir-atas {
             opacity: 1;
             transform: translate3d(0, 0, 0);
             visibility: visible;
             transition:
-                transform 0.95s cubic-bezier(0.65, 0, 0.35, 1),
+                transform 0.9s cubic-bezier(0.32, 0.72, 0, 1),
                 visibility 0s linear 0s;
             will-change: transform;
+            backface-visibility: hidden;
         }
         .tirai-fade-halus.tirai-gulir-atas > div {
-            box-shadow: 0 28px 54px -12px rgba(8, 34, 31, 0.55);
+            box-shadow: 0 28px 56px -12px rgba(8, 34, 31, 0.65);
         }
         .tirai-fade-halus.tirai-gulir-atas.tirai-terbuka {
             opacity: 1;
             transform: translate3d(0, -105%, 0);
             visibility: hidden;
             transition:
-                transform 0.95s cubic-bezier(0.65, 0, 0.35, 1),
-                visibility 0s linear 0.96s;
+                transform 0.9s cubic-bezier(0.32, 0.72, 0, 1),
+                visibility 0s linear 0.92s;
         }
 
-        /* Gerak Naik Sinkron Hero Saat Sampul Digulir Ke Atas */
+        /* Stabilisasi Kamera Video Hero Tanpa Transform 3D Agar Teks Tetap Tajam */
+        .diorama-kamera-3d.syari-kamera-video-aktif {
+            animation: none !important;
+            transform-style: flat !important;
+            transform: none !important;
+        }
+
+        /* Kemunculan Tipografi Mempelai Sinkron Tepat Di Dalam Bingkai Mihrab Zamrud Video */
+        .syari-video-teks {
+            transition:
+                opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 1.15s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: opacity, transform;
+        }
+
+        /* Gerak Naik Sinkron Hero Fallback Saat Sampul Digulir Ke Atas */
         .syari-hero-stagger-1,
         .syari-hero-stagger-2,
         .syari-hero-stagger-3 {
-            transform: translate3d(0, 24px, 0);
+            transform: translate3d(0, 22px, 0);
             transition: transform 0.92s cubic-bezier(0.22, 1, 0.36, 1);
             will-change: transform;
         }
@@ -76,20 +108,7 @@
             transform: translate3d(0, 0, 0);
         }
 
-        /* Hero Andalusian Sanctuary Pas 1 Layar Penuh */
-        .syari-hero-layar-penuh {
-            min-height: 100svh;
-            min-height: 100dvh;
-        }
-        .syari-hero-layar-penuh.dengan-bar-demo {
-            min-height: calc(100svh - 3.5rem);
-            min-height: calc(100dvh - 3.5rem);
-        }
-        html.desktop-triptych [data-kolom-undangan] .syari-hero-layar-penuh {
-            min-height: var(--tinggi-tirai-dalam-inv, 100dvh) !important;
-        }
-
-        /* Pola Geometri Islami Halus untuk Permukaan Sanctuary */
+        /* Pola Geometri Islami Halus untuk Permukaan Sanctuary Alabaster */
         .syari-pola-zellige {
             background-image: radial-gradient(rgba(197, 160, 89, 0.22) 1px, transparent 1px),
                 radial-gradient(rgba(14, 58, 54, 0.08) 1px, transparent 1px);
@@ -102,7 +121,8 @@
             .tirai-fade-halus.tirai-gulir-atas.tirai-terbuka,
             .syari-hero-stagger-1,
             .syari-hero-stagger-2,
-            .syari-hero-stagger-3 {
+            .syari-hero-stagger-3,
+            .syari-video-teks {
                 transition: none !important;
                 transform: none !important;
             }
@@ -115,7 +135,7 @@
 <body
     x-data="temaUndangan()"
     :class="undanganTerbuka ? 'overflow-x-hidden' : 'overflow-hidden h-screen'"
-    class="bg-[#EAF3ED] text-[#0E3A36] antialiased relative"
+    class="bg-[#0B2D2A] text-[#0E3A36] antialiased relative"
 >
     @include('komponen-undangan.bar-pratinjau-demo')
 
@@ -126,8 +146,15 @@
         {{-- KOLOM UNDANGAN PORTRAIT MOBILE-FIRST (TERPUSAT DI TENGAH WEB) --}}
         <div
             data-kolom-undangan
-            class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-[0_0_68px_rgba(14,58,54,0.24)] lg:border-x-2 border-[#C5A059]/45 bg-[#F7FBF8]"
+            class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-[0_0_70px_rgba(8,34,31,0.45)] lg:border-x-2 border-[#C5A059]/45 bg-[#F7FBF8]"
         >
+            {{-- Progres Baca Emas-Zamrud --}}
+            <div data-progres-undangan aria-hidden="true" x-show="undanganTerbuka" x-cloak
+                class="fixed top-0 inset-x-0 mx-auto w-full lg:w-[460px] xl:w-[490px] z-[60] h-[3px] bg-[#0A2B28]/30">
+                <div class="h-full transition-all duration-150 bg-gradient-to-r from-[#16524C] via-[#C5A059] to-[#F3E5AB]"
+                    :style="'width: ' + scrollPersen + '%'"></div>
+            </div>
+
             {{-- Jendela Latar Alabaster Zellige Terpin --}}
             <div data-latar-undangan aria-hidden="true" class="pointer-events-none fixed inset-y-0 inset-x-0 mx-auto w-full lg:w-[460px] xl:w-[490px] z-0 overflow-hidden bg-[#F7FBF8]">
                 <img src="{{ $urlFotoLatar }}" alt="" class="w-full h-full object-cover object-center opacity-[0.14]">

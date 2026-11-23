@@ -1,6 +1,208 @@
 @php
     $gayaFont = $undangan->resolusiGayaFont();
     $tanpaFoto = $undangan->modeTanpaFoto();
+    $slugTemaSelect = $undangan->tema?->slug ?? 'rustic-floral';
+    $daftarPaletSelectTema = [
+        'islami-syari' => [
+            'bg' => '#F7FBF8',
+            'bg_open' => '#FFFFFF',
+            'text' => '#0E3A36',
+            'border' => 'rgba(197, 160, 89, 0.55)',
+            'border_hover' => 'rgba(197, 160, 89, 0.9)',
+            'focus_border' => '#0E3A36',
+            'focus_ring' => 'rgba(14, 58, 54, 0.16)',
+            'arrow' => 'rgba(14, 58, 54, 0.68)',
+            'arrow_open' => '#C5A059',
+            'radius' => '0.75rem',
+            'option_radius' => '0.5rem',
+            'dropdown_bg' => 'linear-gradient(180deg, #0E3A36 0%, #092623 100%)',
+            'dropdown_border' => 'rgba(197, 160, 89, 0.55)',
+            'dropdown_shadow' => '0 16px 36px -10px rgba(7, 30, 28, 0.58)',
+            'search_bg' => '#08221F',
+            'option_text' => '#F7FBF8',
+            'option_hover_bg' => 'rgba(230, 209, 156, 0.18)',
+            'option_hover_text' => '#F3E5AB',
+            'option_selected_bg' => '#C5A059',
+            'option_selected_text' => '#08221F',
+        ],
+        'sunda-heritage' => [
+            'bg' => '#FFFFFF',
+            'bg_open' => '#FFFDF9',
+            'text' => '#4A2020',
+            'border' => 'rgba(197, 155, 67, 0.6)',
+            'border_hover' => 'rgba(197, 155, 67, 0.92)',
+            'focus_border' => '#5A1E1E',
+            'focus_ring' => 'rgba(90, 30, 30, 0.16)',
+            'arrow' => 'rgba(90, 30, 30, 0.68)',
+            'arrow_open' => '#C59B43',
+            'radius' => '0.75rem',
+            'option_radius' => '0.5rem',
+            'dropdown_bg' => 'linear-gradient(180deg, #4A1717 0%, #2B0E0E 100%)',
+            'dropdown_border' => 'rgba(197, 155, 67, 0.55)',
+            'dropdown_shadow' => '0 16px 36px -10px rgba(35, 11, 11, 0.62)',
+            'search_bg' => '#3B1414',
+            'option_text' => '#FAF4E8',
+            'option_hover_bg' => 'rgba(231, 200, 125, 0.18)',
+            'option_hover_text' => '#F3E5AB',
+            'option_selected_bg' => '#C59B43',
+            'option_selected_text' => '#3B1414',
+        ],
+        'adat-jawa' => [
+            'bg' => '#FFFFFF',
+            'bg_open' => '#FFFCF7',
+            'text' => '#2B180F',
+            'border' => 'rgba(71, 42, 28, 0.28)',
+            'border_hover' => 'rgba(215, 187, 131, 0.85)',
+            'focus_border' => '#472A1C',
+            'focus_ring' => 'rgba(71, 42, 28, 0.16)',
+            'arrow' => 'rgba(71, 42, 28, 0.68)',
+            'arrow_open' => '#B68F40',
+            'radius' => '0.75rem',
+            'option_radius' => '0.5rem',
+            'dropdown_bg' => 'linear-gradient(180deg, #472A1C 0%, #2C180F 100%)',
+            'dropdown_border' => 'rgba(215, 187, 131, 0.5)',
+            'dropdown_shadow' => '0 16px 36px -10px rgba(32, 16, 8, 0.6)',
+            'search_bg' => '#3A2116',
+            'option_text' => '#FFFAF5',
+            'option_hover_bg' => 'rgba(215, 187, 131, 0.18)',
+            'option_hover_text' => '#F3E5AB',
+            'option_selected_bg' => '#D7BB83',
+            'option_selected_text' => '#2B180F',
+        ],
+        'islamic-heavenly' => [
+            'bg' => '#091322',
+            'bg_open' => '#0C1A2F',
+            'text' => '#E6EEF8',
+            'border' => 'rgba(217, 182, 100, 0.45)',
+            'border_hover' => 'rgba(217, 182, 100, 0.82)',
+            'focus_border' => '#D9B664',
+            'focus_ring' => 'rgba(217, 182, 100, 0.22)',
+            'arrow' => 'rgba(243, 229, 171, 0.78)',
+            'arrow_open' => '#F3E5AB',
+            'radius' => '0.75rem',
+            'option_radius' => '0.5rem',
+            'dropdown_bg' => 'linear-gradient(180deg, #0E1D33 0%, #060E1A 100%)',
+            'dropdown_border' => 'rgba(217, 182, 100, 0.55)',
+            'dropdown_shadow' => '0 16px 36px -10px rgba(4, 10, 19, 0.72)',
+            'search_bg' => '#07101E',
+            'option_text' => '#E6EEF8',
+            'option_hover_bg' => 'rgba(217, 182, 100, 0.18)',
+            'option_hover_text' => '#F3E5AB',
+            'option_selected_bg' => '#D9B664',
+            'option_selected_text' => '#091322',
+        ],
+        'luxury-noir' => [
+            'bg' => '#0B0B0F',
+            'bg_open' => '#121218',
+            'text' => '#F5EFE6',
+            'border' => 'rgba(212, 175, 55, 0.45)',
+            'border_hover' => 'rgba(212, 175, 55, 0.82)',
+            'focus_border' => '#D4AF37',
+            'focus_ring' => 'rgba(212, 175, 55, 0.22)',
+            'arrow' => 'rgba(243, 229, 171, 0.78)',
+            'arrow_open' => '#F3E5AB',
+            'radius' => '0.5rem',
+            'option_radius' => '0.375rem',
+            'dropdown_bg' => 'linear-gradient(180deg, #16161C 0%, #09090D 100%)',
+            'dropdown_border' => 'rgba(212, 175, 55, 0.55)',
+            'dropdown_shadow' => '0 16px 36px -10px rgba(0, 0, 0, 0.78)',
+            'search_bg' => '#0B0B0F',
+            'option_text' => '#F5EFE6',
+            'option_hover_bg' => 'rgba(212, 175, 55, 0.18)',
+            'option_hover_text' => '#F3E5AB',
+            'option_selected_bg' => '#D4AF37',
+            'option_selected_text' => '#07070A',
+        ],
+        'royal-ivory' => [
+            'bg' => '#FBF8F3',
+            'bg_open' => '#FFFFFF',
+            'text' => '#3B2E25',
+            'border' => 'rgba(158, 123, 79, 0.48)',
+            'border_hover' => 'rgba(158, 123, 79, 0.85)',
+            'focus_border' => '#7B603F',
+            'focus_ring' => 'rgba(158, 123, 79, 0.2)',
+            'arrow' => 'rgba(59, 46, 37, 0.65)',
+            'arrow_open' => '#9E7B4F',
+            'radius' => '0.75rem',
+            'option_radius' => '0.5rem',
+            'dropdown_bg' => 'linear-gradient(180deg, #3B2E25 0%, #231B15 100%)',
+            'dropdown_border' => 'rgba(229, 201, 155, 0.5)',
+            'dropdown_shadow' => '0 16px 36px -10px rgba(35, 27, 21, 0.56)',
+            'search_bg' => '#2F241D',
+            'option_text' => '#FAF6EE',
+            'option_hover_bg' => 'rgba(229, 201, 155, 0.18)',
+            'option_hover_text' => '#E5C99B',
+            'option_selected_bg' => '#E5C99B',
+            'option_selected_text' => '#3B2E25',
+        ],
+        'rustic-floral' => [
+            'bg' => '#FDFBF7',
+            'bg_open' => '#FFFFFF',
+            'text' => '#2F4037',
+            'border' => 'rgba(75, 99, 88, 0.32)',
+            'border_hover' => 'rgba(191, 161, 95, 0.78)',
+            'focus_border' => '#4B6358',
+            'focus_ring' => 'rgba(75, 99, 88, 0.18)',
+            'arrow' => 'rgba(47, 64, 55, 0.65)',
+            'arrow_open' => '#BFA15F',
+            'radius' => '0.75rem',
+            'option_radius' => '0.5rem',
+            'dropdown_bg' => 'linear-gradient(180deg, #2E4238 0%, #1B2922 100%)',
+            'dropdown_border' => 'rgba(217, 190, 123, 0.5)',
+            'dropdown_shadow' => '0 16px 36px -10px rgba(27, 41, 34, 0.55)',
+            'search_bg' => '#24362D',
+            'option_text' => '#F6F1E7',
+            'option_hover_bg' => 'rgba(217, 190, 123, 0.18)',
+            'option_hover_text' => '#F3E2B3',
+            'option_selected_bg' => '#D9BE7B',
+            'option_selected_text' => '#1B2922',
+        ],
+        'velvet-garden' => [
+            'bg' => '#FFFFFF',
+            'bg_open' => '#F8FBF9',
+            'text' => '#1F3431',
+            'border' => 'rgba(200, 164, 100, 0.55)',
+            'border_hover' => 'rgba(200, 164, 100, 0.88)',
+            'focus_border' => '#1F3431',
+            'focus_ring' => 'rgba(31, 52, 49, 0.18)',
+            'arrow' => 'rgba(31, 52, 49, 0.68)',
+            'arrow_open' => '#C8A464',
+            'radius' => '0.75rem',
+            'option_radius' => '0.5rem',
+            'dropdown_bg' => 'linear-gradient(180deg, #12261F 0%, #08130F 100%)',
+            'dropdown_border' => 'rgba(200, 164, 100, 0.55)',
+            'dropdown_shadow' => '0 16px 36px -10px rgba(8, 19, 15, 0.64)',
+            'search_bg' => '#0D1D17',
+            'option_text' => '#F4F8F6',
+            'option_hover_bg' => 'rgba(200, 164, 100, 0.18)',
+            'option_hover_text' => '#F3DFA2',
+            'option_selected_bg' => '#C8A464',
+            'option_selected_text' => '#0A1712',
+        ],
+        'editorial-monokrom' => [
+            'bg' => '#FAF9F6',
+            'bg_open' => '#FFFFFF',
+            'text' => '#18181B',
+            'border' => 'rgba(24, 24, 27, 0.35)',
+            'border_hover' => 'rgba(24, 24, 27, 0.72)',
+            'focus_border' => '#18181B',
+            'focus_ring' => 'rgba(24, 24, 27, 0.14)',
+            'arrow' => 'rgba(24, 24, 27, 0.72)',
+            'arrow_open' => '#18181B',
+            'radius' => '0px',
+            'option_radius' => '0px',
+            'dropdown_bg' => 'linear-gradient(180deg, #141418 0%, #060608 100%)',
+            'dropdown_border' => 'rgba(255, 255, 255, 0.32)',
+            'dropdown_shadow' => '0 16px 36px -10px rgba(0, 0, 0, 0.58)',
+            'search_bg' => '#0C0C0F',
+            'option_text' => '#FFFFFF',
+            'option_hover_bg' => 'rgba(255, 255, 255, 0.14)',
+            'option_hover_text' => '#FFFFFF',
+            'option_selected_bg' => '#FFFFFF',
+            'option_selected_text' => '#0A0A0C',
+        ],
+    ];
+    $paletSelect = $daftarPaletSelectTema[$slugTemaSelect] ?? $daftarPaletSelectTema['rustic-floral'];
     $ogJudul = 'The Wedding of ' . $undangan->nama_panggilan_pria . ' & ' . $undangan->nama_panggilan_wanita;
     $ogDeskripsi =
         'Kepada Yth. ' .
@@ -43,6 +245,108 @@
         --font-tema-aksen: {!! $gayaFont['aksen_css'] !!};
         --font-serif: var(--font-tema-judul);
         --font-sans: var(--font-tema-isi);
+        --s2-bg: {{ $paletSelect['bg'] }};
+        --s2-bg-open: {{ $paletSelect['bg_open'] }};
+        --s2-text: {{ $paletSelect['text'] }};
+        --s2-border: {{ $paletSelect['border'] }};
+        --s2-border-hover: {{ $paletSelect['border_hover'] }};
+        --s2-focus-border: {{ $paletSelect['focus_border'] }};
+        --s2-focus-ring: {{ $paletSelect['focus_ring'] }};
+        --s2-arrow: {{ $paletSelect['arrow'] }};
+        --s2-arrow-open: {{ $paletSelect['arrow_open'] }};
+        --s2-radius: {{ $paletSelect['radius'] }};
+        --s2-option-radius: {{ $paletSelect['option_radius'] }};
+        --s2-dropdown-bg: {{ $paletSelect['dropdown_bg'] }};
+        --s2-dropdown-border: {{ $paletSelect['dropdown_border'] }};
+        --s2-dropdown-shadow: {{ $paletSelect['dropdown_shadow'] }};
+        --s2-search-bg: {{ $paletSelect['search_bg'] }};
+        --s2-option-text: {{ $paletSelect['option_text'] }};
+        --s2-option-hover-bg: {{ $paletSelect['option_hover_bg'] }};
+        --s2-option-hover-text: {{ $paletSelect['option_hover_text'] }};
+        --s2-option-selected-bg: {{ $paletSelect['option_selected_bg'] }};
+        --s2-option-selected-text: {{ $paletSelect['option_selected_text'] }};
+    }
+
+    /* Sinkronisasi Select2 Dropdown & Trigger Dengan Palet Footer Masing-Masing Tema */
+    .select2-container--sesitemu {
+        font-family: var(--font-tema-isi);
+    }
+
+    .select2-container--sesitemu .select2-selection--single:not(.s2-variant-dark-compact),
+    .select2-container--sesitemu .select2-selection--single.s2-variant-white,
+    .select2-container--sesitemu .select2-selection--single.s2-variant-inherit {
+        border-radius: var(--s2-radius);
+        border-color: var(--s2-border);
+        background-color: var(--s2-bg);
+        color: var(--s2-text);
+    }
+
+    .select2-container--sesitemu .select2-selection--single:not(.s2-variant-dark-compact):hover {
+        border-color: var(--s2-border-hover);
+    }
+
+    .select2-container--sesitemu.select2-container--focus .select2-selection--single:not(.s2-variant-dark-compact),
+    .select2-container--sesitemu.select2-container--open .select2-selection--single:not(.s2-variant-dark-compact),
+    .select2-container--sesitemu.select2-container--focus .select2-selection--single.s2-variant-white,
+    .select2-container--sesitemu.select2-container--open .select2-selection--single.s2-variant-white,
+    .select2-container--sesitemu.select2-container--focus .select2-selection--single.s2-variant-inherit,
+    .select2-container--sesitemu.select2-container--open .select2-selection--single.s2-variant-inherit {
+        border-color: var(--s2-focus-border);
+        background-color: var(--s2-bg-open);
+        color: var(--s2-text);
+        box-shadow: 0 0 0 3px var(--s2-focus-ring);
+    }
+
+    .select2-container--sesitemu .select2-selection--single:not(.s2-variant-dark-compact) .select2-selection__arrow b,
+    .select2-container--sesitemu .select2-selection--single.s2-variant-inherit .select2-selection__arrow b {
+        border-color: var(--s2-arrow);
+        opacity: 1;
+    }
+
+    .select2-container--sesitemu.select2-container--open .select2-selection--single:not(.s2-variant-dark-compact) .select2-selection__arrow b {
+        border-color: var(--s2-arrow-open);
+    }
+
+    .select2-container--sesitemu .select2-dropdown:not(.s2-dropdown-dark-compact),
+    .select2-container--sesitemu.select2-container--open .select2-dropdown--below:not(.s2-dropdown-dark-compact),
+    .select2-container--sesitemu.select2-container--open .select2-dropdown--above:not(.s2-dropdown-dark-compact) {
+        background: var(--s2-dropdown-bg);
+        border: 1px solid var(--s2-dropdown-border);
+        border-radius: var(--s2-radius);
+        box-shadow: var(--s2-dropdown-shadow);
+    }
+
+    .select2-container--sesitemu .select2-dropdown:not(.s2-dropdown-dark-compact) .select2-search--dropdown {
+        background-color: var(--s2-search-bg);
+        border-bottom-color: var(--s2-dropdown-border);
+    }
+
+    .select2-container--sesitemu .select2-dropdown:not(.s2-dropdown-dark-compact) .select2-search--dropdown .select2-search__field {
+        background-color: rgba(255, 255, 255, 0.08);
+        border-color: var(--s2-dropdown-border);
+        border-radius: var(--s2-option-radius);
+        color: var(--s2-option-text);
+    }
+
+    .select2-container--sesitemu .select2-dropdown:not(.s2-dropdown-dark-compact) .select2-results__option {
+        border-radius: var(--s2-option-radius);
+        color: var(--s2-option-text);
+    }
+
+    .select2-container--sesitemu .select2-dropdown:not(.s2-dropdown-dark-compact) .select2-results__option--highlighted.select2-results__option--selectable {
+        background-color: var(--s2-option-hover-bg);
+        color: var(--s2-option-hover-text);
+    }
+
+    .select2-container--sesitemu .select2-dropdown:not(.s2-dropdown-dark-compact) .select2-results__option--selected {
+        background-color: var(--s2-option-selected-bg) !important;
+        color: var(--s2-option-selected-text) !important;
+        font-weight: 700;
+    }
+
+    .select2-container--sesitemu .select2-dropdown:not(.s2-dropdown-dark-compact) .select2-results__message {
+        color: var(--s2-option-text);
+        opacity: 0.75;
     }
 
     body {
@@ -1578,6 +1882,7 @@
     html.tablet-stage [data-kolom-undangan] .jawa-hero-layar-penuh,
     html.tablet-stage [data-kolom-undangan] .rustic-hero-layar-penuh,
     html.tablet-stage [data-kolom-undangan] .syari-hero-layar-penuh,
+    html.tablet-stage [data-kolom-undangan] .celestial-hero-layar-penuh,
     html.tablet-stage [data-kolom-undangan] section[data-diorama-3d].h-dvh {
         height: var(--tinggi-tirai-dalam-inv, 100dvh) !important;
         min-height: var(--tinggi-tirai-dalam-inv, 100dvh) !important;
@@ -1817,6 +2122,88 @@
     [data-intro-pembuka="adat-jawa"].intro-keluar .intro-pusat,
     [data-intro-pembuka="adat-jawa"].intro-keluar .intro-pendar,
     [data-intro-pembuka="adat-jawa"].intro-keluar .intro-petunjuk {
+        animation: none !important;
+        opacity: 0;
+        transform: scale(1.08);
+        transition: opacity 0.42s ease, transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* === KOREOGRAFI KHUSUS INTRO ISLAMIC HEAVENLY (ASTROLAB SABIT -> KARTUS MIHRAB -> GERBANG BINTANG) === */
+    @keyframes introCelestialAstrolabBabak1 {
+        0% { opacity: 0; transform: scale(0.76) rotate(-14deg); }
+        34% { opacity: 1; transform: scale(1) rotate(0deg); }
+        74% { opacity: 1; transform: scale(1.03) rotate(4deg); }
+        100% { opacity: 0; transform: scale(1.16) rotate(12deg); }
+    }
+    @keyframes introCelestialLenteraMasukKiri {
+        0% { opacity: 0; transform: translate3d(-12px, -32px, 0) rotate(-6deg); }
+        100% { opacity: 0.9; transform: translate3d(0, 0, 0) rotate(0deg); }
+    }
+    @keyframes introCelestialLenteraMasukKanan {
+        0% { opacity: 0; transform: translate3d(12px, -32px, 0) scaleX(-1) rotate(-6deg); }
+        100% { opacity: 0.9; transform: translate3d(0, 0, 0) scaleX(-1) rotate(0deg); }
+    }
+    @keyframes introCelestialMeteorSapu {
+        0% { opacity: 0; transform: translate3d(40px, -24px, 0) rotate(-28deg) scaleX(0.3); }
+        18% { opacity: 0.95; transform: translate3d(-25px, 14px, 0) rotate(-28deg) scaleX(1); }
+        42%, 100% { opacity: 0; transform: translate3d(-230px, 130px, 0) rotate(-28deg) scaleX(0.5); }
+    }
+
+    [data-intro-pembuka="islamic-heavenly"] .intro-panel-kiri,
+    [data-intro-pembuka="islamic-heavenly"] .intro-panel-kanan {
+        transition: transform 0.94s cubic-bezier(0.76, 0, 0.24, 1);
+    }
+    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-astrolab {
+        animation: introCelestialAstrolabBabak1 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+    }
+    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-tajuk-1 {
+        animation: introJawaTajukBabak1 1.48s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
+    }
+    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-eyebrow {
+        animation: introJawaEyebrowBentang 1.35s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
+    }
+    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-medali {
+        animation: introJawaMedaliMekar 0.78s cubic-bezier(0.16, 1, 0.3, 1) 1.44s both;
+    }
+    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-mahkota {
+        animation: introElemenNaik 0.58s cubic-bezier(0.22, 1, 0.36, 1) 1.62s both;
+    }
+    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-monogram {
+        animation: introMonogramMekar 0.72s cubic-bezier(0.16, 1, 0.3, 1) 1.72s both;
+    }
+    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-pemisah {
+        transform-origin: center;
+        animation: introGarisBentang 0.65s cubic-bezier(0.22, 1, 0.36, 1) 1.94s both;
+    }
+    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-nama {
+        animation: introElemenNaik 0.65s cubic-bezier(0.22, 1, 0.36, 1) 2.04s both;
+    }
+    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-tanggal {
+        animation: introElemenNaik 0.58s cubic-bezier(0.22, 1, 0.36, 1) 2.22s both;
+    }
+    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-lentera-kiri {
+        transform-origin: top center;
+        animation: introCelestialLenteraMasukKiri 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+    }
+    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-lentera-kanan {
+        transform-origin: top center;
+        animation: introCelestialLenteraMasukKanan 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+    }
+    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-halo {
+        animation: introJawaHaloNafas 3.2s ease-in-out infinite;
+    }
+    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-sinar {
+        animation: introJawaSinarSapu 3.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.15s both;
+    }
+    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-meteor {
+        animation: introCelestialMeteorSapu 2.8s ease-out 0.45s both;
+    }
+    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-debu {
+        animation: introJawaDebuNaik 2.6s ease-out infinite;
+    }
+    [data-intro-pembuka="islamic-heavenly"].intro-keluar .intro-pusat,
+    [data-intro-pembuka="islamic-heavenly"].intro-keluar .intro-pendar,
+    [data-intro-pembuka="islamic-heavenly"].intro-keluar .intro-petunjuk {
         animation: none !important;
         opacity: 0;
         transform: scale(1.08);

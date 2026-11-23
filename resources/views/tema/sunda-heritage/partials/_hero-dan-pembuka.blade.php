@@ -188,15 +188,16 @@
             >
         </div>
 
-        {{-- LAPISAN VIDEO MOTION HD SUNDA SIGER HERITAGE (00:00 GERBANG KUJANG -> 00:04.5 RUMAH PANGGUNG & BUNGA -> 00:12 BINGKAI SIGER) --}}
+        {{-- LAPISAN VIDEO MOTION HD SUNDA SIGER HERITAGE (24s @ 1.2x = ~20s: 00:00 GERBANG KUJANG -> 00:08 RUMAH PANGGUNG -> 00:20.4 BINGKAI SIGER) --}}
         @if ($pakaiVideoHeroSunda)
             <video
                 x-ref="heroVideo"
                 x-show="!videoHeroGagal"
                 src="{{ $asetSunda['videoHero'] }}"
-                data-start-at="0.15"
-                data-reveal-at="14.2"
-                data-settled-at="16.2"
+                data-start-at="0"
+                data-playback-rate="1.2"
+                data-reveal-at="20.4"
+                data-settled-at="22.8"
                 muted
                 playsinline
                 webkit-playsinline
@@ -208,7 +209,7 @@
                 class="absolute inset-0 z-10 w-full h-full object-cover object-center bg-[#3B1414] pointer-events-none select-none"
             ></video>
 
-            {{-- OVERLAY TIPOGRAFI MEMPELAI — MUNCUL SINKRON TEPAT DI DALAM BINGKAI OVAL MARUN-EMAS VIDEO (DETIK 14.2) --}}
+            {{-- OVERLAY TIPOGRAFI MEMPELAI — MUNCUL SINKRON TEPAT DI DALAM BINGKAI OVAL MARUN-EMAS VIDEO (DETIK 20.4 / ~17s NYATA) --}}
             <div
                 x-show="!videoHeroGagal"
                 class="absolute inset-x-[18%] top-[18%] bottom-[38%] z-20 flex flex-col items-center justify-center text-center px-3 sunda-video-teks"

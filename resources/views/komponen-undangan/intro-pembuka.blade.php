@@ -156,10 +156,11 @@
 
     $gayaIntro = $daftarGayaIntro[$slugIntro] ?? $daftarGayaIntro['rustic-floral'];
     $adalahAdatJawa = $slugIntro === 'adat-jawa';
+    $adalahIslamicHeavenly = $slugIntro === 'islamic-heavenly';
     $adalahBelahTengah = $gayaIntro['keluar'] === 'belah-tengah';
     $lebarKolomIntro = $lebarKolomIntro ?? 'lg:w-[460px] xl:w-[490px]';
-    $durasiIntroMs = $adalahAdatJawa ? 3450 : 2350;
-    $durasiKeluarMs = $adalahAdatJawa ? 980 : 820;
+    $durasiIntroMs = ($adalahAdatJawa || $adalahIslamicHeavenly) ? 3450 : 2350;
+    $durasiKeluarMs = ($adalahAdatJawa || $adalahIslamicHeavenly) ? 980 : 820;
 @endphp
 
 <div
@@ -357,6 +358,145 @@
 
             {{-- PETUNJUK HALUS LEWATI --}}
             <span class="intro-petunjuk pointer-events-none absolute bottom-7 z-20 text-[9.5px] uppercase tracking-[0.28em] text-[#F3E5AB]/60">
+                Ketuk untuk melewati
+            </span>
+        </div>
+    @elseif ($adalahIslamicHeavenly)
+        {{-- INTRO BESPOKE ISLAMIC HEAVENLY: 2-BABAK PORTAL ASTROLAB SABIT -> KARTUS MIHRAB SAFIR -> GERBANG BINTANG TERBELAH --}}
+        <div class="intro-celestial-panggung relative w-full h-full flex flex-col items-center justify-center overflow-hidden">
+            {{-- GERBANG LANGIT MALAM KIRI (BERLENTERA FANOUS & LENGKUNG ARSITEKTUR CELESTIAL) --}}
+            <div
+                class="intro-panel-kiri intro-celestial-pintu pointer-events-none absolute inset-y-0 left-0 w-1/2 overflow-hidden"
+                style="background: linear-gradient(180deg, #132847 0%, #0A182D 52%, #050C18 100%); border-right: 1px solid rgba(229, 196, 116, 0.45);"
+            >
+                <div class="absolute inset-y-4 left-3.5 right-0 rounded-tl-[11rem] rounded-bl-2xl border-y border-l border-[#E5C474]/30">
+                    <span class="absolute top-[16%] left-[24%] h-1.5 w-1.5 rounded-full bg-[#F7E7B8] shadow-[0_0_10px_#F7E7B8]"></span>
+                    <span class="absolute bottom-[18%] left-[28%] h-1 w-1 rounded-full bg-[#E5C474]/85"></span>
+                </div>
+                <span class="absolute inset-y-12 right-1.5 w-px bg-gradient-to-b from-transparent via-[#E5C474]/42 to-transparent"></span>
+                <img
+                    src="{{ asset('aset-tema/islamic-heavenly/lentera-fanous.webp') }}"
+                    alt=""
+                    loading="eager"
+                    decoding="sync"
+                    class="intro-celestial-lentera-kiri absolute -top-2 left-2 w-18 sm:w-20 opacity-90 drop-shadow-[0_10px_22px_rgba(0,0,0,0.72)]"
+                >
+            </div>
+
+            {{-- GERBANG LANGIT MALAM KANAN (SIMETRIS CERMIN) --}}
+            <div
+                class="intro-panel-kanan intro-celestial-pintu pointer-events-none absolute inset-y-0 right-0 w-1/2 overflow-hidden"
+                style="background: linear-gradient(180deg, #132847 0%, #0A182D 52%, #050C18 100%); border-left: 1px solid rgba(229, 196, 116, 0.45);"
+            >
+                <div class="absolute inset-y-4 right-3.5 left-0 rounded-tr-[11rem] rounded-br-2xl border-y border-r border-[#E5C474]/30">
+                    <span class="absolute top-[20%] right-[24%] h-1.5 w-1.5 rounded-full bg-[#F7E7B8] shadow-[0_0_10px_#F7E7B8]"></span>
+                    <span class="absolute bottom-[16%] right-[26%] h-1 w-1 rounded-full bg-[#E5C474]/85"></span>
+                </div>
+                <span class="absolute inset-y-12 left-1.5 w-px bg-gradient-to-b from-transparent via-[#E5C474]/42 to-transparent"></span>
+                <img
+                    src="{{ asset('aset-tema/islamic-heavenly/lentera-fanous.webp') }}"
+                    alt=""
+                    loading="eager"
+                    decoding="sync"
+                    class="intro-celestial-lentera-kanan absolute -top-2 right-2 w-18 sm:w-20 opacity-90 drop-shadow-[0_10px_22px_rgba(0,0,0,0.72)]"
+                >
+            </div>
+
+            {{-- PENDAR BIMASAKTI, BINTANG JATUH & DEBU BINTANG EMAS --}}
+            <div class="intro-pendar pointer-events-none absolute inset-0 overflow-hidden z-10">
+                <div
+                    class="intro-celestial-halo absolute inset-0"
+                    style="background: radial-gradient(circle at 50% 46%, rgba(229, 196, 116, 0.28) 0%, rgba(42, 82, 138, 0.16) 38%, transparent 70%);"
+                ></div>
+                <div class="intro-celestial-sinar absolute -top-24 left-[14%] w-40 h-[140%] bg-gradient-to-b from-[#FFF5D6]/20 via-[#E5C474]/10 to-transparent blur-2xl"></div>
+                <span class="intro-celestial-meteor absolute top-[18%] right-[14%] h-[1.5px] w-24 rounded-full bg-gradient-to-l from-[#FFF8DC] via-[#E5C474]/70 to-transparent"></span>
+                @foreach ([
+                    ['bottom: 18%; left: 20%;', 'w-1.5 h-1.5', '0.1s'],
+                    ['bottom: 28%; right: 22%;', 'w-2 h-2', '0.45s'],
+                    ['bottom: 42%; left: 15%;', 'w-1.5 h-1.5', '0.95s'],
+                    ['bottom: 48%; right: 16%;', 'w-1.5 h-1.5', '0.7s'],
+                    ['bottom: 24%; left: 50%;', 'w-1.5 h-1.5', '1.25s'],
+                    ['bottom: 66%; left: 28%;', 'w-1 h-1', '0.25s'],
+                    ['bottom: 64%; right: 28%;', 'w-1 h-1', '1.05s'],
+                ] as [$posisiBintang, $ukuranBintang, $jedaBintang])
+                    <span
+                        class="intro-celestial-debu absolute rounded-full {{ $ukuranBintang }} bg-[#FFF4CF] shadow-[0_0_10px_rgba(243,229,171,0.95)]"
+                        style="{{ $posisiBintang }} animation-delay: {{ $jedaBintang }};"
+                    ></span>
+                @endforeach
+            </div>
+
+            {{-- BABAK 1 (0.08s - 1.58s): PORTAL BULAN SABIT & CINCIN ASTROLAB BERPUTAR --}}
+            <div class="intro-pusat intro-celestial-babak-1 pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center px-8 text-center">
+                <div class="intro-celestial-astrolab relative mb-6 h-44 w-44 flex items-center justify-center">
+                    <span class="absolute inset-0 rounded-full border border-dashed border-[#E5C474]/55 intro-putar-pelan"></span>
+                    <span class="absolute inset-3.5 rounded-full border border-[#F3E5AB]/45"></span>
+                    <span class="absolute inset-7 rotate-45 border border-[#E5C474]/40"></span>
+                    <span
+                        class="absolute h-32 w-32 rounded-full blur-2xl opacity-70"
+                        style="background: radial-gradient(circle, rgba(243, 229, 171, 0.38) 0%, transparent 72%);"
+                    ></span>
+                    <img
+                        src="{{ asset('aset-tema/islamic-heavenly/ornamen-sabit.webp') }}"
+                        alt=""
+                        loading="eager"
+                        decoding="sync"
+                        class="relative z-10 w-20 sm:w-24 drop-shadow-[0_12px_28px_rgba(0,0,0,0.75)]"
+                    >
+                </div>
+
+                <div class="intro-celestial-tajuk-1 space-y-2">
+                    <p class="text-xl sm:text-2xl text-[#F3E5AB] drop-shadow" style="font-family: 'Amiri', serif;">
+                        بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
+                    </p>
+                    <p class="intro-celestial-eyebrow text-[10px] sm:text-[11px] font-semibold uppercase text-[#E5C474]">
+                        Walimatul Ursy &bull; Celestial Night
+                    </p>
+                </div>
+            </div>
+
+            {{-- BABAK 2 (1.42s - 3.45s): KARTUS MIHRAB SAFIR-EMAS + MONOGRAM FOIL + NAMA MEMPELAI --}}
+            <div class="intro-pusat intro-celestial-babak-2 relative z-20 flex flex-col items-center justify-center px-6 text-center">
+                <div class="intro-celestial-medali relative w-[264px] sm:w-[290px] rounded-t-[9rem] rounded-b-[2.5rem] border-2 border-[#E5C474]/85 bg-gradient-to-b from-[#132642]/96 via-[#0C192E]/96 to-[#071120]/98 px-7 pt-11 pb-8 shadow-[0_26px_60px_rgba(0,0,0,0.82),inset_0_0_28px_rgba(229,196,116,0.14)]">
+                    {{-- Garis Mihrab Putus-Putus Konsentris --}}
+                    <span class="pointer-events-none absolute inset-2.5 rounded-t-[8.2rem] rounded-b-[2rem] border border-dashed border-[#F3E5AB]/40"></span>
+
+                    {{-- Bintang Rub el Hizb Bermahkota Di Puncak Kartus --}}
+                    <div class="intro-celestial-mahkota absolute -top-5 inset-x-0 mx-auto h-10 w-10 flex items-center justify-center">
+                        <span class="absolute inset-1 bg-[#0E1E36] border border-[#E5C474] shadow-md"></span>
+                        <span class="absolute inset-1 rotate-45 bg-[#0E1E36] border border-[#E5C474] shadow-md"></span>
+                        <span class="relative z-10 text-[11px] text-[#F3E5AB]">&#10022;</span>
+                    </div>
+
+                    {{-- Isi Kartus: Monogram Foil Emas + Garis Bintang + Nama + Tanggal --}}
+                    <div class="relative z-10 flex flex-col items-center text-center">
+                        <div class="intro-celestial-monogram flex items-baseline justify-center gap-1.5 font-serif text-[3.1rem] sm:text-[3.4rem] font-semibold leading-none tracking-[0.06em]">
+                            <span class="intro-jawa-foil">{{ $inisialPriaIntro }}</span>
+                            <span class="font-kaligrafi text-[2.25rem] sm:text-[2.5rem] font-normal text-[#E5C474] drop-shadow">&amp;</span>
+                            <span class="intro-jawa-foil">{{ $inisialWanitaIntro }}</span>
+                        </div>
+
+                        <div class="intro-celestial-pemisah my-3.5 flex items-center justify-center gap-2 w-28">
+                            <span class="h-px flex-1 bg-gradient-to-r from-transparent to-[#E5C474]/85"></span>
+                            <span class="text-[10px] text-[#F3E5AB] drop-shadow">&#10022;</span>
+                            <span class="h-px flex-1 bg-gradient-to-l from-transparent to-[#E5C474]/85"></span>
+                        </div>
+
+                        <p class="intro-celestial-nama font-serif text-[1.45rem] sm:text-[1.65rem] font-semibold leading-[1.15] tracking-[0.04em] text-[#F4F8FF] drop-shadow-[0_2px_10px_rgba(0,0,0,0.78)]">
+                            {{ $undangan->nama_panggilan_pria }}
+                            <span class="font-kaligrafi font-normal text-[#E5C474] mx-0.5">&amp;</span>
+                            {{ $undangan->nama_panggilan_wanita }}
+                        </p>
+
+                        <p class="intro-celestial-tanggal mt-2 text-[9.5px] sm:text-[10.5px] font-medium uppercase tracking-[0.3em] text-[#E5C474]/92">
+                            {{ $tanggalIntro }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- PETUNJUK HALUS LEWATI --}}
+            <span class="intro-petunjuk pointer-events-none absolute bottom-7 z-20 text-[9.5px] uppercase tracking-[0.28em] text-[#F3E5AB]/62">
                 Ketuk untuk melewati
             </span>
         </div>

@@ -145,6 +145,8 @@ class TemaMotion3DTest extends TestCase
                 ->assertSee('We Are Getting Married!', false)
                 ->assertSee('Save The Date', false)
                 ->assertSee('Kami Yang Berbahagia', false)
+                ->assertSee('--s2-dropdown-bg:', false)
+                ->assertSee('--s2-option-selected-bg:', false)
                 ->assertSee($item['ornamen'], false)
                 ->assertSee($item['penandaGerak'], false);
 
@@ -184,6 +186,11 @@ class TemaMotion3DTest extends TestCase
             } elseif ($item['slug'] === 'sunda-heritage') {
                 $respon->assertSee('diorama-kamera-3d', false)
                     ->assertSee('rounded-t-[10.5rem]', false)
+                    ->assertSee('sunda-motion-hero.mp4?v=3', false)
+                    ->assertSee('data-start-at="0"', false)
+                    ->assertSee('data-playback-rate="1.2"', false)
+                    ->assertSee('data-reveal-at="20.4"', false)
+                    ->assertSee('data-settled-at="22.8"', false)
                     ->assertSee('data-sinema-gsap="sunda"', false)
                     ->assertSee('data-gsap="potret"', false)
                     ->assertSee('data-gsap="garis"', false)
@@ -599,5 +606,119 @@ class TemaMotion3DTest extends TestCase
                 $respon->assertSee($jalur, false);
             }
         }
+    }
+
+    /**
+     * Memastikan tema Islami Syar'i merender video motion hero Alhambra, overlay Mihrab sinkron,
+     * seksi konten lengkap (slideshow, amplop buka-tutup, doa pengantin), aman pada Mode Tanpa Foto,
+     * serta menampilkan poster hero-poster.webp pada katalog beranda.
+     */
+    public function test_islami_syari_merender_video_hero_poster_dan_seksi_lengkap(): void
+    {
+        $this->assertFileExists(public_path('aset-tema/islami-syari/islami-syari-motion-hero.mp4'));
+        $this->assertFileExists(public_path('aset-tema/islami-syari/hero-poster.webp'));
+
+        Tema::create([
+            'nama_tema' => 'Islami Syari Emerald',
+            'slug' => 'islami-syari',
+            'kategori' => 'islami',
+            'tier' => 'basic',
+            'harga' => 59000,
+            'lokasi_view' => 'tema.islami-syari.index',
+            'aktif' => true,
+        ]);
+
+        $this->get('/demo/islami-syari?kanvas=1')
+            ->assertOk()
+            ->assertSee('aset-tema/islami-syari/islami-syari-motion-hero.mp4', false)
+            ->assertSee('data-start-at="0.15"', false)
+            ->assertSee('data-playback-rate="1.2"', false)
+            ->assertSee('data-reveal-at="20.2"', false)
+            ->assertSee('data-settled-at="22.8"', false)
+            ->assertSee('putarUlangVideoHero()', false)
+            ->assertSee('data-slideshow-syari', false)
+            ->assertSee('Buka Amplop Digital', false)
+            ->assertSee('data-section-doa-pengantin="mihrab"', false)
+            ->assertSee('Doa Untuk Pengantin', false)
+            ->assertSee('RSVP &amp; Wishes', false)
+            ->assertSee('data-galeri-kolase-syari', false)
+            ->assertSee('aspect-[16/10]', false)
+            ->assertSee('Jazakumullahu Khairan', false);
+
+        $this->get('/demo/islami-syari?kanvas=1&tf=1')
+            ->assertOk()
+            ->assertSee('aset-tema/islami-syari/islami-syari-motion-hero.mp4', false)
+            ->assertSee('aset-tema/islami-syari/latar-utama.webp', false)
+            ->assertDontSee('sampul-islami.webp', false)
+            ->assertDontSee('data-slideshow-syari', false);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('aset-tema/islami-syari/hero-poster.webp', false);
+    }
+
+    /**
+     * Memastikan tema Islamic Heavenly merender video motion hero Celestial Night,
+     * overlay bingkai safir sinkron, seksi konten lengkap (slideshow, amplop buka-tutup,
+     * doa pengantin, galeri kolase bervariasi rasio), aman Mode Tanpa Foto, serta poster katalog.
+     */
+    public function test_islamic_heavenly_merender_video_hero_poster_dan_seksi_lengkap(): void
+    {
+        $this->assertFileExists(public_path('aset-tema/islamic-heavenly/islamic-heavenly-motion-hero.mp4'));
+        $this->assertFileExists(public_path('aset-tema/islamic-heavenly/hero-poster.webp'));
+
+        Tema::create([
+            'nama_tema' => 'Islamic Heavenly Motion',
+            'slug' => 'islamic-heavenly',
+            'kategori' => 'islami',
+            'tier' => 'eksklusif',
+            'harga' => 119000,
+            'lokasi_view' => 'tema.islamic-heavenly.index',
+            'aktif' => true,
+        ]);
+
+        $responHeavenly = $this->get('/demo/islamic-heavenly?kanvas=1')
+            ->assertOk()
+            ->assertSee('intro-celestial-panggung', false)
+            ->assertSee('intro-celestial-astrolab', false)
+            ->assertSee('aset-tema/islamic-heavenly/islamic-heavenly-motion-hero.mp4', false)
+            ->assertSee('data-start-at="0"', false)
+            ->assertSee('data-playback-rate="1.05"', false)
+            ->assertSee('data-reveal-at="16.8"', false)
+            ->assertSee('data-settled-at="19.8"', false)
+            ->assertSee('putarUlangVideoHero()', false)
+            ->assertSee('data-slideshow-heavenly', false)
+            ->assertSee('Buka Amplop Digital', false)
+            ->assertSee('data-section-doa-pengantin="celestial"', false)
+            ->assertSee('Doa Untuk Pengantin', false)
+            ->assertSee('RSVP &amp; Wishes', false)
+            ->assertSee('data-galeri-kolase-heavenly', false)
+            ->assertSee('aspect-[16/10]', false)
+            ->assertSee('Jazakumullahu Khairan', false);
+
+        // Pastikan urutan seksi selaras Islami Syar'i: Mempelai -> Slideshow -> Save The Date -> Jadwal
+        $htmlHeavenly = $responHeavenly->getContent();
+        $posMempelai = strpos($htmlHeavenly, 'data-layout-mempelai="celestial"');
+        $posSlideshow = strpos($htmlHeavenly, 'data-slideshow-heavenly');
+        $posCountdown = strpos($htmlHeavenly, 'data-layout-countdown="celestial"');
+        $posAcara = strpos($htmlHeavenly, 'data-layout-acara="celestial"');
+        $this->assertNotFalse($posMempelai);
+        $this->assertNotFalse($posSlideshow);
+        $this->assertNotFalse($posCountdown);
+        $this->assertNotFalse($posAcara);
+        $this->assertLessThan($posSlideshow, $posMempelai);
+        $this->assertLessThan($posCountdown, $posSlideshow);
+        $this->assertLessThan($posAcara, $posCountdown);
+
+        $this->get('/demo/islamic-heavenly?kanvas=1&tf=1')
+            ->assertOk()
+            ->assertSee('aset-tema/islamic-heavenly/islamic-heavenly-motion-hero.mp4', false)
+            ->assertSee('aset-tema/islamic-heavenly/latar-utama.webp', false)
+            ->assertDontSee('sampul-islamic-heavenly.webp', false)
+            ->assertDontSee('data-slideshow-heavenly', false);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('aset-tema/islamic-heavenly/hero-poster.webp', false);
     }
 }

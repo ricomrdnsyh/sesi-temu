@@ -7,7 +7,7 @@
         'tiraiKujang' => asset('aset-tema/sunda-heritage/tirai-kujang-pembuka.webp'),
         'bingkaiPriangan' => asset('aset-tema/sunda-heritage/bingkai-priangan.webp'),
         'bungaDepan' => asset('aset-tema/sunda-heritage/bunga-depan-sunda.webp'),
-        'videoHero' => file_exists($jalurVideoSunda) ? asset('aset-tema/sunda-heritage/sunda-motion-hero.mp4?v=2') : null,
+        'videoHero' => file_exists($jalurVideoSunda) ? asset('aset-tema/sunda-heritage/sunda-motion-hero.mp4?v=3') : null,
     ];
 
     $dataTema = \App\Support\DataTemaUndangan::siapkan(

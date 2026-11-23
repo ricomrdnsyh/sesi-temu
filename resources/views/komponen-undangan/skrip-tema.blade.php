@@ -360,6 +360,9 @@
 
                 vid.muted = true;
                 vid.defaultMuted = true;
+                const lajuPutar = Math.max(0.5, Math.min(2, Number.parseFloat(vid.dataset.playbackRate || '1') || 1));
+                vid.defaultPlaybackRate = lajuPutar;
+                vid.playbackRate = lajuPutar;
 
                 let sudahDipanaskan = false;
                 const panaskanDecoder = () => {
@@ -385,6 +388,11 @@
                                             return;
                                         }
                                         vid.pause();
+                                        if (vid.currentTime > mulaiDetik + 0.06) {
+                                            try {
+                                                vid.currentTime = mulaiDetik;
+                                            } catch (e) {}
+                                        }
                                         this.videoHeroSiap = true;
                                     };
                                     if (typeof vid.requestVideoFrameCallback === 'function') {
@@ -451,10 +459,12 @@
                         this.teksHeroTampil = false;
                         this.videoHeroSedangIntro = true;
                         vid.muted = true;
+                        const lajuPutar = Math.max(0.5, Math.min(2, Number.parseFloat(vid.dataset.playbackRate || '1') || 1));
+                        vid.defaultPlaybackRate = lajuPutar;
+                        vid.playbackRate = lajuPutar;
 
                         const mulaiDetik = this.videoHeroMulaiDetik || Number.parseFloat(vid.dataset.startAt || '0') || 0;
-                        const sudahDiTitikAwal = this.videoHeroSiap
-                            || (vid.currentTime >= Math.max(0, mulaiDetik - 0.15) && vid.currentTime <= mulaiDetik + 0.5);
+                        const sudahDiTitikAwal = vid.currentTime >= Math.max(0, mulaiDetik - 0.05) && vid.currentTime <= mulaiDetik + 0.12;
 
                         // Hindari seek ulang jika sudah pre-warmed agar decoder tidak flush / terjeda
                         if (!sudahDiTitikAwal && !vid.seeking) {
@@ -500,7 +510,7 @@
                             window.clearTimeout(this.timerWatchdogHero);
                         }
                         const ambangReveal = Number.parseFloat(vid.dataset.revealAt || '13.15');
-                        const durasiWatchdog = Math.max(8000, Math.round((ambangReveal - mulaiDetik + 2.4) * 1000));
+                        const durasiWatchdog = Math.max(8000, Math.round((((ambangReveal - mulaiDetik) / lajuPutar) + 2.4) * 1000));
                         this.timerWatchdogHero = window.setTimeout(() => {
                             if (!this.teksHeroTampil) {
                                 this.teksHeroTampil = true;
@@ -601,6 +611,9 @@
                 this.videoHeroSelesai = false;
                 try {
                     const mulaiDetik = this.videoHeroMulaiDetik || Number.parseFloat(vid.dataset.startAt || '0') || 0;
+                    const lajuPutar = Math.max(0.5, Math.min(2, Number.parseFloat(vid.dataset.playbackRate || '1') || 1));
+                    vid.defaultPlaybackRate = lajuPutar;
+                    vid.playbackRate = lajuPutar;
                     vid.currentTime = Math.min(mulaiDetik, Math.max(0, (vid.duration || 20) - 1));
                     vid.play().catch(() => {
                         this.teksHeroTampil = true;

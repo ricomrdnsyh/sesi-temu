@@ -17,7 +17,9 @@
 
     $adalahAdatJawa = $tema->slug === 'adat-jawa';
     $adalahSundaHeritage = $tema->slug === 'sunda-heritage';
-    $adalahAdatShowcase = $adalahAdatJawa || $adalahSundaHeritage;
+    $adalahIslamiSyari = $tema->slug === 'islami-syari';
+    $adalahIslamicHeavenly = $tema->slug === 'islamic-heavenly';
+    $adalahAdatShowcase = $adalahAdatJawa || $adalahSundaHeritage || $adalahIslamiSyari || $adalahIslamicHeavenly;
 
     $relatifLatarTema = "aset-tema/{$tema->slug}/latar-utama.webp";
     $gambarLatarTemaUrl = is_file(public_path($relatifLatarTema))
@@ -43,6 +45,16 @@
         'heroPoster' => asset('aset-tema/sunda-heritage/hero-poster.webp'),
         'bingkai' => asset('aset-tema/sunda-heritage/bingkai-priangan.webp'),
         'bungaDepan' => asset('aset-tema/sunda-heritage/bunga-depan-sunda.webp'),
+    ] : [];
+
+    $asetPosterSyari = $adalahIslamiSyari ? [
+        'arabesque' => asset('aset-tema/islami-syari/ornamen-arabesque.webp'),
+        'heroPoster' => asset('aset-tema/islami-syari/hero-poster.webp'),
+    ] : [];
+
+    $asetPosterHeavenly = $adalahIslamicHeavenly ? [
+        'sabit' => asset('aset-tema/islamic-heavenly/ornamen-sabit.webp'),
+        'heroPoster' => asset('aset-tema/islamic-heavenly/hero-poster.webp'),
     ] : [];
 
     $adalahEditorial = !empty($poster['editorial']);
@@ -144,17 +156,17 @@
                             >
                             <div
                                 class="absolute inset-0"
-                                style="background: linear-gradient(180deg, rgba(20,10,8,0.16) 0%, {{ $adalahAdatJawa ? 'rgba(71,42,28,0.36)' : 'rgba(90,30,30,0.36)' }} 54%, {{ $adalahAdatJawa ? '#472A1C' : '#5A1E1E' }} 100%);"
+                                style="background: linear-gradient(180deg, rgba(12,16,28,0.18) 0%, {{ $adalahAdatJawa ? 'rgba(71,42,28,0.36)' : ($adalahIslamiSyari ? 'rgba(14,58,54,0.42)' : ($adalahIslamicHeavenly ? 'rgba(19,38,62,0.45)' : 'rgba(90,30,30,0.36)')) }} 54%, {{ $adalahAdatJawa ? '#472A1C' : ($adalahIslamiSyari ? '#0E3A36' : ($adalahIslamicHeavenly ? '#091322' : '#5A1E1E')) }} 100%);"
                             ></div>
                         </div>
 
                         <div class="relative z-10 text-center" style="margin-top: -2.4cqw; padding: 0 1.85cqw 0 1.2cqw;">
                             <img
-                                src="{{ $adalahAdatJawa ? $asetPosterJawa['gunungan'] : $asetPosterSunda['siger'] }}"
+                                src="{{ $adalahAdatJawa ? $asetPosterJawa['gunungan'] : ($adalahIslamiSyari ? $asetPosterSyari['arabesque'] : ($adalahIslamicHeavenly ? $asetPosterHeavenly['sabit'] : $asetPosterSunda['siger'])) }}"
                                 alt=""
                                 loading="lazy"
                                 class="mx-auto drop-shadow"
-                                style="width: {{ $adalahAdatJawa ? '3.15cqw' : '3.65cqw' }};"
+                                style="width: {{ $adalahAdatJawa ? '3.15cqw' : ($adalahIslamiSyari ? '3.2cqw' : ($adalahIslamicHeavenly ? '3cqw' : '3.65cqw')) }};"
                             >
                             <p class="font-script leading-none text-white" style="margin-top: 0.5cqw; font-size: 3.05cqw;">
                                 Save The Date
@@ -196,6 +208,36 @@
                                 </p>
                                 <p class="opacity-70 truncate leading-tight" style="margin-top: 0.35cqw; font-size: 0.95cqw; color: #472A1C;">
                                     Royal Ambarrukmo
+                                </p>
+                            </div>
+                        @elseif ($adalahIslamiSyari)
+                            <div
+                                class="text-center shadow-md"
+                                style="border-radius: 999px 999px 1.25cqw 1.25cqw; background-color: #FCFEFD; border: 0.22cqw solid rgba(197,160,89,0.85); color: #0E3A36; padding: 2.1cqw 1cqw 1.45cqw;"
+                            >
+                                <p class="font-serif-poster font-bold leading-tight truncate" style="font-size: 1.85cqw; color: #0E3A36;">
+                                    Akad Nikah
+                                </p>
+                                <p class="font-serif-poster font-bold uppercase tracking-wider leading-tight" style="margin-top: 0.45cqw; font-size: 1.15cqw; color: #9E7D40;">
+                                    26 DES 2026
+                                </p>
+                                <p class="opacity-70 truncate leading-tight" style="margin-top: 0.3cqw; font-size: 0.92cqw;">
+                                    Masjid Istiqlal
+                                </p>
+                            </div>
+                        @elseif ($adalahIslamicHeavenly)
+                            <div
+                                class="text-center shadow-md"
+                                style="border-radius: 999px 999px 1.25cqw 1.25cqw; background: linear-gradient(180deg, #162B47 0%, #0D1B2E 100%); border: 0.22cqw solid rgba(217,182,100,0.85); color: #E6EEF8; padding: 2.1cqw 1cqw 1.45cqw;"
+                            >
+                                <p class="font-serif-poster font-bold leading-tight truncate" style="font-size: 1.85cqw; color: #F3E5AB;">
+                                    Ijab Qabul
+                                </p>
+                                <p class="font-serif-poster font-bold uppercase tracking-wider leading-tight" style="margin-top: 0.45cqw; font-size: 1.15cqw; color: #D9B664;">
+                                    27 DES 2026
+                                </p>
+                                <p class="opacity-75 truncate leading-tight" style="margin-top: 0.3cqw; font-size: 0.92cqw;">
+                                    Sunda Kelapa
                                 </p>
                             </div>
                         @else
@@ -334,6 +376,192 @@
                             aria-hidden="true"
                             class="pointer-events-none absolute inset-y-0 left-0 z-20"
                             style="width: 3.4cqw; background: linear-gradient(270deg, transparent, rgba(0,0,0,0.22));"
+                        ></div>
+                    </div>
+                @elseif ($adalahIslamiSyari)
+                    {{-- PONSEL KANAN ISLAMI SYAR'I: Header Arabesque + Kartu Paviliun Kubah Zamrud & Potret Al-Arus --}}
+                    <div
+                        class="relative w-full h-full overflow-hidden flex flex-col justify-between text-center"
+                        style="border-radius: 2.85cqw; background-color: #F7FBF8; color: #0E3A36; padding: 3.1cqw 1.15cqw 1.75cqw 1.65cqw;"
+                    >
+                        @if ($gambarLatarTemaUrl)
+                            <img
+                                src="{{ $gambarLatarTemaUrl }}"
+                                alt=""
+                                aria-hidden="true"
+                                loading="lazy"
+                                class="pointer-events-none absolute inset-0 w-full h-full object-cover opacity-14"
+                            >
+                        @endif
+
+                        <div class="relative z-10 w-full">
+                            <img
+                                src="{{ $asetPosterSyari['arabesque'] }}"
+                                alt=""
+                                loading="lazy"
+                                class="mx-auto drop-shadow-xs"
+                                style="width: 3.4cqw;"
+                            >
+                            <p class="uppercase font-bold leading-none" style="margin-top: 0.45cqw; font-size: 0.8cqw; letter-spacing: 0.18em; color: #9E7D40;">
+                                &bull; Bismillahirrahmanirrahim &bull;
+                            </p>
+                            <p class="font-serif-poster font-bold leading-tight" style="margin-top: 0.35cqw; font-size: 1.9cqw; color: #0E3A36;">
+                                Mempelai Pengantin
+                            </p>
+                            <p class="opacity-70 leading-tight mx-auto" style="margin-top: 0.35cqw; font-size: 0.82cqw; max-width: 21cqw;">
+                                Dengan memohon rahmat &amp; ridho Allah SWT:
+                            </p>
+                        </div>
+
+                        <div
+                            class="relative z-10 w-full overflow-hidden shadow-md flex flex-col"
+                            style="margin-top: 1cqw; flex: 1; border-radius: 1.8cqw; background-color: #FCFEFD; border: 0.22cqw solid rgba(197,160,89,0.8);"
+                        >
+                            <div
+                                class="relative flex items-center justify-center overflow-hidden"
+                                style="flex: 1.18; background: linear-gradient(180deg, #154E48 0%, #0E3A36 58%, #0A2B28 100%); padding: 1.4cqw 1.1cqw 2cqw;"
+                            >
+                                <div
+                                    class="relative z-10 overflow-hidden shadow-md"
+                                    style="width: 13cqw; height: 16.5cqw; border-radius: 999px 999px 1.2cqw 1.2cqw; border: 0.28cqw solid #D4B56E; background-color: #08221F;"
+                                >
+                                    <img
+                                        src="{{ $fotoWanitaUrl }}"
+                                        alt="{{ $wanitaLengkap }}"
+                                        loading="lazy"
+                                        class="w-full h-full object-cover"
+                                        style="object-position: 50% 18%;"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="relative z-30 flex justify-center" style="margin-top: -1.15cqw;">
+                                <span
+                                    class="uppercase font-bold leading-none shadow-xs"
+                                    style="border-radius: 9999px; background: linear-gradient(90deg, #EFE0B4 0%, #D4B56E 50%, #EFE0B4 100%); color: #092623; padding: 0.36cqw 1.2cqw; font-size: 0.76cqw; letter-spacing: 0.12em; border: 0.14cqw solid #FFFBF0;"
+                                >
+                                    &bull; Mempelai Wanita &bull;
+                                </span>
+                            </div>
+
+                            <div class="text-center" style="padding: 0.9cqw 1cqw 1.35cqw;">
+                                <p class="font-script leading-none" style="font-size: 2.7cqw; color: #0E3A36;">
+                                    {{ $wanitaPanggilan }}
+                                </p>
+                                <p class="font-serif-poster font-bold truncate leading-tight" style="margin-top: 0.32cqw; font-size: 1.12cqw; color: #16524C;">
+                                    {{ $wanitaLengkap }}
+                                </p>
+                                <p class="opacity-70 truncate leading-tight" style="margin-top: 0.22cqw; font-size: 0.84cqw;">
+                                    Putri dari {{ $wanitaAyah }}
+                                </p>
+                                @if ($instagramWanita)
+                                    <div
+                                        class="inline-flex items-center justify-center font-semibold"
+                                        style="margin-top: 0.6cqw; padding: 0.3cqw 1.25cqw; font-size: 0.84cqw; border-radius: 9999px; background: linear-gradient(135deg, #16524C 0%, #0E3A36 100%); color: #F7FBF8; border: 0.12cqw solid rgba(197,160,89,0.65);"
+                                    >
+                                        &#64;{{ $instagramWanita }}
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div
+                            aria-hidden="true"
+                            class="pointer-events-none absolute inset-y-0 left-0 z-20"
+                            style="width: 3.4cqw; background: linear-gradient(270deg, transparent, rgba(0,0,0,0.22));"
+                        ></div>
+                    </div>
+                @elseif ($adalahIslamicHeavenly)
+                    {{-- PONSEL KANAN ISLAMIC HEAVENLY: Observatorium Malam Safir + Potret Lingkaran Astrolab --}}
+                    <div
+                        class="relative w-full h-full overflow-hidden flex flex-col justify-between text-center"
+                        style="border-radius: 2.85cqw; background: linear-gradient(180deg, #102036 0%, #091322 100%); color: #E6EEF8; padding: 3.1cqw 1.15cqw 1.75cqw 1.65cqw;"
+                    >
+                        @if ($gambarLatarTemaUrl)
+                            <img
+                                src="{{ $gambarLatarTemaUrl }}"
+                                alt=""
+                                aria-hidden="true"
+                                loading="lazy"
+                                class="pointer-events-none absolute inset-0 w-full h-full object-cover opacity-22"
+                            >
+                        @endif
+
+                        <div class="relative z-10 w-full">
+                            <img
+                                src="{{ $asetPosterHeavenly['sabit'] }}"
+                                alt=""
+                                loading="lazy"
+                                class="mx-auto drop-shadow-xs"
+                                style="width: 3.1cqw;"
+                            >
+                            <p class="uppercase font-bold leading-none" style="margin-top: 0.45cqw; font-size: 0.8cqw; letter-spacing: 0.18em; color: #D9B664;">
+                                &#10022; Calon Mempelai &#10022;
+                            </p>
+                            <p class="font-serif-poster font-bold leading-tight text-white" style="margin-top: 0.35cqw; font-size: 1.9cqw;">
+                                Mempelai Berbahagia
+                            </p>
+                            <p class="opacity-75 leading-tight mx-auto" style="margin-top: 0.35cqw; font-size: 0.82cqw; max-width: 21cqw;">
+                                Dengan memohon rahmat &amp; ridho Allah SWT:
+                            </p>
+                        </div>
+
+                        <div
+                            class="relative z-10 w-full overflow-hidden shadow-md flex flex-col"
+                            style="margin-top: 1cqw; flex: 1; border-radius: 1.8cqw; background: linear-gradient(180deg, #152842 0%, #0B1626 100%); border: 0.22cqw solid rgba(217,182,100,0.72);"
+                        >
+                            <div
+                                class="relative flex items-center justify-center overflow-hidden"
+                                style="flex: 1.18; padding: 1.4cqw 1.1cqw 2cqw;"
+                            >
+                                <div
+                                    class="relative z-10 overflow-hidden shadow-md"
+                                    style="width: 13cqw; height: 16.5cqw; border-radius: 999px 999px 1.2cqw 1.2cqw; border: 0.28cqw solid #D9B664; background-color: #091322; box-shadow: 0 0 1.4cqw rgba(217,182,100,0.28);"
+                                >
+                                    <img
+                                        src="{{ $fotoWanitaUrl }}"
+                                        alt="{{ $wanitaLengkap }}"
+                                        loading="lazy"
+                                        class="w-full h-full object-cover"
+                                        style="object-position: 50% 18%;"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="relative z-30 flex justify-center" style="margin-top: -1.15cqw;">
+                                <span
+                                    class="uppercase font-bold leading-none shadow-xs"
+                                    style="border-radius: 9999px; background: linear-gradient(90deg, #F3E5AB 0%, #D9B664 50%, #F3E5AB 100%); color: #091322; padding: 0.36cqw 1.2cqw; font-size: 0.76cqw; letter-spacing: 0.12em; border: 0.14cqw solid #FFF8E4;"
+                                >
+                                    &#10022; Mempelai Wanita &#10022;
+                                </span>
+                            </div>
+
+                            <div class="text-center" style="padding: 0.9cqw 1cqw 1.35cqw; background-color: rgba(9,19,34,0.45);">
+                                <p class="font-script leading-none" style="font-size: 2.75cqw; color: #F3E5AB;">
+                                    {{ $wanitaPanggilan }}
+                                </p>
+                                <p class="font-serif-poster font-bold truncate leading-tight text-white" style="margin-top: 0.32cqw; font-size: 1.12cqw;">
+                                    {{ $wanitaLengkap }}
+                                </p>
+                                <p class="opacity-75 truncate leading-tight" style="margin-top: 0.22cqw; font-size: 0.84cqw;">
+                                    Putri dari {{ $wanitaAyah }}
+                                </p>
+                                @if ($instagramWanita)
+                                    <div
+                                        class="inline-flex items-center justify-center font-semibold"
+                                        style="margin-top: 0.6cqw; padding: 0.3cqw 1.25cqw; font-size: 0.84cqw; border-radius: 9999px; background: linear-gradient(135deg, #18304F 0%, #091322 100%); color: #F3E5AB; border: 0.14cqw solid rgba(217,182,100,0.68);"
+                                    >
+                                        &#64;{{ $instagramWanita }}
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div
+                            aria-hidden="true"
+                            class="pointer-events-none absolute inset-y-0 left-0 z-20"
+                            style="width: 3.4cqw; background: linear-gradient(270deg, transparent, rgba(0,0,0,0.34));"
                         ></div>
                     </div>
                 @else
@@ -500,6 +728,86 @@
                                 {{ $wanitaPanggilan }}
                             </p>
                             <p class="uppercase font-semibold leading-none drop-shadow-xs" style="margin-top: 1.25cqw; font-size: 1cqw; letter-spacing: 0.24em; color: #FFFAF5;">
+                                {{ $poster['tanggal_pendek'] }}
+                            </p>
+                        </div>
+                    </div>
+                @elseif ($adalahIslamiSyari)
+                    {{-- PONSEL TENGAH ISLAMI SYAR'I: Visual Hero Video Motion Alhambra (Bingkai Mihrab Zamrud, Paviliun Kubah & Mawar Putih) --}}
+                    <div
+                        class="relative w-full h-full overflow-hidden text-center"
+                        style="border-radius: 3.25cqw; background: #0E3A36;"
+                    >
+                        <img
+                            src="{{ $asetPosterSyari['heroPoster'] }}"
+                            alt="{{ $tema->nama_tema }}"
+                            loading="lazy"
+                            class="absolute inset-0 w-full h-full object-cover object-center"
+                        >
+
+                        {{-- Tipografi Mempelai Tepat Di Dalam Bingkai Mihrab Zamrud Video Hero --}}
+                        <div
+                            class="absolute z-20 flex flex-col items-center justify-center text-center"
+                            style="inset: 18% 20% 50.5% 20%;"
+                        >
+                            <p class="leading-none drop-shadow-xs" style="font-size: 1.45cqw; color: #F3E5AB;">
+                                بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
+                            </p>
+                            <p class="uppercase font-bold leading-none drop-shadow-xs" style="margin-top: 0.65cqw; font-size: 0.82cqw; letter-spacing: 0.22em; color: #E6D19C;">
+                                Walimatul Ursy
+                            </p>
+                            <p class="font-serif-poster font-bold uppercase leading-[1.06] drop-shadow-xs" style="margin-top: 0.75cqw; font-size: 2.7cqw; letter-spacing: 0.08em; color: #FFFDF8;">
+                                {{ $priaPanggilan }}
+                            </p>
+                            <div class="flex items-center justify-center gap-[0.65cqw]" style="margin: 0.18cqw 0;">
+                                <span style="height: 0.14cqw; width: 2cqw; background: rgba(230,209,156,0.75);"></span>
+                                <span class="font-script leading-none" style="font-size: 2.2cqw; color: #E6D19C;">&amp;</span>
+                                <span style="height: 0.14cqw; width: 2cqw; background: rgba(230,209,156,0.75);"></span>
+                            </div>
+                            <p class="font-serif-poster font-bold uppercase leading-[1.06] drop-shadow-xs" style="font-size: 2.7cqw; letter-spacing: 0.08em; color: #FFFDF8;">
+                                {{ $wanitaPanggilan }}
+                            </p>
+                            <p class="uppercase font-semibold leading-none drop-shadow-xs" style="margin-top: 0.85cqw; font-size: 0.92cqw; letter-spacing: 0.22em; color: #F3E5AB;">
+                                {{ $poster['tanggal_pendek'] }}
+                            </p>
+                        </div>
+                    </div>
+                @elseif ($adalahIslamicHeavenly)
+                    {{-- PONSEL TENGAH ISLAMIC HEAVENLY: Visual Hero Video Motion Celestial Night (Bingkai Safir, Kubah Masjid & Teratai Putih) --}}
+                    <div
+                        class="relative w-full h-full overflow-hidden text-center"
+                        style="border-radius: 3.25cqw; background: #091322;"
+                    >
+                        <img
+                            src="{{ $asetPosterHeavenly['heroPoster'] }}"
+                            alt="{{ $tema->nama_tema }}"
+                            loading="lazy"
+                            class="absolute inset-0 w-full h-full object-cover object-center"
+                        >
+
+                        {{-- Tipografi Mempelai Tepat Di Dalam Bingkai Safir Video Hero --}}
+                        <div
+                            class="absolute z-20 flex flex-col items-center justify-center text-center"
+                            style="inset: 19.5% 27% 47% 27%;"
+                        >
+                            <p class="leading-none drop-shadow-xs" style="font-size: 1.3cqw; color: #F3E5AB;">
+                                بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
+                            </p>
+                            <p class="uppercase font-bold leading-none drop-shadow-xs" style="margin-top: 0.6cqw; font-size: 0.76cqw; letter-spacing: 0.2em; color: #D9B664;">
+                                Walimatul Ursy
+                            </p>
+                            <p class="font-serif-poster font-bold uppercase leading-[1.06] drop-shadow-xs" style="margin-top: 0.7cqw; font-size: 2.4cqw; letter-spacing: 0.07em; color: #FFFDF8;">
+                                {{ $priaPanggilan }}
+                            </p>
+                            <div class="flex items-center justify-center gap-[0.6cqw]" style="margin: 0.16cqw 0;">
+                                <span style="height: 0.14cqw; width: 1.8cqw; background: rgba(217,182,100,0.75);"></span>
+                                <span class="font-script leading-none" style="font-size: 2.05cqw; color: #E7C87D;">&amp;</span>
+                                <span style="height: 0.14cqw; width: 1.8cqw; background: rgba(217,182,100,0.75);"></span>
+                            </div>
+                            <p class="font-serif-poster font-bold uppercase leading-[1.06] drop-shadow-xs" style="font-size: 2.4cqw; letter-spacing: 0.07em; color: #FFFDF8;">
+                                {{ $wanitaPanggilan }}
+                            </p>
+                            <p class="uppercase font-semibold leading-none drop-shadow-xs" style="margin-top: 0.8cqw; font-size: 0.86cqw; letter-spacing: 0.2em; color: #F3E5AB;">
                                 {{ $poster['tanggal_pendek'] }}
                             </p>
                         </div>

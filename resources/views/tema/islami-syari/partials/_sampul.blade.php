@@ -18,7 +18,7 @@
             <div
                 aria-hidden="true"
                 class="pointer-events-none absolute inset-0"
-                style="background: radial-gradient(ellipse 88% 58% at 50% 42%, rgba(20,76,69,0.52) 0%, rgba(11,45,41,0.86) 56%, rgba(7,29,26,0.96) 100%);"
+                style="background: radial-gradient(ellipse 88% 58% at 50% 42%, rgba(20,76,69,0.52) 0%, rgba(11,45,41,0.88) 56%, rgba(7,29,26,0.97) 100%);"
             ></div>
 
             {{-- Pola Geometri Islami Halus --}}
@@ -90,9 +90,7 @@
             {{-- BAGIAN TENGAH: KUBAH POTRET BESAR RESPONSIF BERBINGKAI GANDA EMAS --}}
             <div class="relative z-20 flex items-center justify-center py-1">
                 <div class="relative">
-                    {{-- Halo Lengkung Putus-Putus Emas Di Luar Bingkai --}}
                     <span aria-hidden="true" class="pointer-events-none absolute -inset-2.5 rounded-t-full rounded-b-[1.9rem] border border-dashed border-[#E6D19C]/45"></span>
-                    {{-- Bintang Filigree Samping Kiri & Kanan --}}
                     <svg aria-hidden="true" class="pointer-events-none absolute top-1/2 -left-5 -translate-y-1/2 h-3.5 w-3.5 text-[#E6D19C]/85" viewBox="0 0 16 16" fill="currentColor">
                         <path d="M8 0.5L9.9 6.1L15.5 8L9.9 9.9L8 15.5L6.1 9.9L0.5 8L6.1 6.1L8 0.5Z" />
                     </svg>
@@ -100,7 +98,6 @@
                         <path d="M8 0.5L9.9 6.1L15.5 8L9.9 9.9L8 15.5L6.1 9.9L0.5 8L6.1 6.1L8 0.5Z" />
                     </svg>
 
-                    {{-- Bingkai Emas Solid + Mahkota Arabesque --}}
                     <div class="relative p-[4px] rounded-t-full rounded-b-[1.5rem] bg-gradient-to-b from-[#F5E7B2] via-[#C5A059] to-[#8C6D32] shadow-[0_24px_48px_-14px_rgba(0,0,0,0.72)]">
                         <img
                             src="{{ $asetSyari['arabesque'] }}"
@@ -115,6 +112,8 @@
                             <img
                                 src="{{ $urlFotoSampul }}"
                                 alt="Sampul {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}"
+                                fetchpriority="high"
+                                decoding="sync"
                                 class="w-full h-full object-cover object-top scale-[1.03] animasi-nafas"
                             >
                             <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#08221F]/45 via-transparent to-[#08221F]/12"></div>
@@ -125,7 +124,6 @@
 
             {{-- BAGIAN BAWAH: PLAKAT SAPAAN TAMU ALABASTER-EMAS --}}
             <div class="relative z-20 w-full max-w-[356px] rounded-[1.75rem] bg-[#F8FCF9]/96 backdrop-blur-md border border-[#C5A059]/80 px-5 py-4 text-center text-[#0E3A36] shadow-[0_22px_48px_-14px_rgba(0,0,0,0.62)]">
-                {{-- Siku Filigree 4 Sudut --}}
                 <span aria-hidden="true" class="pointer-events-none absolute top-2.5 left-2.5 h-2.5 w-2.5 border-t border-l border-[#C5A059]/75"></span>
                 <span aria-hidden="true" class="pointer-events-none absolute top-2.5 right-2.5 h-2.5 w-2.5 border-t border-r border-[#C5A059]/75"></span>
                 <span aria-hidden="true" class="pointer-events-none absolute bottom-2.5 left-2.5 h-2.5 w-2.5 border-b border-l border-[#C5A059]/75"></span>
@@ -143,7 +141,7 @@
                     <button
                         type="button"
                         @click="bukaUndangan()"
-                        class="syari-tombol inline-flex items-center justify-center gap-2 rounded-full border border-[#C5A059]/80 px-8 py-2.5 text-xs sm:text-[13px] font-bold uppercase tracking-[0.18em] active:scale-95 transition cursor-pointer"
+                        class="syari-tombol inline-flex items-center justify-center gap-2 rounded-full px-8 py-2.5 text-xs sm:text-[13px] font-bold uppercase tracking-[0.18em] active:scale-95 transition cursor-pointer"
                     >
                         <svg class="w-4 h-4 text-[#F3E5AB]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <rect width="20" height="16" x="2" y="4" rx="2"/>
@@ -164,23 +162,25 @@
             <img
                 src="{{ $urlFotoLatar }}"
                 alt="Sampul {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}"
+                fetchpriority="high"
+                decoding="sync"
                 class="absolute inset-0 w-full h-full object-cover object-center scale-105 animasi-nafas"
             >
             <div
                 aria-hidden="true"
                 class="pointer-events-none absolute inset-0"
-                style="background: radial-gradient(ellipse 86% 68% at 50% 50%, rgba(247,251,248,0.88) 0%, rgba(238,246,241,0.56) 60%, rgba(14,58,54,0.28) 100%);"
+                style="background: radial-gradient(ellipse 86% 68% at 50% 50%, rgba(247,251,248,0.90) 0%, rgba(238,246,241,0.58) 60%, rgba(14,58,54,0.32) 100%);"
             ></div>
 
             {{-- Ornamen Lentera Fanous Emas Lembut Di Sisi Atas --}}
-            <svg aria-hidden="true" viewBox="0 0 60 120" class="pointer-events-none absolute top-0 left-5 w-9 text-[#9E7D40]/65 z-10 animasi-ayun-3d" fill="none" stroke="currentColor" stroke-width="1.25">
+            <svg aria-hidden="true" viewBox="0 0 60 120" class="pointer-events-none absolute top-0 left-5 w-9 text-[#9E7D40]/70 z-10 animasi-ayun-3d" fill="none" stroke="currentColor" stroke-width="1.25">
                 <line x1="30" y1="0" x2="30" y2="48" />
                 <circle cx="30" cy="51" r="2.8" fill="currentColor" />
                 <path d="M23 58 Q30 51 37 58 L39 76 Q30 86 21 76 Z" fill="currentColor" fill-opacity="0.14" />
                 <path d="M30 84 L30 96" />
                 <path d="M30 96 L32.5 101 L30 106 L27.5 101 Z" fill="currentColor" stroke="none" />
             </svg>
-            <svg aria-hidden="true" viewBox="0 0 60 120" class="pointer-events-none absolute top-0 right-5 w-9 text-[#9E7D40]/65 z-10 animasi-ayun-3d-balik" fill="none" stroke="currentColor" stroke-width="1.25">
+            <svg aria-hidden="true" viewBox="0 0 60 120" class="pointer-events-none absolute top-0 right-5 w-9 text-[#9E7D40]/70 z-10 animasi-ayun-3d-balik" fill="none" stroke="currentColor" stroke-width="1.25">
                 <line x1="30" y1="0" x2="30" y2="40" />
                 <circle cx="30" cy="43" r="2.8" fill="currentColor" />
                 <path d="M23 50 Q30 43 37 50 L39 68 Q30 78 21 68 Z" fill="currentColor" fill-opacity="0.14" />
@@ -191,8 +191,8 @@
             @include('komponen-undangan.lapisan-motion', ['efekMotion' => 'zaitun-kilau', 'konteks' => 'sampul'])
 
             {{-- Plakat Lengkung Mihrab Berbingkai Emas --}}
-            <div class="relative z-20 w-full max-w-[342px] rounded-t-[9rem] rounded-b-[2rem] bg-[#F8FCF9]/94 backdrop-blur-sm border-2 border-[#C5A059]/80 ring-4 ring-[#0E3A36]/10 px-6 pt-9 pb-6 text-center text-[#0E3A36] shadow-[0_26px_60px_-18px_rgba(14,58,54,0.34)]">
-                <div aria-hidden="true" class="pointer-events-none absolute inset-2.5 rounded-t-[8rem] rounded-b-[1.45rem] border border-dashed border-[#C5A059]/50"></div>
+            <div class="relative z-20 w-full max-w-[342px] rounded-t-[10.5rem] rounded-b-[2rem] bg-[#F8FCF9]/95 backdrop-blur-sm border-2 border-[#C5A059]/80 ring-4 ring-[#0E3A36]/10 px-6 pt-9 pb-6 text-center text-[#0E3A36] shadow-[0_26px_60px_-18px_rgba(14,58,54,0.34)]">
+                <div aria-hidden="true" class="pointer-events-none absolute inset-2.5 rounded-t-[9.6rem] rounded-b-[1.45rem] border border-dashed border-[#C5A059]/50"></div>
 
                 <div class="relative z-10 space-y-4">
                     <div class="space-y-1">
@@ -242,7 +242,7 @@
                             <button
                                 type="button"
                                 @click="bukaUndangan()"
-                                class="syari-tombol inline-flex items-center justify-center gap-2 rounded-full border border-[#C5A059]/80 px-8 py-2.5 text-xs font-bold uppercase tracking-[0.18em] active:scale-95 transition cursor-pointer"
+                                class="syari-tombol inline-flex items-center justify-center gap-2 rounded-full px-8 py-2.5 text-xs font-bold uppercase tracking-[0.18em] active:scale-95 transition cursor-pointer"
                             >
                                 <svg class="w-4 h-4 text-[#F3E5AB]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                     <rect width="20" height="16" x="2" y="4" rx="2"/>
