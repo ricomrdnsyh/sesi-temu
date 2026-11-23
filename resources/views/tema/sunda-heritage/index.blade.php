@@ -25,6 +25,7 @@
 
 <head>
     @include('komponen-undangan.meta-opengraph')
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* Hero Sinema 2.5D Penuh 1 Layar HP, Tablet & Desktop Anti-Zoom */
         .sunda-hero-layar-penuh {

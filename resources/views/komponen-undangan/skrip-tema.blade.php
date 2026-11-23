@@ -37,7 +37,8 @@
                     this.siapkanVideoHero(this.$refs.heroVideo);
                 }
 
-                const panggungEls = Array.from(document.querySelectorAll('[data-panggung-3d]'));
+                const panggungSampingEls = Array.from(document.querySelectorAll('aside[data-panggung-3d]'));
+                const paralaksScrollEls = Array.from(document.querySelectorAll('.lapis-paralaks-scroll'));
                 const scrubEls = Array.from(document.querySelectorAll('[data-scroll-scrub]'));
 
                 let rafScroll = null;
@@ -49,9 +50,11 @@
 
                     const geserScroll = Math.min(26, y * 0.032).toFixed(2);
                     const syTerbatas = Math.min(1800, y).toFixed(1);
-                    for (let i = 0; i < panggungEls.length; i++) {
-                        panggungEls[i].style.setProperty('--ps', `${geserScroll}px`);
-                        panggungEls[i].style.setProperty('--sy', syTerbatas);
+                    for (let i = 0; i < panggungSampingEls.length; i++) {
+                        panggungSampingEls[i].style.setProperty('--ps', `${geserScroll}px`);
+                    }
+                    for (let i = 0; i < paralaksScrollEls.length; i++) {
+                        paralaksScrollEls[i].style.setProperty('--sy', syTerbatas);
                     }
 
                     const vh = window.innerHeight || 800;
@@ -109,7 +112,7 @@
                 });
 
                 this.inisialisasiParallax3D();
-                this.inisialisasiKartuTilt3D();
+                this.inisialisasiJedaHeroOffscreen();
                 this.inisialisasiMasuk3D();
                 this.inisialisasiFxReveal();
             },
@@ -121,16 +124,22 @@
                     return;
                 }
 
-                document.querySelectorAll('[data-panggung-3d]').forEach((panggung) => {
+                // Hanya panel samping desktop yang memakai paralaks kursor (--px/--py); hindari mutasi variabel CSS di <main> agar hover tombol tetap instan
+                document.querySelectorAll('aside[data-panggung-3d]').forEach((panggung) => {
                     let rafMove = null;
+                    let rectTersimpan = null;
                     let targetX = 0;
                     let targetY = 0;
+
+                    panggung.addEventListener('pointerenter', () => {
+                        rectTersimpan = panggung.getBoundingClientRect();
+                    }, { passive: true });
 
                     panggung.addEventListener('pointermove', (acara) => {
                         if (acara.pointerType === 'touch') {
                             return;
                         }
-                        const rect = panggung.getBoundingClientRect();
+                        const rect = rectTersimpan || panggung.getBoundingClientRect();
                         if (rect.width === 0 || rect.height === 0) {
                             return;
                         }
@@ -148,42 +157,25 @@
                     });
 
                     panggung.addEventListener('pointerleave', () => {
+                        rectTersimpan = null;
                         panggung.style.setProperty('--px', '0');
                         panggung.style.setProperty('--py', '0');
                     });
                 });
             },
-            inisialisasiKartuTilt3D() {
-                const mendukungHover = window.matchMedia && window.matchMedia('(hover: hover)').matches;
-                const kurangiGerak = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-                if (!mendukungHover || kurangiGerak) {
+            inisialisasiJedaHeroOffscreen() {
+                const hero = document.querySelector('[data-diorama-3d]');
+                if (!hero || !('IntersectionObserver' in window)) {
                     return;
                 }
-
-                document.querySelectorAll('.kartu-3d').forEach((kartu) => {
-                    kartu.addEventListener('pointermove', (acara) => {
-                        if (acara.pointerType === 'touch') {
-                            return;
-                        }
-                        const rect = kartu.getBoundingClientRect();
-                        if (rect.width === 0 || rect.height === 0) {
-                            return;
-                        }
-                        const dx = (acara.clientX - rect.left) / rect.width - 0.5;
-                        const dy = (acara.clientY - rect.top) / rect.height - 0.5;
-                        kartu.classList.add('sedang-tilt');
-                        kartu.style.setProperty('--rx', `${(-dy * 4.5).toFixed(2)}deg`);
-                        kartu.style.setProperty('--ry', `${(dx * 5.2).toFixed(2)}deg`);
-                    }, {
-                        passive: true
-                    });
-
-                    kartu.addEventListener('pointerleave', () => {
-                        kartu.style.setProperty('--rx', '0deg');
-                        kartu.style.setProperty('--ry', '0deg');
-                        window.setTimeout(() => kartu.classList.remove('sedang-tilt'), 240);
-                    });
+                const ioHero = new IntersectionObserver((entries) => {
+                    const tampil = entries.some((entry) => entry.isIntersecting);
+                    hero.classList.toggle('hero-tidak-terlihat', !tampil);
+                }, {
+                    threshold: 0,
+                    rootMargin: '80px 0px 80px 0px',
                 });
+                ioHero.observe(hero);
             },
             inisialisasiMasuk3D() {
                 const elemen = document.querySelectorAll('.masuk-3d');
@@ -253,6 +245,19 @@
                 }
 
                 const petaTimer = new WeakMap();
+                const petaSelesai = new WeakMap();
+
+                const aktifkanElemen = (el) => {
+                    el.classList.add('active');
+                    if (petaSelesai.has(el)) {
+                        window.clearTimeout(petaSelesai.get(el));
+                    }
+                    const idSelesai = window.setTimeout(() => {
+                        el.classList.add('fx-selesai');
+                        petaSelesai.delete(el);
+                    }, 740);
+                    petaSelesai.set(el, idSelesai);
+                };
 
                 // Observer A: picu animasi masuk saat elemen muncul baik dari scroll bawah maupun kembali scroll atas
                 const observerMasuk = new IntersectionObserver((entries) => {
@@ -268,12 +273,12 @@
                         const jeda = Number.parseInt(el.dataset.fxDelay || '0', 10);
                         if (jeda > 0) {
                             const idTimer = window.setTimeout(() => {
-                                el.classList.add('active');
+                                aktifkanElemen(el);
                                 petaTimer.delete(el);
                             }, jeda);
                             petaTimer.set(el, idTimer);
                         } else {
-                            el.classList.add('active');
+                            aktifkanElemen(el);
                         }
                     });
                 }, {
@@ -295,7 +300,11 @@
                             window.clearTimeout(petaTimer.get(el));
                             petaTimer.delete(el);
                         }
-                        el.classList.remove('active');
+                        if (petaSelesai.has(el)) {
+                            window.clearTimeout(petaSelesai.get(el));
+                            petaSelesai.delete(el);
+                        }
+                        el.classList.remove('active', 'fx-selesai');
                         el.classList.toggle('fx-dari-atas', entry.boundingClientRect.bottom < 0);
                     });
                 }, {
@@ -526,6 +535,11 @@
                         const rect = el.getBoundingClientRect();
                         if (rect.top < window.innerHeight * 1.15 && rect.bottom > 0) {
                             el.classList.add('active');
+                            window.setTimeout(() => {
+                                if (el.classList.contains('active')) {
+                                    el.classList.add('fx-selesai');
+                                }
+                            }, 740);
                         }
                     });
                     if (window.AOS && document.querySelector('[data-aos]')) {
@@ -750,7 +764,7 @@
     function kanvasSinemaTema(opsi = {}) {
         return {
             rafId: null,
-            terlihat: true,
+            terlihat: false,
             init() {
                 const kurangiGerak = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
                 if (kurangiGerak) {
@@ -776,32 +790,63 @@
                     jumlahKilau: opsi.jumlahKilau ?? 26,
                 };
 
+                // Pre-render 1 sprite pendar emas di memori sekali saja (hindari createRadialGradient 28x setiap frame)
+                const spriteKilau = document.createElement('canvas');
+                spriteKilau.width = 24;
+                spriteKilau.height = 24;
+                const sCtx = spriteKilau.getContext('2d');
+                if (sCtx) {
+                    const grad = sCtx.createRadialGradient(12, 12, 0, 12, 12, 12);
+                    grad.addColorStop(0, palet.kilau);
+                    grad.addColorStop(1, 'rgba(247, 231, 180, 0)');
+                    sCtx.fillStyle = grad;
+                    sCtx.fillRect(0, 0, 24, 24);
+                }
+
                 let w = 0;
                 let h = 0;
                 let dpr = 1;
+                let sedangIntersect = true;
+                let lalu = performance.now();
+
+                const hentikanLoop = () => {
+                    if (this.rafId) {
+                        window.cancelAnimationFrame(this.rafId);
+                        this.rafId = null;
+                    }
+                };
+
+                const cekAktif = () => {
+                    const aktif = !document.hidden
+                        && sedangIntersect
+                        && canvas.offsetParent !== null
+                        && canvas.clientWidth > 0
+                        && canvas.clientHeight > 0;
+                    this.terlihat = aktif;
+                    if (aktif) {
+                        if (!this.rafId) {
+                            lalu = performance.now();
+                            this.rafId = window.requestAnimationFrame(gambar);
+                        }
+                    } else {
+                        hentikanLoop();
+                    }
+                };
 
                 const sesuaikanUkuran = () => {
+                    if (canvas.offsetParent === null || canvas.clientWidth === 0 || canvas.clientHeight === 0) {
+                        cekAktif();
+                        return;
+                    }
                     const rect = canvas.getBoundingClientRect();
                     w = Math.max(200, rect.width || 390);
                     h = Math.max(300, rect.height || 760);
-                    dpr = Math.min(2, window.devicePixelRatio || 1);
+                    dpr = Math.min(1.5, window.devicePixelRatio || 1);
                     canvas.width = Math.round(w * dpr);
                     canvas.height = Math.round(h * dpr);
                     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                    cekAktif();
                 };
-
-                sesuaikanUkuran();
-                const ro = 'ResizeObserver' in window ? new ResizeObserver(sesuaikanUkuran) : null;
-                if (ro) {
-                    ro.observe(canvas);
-                }
-
-                if ('IntersectionObserver' in window) {
-                    const io = new IntersectionObserver((entries) => {
-                        this.terlihat = entries.some((e) => e.isIntersecting);
-                    }, { threshold: 0.05 });
-                    io.observe(canvas);
-                }
 
                 // Inisialisasi kupu-kupu emas yang terbang anggun melengkung dari bawah ke atas
                 const kupuList = Array.from({ length: palet.jumlahKupu }, (_, idx) => ({
@@ -847,13 +892,12 @@
                     { progres: 0.02, y: 0.17, skala: 0.62, kec: 0.024, offset: 2.3 },
                 ];
 
-                let lalu = performance.now();
                 const gambar = (sekarang) => {
-                    this.rafId = window.requestAnimationFrame(gambar);
-                    if (document.hidden || !this.terlihat) {
-                        lalu = sekarang;
+                    if (document.hidden || !this.terlihat || canvas.offsetParent === null) {
+                        this.rafId = null;
                         return;
                     }
+                    this.rafId = window.requestAnimationFrame(gambar);
                     const dt = Math.min(0.05, Math.max(0.001, (sekarang - lalu) / 1000));
                     lalu = sekarang;
                     const t = sekarang / 1000;
@@ -878,7 +922,7 @@
                         ctx.stroke();
                     }
 
-                    // 2. Kilau debu emas berpendar halus
+                    // 2. Kilau debu emas berpendar halus (drawImage sprite ter-cache, 0 alokasi per frame)
                     for (let i = 0; i < kilauList.length; i++) {
                         const k = kilauList[i];
                         k.y -= k.vy * dt;
@@ -889,14 +933,9 @@
                         const alpha = 0.16 + 0.55 * (0.5 + 0.5 * Math.sin(t * k.kecepatanKedip + k.fase));
                         const kx = k.x * w + Math.sin(t * 0.9 + k.fase) * 8;
                         const ky = k.y * h;
-                        const grad = ctx.createRadialGradient(kx, ky, 0, kx, ky, k.r * 3.4);
-                        grad.addColorStop(0, palet.kilau);
-                        grad.addColorStop(1, 'rgba(247, 231, 180, 0)');
+                        const ukuran = k.r * 6.8;
                         ctx.globalAlpha = alpha;
-                        ctx.fillStyle = grad;
-                        ctx.beginPath();
-                        ctx.arc(kx, ky, k.r * 3.4, 0, Math.PI * 2);
-                        ctx.fill();
+                        ctx.drawImage(spriteKilau, kx - ukuran * 0.5, ky - ukuran * 0.5, ukuran, ukuran);
                     }
 
                     // 3. Kelopak melati melayang
@@ -977,7 +1016,21 @@
                     ctx.globalAlpha = 1;
                 };
 
-                this.rafId = window.requestAnimationFrame(gambar);
+                const ro = 'ResizeObserver' in window ? new ResizeObserver(sesuaikanUkuran) : null;
+                if (ro) {
+                    ro.observe(canvas);
+                }
+
+                if ('IntersectionObserver' in window) {
+                    const io = new IntersectionObserver((entries) => {
+                        sedangIntersect = entries.some((e) => e.isIntersecting);
+                        cekAktif();
+                    }, { threshold: 0.05 });
+                    io.observe(canvas);
+                }
+
+                document.addEventListener('visibilitychange', cekAktif);
+                sesuaikanUkuran();
             },
         };
     }

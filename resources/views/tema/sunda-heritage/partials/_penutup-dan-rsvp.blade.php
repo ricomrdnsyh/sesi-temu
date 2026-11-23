@@ -1,4 +1,4 @@
-{{-- SEKSI 9: AMPLOP DIGITAL & KADO FISIK PRIANGAN (BUKA-TUTUP KARTU BANK GLOSSY) --}}
+{{-- SEKSI 10: AMPLOP DIGITAL & KADO FISIK PRIANGAN (BUKA-TUTUP KARTU BANK GLOSSY) --}}
 @if ($undangan->fiturAktif('amplop_digital') && ($undangan->daftarAmplop->isNotEmpty() || $alamatKado !== ''))
     <section x-data="{ amplopTerbuka: false }" class="relative px-4 py-12 overflow-hidden">
         <div
@@ -172,23 +172,219 @@
     </section>
 @endif
 
-{{-- SEKSI 10: TURUT MENGUNDANG (OPSIONAL) --}}
-@if ($adaTurutMengundang)
-    <section data-section-turut-mengundang="priangan" class="relative px-4 pb-8 overflow-hidden">
-        <div
-            class="max-w-md mx-auto rounded-3xl bg-[#5A1E1E] text-[#FAF4E8] border-2 border-[#C59B43]/65 p-6 text-center shadow-xl space-y-4">
+{{-- SEKSI 11: RSVP & WISHES (BLOK MARUN PRIANGAN) --}}
+@if ($undangan->fiturAktif('buku_tamu'))
+    <section id="buku-tamu" class="relative bg-[#5A1E1E] shadow-[0_0_0_2px_#5A1E1E] text-[#FAF4E8] py-14 px-5 overflow-hidden">
+        <div class="max-w-md mx-auto">
+            <div class="text-center space-y-2">
+                <img src="{{ $asetSunda['siger'] }}" alt="" loading="lazy" decoding="async"
+                    class="fx-rise-down w-14 mx-auto drop-shadow-lg">
+                <h2 class="fx-scale-in font-serif text-4xl sm:text-5xl font-bold uppercase tracking-[0.12em] text-white leading-tight">
+                    RSVP &amp; Wishes
+                </h2>
+                <p class="text-xs text-[#FAF4E8]/80 max-w-xs mx-auto leading-relaxed">
+                    Kami mempersilakan Bapak/Ibu/Saudara/i untuk menyampaikan ucapan selamat, doa restu, serta konfirmasi kehadiran.
+                </p>
+                <div aria-hidden="true" class="mx-auto w-24 h-px bg-[#E7C87D]/55 pt-1"></div>
+            </div>
+
+            <div
+                class="mt-7 fx-rise rounded-[22px] bg-[#FFFBF4] border-2 border-[#C59B43]/65 p-5 sm:p-6 shadow-2xl space-y-5 text-[#4A2020] kartu-3d">
+                @if (session('sukses_ucapan'))
+                    <div data-swal-success="{{ session('sukses_ucapan') }}" hidden aria-hidden="true"></div>
+                @endif
+
+                @if ($errors->any())
+                    <div data-swal-errors="{{ json_encode($errors->all(), JSON_UNESCAPED_UNICODE) }}" hidden
+                        aria-hidden="true"></div>
+                @endif
+
+                @if (!empty($modeDemo))
+                    <div x-data="bukuTamuDemo(@js($daftarUcapanAwal), @js($namaTamu))" class="space-y-5">
+                        <form @submit.prevent="kirimUcapanDemo()" class="space-y-3.5 text-left">
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-[#5A1E1E]/80">Nama
+                                    Lengkap</label>
+                                <input type="text" x-model="namaTamu" required placeholder="Nama Anda"
+                                    class="mt-1 w-full rounded-xl border border-[#C59B43]/60 bg-white px-4 py-2.5 text-sm">
+                            </div>
+                            <div class="grid gap-3" :class="statusKehadiran === 'hadir' ? 'grid-cols-2' : 'grid-cols-1'">
+                                <div>
+                                    <label
+                                        class="block text-xs font-semibold uppercase tracking-wider text-[#5A1E1E]/80">Kehadiran</label>
+                                    <select x-ref="selectKehadiran" x-model="statusKehadiran"
+                                        @change="statusKehadiran = $event.target.value"
+                                        class="mt-1 w-full rounded-xl border border-[#C59B43]/60 bg-white px-3.5 py-2.5 text-sm">
+                                        <option value="hadir">Hadir</option>
+                                        <option value="ragu">Masih Ragu</option>
+                                        <option value="tidak_hadir">Tidak Hadir</option>
+                                    </select>
+                                </div>
+                                <div x-show="statusKehadiran === 'hadir'" x-cloak>
+                                    <label
+                                        class="block text-xs font-semibold uppercase tracking-wider text-[#5A1E1E]/80">Jumlah</label>
+                                    <input type="number" x-model.number="jumlahTamu" min="1" max="20"
+                                        :required="statusKehadiran === 'hadir'"
+                                        :disabled="statusKehadiran !== 'hadir'"
+                                        class="mt-1 w-full rounded-xl border border-[#C59B43]/60 bg-white px-3.5 py-2.5 text-sm">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-[#5A1E1E]/80">Ucapan
+                                    &amp; Doa</label>
+                                <textarea x-model="ucapanDoa" rows="3" required placeholder="Tulis ucapan &amp; doa terbaik..."
+                                    class="mt-1 w-full rounded-xl border border-[#C59B43]/60 bg-white px-4 py-2.5 text-sm"></textarea>
+                            </div>
+                            <button type="submit"
+                                class="sunda-tombol-marun w-full rounded-full py-3 text-xs font-bold uppercase tracking-wider transition cursor-pointer">
+                                Kirim Konfirmasi &amp; Doa
+                            </button>
+                            <p x-show="pesanGalat" x-cloak x-text="pesanGalat"
+                                class="text-xs font-semibold text-rose-700 text-center"></p>
+                            <p x-show="pesanSukses" x-cloak x-text="pesanSukses"
+                                class="rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2 text-[11px] font-semibold text-emerald-800 text-center">
+                            </p>
+                        </form>
+
+                        <div class="pt-4 border-t border-[#C59B43]/35 space-y-3">
+                            <div class="flex items-center justify-between gap-2">
+                                <h3 class="font-serif text-base font-bold text-[#5A1E1E]">
+                                    Doa &amp; Ucapan (<span
+                                        x-text="daftarUcapan.length">{{ count($daftarUcapanAwal) }}</span>)
+                                </h3>
+                                <span class="text-[10px] uppercase tracking-wider text-[#8E6620]">Gulir untuk lainnya</span>
+                            </div>
+                            <div x-ref="daftarUcapanScroll"
+                                class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
+                                <template x-for="ucapan in daftarUcapan" :key="ucapan.id">
+                                    <div class="rounded-2xl bg-[#FAF4E8]/90 border p-3.5 space-y-1.5 transition"
+                                        :class="ucapan.baru ? 'border-[#5A1E1E]/60 ring-1 ring-[#C59B43]/50' : 'border-[#C59B43]/35'">
+                                        <div class="flex items-center justify-between gap-2">
+                                            <p class="font-bold text-xs text-[#5A1E1E]" x-text="ucapan.nama_tamu"></p>
+                                            <span class="shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-semibold"
+                                                :class="kelasStatus(ucapan.status_kehadiran, false,
+                                                    'bg-[#5A1E1E]/10 text-[#5A1E1E]')"
+                                                x-text="labelStatus(ucapan.status_kehadiran)"></span>
+                                        </div>
+                                        <p class="text-xs text-[#4A2020]/80 leading-relaxed" x-text="ucapan.ucapan_doa"></p>
+                                        <p class="text-[10px] text-[#8E6620]/80" x-text="ucapan.waktu"></p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    @if (!empty($modePratinjau) || !$undangan->sudahAktifPublik())
+                        <div
+                            class="rounded-2xl bg-[#FAF4E8] border border-[#C59B43]/50 px-4 py-3 text-center text-xs font-semibold text-[#5A1E1E]">
+                            Mode Pratinjau — Buku Tamu &amp; RSVP Dikunci
+                        </div>
+                    @else
+                        <form x-data="{ statusKehadiran: @js(old('status_kehadiran', 'hadir')) }" method="POST"
+                            action="{{ route('undangan.ucapan', $undangan->slug) }}" class="space-y-4 text-left">
+                            @csrf
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-[#5A1E1E]/80">Nama
+                                    Lengkap</label>
+                                <input type="text" name="nama_tamu"
+                                    value="{{ old('nama_tamu', $namaTamu !== 'Tamu Undangan' ? $namaTamu : '') }}"
+                                    required placeholder="Masukkan nama Anda"
+                                    class="mt-1.5 w-full rounded-xl border border-[#C59B43]/60 bg-white px-4 py-2.5 text-sm">
+                            </div>
+                            <div class="grid grid-cols-1 gap-3.5"
+                                :class="statusKehadiran === 'hadir' ? 'sm:grid-cols-2' : 'sm:grid-cols-1'">
+                                <div>
+                                    <label
+                                        class="block text-xs font-semibold uppercase tracking-wider text-[#5A1E1E]/80">Konfirmasi
+                                        Kehadiran</label>
+                                    <select name="status_kehadiran" x-model="statusKehadiran"
+                                        @change="statusKehadiran = $event.target.value"
+                                        class="mt-1.5 w-full rounded-xl border border-[#C59B43]/60 bg-white px-3.5 py-2.5 text-sm">
+                                        <option value="hadir" @selected(old('status_kehadiran', 'hadir') === 'hadir')>InsyaAllah Hadir</option>
+                                        <option value="ragu" @selected(old('status_kehadiran') === 'ragu')>Masih Ragu</option>
+                                        <option value="tidak_hadir" @selected(old('status_kehadiran') === 'tidak_hadir')>Tidak Dapat Hadir</option>
+                                    </select>
+                                </div>
+                                <div x-show="statusKehadiran === 'hadir'" x-cloak>
+                                    <label
+                                        class="block text-xs font-semibold uppercase tracking-wider text-[#5A1E1E]/80">Jumlah
+                                        Tamu</label>
+                                    <input type="number" name="jumlah_tamu" value="{{ old('jumlah_tamu', 1) }}"
+                                        min="1" max="20" :required="statusKehadiran === 'hadir'"
+                                        :disabled="statusKehadiran !== 'hadir'"
+                                        class="mt-1.5 w-full rounded-xl border border-[#C59B43]/60 bg-white px-3.5 py-2.5 text-sm">
+                                </div>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-xs font-semibold uppercase tracking-wider text-[#5A1E1E]/80">Ucapan
+                                    &amp; Doa Restu</label>
+                                <textarea name="ucapan_doa" rows="3" required placeholder="Tuliskan doa terbaik untuk kedua mempelai..."
+                                    class="mt-1.5 w-full rounded-xl border border-[#C59B43]/60 bg-white px-4 py-2.5 text-sm">{{ old('ucapan_doa') }}</textarea>
+                            </div>
+                            <button type="submit"
+                                class="sunda-tombol-marun w-full rounded-full py-3 text-xs font-bold uppercase tracking-wider transition cursor-pointer">
+                                Kirim Konfirmasi &amp; Doa
+                            </button>
+                        </form>
+                    @endif
+
+                    <div class="pt-4 border-t border-[#C59B43]/35 space-y-3">
+                        <h3 class="font-serif text-base font-bold text-[#5A1E1E]">Doa &amp; Ucapan
+                            ({{ $undangan->bukuTamu->count() }})</h3>
+                        <div class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
+                            @forelse ($undangan->bukuTamu as $ucapan)
+                                <div class="rounded-2xl bg-[#FAF4E8]/90 border border-[#C59B43]/35 p-3.5 space-y-1">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <p class="font-bold text-xs text-[#5A1E1E]">{{ $ucapan->nama_tamu }}</p>
+                                        <span
+                                            class="rounded-full bg-[#5A1E1E]/10 px-2.5 py-0.5 text-[10px] font-semibold text-[#5A1E1E]">
+                                            {{ str_replace('_', ' ', ucfirst($ucapan->status_kehadiran)) }}
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-[#4A2020]/80 leading-relaxed">{{ $ucapan->ucapan_doa }}</p>
+                                </div>
+                            @empty
+                                <p class="text-xs text-[#4A2020]/60 text-center">Jadilah yang pertama memberikan doa restu.
+                                </p>
+                            @endforelse
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </section>
+@endif
+
+{{-- SEKSI 12: DOA UNTUK PENGANTIN & TURUT MENGUNDANG --}}
+<section class="relative px-4 py-12 space-y-6 overflow-hidden">
+    {{-- Kartu Doa Untuk Pengantin --}}
+    <div data-section-doa-pengantin="priangan"
+        class="fx-scale-in max-w-md mx-auto rounded-[1.75rem] border-2 border-[#C59B43]/75 bg-[#FFFBF4] px-6 py-9 text-center text-[#4A2020] shadow-[0_18px_42px_-16px_rgba(74,23,23,0.22)] space-y-4 kartu-3d">
+        <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#8E6620]">Doa Restu</p>
+        <h2 class="font-serif text-2xl sm:text-3xl font-bold uppercase tracking-[0.12em] text-[#5A1E1E]">
+            Doa Untuk Pengantin
+        </h2>
+        <p class="text-xl sm:text-2xl leading-loose text-[#5A1E1E]" style="font-family: 'Amiri', serif;"
+            dir="rtl">
+            بَارَكَ اللّٰهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ
+        </p>
+        <p class="text-xs italic text-[#8E6620]">
+            &ldquo;Baarakallahu laka wa baaraka &lsquo;alaika wa jama&lsquo;a bainakuma fii khair.&rdquo;
+        </p>
+        <p class="text-xs sm:text-sm text-[#4A2020]/85 leading-relaxed">
+            Semoga Allah memberkahimu di waktu bahagia dan memberkahimu di waktu susah, serta semoga Allah mempersatukan
+            kalian berdua dalam kebaikan. <span class="font-semibold text-[#5A1E1E]">(HR. Abu Daud)</span>
+        </p>
+    </div>
+
+    {{-- Kartu Turut Mengundang (Opsional) --}}
+    @if ($adaTurutMengundang)
+        <div data-section-turut-mengundang="priangan"
+            class="fx-rise max-w-md mx-auto rounded-[1.75rem] bg-[#5A1E1E] text-[#FAF4E8] border-2 border-[#C59B43]/65 p-6 text-center shadow-xl space-y-4 kartu-3d">
             <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#E7C87D]">Keluarga Besar</p>
             <h2 class="font-serif text-2xl font-bold text-white">Turut Mengundang</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                @if (!empty($turutPria))
-                    <div class="rounded-2xl bg-[#3B1414]/75 border border-[#C59B43]/40 p-3.5 space-y-1">
-                        <p class="font-bold uppercase tracking-wider text-[#E7C87D] text-[10px]">Pihak
-                            {{ $undangan->nama_panggilan_pria }}</p>
-                        @foreach ($turutPria as $baris)
-                            <p class="text-[#FAF4E8]/90">{{ $baris }}</p>
-                        @endforeach
-                    </div>
-                @endif
                 @if (!empty($turutWanita))
                     <div class="rounded-2xl bg-[#3B1414]/75 border border-[#C59B43]/40 p-3.5 space-y-1">
                         <p class="font-bold uppercase tracking-wider text-[#E7C87D] text-[10px]">Pihak
@@ -198,205 +394,107 @@
                         @endforeach
                     </div>
                 @endif
-            </div>
-        </div>
-    </section>
-@endif
-
-{{-- SEKSI 11: BUKU TAMU & RSVP --}}
-@if ($undangan->fiturAktif('buku_tamu'))
-    <section class="relative px-4 py-8 overflow-hidden">
-        <div
-            class="max-w-md mx-auto rounded-3xl bg-[#FFFBF4] border-2 border-[#C59B43]/65 p-6 shadow-xl space-y-5 text-[#4A2020]">
-            <div class="text-center space-y-1">
-                <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#8E6620]">Doa &amp; Pangestu</p>
-                <h2 class="font-serif text-3xl font-bold text-[#5A1E1E]">Buku Tamu &amp; RSVP</h2>
-            </div>
-
-            @if (!empty($modeDemo))
-                <div x-data="bukuTamuDemo(@js($daftarUcapanAwal), @js($namaTamu))" class="space-y-5">
-                    <form @submit.prevent="kirimUcapanDemo()" class="space-y-3.5 text-left">
-                        <div>
-                            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#5A1E1E]/80">Nama
-                                Tamu</label>
-                            <input type="text" x-model="namaTamu" required placeholder="Masukkan nama Anda"
-                                class="mt-1 w-full rounded-xl border border-[#C59B43]/60 bg-white px-3.5 py-2.5 text-sm">
-                        </div>
-                        <div class="grid gap-3" :class="statusKehadiran === 'hadir' ? 'grid-cols-2' : 'grid-cols-1'">
-                            <div>
-                                <label
-                                    class="block text-[11px] font-bold uppercase tracking-wider text-[#5A1E1E]/80">Kehadiran</label>
-                                <select x-ref="selectKehadiran" x-model="statusKehadiran"
-                                    @change="statusKehadiran = $event.target.value"
-                                    class="mt-1 w-full rounded-xl border border-[#C59B43]/60 bg-white px-3 py-2.5 text-sm">
-                                    <option value="hadir">Hadir</option>
-                                    <option value="ragu">Masih Ragu</option>
-                                    <option value="tidak_hadir">Tidak Hadir</option>
-                                </select>
-                            </div>
-                            <div x-show="statusKehadiran === 'hadir'" x-cloak>
-                                <label
-                                    class="block text-[11px] font-bold uppercase tracking-wider text-[#5A1E1E]/80">Jumlah</label>
-                                <input type="number" x-model.number="jumlahTamu" min="1" max="20"
-                                    :required="statusKehadiran === 'hadir'"
-                                    :disabled="statusKehadiran !== 'hadir'"
-                                    class="mt-1 w-full rounded-xl border border-[#C59B43]/60 bg-white px-3.5 py-2.5 text-sm">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#5A1E1E]/80">Ucapan
-                                &amp; Doa</label>
-                            <textarea x-model="ucapanDoa" rows="3" required placeholder="Tulis doa terbaik untuk kedua mempelai..."
-                                class="mt-1 w-full rounded-xl border border-[#C59B43]/60 bg-white px-3.5 py-2.5 text-sm"></textarea>
-                        </div>
-                        <button type="submit"
-                            class="sunda-tombol-marun w-full rounded-full py-3 text-xs font-bold uppercase tracking-wider transition cursor-pointer">
-                            Kirim Konfirmasi &amp; Doa
-                        </button>
-                        <p x-show="pesanGalat" x-cloak x-text="pesanGalat"
-                            class="text-xs font-semibold text-rose-700 text-center"></p>
-                        <p x-show="pesanSukses" x-cloak x-text="pesanSukses"
-                            class="rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2 text-[11px] font-semibold text-emerald-800 text-center">
-                        </p>
-                    </form>
-
-                    <div class="pt-4 border-t border-[#C59B43]/35 space-y-3">
-                        <div class="flex items-center justify-between gap-2">
-                            <h3 class="font-serif text-base font-bold text-[#5A1E1E]">
-                                Doa &amp; Ucapan (<span
-                                    x-text="daftarUcapan.length">{{ count($daftarUcapanAwal) }}</span>)
-                            </h3>
-                            <span class="text-[10px] uppercase tracking-wider text-[#8E6620]">Gulir untuk lainnya</span>
-                        </div>
-                        <div x-ref="daftarUcapanScroll"
-                            class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
-                            <template x-for="ucapan in daftarUcapan" :key="ucapan.id">
-                                <div class="rounded-2xl bg-[#FAF4E8]/90 border p-3.5 space-y-1.5 transition"
-                                    :class="ucapan.baru ? 'border-[#5A1E1E]/60 ring-1 ring-[#C59B43]/50' : 'border-[#C59B43]/35'">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <p class="font-bold text-xs text-[#5A1E1E]" x-text="ucapan.nama_tamu"></p>
-                                        <span class="shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-semibold"
-                                            :class="kelasStatus(ucapan.status_kehadiran, false,
-                                                'bg-[#5A1E1E]/10 text-[#5A1E1E]')"
-                                            x-text="labelStatus(ucapan.status_kehadiran)"></span>
-                                    </div>
-                                    <p class="text-xs text-[#4A2020]/80 leading-relaxed" x-text="ucapan.ucapan_doa"></p>
-                                    <p class="text-[10px] text-[#8E6620]/80" x-text="ucapan.waktu"></p>
-                                </div>
-                            </template>
-                        </div>
+                @if (!empty($turutPria))
+                    <div class="rounded-2xl bg-[#3B1414]/75 border border-[#C59B43]/40 p-3.5 space-y-1">
+                        <p class="font-bold uppercase tracking-wider text-[#E7C87D] text-[10px]">Pihak
+                            {{ $undangan->nama_panggilan_pria }}</p>
+                        @foreach ($turutPria as $baris)
+                            <p class="text-[#FAF4E8]/90">{{ $baris }}</p>
+                        @endforeach
                     </div>
-                </div>
-            @else
-                @if (!empty($modePratinjau) || !$undangan->sudahAktifPublik())
-                    <div
-                        class="rounded-2xl bg-[#FAF4E8] border border-[#C59B43]/50 px-4 py-3 text-center text-xs font-semibold text-[#5A1E1E]">
-                        Mode Pratinjau — Buku Tamu &amp; RSVP Dikunci
-                    </div>
-                @else
-                    <form x-data="{ statusKehadiran: @js(old('status_kehadiran', 'hadir')) }" method="POST"
-                        action="{{ route('undangan.ucapan', $undangan->slug) }}" class="space-y-3.5 text-left">
-                        @csrf
-                        <div>
-                            <label class="block text-[11px] font-bold uppercase tracking-wider text-[#5A1E1E]/80">Nama
-                                Tamu</label>
-                            <input type="text" name="nama_tamu"
-                                value="{{ old('nama_tamu', $namaTamu !== 'Tamu Undangan' ? $namaTamu : '') }}"
-                                required
-                                class="mt-1 w-full rounded-xl border border-[#C59B43]/60 bg-white px-3.5 py-2.5 text-sm">
-                        </div>
-                        <div class="grid gap-3"
-                            :class="statusKehadiran === 'hadir' ? 'grid-cols-2' : 'grid-cols-1'">
-                            <div>
-                                <label
-                                    class="block text-[11px] font-bold uppercase tracking-wider text-[#5A1E1E]/80">Kehadiran</label>
-                                <select name="status_kehadiran" x-model="statusKehadiran"
-                                    @change="statusKehadiran = $event.target.value"
-                                    class="mt-1 w-full rounded-xl border border-[#C59B43]/60 bg-white px-3 py-2.5 text-sm">
-                                    <option value="hadir" @selected(old('status_kehadiran', 'hadir') === 'hadir')>Hadir</option>
-                                    <option value="ragu" @selected(old('status_kehadiran') === 'ragu')>Masih Ragu</option>
-                                    <option value="tidak_hadir" @selected(old('status_kehadiran') === 'tidak_hadir')>Tidak Hadir</option>
-                                </select>
-                            </div>
-                            <div x-show="statusKehadiran === 'hadir'" x-cloak>
-                                <label
-                                    class="block text-[11px] font-bold uppercase tracking-wider text-[#5A1E1E]/80">Jumlah</label>
-                                <input type="number" name="jumlah_tamu" value="{{ old('jumlah_tamu', 1) }}"
-                                    min="1" max="20" :required="statusKehadiran === 'hadir'"
-                                    :disabled="statusKehadiran !== 'hadir'"
-                                    class="mt-1 w-full rounded-xl border border-[#C59B43]/60 bg-white px-3.5 py-2.5 text-sm">
-                            </div>
-                        </div>
-                        <div>
-                            <label
-                                class="block text-[11px] font-bold uppercase tracking-wider text-[#5A1E1E]/80">Ucapan
-                                &amp; Doa</label>
-                            <textarea name="ucapan_doa" rows="3" required placeholder="Tulis doa terbaik untuk kedua mempelai..."
-                                class="mt-1 w-full rounded-xl border border-[#C59B43]/60 bg-white px-3.5 py-2.5 text-sm">{{ old('ucapan_doa') }}</textarea>
-                        </div>
-                        <button type="submit"
-                            class="sunda-tombol-marun w-full rounded-full py-3 text-xs font-bold uppercase tracking-wider transition cursor-pointer">
-                            Kirim Konfirmasi &amp; Doa
-                        </button>
-                    </form>
                 @endif
+            </div>
+        </div>
+    @endif
+</section>
 
-                <div class="pt-4 border-t border-[#C59B43]/35 space-y-3">
-                    <h3 class="font-serif text-base font-bold text-[#5A1E1E]">Doa &amp; Ucapan
-                        ({{ $undangan->bukuTamu->count() }})</h3>
-                    <div class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
-                        @forelse ($undangan->bukuTamu as $ucapan)
-                            <div class="rounded-2xl bg-[#FAF4E8]/90 border border-[#C59B43]/35 p-3.5 space-y-1">
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="font-bold text-xs text-[#5A1E1E]">{{ $ucapan->nama_tamu }}</p>
-                                    <span
-                                        class="rounded-full bg-[#5A1E1E]/10 px-2.5 py-0.5 text-[10px] font-semibold text-[#5A1E1E]">
-                                        {{ str_replace('_', ' ', ucfirst($ucapan->status_kehadiran)) }}
-                                    </span>
-                                </div>
-                                <p class="text-xs text-[#4A2020]/80 leading-relaxed">{{ $ucapan->ucapan_doa }}</p>
-                            </div>
-                        @empty
-                            <p class="text-xs text-[#4A2020]/60 text-center">Jadilah yang pertama memberikan doa restu.
-                            </p>
-                        @endforelse
+{{-- SEKSI 13: KAPSUL PENUTUP PRIANGAN & FOOTER --}}
+<section data-layout-penutup="priangan" class="relative px-4 pt-6 pb-16 overflow-hidden">
+    <div
+        class="fx-scale-in relative z-10 max-w-md mx-auto rounded-t-[10.5rem] rounded-b-[2rem] bg-gradient-to-b from-[#5F2222] via-[#4A1717] to-[#340F0F] text-[#FAF4E8] border-2 border-[#C59B43]/85 shadow-[0_26px_58px_-16px_rgba(59,20,20,0.5)] overflow-hidden kartu-3d">
+        {{-- Siluet Halus Gapura Priangan di Latar Teks --}}
+        <img src="{{ $asetSunda['gapura'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async"
+            class="pointer-events-none absolute inset-x-0 bottom-0 w-full h-3/4 object-cover object-bottom opacity-[0.07]">
+
+        {{-- Potret Penutup Besar Mengisi Lengkungan Kubah Penuh (Konsetris dengan Bingkai Emas) --}}
+        @if ($urlFotoPenutup)
+            <div class="relative p-2.5 sm:p-3 pb-0">
+                <div
+                    class="relative overflow-hidden rounded-t-[9.6rem] rounded-b-[1.35rem] border border-[#E7C87D]/70 bg-[#2E0E0E] shadow-[0_18px_38px_-12px_rgba(16,4,4,0.75)]">
+                    <img src="{{ $urlFotoPenutup }}"
+                        alt="Foto Penutup {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}"
+                        loading="lazy" decoding="async"
+                        class="w-full h-[22.5rem] sm:h-[24.5rem] object-cover object-top">
+                    <div aria-hidden="true"
+                        class="pointer-events-none absolute inset-0"
+                        style="background: linear-gradient(180deg, rgba(43,14,14,0.08) 0%, rgba(43,14,14,0) 45%, rgba(59,20,20,0.48) 82%, rgba(74,23,23,0.92) 100%);">
                     </div>
                 </div>
-            @endif
-        </div>
-    </section>
-@endif
-
-{{-- SEKSI 12: KAPSUL PENUTUP PRIANGAN & FOOTER --}}
-<section data-layout-penutup="priangan" class="relative px-4 pt-6 pb-12 overflow-hidden">
-    <div
-        class="fx-scale-in max-w-md mx-auto rounded-t-[10.5rem] rounded-b-3xl bg-[#5A1E1E] text-[#FAF4E8] border-2 border-[#C59B43]/80 px-6 pt-14 pb-10 text-center shadow-2xl space-y-4">
-        @if ($urlFotoPenutup)
-            <div
-                class="mx-auto w-44 sm:w-48 overflow-hidden rounded-t-[8rem] rounded-b-2xl border-2 border-[#E7C87D] shadow-xl">
-                <img src="{{ $urlFotoPenutup }}"
-                    alt="Foto Penutup {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}"
-                    class="w-full aspect-[4/5] object-cover object-top">
+            </div>
+        @else
+            <div class="pt-14 pb-2 flex justify-center">
+                <div
+                    class="relative w-36 h-44 rounded-t-[6rem] rounded-b-2xl border-2 border-[#E7C87D]/75 bg-gradient-to-b from-[#6E2C2C]/85 to-[#320F0F] flex flex-col items-center justify-center shadow-xl">
+                    <span aria-hidden="true"
+                        class="pointer-events-none absolute inset-1.5 rounded-t-[5.4rem] rounded-b-xl border border-[#F3E5AB]/30"></span>
+                    <span class="font-serif text-4xl font-bold text-[#F3E5AB] tracking-wider">
+                        {{ $undangan->inisialPria() }} &amp; {{ $undangan->inisialWanita() }}
+                    </span>
+                </div>
             </div>
         @endif
 
-        <img src="{{ $asetSunda['siger'] }}" alt="" class="w-12 mx-auto opacity-95">
-        <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#E7C87D]">Hatur Nuhun</p>
-        <p class="text-xs sm:text-sm text-[#FAF4E8]/85 leading-relaxed max-w-xs mx-auto">
-            Mugia kahadiran sareng doa restu Bapa/Ibu/Saderek ngajantenkeun amal soleh sareng kabagjaan kangge rumah
-            tangga sim kuring.
-        </p>
+        {{-- Mahkota Siger & Panel Terima Kasih Priangan --}}
+        <div class="relative z-10 px-6 {{ $urlFotoPenutup ? '-mt-7 pt-0' : 'pt-4' }} pb-10 text-center space-y-4">
+            {{-- Sudut Filigree Emas Bawah --}}
+            <span aria-hidden="true"
+                class="pointer-events-none absolute bottom-3 left-3 h-4 w-4 border-b border-l border-[#E7C87D]/60 rounded-bl-md"></span>
+            <span aria-hidden="true"
+                class="pointer-events-none absolute bottom-3 right-3 h-4 w-4 border-b border-r border-[#E7C87D]/60 rounded-br-md"></span>
 
-        <div class="pt-2">
-            <p class="text-[10px] uppercase tracking-[0.28em] text-[#E7C87D]/85">Kami Yang Berbahagia</p>
-            <p class="mt-1.5 font-kaligrafi text-5xl text-white leading-tight">
-                {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}
+            {{-- Medali Siger Bertengger di Sambungan Potret --}}
+            <div
+                class="mx-auto inline-flex items-center justify-center rounded-full bg-[#4A1717] border border-[#E7C87D]/70 px-3.5 py-2 shadow-[0_10px_22px_rgba(16,4,4,0.65)]">
+                <img src="{{ $asetSunda['siger'] }}" alt="" loading="lazy" decoding="async"
+                    class="w-12 opacity-95">
+            </div>
+
+            <div class="flex items-center justify-center gap-2.5 pt-0.5">
+                <span aria-hidden="true" class="h-px w-8 bg-gradient-to-r from-transparent to-[#E7C87D]/70"></span>
+                <span aria-hidden="true" class="w-1.5 h-1.5 rotate-45 bg-[#E7C87D]"></span>
+                <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#E7C87D]">Hatur Nuhun</p>
+                <span aria-hidden="true" class="w-1.5 h-1.5 rotate-45 bg-[#E7C87D]"></span>
+                <span aria-hidden="true" class="h-px w-8 bg-gradient-to-l from-transparent to-[#E7C87D]/70"></span>
+            </div>
+
+            <p class="text-xs sm:text-[13px] text-[#FAF4E8]/88 leading-relaxed max-w-xs mx-auto">
+                Mugia kahadiran sareng doa restu Bapa/Ibu/Saderek ngajantenkeun amal soleh sareng kabagjaan kangge rumah
+                tangga sim kuring.
             </p>
-            <p class="mt-1 text-[11px] uppercase tracking-[0.22em] text-[#F3E5AB]">
-                {{ $hashtagPasangan }}
-            </p>
+
+            <div class="flex items-center justify-center gap-3 px-10 pt-1" aria-hidden="true">
+                <span class="h-px flex-1 bg-gradient-to-r from-transparent to-[#E7C87D]/45"></span>
+                <span class="w-1 h-1 rotate-45 bg-[#E7C87D]"></span>
+                <span class="h-px flex-1 bg-gradient-to-l from-transparent to-[#E7C87D]/45"></span>
+            </div>
+
+            <div class="pt-0.5 space-y-1.5">
+                <p class="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#E7C87D]/85">
+                    Kami Yang Berbahagia
+                </p>
+                <p class="font-kaligrafi text-[2.75rem] sm:text-5xl text-white leading-[1.12] drop-shadow-[0_3px_12px_rgba(16,4,4,0.55)]">
+                    {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}
+                </p>
+                <p class="inline-block rounded-full border border-[#E7C87D]/35 bg-[#3B1414]/65 px-3.5 py-1 text-[10px] font-medium uppercase tracking-[0.22em] text-[#F3E5AB]">
+                    {{ $hashtagPasangan }}
+                </p>
+            </div>
         </div>
     </div>
+
+    {{-- Hamparan Bunga Priangan Halus Menyatukan Tepi Bawah Seksi Penutup ke Footer --}}
+    <img src="{{ $asetSunda['bungaDepan'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async"
+        class="pointer-events-none absolute -bottom-2 inset-x-0 w-full z-20 opacity-95 drop-shadow-[0_-8px_18px_rgba(32,10,10,0.45)]">
 </section>
 
 @include('komponen-undangan.footer-tema', [

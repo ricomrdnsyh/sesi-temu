@@ -373,34 +373,30 @@
         animation: shimmerSweep 6s ease-in-out infinite;
     }
 
-    /* === ENGINE DIORAMA & PERGERAKAN 3D === */
+    /* === ENGINE DIORAMA & PERGERAKAN 3D (RINGAN & RESPONSIF DI SEMUA BROWSER) === */
     .panggung-3d {
         perspective: 1600px;
-        transform-style: preserve-3d;
+    }
+
+    main.panggung-3d {
+        perspective: none;
+        transform-style: flat;
     }
 
     .lapis-3d {
-        transform-style: preserve-3d;
         transform: translate3d(calc(var(--px, 0) * var(--depth, 10px)),
                 calc(var(--py, 0) * var(--depth, 8px) + var(--ps, 0px)),
                 var(--pz, 0px));
-        transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
-        will-change: transform;
+        transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .kartu-3d {
         position: relative;
-        transition: box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: box-shadow 0.18s ease, border-color 0.18s ease;
         box-shadow:
             0 16px 36px -14px rgba(0, 0, 0, 0.2),
             0 4px 12px -4px rgba(0, 0, 0, 0.1),
             inset 0 1px 0 0 rgba(255, 255, 255, 0.24);
-    }
-
-    .kartu-3d.sedang-tilt {
-        transform: perspective(1200px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(0) !important;
-        transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
-        will-change: transform;
     }
 
     .kartu-3d:hover {
@@ -408,6 +404,24 @@
             0 24px 48px -16px rgba(0, 0, 0, 0.28),
             0 8px 20px -8px rgba(191, 161, 95, 0.22),
             inset 0 1px 0 0 rgba(255, 255, 255, 0.34);
+    }
+
+    /* Jeda seluruh animasi di balik tirai sampul yang sudah terbuka dan hero yang sudah terlewat gulir */
+    .tirai-fade-halus.tirai-terbuka,
+    .tirai-fade-halus.tirai-terbuka *,
+    .tirai-fade-halus.tirai-terbuka *::before,
+    .tirai-fade-halus.tirai-terbuka *::after,
+    [data-diorama-3d].hero-tidak-terlihat *,
+    [data-diorama-3d].hero-tidak-terlihat *::before,
+    [data-diorama-3d].hero-tidak-terlihat *::after {
+        animation-play-state: paused !important;
+    }
+
+    /* Pastikan tombol & tautan selalu responsif instan saat di-hover/klik */
+    [data-transisi-sampul] button,
+    main[data-panggung-3d] a,
+    main[data-panggung-3d] button {
+        transition-duration: 120ms;
     }
 
     body.siap-3d .masuk-3d {
@@ -545,23 +559,19 @@
     .animasi-ayun-3d {
         animation: ayun3d 7s ease-in-out infinite;
         transform-origin: top left;
-        will-change: transform;
     }
 
     .animasi-ayun-3d-balik {
         animation: ayun3dBalik 7.4s ease-in-out infinite;
         transform-origin: top center;
-        will-change: transform;
     }
 
     .animasi-kelopak-3d {
         animation: kelopak3d 11.5s linear infinite;
-        will-change: transform, opacity;
     }
 
     .animasi-burung {
         animation: burungTerbang 18s linear infinite;
-        will-change: transform, opacity;
     }
 
     .animasi-kepak {
@@ -1118,13 +1128,11 @@
     .ayun-kanan {
         transform-origin: bottom left;
         animation: ayunKananOrganik 8.5s ease-in-out infinite;
-        will-change: transform;
     }
 
     .ayun-kiri {
         transform-origin: bottom right;
         animation: ayunKiriOrganik 9s ease-in-out infinite;
-        will-change: transform;
     }
 
     .bingkai-hero-aktif {
@@ -1133,17 +1141,14 @@
 
     .lapis-paralaks-scroll {
         transform: translate3d(0, calc(var(--sy, 0) * var(--sp, 0.06) * -1px), var(--pz, 0px));
-        will-change: transform;
     }
 
     .scroll-scrub-kiri {
         transform: translate3d(calc(var(--scrub, 0) * -22px), 0, 0);
-        will-change: transform;
     }
 
     .scroll-scrub-kanan {
         transform: translate3d(calc(var(--scrub, 0) * 22px), 0, 0);
-        will-change: transform;
     }
 
     /* Kit Reveal 60fps Berbasis Scroll Dua Arah (Aktif Saat Scroll Bawah & Kembali Scroll Atas, Reset Instan di Luar Layar) */
@@ -1222,9 +1227,13 @@
         opacity: 1;
         transform: translate3d(0, 0, 0) scale(1);
         transition:
-            opacity 0.78s cubic-bezier(0.16, 1, 0.3, 1),
-            transform 0.88s cubic-bezier(0.16, 1, 0.3, 1),
-            box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+            transform 0.72s cubic-bezier(0.16, 1, 0.3, 1),
+            box-shadow 0.18s ease;
+    }
+
+    body.siap-3d .fx-selesai.active {
+        transition: box-shadow 0.18s ease, border-color 0.18s ease, background-color 0.15s ease, color 0.15s ease;
     }
 
     .polaroid-3d-kiri {

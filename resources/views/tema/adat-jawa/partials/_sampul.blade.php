@@ -151,7 +151,7 @@
                         <button
                             type="button"
                             @click="bukaUndangan()"
-                            class="jawa-tombol-emas jawa-tombol-kilau animasi-segel relative overflow-hidden w-full inline-flex items-center justify-center gap-2 rounded-lg border border-[#F3E5AB]/55 px-6 py-2.5 text-xs sm:text-[13px] font-semibold uppercase tracking-[0.18em] transition active:scale-[0.98] cursor-pointer"
+                            class="jawa-tombol-emas relative w-full inline-flex items-center justify-center gap-2 rounded-lg border border-[#F3E5AB]/55 px-6 py-2.5 text-xs sm:text-[13px] font-semibold uppercase tracking-[0.18em] transition active:scale-[0.98] cursor-pointer"
                         >
                             <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <rect width="20" height="16" x="2" y="4" rx="2"/>
@@ -233,7 +233,7 @@
                                 <button
                                     type="button"
                                     @click="bukaUndangan()"
-                                    class="jawa-tombol-emas jawa-tombol-kilau animasi-segel relative overflow-hidden w-full inline-flex items-center justify-center gap-2 rounded-lg border border-[#F3E5AB]/55 px-6 py-2.5 text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] transition active:scale-[0.98] cursor-pointer"
+                                    class="jawa-tombol-emas relative w-full inline-flex items-center justify-center gap-2 rounded-lg border border-[#F3E5AB]/55 px-6 py-2.5 text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] transition active:scale-[0.98] cursor-pointer"
                                 >
                                     <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <rect width="20" height="16" x="2" y="4" rx="2"/>

@@ -268,7 +268,7 @@
             </svg>
         </button>
 
-        {{-- Gradasi Halus Penyatu Tepi Bawah Hero Ke Marquee & Seksi Marun --}}
+        {{-- Gradasi Halus Penyatu Tepi Bawah Hero Ke Seksi Pembuka Marun --}}
         <div
             aria-hidden="true"
             class="pointer-events-none absolute inset-x-0 bottom-0 h-14 z-40"
@@ -277,26 +277,10 @@
     </div>
 </section>
 
-{{-- MARQUEE TICKER PRIANGAN --}}
-<div class="py-2.5 bg-[#5A1E1E] border-y border-[#C59B43]/50 overflow-hidden">
-    <div class="animasi-marquee flex items-center gap-6 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#F3E5AB]">
-        @for ($i = 0; $i < 4; $i++)
-            <span>Sampurasun</span>
-            <span>&#10022;</span>
-            <span>{{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}</span>
-            <span>&#10022;</span>
-            <span>{{ $tanggalTitik }}</span>
-            <span>&#10022;</span>
-            <span>{{ $hashtagPasangan }}</span>
-            <span>&#10022;</span>
-        @endfor
-    </div>
-</div>
-
-{{-- SEKSI 2: PRELUDE PRIANGAN, MONOGRAM BERTEMU, FOTO PEMBUKA & PETUAH SUNDA --}}
+{{-- SEKSI 3: PRELUDE PRIANGAN, FOTO PEMBUKA, MONOGRAM BERTEMU & KUTIPAN AYAT --}}
 <section
     data-section-pembuka="priangan"
-    class="relative bg-gradient-to-b from-[#5A1E1E] via-[#4A1717] to-[#3B1414] text-[#FAF4E8] px-5 pt-11 pb-14 overflow-hidden"
+    class="relative bg-gradient-to-b from-[#5A1E1E] via-[#4A1717] to-[#3B1414] shadow-[0_-2px_0_0_#5A1E1E] text-[#FAF4E8] px-5 pt-11 pb-14 overflow-hidden"
 >
     {{-- Siluet Halus Gapura & Pendar Hangat Latar Beludru Marun --}}
     <img
@@ -314,21 +298,6 @@
     ></div>
 
     <div class="relative z-10 max-w-md mx-auto text-center space-y-7">
-        {{-- Monogram Pasangan Bertemu Kiri <-> Kanan dengan Garis Emas --}}
-        <div class="flex items-center justify-center gap-4 px-4">
-            <span aria-hidden="true" class="h-px flex-1 max-w-[54px] bg-gradient-to-r from-transparent to-[#E7C87D]/65"></span>
-            <div class="grid grid-cols-3 items-center gap-2 min-w-[140px]">
-                <span class="fx-slide-left font-serif text-4xl sm:text-[2.75rem] font-bold text-[#F3E5AB] drop-shadow-[0_3px_10px_rgba(16,4,4,0.5)]">
-                    {{ $undangan->inisialPria() }}
-                </span>
-                <span class="fx-scale-in font-kaligrafi text-3xl text-[#E7C87D]/90">&amp;</span>
-                <span class="fx-slide-right font-serif text-4xl sm:text-[2.75rem] font-bold text-[#F3E5AB] drop-shadow-[0_3px_10px_rgba(16,4,4,0.5)]">
-                    {{ $undangan->inisialWanita() }}
-                </span>
-            </div>
-            <span aria-hidden="true" class="h-px flex-1 max-w-[54px] bg-gradient-to-l from-transparent to-[#E7C87D]/65"></span>
-        </div>
-
         {{-- Foto Pembuka Berbingkai Oval Filigree Emas Ganda (Tersembunyi pada Mode Tanpa Foto) --}}
         @if ($urlFotoPembuka)
             <div class="fx-scale-in relative mx-auto w-56 sm:w-60">
@@ -346,6 +315,21 @@
                 </div>
             </div>
         @endif
+
+        {{-- Monogram Pasangan Bertemu Kiri <-> Kanan dengan Garis Emas --}}
+        <div class="flex items-center justify-center gap-4 px-4">
+            <span aria-hidden="true" class="h-px flex-1 max-w-[54px] bg-gradient-to-r from-transparent to-[#E7C87D]/65"></span>
+            <div class="grid grid-cols-3 items-center gap-2 min-w-[140px]">
+                <span class="fx-slide-left font-serif text-4xl sm:text-[2.75rem] font-bold text-[#F3E5AB] drop-shadow-[0_3px_10px_rgba(16,4,4,0.5)]">
+                    {{ $undangan->inisialPria() }}
+                </span>
+                <span class="fx-scale-in font-kaligrafi text-3xl text-[#E7C87D]/90">&amp;</span>
+                <span class="fx-slide-right font-serif text-4xl sm:text-[2.75rem] font-bold text-[#F3E5AB] drop-shadow-[0_3px_10px_rgba(16,4,4,0.5)]">
+                    {{ $undangan->inisialWanita() }}
+                </span>
+            </div>
+            <span aria-hidden="true" class="h-px flex-1 max-w-[54px] bg-gradient-to-l from-transparent to-[#E7C87D]/65"></span>
+        </div>
 
         {{-- Petuah / Kutipan Ayat Bergaya Editorial Beludru-Emas Menyatu --}}
         @if ($undangan->kutipan_ayat)

@@ -79,13 +79,12 @@
             overflow: hidden;
             background: #FFFFFF;
             transition:
-                width 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-                height 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-                border-radius 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-                padding 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-                box-shadow 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-                background-color 0.32s ease;
-            will-change: width, height, border-radius;
+                width 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                height 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                border-radius 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                padding 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                background-color 0.25s ease;
         }
 
         [data-layar-bingkai] {
@@ -95,7 +94,8 @@
             width: 100%;
             overflow: hidden;
             background: #1F2937;
-            transition: border-radius 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+            contain: layout paint;
+            transition: border-radius 0.34s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         [data-aksen-bezel-hp],
@@ -358,7 +358,7 @@
         {{-- STUDIO TOP BAR KHAS SESITEMU (BERSIH, ELEGAN, ANTI-ZOOM) --}}
         <header
             data-bar-pratinjau-perangkat
-            class="shrink-0 h-16 items-center justify-between gap-4 border-b border-[#BFA15F]/22 bg-[#FDFBF7]/92 backdrop-blur-md px-6 lg:px-8 z-30 shadow-[0_1px_0_rgba(255,255,255,0.75)]"
+            class="shrink-0 h-16 items-center justify-between gap-4 border-b border-[#BFA15F]/22 bg-[#FDFBF7]/98 px-6 lg:px-8 z-30 shadow-[0_1px_0_rgba(255,255,255,0.75)]"
         >
             {{-- Kiri: Identitas SesiTemu + Nama Tema & Tier --}}
             <div class="flex items-center gap-3 min-w-0">
@@ -393,7 +393,7 @@
                     :class="perangkat === 'handphone'
                         ? 'bg-charcoal text-[#F3E5AB] shadow-sm'
                         : 'text-charcoal/65 hover:text-charcoal'"
-                    class="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition cursor-pointer"
+                    class="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition-colors duration-100 cursor-pointer"
                 >
                     <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <rect width="12" height="20" x="6" y="2" rx="2.5" />
@@ -409,7 +409,7 @@
                     :class="perangkat === 'tablet'
                         ? 'bg-charcoal text-[#F3E5AB] shadow-sm'
                         : 'text-charcoal/65 hover:text-charcoal'"
-                    class="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition cursor-pointer"
+                    class="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition-colors duration-100 cursor-pointer"
                 >
                     <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <rect width="16" height="20" x="4" y="2" rx="2.5" />
@@ -425,7 +425,7 @@
                     :class="perangkat === 'desktop'
                         ? 'bg-charcoal text-[#F3E5AB] shadow-sm'
                         : 'text-charcoal/65 hover:text-charcoal'"
-                    class="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition cursor-pointer"
+                    class="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition-colors duration-100 cursor-pointer"
                 >
                     <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <rect width="20" height="14" x="2" y="3" rx="2" />
@@ -450,7 +450,7 @@
                     @click="muatUlangKanvas()"
                     title="Muat ulang pratinjau dari sampul"
                     aria-label="Muat ulang pratinjau dari sampul"
-                    class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#BFA15F]/30 bg-white/85 text-charcoal/70 hover:bg-charcoal hover:text-[#F3E5AB] hover:border-charcoal active:scale-95 transition cursor-pointer"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#BFA15F]/30 bg-white/85 text-charcoal/70 hover:bg-charcoal hover:text-[#F3E5AB] hover:border-charcoal active:scale-95 transition-colors duration-100 cursor-pointer"
                 >
                     <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
