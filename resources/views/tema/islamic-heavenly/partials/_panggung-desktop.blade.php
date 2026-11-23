@@ -30,7 +30,7 @@
             <div class="relative w-16 h-16 xl:w-18 xl:h-18 flex items-center justify-center">
                 <span class="absolute inset-0 rounded-full border border-dashed border-[#D9B664]/60 animasi-orbit"></span>
                 <span class="absolute inset-2 rounded-full border border-[#F3E5AB]/30"></span>
-                <img src="{{ $asetCelestial['sabit'] }}" alt="" class="w-8 xl:w-9 opacity-95 animasi-ayun-3d">
+                <img src="{{ $asetCelestial['sabit'] }}" alt="" class="h-11 w-auto opacity-95 animasi-ayun-3d">
             </div>
         </div>
 

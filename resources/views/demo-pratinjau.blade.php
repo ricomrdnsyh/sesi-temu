@@ -70,6 +70,13 @@
             overflow: hidden;
         }
 
+        [data-slot-bingkai] {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            flex-shrink: 0;
+        }
+
         [data-bingkai-pratinjau] {
             position: relative;
             width: 100%;
@@ -81,6 +88,7 @@
             transition:
                 width 0.34s cubic-bezier(0.22, 1, 0.36, 1),
                 height 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
                 border-radius 0.34s cubic-bezier(0.22, 1, 0.36, 1),
                 padding 0.34s cubic-bezier(0.22, 1, 0.36, 1),
                 box-shadow 0.34s cubic-bezier(0.22, 1, 0.36, 1),
@@ -120,13 +128,32 @@
         }
 
         html.pratinjau-anti-zoom [data-stage-pratinjau] {
-            padding: 18px 24px;
+            padding: var(--pz-stage-py, 18px) var(--pz-stage-px, 24px);
+        }
+
+        html.pratinjau-anti-zoom [data-slot-bingkai] {
+            transition:
+                width 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+                height 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        html.pratinjau-anti-zoom [data-bingkai-pratinjau] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: top left;
         }
 
         /* 1. Mode Handphone: Chassis Obsidian Titanium + Aksen Speaker Rim + Layar 390px */
+        html.pratinjau-anti-zoom [data-slot-bingkai][data-mode="handphone"] {
+            width: var(--pz-phone-vis-w, 408px);
+            height: var(--pz-phone-vis-h, 820px);
+        }
+
         html.pratinjau-anti-zoom [data-bingkai-pratinjau][data-mode="handphone"] {
             width: var(--pz-phone-w, 408px);
             height: var(--pz-phone-h, 820px);
+            transform: var(--pz-phone-transform, none);
             padding: 9px;
             border-radius: 2.85rem;
             background: linear-gradient(165deg, #2D3542 0%, #1C232D 52%, #131820 100%);
@@ -146,9 +173,15 @@
         }
 
         /* 2. Mode Tablet: Chassis Slate-Champagne + Layar 768px (Portrait Tengah + Sayap Artwork) */
+        html.pratinjau-anti-zoom [data-slot-bingkai][data-mode="tablet"] {
+            width: var(--pz-tablet-vis-w, 790px);
+            height: var(--pz-tablet-vis-h, 860px);
+        }
+
         html.pratinjau-anti-zoom [data-bingkai-pratinjau][data-mode="tablet"] {
             width: var(--pz-tablet-w, 790px);
             height: var(--pz-tablet-h, 860px);
+            transform: var(--pz-tablet-transform, none);
             padding: 11px;
             border-radius: 2.05rem;
             background: linear-gradient(165deg, #2A323F 0%, #1B222C 55%, #141922 100%);
@@ -168,9 +201,15 @@
         }
 
         /* 3. Mode Desktop: Jendela Studio Browser SesiTemu Berbingkai Elegan (Triptych 3-Kolom) */
+        html.pratinjau-anti-zoom [data-slot-bingkai][data-mode="desktop"] {
+            width: var(--pz-desktop-vis-w, 1280px);
+            height: var(--pz-desktop-vis-h, 780px);
+        }
+
         html.pratinjau-anti-zoom [data-bingkai-pratinjau][data-mode="desktop"] {
             width: var(--pz-desktop-w, 1280px);
             height: var(--pz-desktop-h, 780px);
+            transform: var(--pz-desktop-transform, none);
             padding: 0;
             border-radius: 1.25rem;
             background: #FDFBF7;
@@ -249,41 +288,76 @@
 
                 if (lebarTanpaZoom >= 768) {
                     const invZoom = Number((1 / browserZoom).toFixed(5));
-                    const tinggiStage = Math.max(520, Math.round(tinggiTanpaZoom - 64));
+                    const tinggiHeader = 64;
+                    const padY = tinggiTanpaZoom < 760 ? 12 : 18;
+                    const padX = lebarTanpaZoom < 960 ? 16 : 24;
+                    const ruangLebar = Math.max(200, lebarTanpaZoom - padX * 2);
+                    const ruangTinggi = Math.max(160, tinggiTanpaZoom - tinggiHeader - padY * 2);
 
-                    // Lebar & tinggi proporsional agar Handphone (390px), Tablet (768px), dan Desktop (>=1060px) selalu pas & terkunci
-                    const lebarPhone = Math.min(408, Math.max(360, Math.round(lebarTanpaZoom - 36)));
-                    const tinggiPhone = Math.min(844, Math.max(500, tinggiStage - 36));
+                    function hitungDimensiPerangkat(lebarLogis, tinggiMinLogis, tinggiMaksLogis) {
+                        const tinggiLogis = Math.round(Math.min(tinggiMaksLogis, Math.max(tinggiMinLogis, ruangTinggi)));
+                        const skalaMentah = Math.min(1, ruangLebar / lebarLogis, ruangTinggi / tinggiLogis);
+                        const skala = skalaMentah >= 0.995 ? 1 : Number(skalaMentah.toFixed(5));
+                        return {
+                            w: lebarLogis,
+                            h: tinggiLogis,
+                            visW: Number((lebarLogis * skala).toFixed(2)),
+                            visH: Number((tinggiLogis * skala).toFixed(2)),
+                            transform: skala === 1 ? 'none' : `scale(${skala})`,
+                        };
+                    }
 
-                    const lebarTablet = Math.min(790, Math.max(680, Math.round(lebarTanpaZoom - 48)));
-                    const tinggiTablet = Math.min(920, Math.max(500, tinggiStage - 36));
-
-                    const lebarDesktop = lebarTanpaZoom >= 1140
-                        ? Math.min(1320, Math.round(lebarTanpaZoom - 88))
-                        : Math.max(1024, Math.round(lebarTanpaZoom - 32));
-                    const tinggiDesktop = Math.min(820, Math.max(500, tinggiStage - 38));
+                    // Pertahankan rasio perangkat sejati (HP 390px, Tablet 768px, Desktop >=1280px) lalu skalakan proporsional di layar pendek (laptop)
+                    const phone = hitungDimensiPerangkat(408, 800, 844);
+                    const tablet = hitungDimensiPerangkat(790, 840, 920);
+                    const lebarDesktopLogis = Math.min(1320, Math.max(1280, Math.round(lebarTanpaZoom - 88)));
+                    const desktop = hitungDimensiPerangkat(lebarDesktopLogis, 760, 820);
 
                     root.classList.add('pratinjau-anti-zoom');
                     root.style.setProperty('--pz-w', `${lebarTanpaZoom.toFixed(2)}px`);
                     root.style.setProperty('--pz-h', `${tinggiTanpaZoom.toFixed(2)}px`);
                     root.style.setProperty('--pz-transform', browserZoom === 1 ? 'none' : `scale(${invZoom})`);
-                    root.style.setProperty('--pz-phone-w', `${lebarPhone}px`);
-                    root.style.setProperty('--pz-phone-h', `${tinggiPhone}px`);
-                    root.style.setProperty('--pz-tablet-w', `${lebarTablet}px`);
-                    root.style.setProperty('--pz-tablet-h', `${tinggiTablet}px`);
-                    root.style.setProperty('--pz-desktop-w', `${lebarDesktop}px`);
-                    root.style.setProperty('--pz-desktop-h', `${tinggiDesktop}px`);
+                    root.style.setProperty('--pz-stage-py', `${padY}px`);
+                    root.style.setProperty('--pz-stage-px', `${padX}px`);
+                    root.style.setProperty('--pz-phone-w', `${phone.w}px`);
+                    root.style.setProperty('--pz-phone-h', `${phone.h}px`);
+                    root.style.setProperty('--pz-phone-vis-w', `${phone.visW}px`);
+                    root.style.setProperty('--pz-phone-vis-h', `${phone.visH}px`);
+                    root.style.setProperty('--pz-phone-transform', phone.transform);
+                    root.style.setProperty('--pz-tablet-w', `${tablet.w}px`);
+                    root.style.setProperty('--pz-tablet-h', `${tablet.h}px`);
+                    root.style.setProperty('--pz-tablet-vis-w', `${tablet.visW}px`);
+                    root.style.setProperty('--pz-tablet-vis-h', `${tablet.visH}px`);
+                    root.style.setProperty('--pz-tablet-transform', tablet.transform);
+                    root.style.setProperty('--pz-desktop-w', `${desktop.w}px`);
+                    root.style.setProperty('--pz-desktop-h', `${desktop.h}px`);
+                    root.style.setProperty('--pz-desktop-vis-w', `${desktop.visW}px`);
+                    root.style.setProperty('--pz-desktop-vis-h', `${desktop.visH}px`);
+                    root.style.setProperty('--pz-desktop-transform', desktop.transform);
                 } else {
                     root.classList.remove('pratinjau-anti-zoom');
-                    root.style.removeProperty('--pz-w');
-                    root.style.removeProperty('--pz-h');
-                    root.style.removeProperty('--pz-transform');
-                    root.style.removeProperty('--pz-phone-w');
-                    root.style.removeProperty('--pz-phone-h');
-                    root.style.removeProperty('--pz-tablet-w');
-                    root.style.removeProperty('--pz-tablet-h');
-                    root.style.removeProperty('--pz-desktop-w');
-                    root.style.removeProperty('--pz-desktop-h');
+                    [
+                        '--pz-w',
+                        '--pz-h',
+                        '--pz-transform',
+                        '--pz-stage-py',
+                        '--pz-stage-px',
+                        '--pz-phone-w',
+                        '--pz-phone-h',
+                        '--pz-phone-vis-w',
+                        '--pz-phone-vis-h',
+                        '--pz-phone-transform',
+                        '--pz-tablet-w',
+                        '--pz-tablet-h',
+                        '--pz-tablet-vis-w',
+                        '--pz-tablet-vis-h',
+                        '--pz-tablet-transform',
+                        '--pz-desktop-w',
+                        '--pz-desktop-h',
+                        '--pz-desktop-vis-w',
+                        '--pz-desktop-vis-h',
+                        '--pz-desktop-transform',
+                    ].forEach((prop) => root.style.removeProperty(prop));
                 }
             }
 
@@ -463,9 +537,15 @@
         {{-- PANGGUNG PRATINJAU BERBINGKAI PERANGKAT (HANDPHONE / TABLET / DESKTOP) --}}
         <main data-stage-pratinjau>
             <div
-                data-bingkai-pratinjau
+                data-slot-bingkai
+                data-mode="{{ $modePerangkat ?? 'handphone' }}"
                 :data-mode="perangkat"
             >
+                <div
+                    data-bingkai-pratinjau
+                    data-mode="{{ $modePerangkat ?? 'handphone' }}"
+                    :data-mode="perangkat"
+                >
                 {{-- Aksen Speaker Halus Di Tepi Atas Bezel Handphone --}}
                 <div
                     data-aksen-bezel-hp
@@ -532,6 +612,7 @@
                         @load="kanvasSiap = true"
                         class="block h-full w-full border-0 bg-transparent"
                     ></iframe>
+                </div>
                 </div>
             </div>
         </main>

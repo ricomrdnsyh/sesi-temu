@@ -127,7 +127,9 @@ class TemaMotion3DTest extends TestCase
                 ->assertSee('data-panggung-3d', false)
                 ->assertSee('data-diorama-3d="'.$item['tier'].'"', false)
                 ->assertSee('data-intro-pembuka="'.$item['slug'].'"', false)
-                ->assertSee('data-intro-keluar="', false)
+                ->assertSee('data-intro-keluar="fade-halus"', false)
+                ->assertSee('data-intro-keluar-ms="1350"', false)
+                ->assertSee('intro-seragam-panggung', false)
                 ->assertSee('data-transisi-sampul="fade-halus"', false)
                 ->assertSee('tirai-fade-halus', false)
                 ->assertSee('data-autoscroll-dock', false)
@@ -172,8 +174,7 @@ class TemaMotion3DTest extends TestCase
             if ($item['slug'] === 'adat-jawa') {
                 $respon->assertSee('rounded-[500px]', false)
                     ->assertSee('diorama-kamera-3d', false)
-                    ->assertSee('intro-jawa-panggung', false)
-                    ->assertSee('intro-jawa-gunungan', false)
+                    ->assertSee('intro-seragam-panggung', false)
                     ->assertSee('data-sinema-gsap="jawa"', false)
                     ->assertSee('data-gsap="potret"', false)
                     ->assertSee('data-lenis-prevent', false);
@@ -182,7 +183,7 @@ class TemaMotion3DTest extends TestCase
                 $this->get('/demo/'.$item['slug'].'?kanvas=1&embed=1')
                     ->assertOk()
                     ->assertDontSee('class="intro-pembuka-tirai', false)
-                    ->assertDontSee('intro-jawa-panggung', false);
+                    ->assertDontSee('intro-seragam-panggung', false);
             } elseif ($item['slug'] === 'sunda-heritage') {
                 $respon->assertSee('diorama-kamera-3d', false)
                     ->assertSee('rounded-t-[10.5rem]', false)
@@ -679,8 +680,8 @@ class TemaMotion3DTest extends TestCase
 
         $responHeavenly = $this->get('/demo/islamic-heavenly?kanvas=1')
             ->assertOk()
-            ->assertSee('intro-celestial-panggung', false)
-            ->assertSee('intro-celestial-astrolab', false)
+            ->assertSee('intro-seragam-panggung', false)
+            ->assertSee('data-intro-keluar="fade-halus"', false)
             ->assertSee('aset-tema/islamic-heavenly/islamic-heavenly-motion-hero.mp4', false)
             ->assertSee('data-start-at="0"', false)
             ->assertSee('data-playback-rate="1.05"', false)

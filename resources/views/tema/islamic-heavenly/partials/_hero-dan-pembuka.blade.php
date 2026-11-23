@@ -97,7 +97,7 @@
                     <div class="pt-4 space-y-3">
                         <div class="mx-auto w-14 h-14 relative flex items-center justify-center">
                             <span class="absolute inset-0 rounded-full border border-dashed border-[#D9B664]/70 animasi-orbit"></span>
-                            <img src="{{ $asetCelestial['sabit'] }}" alt="" class="w-8 opacity-95 animasi-ayun-3d">
+                            <img src="{{ $asetCelestial['sabit'] }}" alt="" class="h-10 w-auto opacity-95 animasi-ayun-3d">
                         </div>
                         <svg aria-hidden="true" viewBox="0 0 360 56" class="w-full max-w-[280px] mx-auto opacity-85">
                             <path d="M0 54 H360 M36 54 V34 L42 20 L48 34 V54 M312 54 V34 L318 20 L324 34 V54 M96 54 C96 34 118 28 128 20 C138 28 160 34 160 54 M200 54 C200 34 222 28 232 20 C242 28 264 34 264 54 M134 54 C134 26 164 18 180 6 C196 18 226 26 226 54" fill="rgba(19,36,56,0.75)" stroke="#D9B664" stroke-width="1.3"/>
@@ -204,46 +204,57 @@
     </div>
 </section>
 
-{{-- SEKSI 2: PRELUDE SANCTUARY LANGIT MALAM — SALAM, POTRET ASTROLAB, MONOGRAM ORBIT & AYAT --}}
+{{-- SEKSI 2: PRELUDE EDITORIAL OBSERVATORIUM MALAM — SALAM, POTRET BERSIH, MONOGRAM & KALAM DOA --}}
 <section
     data-section-pembuka="celestial"
-    class="relative bg-gradient-to-b from-[#091322] via-[#0C192C] to-[#0E1B2A] shadow-[0_-2px_0_0_#091322] celestial-pola-bintang px-5 pt-11 pb-14 overflow-hidden"
+    class="relative bg-gradient-to-b from-[#091322] via-[#0B172A] to-[#0A1526] shadow-[0_-2px_0_0_#091322] celestial-pola-bintang px-5 pt-12 pb-14 overflow-hidden"
 >
-    {{-- Pendar Bimasakti Lembut Di Latar Prelude --}}
+    {{-- Pendar Cahaya Bulan Lembut Di Latar Prelude --}}
     <div
         aria-hidden="true"
         class="pointer-events-none absolute inset-0"
-        style="background: radial-gradient(circle at 50% 34%, rgba(217,182,100,0.14) 0%, rgba(19,36,56,0.08) 46%, rgba(6,13,24,0.65) 100%);"
+        style="background: radial-gradient(circle at 50% 24%, rgba(217,182,100,0.12) 0%, rgba(19,36,56,0.06) 44%, rgba(6,13,24,0.72) 100%);"
     ></div>
 
-    <div class="relative z-10 max-w-md mx-auto text-center space-y-7">
-        {{-- Salam Pembuka & Tajuk --}}
-        <div class="space-y-1.5">
+    <div class="relative z-10 max-w-md mx-auto space-y-8">
+        {{-- Salam Pembuka & Tajuk Editorial --}}
+        <div class="text-center space-y-2">
+            <svg
+                data-gsap="turun"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                class="w-5 h-5 mx-auto text-[#E5C474]/90"
+                fill="currentColor"
+            >
+                <path d="M14.7 3.2a8.4 8.4 0 1 0 6.1 14.1 7.1 7.1 0 0 1-9.3-9.3 8.3 8.3 0 0 1 3.2-4.8Z" />
+                <path d="M18.4 5.2l.55 1.45 1.45.55-1.45.55-.55 1.45-.55-1.45-1.45-.55 1.45-.55.55-1.45Z" />
+            </svg>
             <p data-gsap="turun" class="text-xl sm:text-2xl text-[#F3E5AB]" style="font-family: 'Amiri', serif;">
                 بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
             </p>
-            <p data-gsap="teks" class="text-[9.5px] font-bold uppercase tracking-[0.26em] text-[#D9B664]">
+            <p data-gsap="teks" class="text-[9.5px] font-semibold uppercase tracking-[0.26em] text-[#D9B664]">
                 Assalamu&rsquo;alaikum Warahmatullahi Wabarakatuh
             </p>
-            <p data-gsap="mekar" data-gsap-delay="0.06" class="text-[10px] font-medium uppercase tracking-[0.34em] text-[#E6EEF8]/78">
-                We Are Getting Married!
-            </p>
+            <div data-gsap="mekar" data-gsap-delay="0.06" class="flex items-center justify-center gap-2.5 pt-0.5">
+                <span aria-hidden="true" class="h-px w-8 bg-gradient-to-r from-transparent to-[#D9B664]/65"></span>
+                <p class="text-[10px] font-medium uppercase tracking-[0.34em] text-[#E6EEF8]/82">
+                    We Are Getting Married!
+                </p>
+                <span aria-hidden="true" class="h-px w-8 bg-gradient-to-l from-transparent to-[#D9B664]/65"></span>
+            </div>
         </div>
 
-        {{-- Potret Pembuka Berbingkai Lengkung Kubah Malam (Tersembunyi Saat Mode Tanpa Foto) --}}
+        {{-- Potret Pembuka Bergaya Editorial Galeri Malam (Tanpa Ornamen Menghalangi Foto) --}}
         @if ($urlFotoPembuka)
-            <div data-gsap="potret" class="relative mx-auto w-56 sm:w-60">
-                <span aria-hidden="true" class="pointer-events-none absolute -inset-2.5 rounded-t-[9.2rem] rounded-b-[1.6rem] border border-dashed border-[#D9B664]/40"></span>
-                <div class="relative p-2 rounded-t-[8.5rem] rounded-b-2xl border-2 border-[#D9B664]/80 bg-[#0A1526]/90 shadow-[0_24px_52px_-14px_rgba(0,0,0,0.82)]">
-                    <img
-                        src="{{ $asetCelestial['sabit'] }}"
-                        alt=""
-                        aria-hidden="true"
-                        loading="lazy"
-                        decoding="async"
-                        class="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 w-9 z-20 drop-shadow-md animasi-ayun-3d"
-                    >
-                    <div class="overflow-hidden rounded-t-[7.8rem] rounded-b-xl aspect-[4/5] border border-[#F3E5AB]/40">
+            <div data-gsap="potret" class="relative mx-auto max-w-[300px] sm:max-w-[320px]">
+                {{-- Garis Bingkai Offset Arsitektural Emas --}}
+                <div
+                    aria-hidden="true"
+                    class="pointer-events-none absolute -inset-2 translate-x-1.5 translate-y-1.5 rounded-[1.6rem] border border-[#D9B664]/28"
+                ></div>
+
+                <div class="relative overflow-hidden rounded-[1.4rem] border border-[#D9B664]/55 bg-[#081220] shadow-[0_26px_54px_-16px_rgba(0,0,0,0.85)]">
+                    <div class="aspect-[4/4.6] overflow-hidden">
                         <img
                             src="{{ $urlFotoPembuka }}"
                             alt="Foto Pembuka {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}"
@@ -252,74 +263,59 @@
                             class="w-full h-full object-cover object-top"
                         >
                     </div>
+                    <div
+                        aria-hidden="true"
+                        class="pointer-events-none absolute inset-x-0 bottom-0 h-20"
+                        style="background: linear-gradient(180deg, transparent 0%, rgba(6,14,27,0.86) 100%);"
+                    ></div>
+                    <div class="absolute inset-x-4 bottom-3 flex items-center justify-between text-[9.5px] font-medium uppercase tracking-[0.24em] text-[#F3E5AB]/90">
+                        <span>{{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}</span>
+                        <span class="text-[#D9B664]">{{ $tanggalTitik }}</span>
+                    </div>
                 </div>
             </div>
         @endif
 
-        {{-- Medali Monogram Orbit Astrolab Pasangan --}}
+        {{-- Pita Monogram Pasangan Minimalis Bergaya Astrolab --}}
         <div class="flex items-center justify-center gap-4 px-4">
-            <span data-gsap="garis" aria-hidden="true" class="h-px flex-1 max-w-[62px] bg-gradient-to-r from-transparent to-[#D9B664]/70"></span>
-            <div data-gsap="mekar" class="relative h-24 w-24 flex items-center justify-center">
-                <span aria-hidden="true" class="absolute inset-0 rounded-full border border-dashed border-[#D9B664]/65 animasi-orbit"></span>
-                <span aria-hidden="true" class="absolute inset-2 rounded-full border border-[#F3E5AB]/45 bg-[#102036]/85 shadow-[0_0_28px_-6px_rgba(217,182,100,0.3)] animasi-orbit-balik"></span>
-                <div class="relative z-10 flex items-baseline gap-1 text-[#F3E5AB]">
-                    <span data-gsap="kiri" class="fx-slide-left font-serif text-2xl sm:text-[1.75rem] font-bold">{{ $undangan->inisialPria() }}</span>
-                    <span class="font-kaligrafi text-2xl text-[#D9B664]">&amp;</span>
-                    <span data-gsap="kanan" class="fx-slide-right font-serif text-2xl sm:text-[1.75rem] font-bold">{{ $undangan->inisialWanita() }}</span>
-                </div>
+            <span data-gsap="garis" aria-hidden="true" class="h-px flex-1 bg-gradient-to-r from-transparent to-[#D9B664]/55"></span>
+            <div data-gsap="mekar" class="inline-flex items-center gap-2 rounded-full border border-[#D9B664]/45 bg-[#0F1E33]/85 px-5 py-2 shadow-[0_10px_28px_-10px_rgba(0,0,0,0.75)]">
+                <span data-gsap="kiri" class="fx-slide-left font-serif text-xl sm:text-2xl font-semibold text-[#F3E5AB] leading-none">{{ $undangan->inisialPria() }}</span>
+                <span class="font-kaligrafi text-xl text-[#D9B664] leading-none">&amp;</span>
+                <span data-gsap="kanan" class="fx-slide-right font-serif text-xl sm:text-2xl font-semibold text-[#F3E5AB] leading-none">{{ $undangan->inisialWanita() }}</span>
             </div>
-            <span data-gsap="garis" aria-hidden="true" class="h-px flex-1 max-w-[62px] bg-gradient-to-l from-transparent to-[#D9B664]/70"></span>
+            <span data-gsap="garis" aria-hidden="true" class="h-px flex-1 bg-gradient-to-l from-transparent to-[#D9B664]/55"></span>
         </div>
 
-        {{-- Plakat Ayat Suci Malam Bintang & Siluet Teratai Putih --}}
+        {{-- Kalam & Cahaya Doa: Panel Editorial Terbuka Berbingkai Garis Emas Tipis (Tanpa Ornamen Menutupi Teks) --}}
         @if ($undangan->kutipan_ayat)
-            <div class="pt-3">
-                <blockquote class="relative rounded-[1.85rem] bg-gradient-to-b from-[#13243B]/92 via-[#0F1E33]/90 to-[#0A1525]/96 backdrop-blur-sm border border-[#D9B664]/50 px-6 sm:px-7 pt-9 pb-7 shadow-[0_24px_52px_-16px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(243,229,171,0.18)] kartu-3d">
-                    <span aria-hidden="true" class="pointer-events-none absolute top-2.5 left-2.5 h-3.5 w-3.5 border-t border-l border-[#D9B664]/65 rounded-tl-md"></span>
-                    <span aria-hidden="true" class="pointer-events-none absolute top-2.5 right-2.5 h-3.5 w-3.5 border-t border-r border-[#D9B664]/65 rounded-tr-md"></span>
-                    <span aria-hidden="true" class="pointer-events-none absolute bottom-2.5 left-2.5 h-3.5 w-3.5 border-b border-l border-[#D9B664]/65 rounded-bl-md"></span>
-                    <span aria-hidden="true" class="pointer-events-none absolute bottom-2.5 right-2.5 h-3.5 w-3.5 border-b border-r border-[#D9B664]/65 rounded-br-md"></span>
-
-                    {{-- Medali Bulan Sabit Di Puncak Plakat Ayat --}}
-                    <div data-gsap="turun" class="absolute -top-6 inset-x-0 mx-auto w-fit rounded-full bg-[#0E1C30] border border-[#D9B664]/70 px-3.5 py-1.5 shadow-[0_8px_20px_rgba(0,0,0,0.7)]">
-                        <img
-                            src="{{ $asetCelestial['sabit'] }}"
-                            alt=""
-                            loading="lazy"
-                            decoding="async"
-                            class="w-7 mx-auto"
-                        >
-                    </div>
-
-                    <p data-gsap="teks" class="text-[9.5px] font-bold uppercase tracking-[0.34em] text-[#D9B664] pt-1">
+            <blockquote class="relative rounded-2xl bg-gradient-to-b from-[#112238]/78 to-[#091425]/88 border border-[#D9B664]/35 px-6 sm:px-7 py-7 text-center shadow-[0_22px_48px_-18px_rgba(0,0,0,0.82)] kartu-3d">
+                <div data-gsap="turun" class="inline-flex items-center gap-2 rounded-full border border-[#D9B664]/35 bg-[#091322]/75 px-3.5 py-1">
+                    <svg aria-hidden="true" viewBox="0 0 16 16" class="h-2.5 w-2.5 text-[#F3E5AB]" fill="currentColor">
+                        <path d="M8 0.5L9.7 6.3L15.5 8L9.7 9.7L8 15.5L6.3 9.7L0.5 8L6.3 6.3L8 0.5Z" />
+                    </svg>
+                    <p class="text-[9px] font-bold uppercase tracking-[0.32em] text-[#D9B664]">
                         Kalam &amp; Cahaya Doa
                     </p>
+                    <svg aria-hidden="true" viewBox="0 0 16 16" class="h-2.5 w-2.5 text-[#F3E5AB]" fill="currentColor">
+                        <path d="M8 0.5L9.7 6.3L15.5 8L9.7 9.7L8 15.5L6.3 9.7L0.5 8L6.3 6.3L8 0.5Z" />
+                    </svg>
+                </div>
 
-                    <span data-gsap="mekar" aria-hidden="true" class="block font-serif text-5xl leading-[0.65] text-[#D9B664]/30 pt-3 select-none">
-                        &ldquo;
-                    </span>
+                <p data-gsap="naik" data-gsap-delay="0.06" class="mt-5 font-serif italic text-[14.5px] sm:text-[15.5px] leading-[1.88] text-[#F4F7FC]/92">
+                    &ldquo;{{ $undangan->kutipan_ayat }}&rdquo;
+                </p>
 
-                    <p data-gsap="naik" data-gsap-delay="0.06" class="font-serif italic text-[14.5px] sm:text-[15.5px] leading-[1.82] text-[#F4F7FC]/95 pt-1">
-                        {{ $undangan->kutipan_ayat }}
-                    </p>
+                <div data-gsap="garis" class="mt-5 flex items-center justify-center gap-3 px-8" aria-hidden="true">
+                    <span class="h-px flex-1 bg-gradient-to-r from-transparent to-[#D9B664]/45"></span>
+                    <span class="h-1 w-1 rotate-45 bg-[#F3E5AB]/85"></span>
+                    <span class="h-px flex-1 bg-gradient-to-l from-transparent to-[#D9B664]/45"></span>
+                </div>
 
-                    {{-- Ornamen Teratai Putih Celestial (Selaras Video Hero) --}}
-                    <div data-gsap="garis" class="mt-5 flex items-center justify-center gap-3 px-6" aria-hidden="true">
-                        <span class="h-px flex-1 bg-gradient-to-r from-transparent to-[#D9B664]/55"></span>
-                        <svg viewBox="0 0 48 22" class="w-10 text-[#F3E5AB]/85" fill="none" stroke="currentColor" stroke-width="1.2">
-                            <path d="M24 3 C20 9 20 15 24 19 C28 15 28 9 24 3 Z" fill="currentColor" fill-opacity="0.22"/>
-                            <path d="M24 19 C17 17 12 12 11 7 C16 8 20 12 24 19 Z" fill="currentColor" fill-opacity="0.14"/>
-                            <path d="M24 19 C31 17 36 12 37 7 C32 8 28 12 24 19 Z" fill="currentColor" fill-opacity="0.14"/>
-                            <path d="M5 19 Q24 21 43 19" stroke-opacity="0.55"/>
-                        </svg>
-                        <span class="h-px flex-1 bg-gradient-to-l from-transparent to-[#D9B664]/55"></span>
-                    </div>
-
-                    <p data-gsap="mekar" data-gsap-delay="0.06" class="mt-2 text-[10px] font-medium tracking-[0.22em] text-[#F3E5AB]/85">
-                        {{ $hashtagPasangan }}
-                    </p>
-                </blockquote>
-            </div>
+                <p data-gsap="mekar" data-gsap-delay="0.06" class="mt-3 text-[10px] font-medium tracking-[0.24em] text-[#E5C474]/85">
+                    {{ $hashtagPasangan }}
+                </p>
+            </blockquote>
         @endif
     </div>
 </section>

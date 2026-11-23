@@ -898,14 +898,14 @@
         opacity: 1;
         transform: scale(1);
         transition:
-            opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-            transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+            opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
         will-change: opacity, transform;
     }
 
     .tirai-fade-halus.tirai-terbuka {
         opacity: 0;
-        transform: scale(1.03);
+        transform: scale(1.025);
     }
 
     /* === KOREOGRAFI DIORAMA 3D MULTI-LAPIS ADAT JAWA KERATON (60FPS GPU-COMPOSITED) === */
@@ -1888,326 +1888,113 @@
         min-height: var(--tinggi-tirai-dalam-inv, 100dvh) !important;
     }
 
-    /* === INTRO PEMBUKA SINEMATIK AWAL BUKA (UNIK PER TEMA, 60FPS GPU-COMPOSITED) === */
+    /* === INTRO PEMBUKA SERAGAM CLEAN & SLOW FADE (SELURUH TEMA, 60FPS GPU-COMPOSITED) === */
     @keyframes introBingkaiMasuk {
-        0% { opacity: 0; transform: scale(0.95); }
+        0% { opacity: 0; transform: scale(0.96); }
         100% { opacity: 1; transform: scale(1); }
     }
     @keyframes introElemenNaik {
-        0% { opacity: 0; transform: translate3d(0, 16px, 0) scale(0.97); }
-        100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+        0% { opacity: 0; transform: translate3d(0, 20px, 0); }
+        100% { opacity: 1; transform: translate3d(0, 0, 0); }
     }
     @keyframes introMonogramMekar {
-        0% { opacity: 0; transform: scale(0.84) translate3d(0, 10px, 0); }
+        0% { opacity: 0; transform: scale(0.84) translate3d(0, 14px, 0); }
         100% { opacity: 1; transform: scale(1) translate3d(0, 0, 0); }
+    }
+    @keyframes introNamaDariKiri {
+        0% { opacity: 0; transform: translate3d(-18px, 6px, 0); }
+        100% { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
+    @keyframes introNamaDariKanan {
+        0% { opacity: 0; transform: translate3d(18px, 6px, 0); }
+        100% { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
+    @keyframes introAmpMekar {
+        0% { opacity: 0; transform: scale(0.72); }
+        100% { opacity: 1; transform: scale(1); }
     }
     @keyframes introGarisBentang {
         0% { opacity: 0; transform: scaleX(0); }
         100% { opacity: 1; transform: scaleX(1); }
     }
-    @keyframes introPutarPelan {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+    @keyframes introPendarNafas {
+        0%, 100% { opacity: 0.72; transform: scale(0.98); }
+        50% { opacity: 1; transform: scale(1.04); }
     }
 
     .intro-pembuka-tirai {
-        will-change: transform, opacity;
+        will-change: opacity;
         backface-visibility: hidden;
     }
-    .intro-pembuka-tirai .intro-bingkai {
-        animation: introBingkaiMasuk 0.72s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both;
-    }
-    .intro-pembuka-tirai .intro-tahap-1 {
-        animation: introElemenNaik 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.14s both;
-    }
-    .intro-pembuka-tirai .intro-tahap-2 {
-        animation: introElemenNaik 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.36s both;
-    }
-    .intro-pembuka-tirai .intro-tahap-3 {
-        animation: introMonogramMekar 0.78s cubic-bezier(0.16, 1, 0.3, 1) 0.62s both;
-    }
-    .intro-pembuka-tirai .intro-tahap-4 {
-        animation: introElemenNaik 0.72s cubic-bezier(0.22, 1, 0.36, 1) 0.92s both;
-    }
-    .intro-pembuka-tirai .intro-garis {
-        transform-origin: center;
-        animation: introGarisBentang 0.75s cubic-bezier(0.22, 1, 0.36, 1) 1.08s both;
-    }
-    .intro-pembuka-tirai .intro-petunjuk {
-        animation: introElemenNaik 0.55s ease 1.15s both;
-    }
-    .intro-pembuka-tirai .intro-putar-pelan {
-        animation: introPutarPelan 18s linear infinite;
+    .intro-pembuka-tirai .intro-pendar {
+        animation: introPendarNafas 4s ease-in-out infinite;
     }
 
-    /* Transisi Keluar 1: Belah Tengah (Adat Jawa, Islamic Heavenly, Luxury Noir, Editorial Monokrom) */
-    .intro-pembuka-tirai .intro-panel-kiri,
-    .intro-pembuka-tirai .intro-panel-kanan {
-        transition: transform 0.78s cubic-bezier(0.76, 0, 0.24, 1);
-        will-change: transform;
-    }
-    .intro-pembuka-tirai .intro-pusat,
+    /* Tahan seluruh elemen pada opacity 0 hingga .intro-mulai aktif (setelah layar siap/spinner hilang) */
     .intro-pembuka-tirai .intro-bingkai,
-    .intro-pembuka-tirai .intro-pendar,
+    .intro-pembuka-tirai .intro-tahap-1,
+    .intro-pembuka-tirai .intro-tahap-2,
+    .intro-pembuka-tirai .intro-nama-pria,
+    .intro-pembuka-tirai .intro-nama-amp,
+    .intro-pembuka-tirai .intro-nama-wanita,
+    .intro-pembuka-tirai .intro-garis,
+    .intro-pembuka-tirai .intro-tanggal,
     .intro-pembuka-tirai .intro-petunjuk {
-        transition: opacity 0.34s ease, transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+        opacity: 0;
+    }
+
+    .intro-pembuka-tirai.intro-mulai .intro-bingkai {
+        animation: introBingkaiMasuk 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+    }
+    .intro-pembuka-tirai.intro-mulai .intro-tahap-1 {
+        animation: introElemenNaik 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
+    }
+    .intro-pembuka-tirai.intro-mulai .intro-tahap-2 {
+        animation: introMonogramMekar 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.52s both;
+    }
+    .intro-pembuka-tirai.intro-mulai .intro-nama-pria {
+        animation: introNamaDariKiri 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.86s both;
+    }
+    .intro-pembuka-tirai.intro-mulai .intro-nama-amp {
+        animation: introAmpMekar 0.75s cubic-bezier(0.16, 1, 0.3, 1) 1.02s both;
+    }
+    .intro-pembuka-tirai.intro-mulai .intro-nama-wanita {
+        animation: introNamaDariKanan 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.86s both;
+    }
+    .intro-pembuka-tirai.intro-mulai .intro-garis {
+        transform-origin: center;
+        animation: introGarisBentang 0.85s cubic-bezier(0.22, 1, 0.36, 1) 1.22s both;
+    }
+    .intro-pembuka-tirai.intro-mulai .intro-tanggal {
+        animation: introElemenNaik 0.8s cubic-bezier(0.22, 1, 0.36, 1) 1.42s both;
+    }
+    .intro-pembuka-tirai.intro-mulai .intro-petunjuk {
+        animation: introElemenNaik 0.7s ease 1.68s both;
+    }
+
+    /* Transisi Keluar Seragam: Fade-Out Lambat & Halus Menuju Sampul (1.35s) */
+    .intro-pembuka-tirai[data-intro-keluar="fade-halus"] {
+        transition: opacity 1.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .intro-pembuka-tirai[data-intro-keluar="fade-halus"] .intro-pusat {
+        transition:
+            opacity 1.05s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 1.25s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .intro-pembuka-tirai.intro-keluar {
         pointer-events: none;
     }
-    .intro-pembuka-tirai.intro-keluar[data-intro-keluar="belah-tengah"] .intro-pusat,
-    .intro-pembuka-tirai.intro-keluar[data-intro-keluar="belah-tengah"] .intro-bingkai,
-    .intro-pembuka-tirai.intro-keluar[data-intro-keluar="belah-tengah"] .intro-pendar,
-    .intro-pembuka-tirai.intro-keluar[data-intro-keluar="belah-tengah"] .intro-petunjuk {
-        animation: none !important;
-        opacity: 0;
-        transform: scale(1.04);
-    }
-    .intro-pembuka-tirai.intro-keluar[data-intro-keluar="belah-tengah"] .intro-panel-kiri {
-        transform: translate3d(-104%, 0, 0);
-    }
-    .intro-pembuka-tirai.intro-keluar[data-intro-keluar="belah-tengah"] .intro-panel-kanan {
-        transform: translate3d(104%, 0, 0);
-    }
-
-    /* Transisi Keluar 2: Gulir Halus Ke Atas (Sunda Heritage, Rustic Floral, Royal Ivory) */
-    .intro-pembuka-tirai[data-intro-keluar="gulir-atas"] {
-        transition: transform 0.78s cubic-bezier(0.76, 0, 0.24, 1), opacity 0.45s ease 0.32s;
-    }
-    .intro-pembuka-tirai.intro-keluar[data-intro-keluar="gulir-atas"] {
-        transform: translate3d(0, -104%, 0);
-        opacity: 0;
-    }
-
-    /* Transisi Keluar 3: Mekar Halus (Islami Syar'i, Velvet Garden) */
-    .intro-pembuka-tirai[data-intro-keluar="mekar-halus"] {
-        transition: opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1), transform 0.78s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .intro-pembuka-tirai.intro-keluar[data-intro-keluar="mekar-halus"] {
-        opacity: 0;
-        transform: scale(1.065);
-    }
-
-    /* Transisi Keluar 4: Fade Halus Murni (Sunda Heritage — agar kontras dengan sampul gulir ke atas) */
-    .intro-pembuka-tirai[data-intro-keluar="fade-halus"] {
-        transition: opacity 0.76s cubic-bezier(0.22, 1, 0.36, 1);
-    }
     .intro-pembuka-tirai.intro-keluar[data-intro-keluar="fade-halus"] {
         opacity: 0;
+    }
+    .intro-pembuka-tirai.intro-keluar[data-intro-keluar="fade-halus"] .intro-pusat {
+        opacity: 0;
+        transform: translate3d(0, -10px, 0) scale(0.985);
     }
 
     .intro-pembuka-tirai.intro-selesai,
     .intro-pembuka-tirai.intro-selesai * {
         animation: none !important;
-    }
-
-    /* === KOREOGRAFI KHUSUS INTRO ADAT JAWA KERATON (TANCEP KAYON -> UKIRAN -> GEBYOK) === */
-    .intro-jawa-mask-atas {
-        -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.92) 15%, rgba(0, 0, 0, 0.3) 65%, transparent 100%);
-        mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.92) 15%, rgba(0, 0, 0, 0.3) 65%, transparent 100%);
-    }
-    .intro-jawa-mask-bawah {
-        -webkit-mask-image: linear-gradient(0deg, rgba(0, 0, 0, 0.92) 15%, rgba(0, 0, 0, 0.3) 65%, transparent 100%);
-        mask-image: linear-gradient(0deg, rgba(0, 0, 0, 0.92) 15%, rgba(0, 0, 0, 0.3) 65%, transparent 100%);
-    }
-    .intro-jawa-foil {
-        background: linear-gradient(180deg, #FFFBE4 0%, #F1D384 46%, #C4933B 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.55));
-    }
-
-    @keyframes introJawaGununganBabak1 {
-        0% { opacity: 0; transform: translate3d(0, 28px, 0) scale(0.84); }
-        34% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-        74% { opacity: 1; transform: translate3d(0, -4px, 0) scale(1.03); }
-        100% { opacity: 0; transform: translate3d(0, -14px, 0) scale(1.12); }
-    }
-    @keyframes introJawaTajukBabak1 {
-        0% { opacity: 0; transform: translate3d(0, 14px, 0); }
-        32% { opacity: 1; transform: translate3d(0, 0, 0); }
-        74% { opacity: 1; transform: translate3d(0, 0, 0); }
-        100% { opacity: 0; transform: translate3d(0, -10px, 0); }
-    }
-    @keyframes introJawaEyebrowBentang {
-        0% { letter-spacing: 0.16em; }
-        55%, 100% { letter-spacing: 0.36em; }
-    }
-    @keyframes introJawaWatermarkMasuk {
-        0% { opacity: 0; transform: scale(0.92); }
-        100% { opacity: 0.14; transform: scale(1.04); }
-    }
-    @keyframes introJawaMedaliMekar {
-        0% { opacity: 0; transform: scale(0.86) translate3d(0, 14px, 0); }
-        100% { opacity: 1; transform: scale(1) translate3d(0, 0, 0); }
-    }
-    @keyframes introJawaSayapKiri {
-        0% { opacity: 0; transform: translate3d(-24px, 14px, 0) rotate(-14deg) scale(0.88); }
-        100% { opacity: 0.72; transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
-    }
-    @keyframes introJawaSayapKanan {
-        0% { opacity: 0; transform: translate3d(24px, 14px, 0) scaleX(-1) rotate(-14deg) scale(0.88); }
-        100% { opacity: 0.72; transform: translate3d(0, 0, 0) scaleX(-1) rotate(0deg) scale(1); }
-    }
-    @keyframes introJawaHaloNafas {
-        0%, 100% { opacity: 0.78; transform: scale(0.98); }
-        50% { opacity: 1; transform: scale(1.06); }
-    }
-    @keyframes introJawaSinarSapu {
-        0% { opacity: 0; transform: translate3d(-45%, 0, 0) rotate(-18deg); }
-        45% { opacity: 0.9; }
-        100% { opacity: 0; transform: translate3d(145%, 0, 0) rotate(-14deg); }
-    }
-    @keyframes introJawaDebuNaik {
-        0% { opacity: 0; transform: translate3d(0, 16px, 0) scale(0.7); }
-        35% { opacity: 0.85; }
-        100% { opacity: 0; transform: translate3d(6px, -68px, 0) scale(1.15); }
-    }
-
-    [data-intro-pembuka="adat-jawa"] .intro-panel-kiri,
-    [data-intro-pembuka="adat-jawa"] .intro-panel-kanan {
-        transition: transform 0.94s cubic-bezier(0.76, 0, 0.24, 1);
-    }
-    [data-intro-pembuka="adat-jawa"] .intro-jawa-watermark {
-        opacity: 0;
-        animation: introJawaWatermarkMasuk 0.95s cubic-bezier(0.22, 1, 0.36, 1) 1.38s both;
-        transition: opacity 0.4s ease, transform 0.45s ease;
-    }
-    [data-intro-pembuka="adat-jawa"] .intro-jawa-gunungan {
-        animation: introJawaGununganBabak1 1.62s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
-    }
-    [data-intro-pembuka="adat-jawa"] .intro-jawa-tajuk-1 {
-        animation: introJawaTajukBabak1 1.48s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
-    }
-    [data-intro-pembuka="adat-jawa"] .intro-jawa-eyebrow {
-        animation: introJawaEyebrowBentang 1.35s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
-    }
-    [data-intro-pembuka="adat-jawa"] .intro-jawa-medali {
-        animation: introJawaMedaliMekar 0.78s cubic-bezier(0.16, 1, 0.3, 1) 1.48s both;
-    }
-    [data-intro-pembuka="adat-jawa"] .intro-jawa-mahkota {
-        animation: introElemenNaik 0.58s cubic-bezier(0.22, 1, 0.36, 1) 1.66s both;
-    }
-    [data-intro-pembuka="adat-jawa"] .intro-jawa-monogram {
-        animation: introMonogramMekar 0.72s cubic-bezier(0.16, 1, 0.3, 1) 1.76s both;
-    }
-    [data-intro-pembuka="adat-jawa"] .intro-jawa-pemisah {
-        transform-origin: center;
-        animation: introGarisBentang 0.65s cubic-bezier(0.22, 1, 0.36, 1) 1.98s both;
-    }
-    [data-intro-pembuka="adat-jawa"] .intro-jawa-nama {
-        animation: introElemenNaik 0.65s cubic-bezier(0.22, 1, 0.36, 1) 2.08s both;
-    }
-    [data-intro-pembuka="adat-jawa"] .intro-jawa-tanggal {
-        animation: introElemenNaik 0.58s cubic-bezier(0.22, 1, 0.36, 1) 2.26s both;
-    }
-    [data-intro-pembuka="adat-jawa"] .intro-jawa-sayap-kiri {
-        transform-origin: 18% 82%;
-        animation: introJawaSayapKiri 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both;
-    }
-    [data-intro-pembuka="adat-jawa"] .intro-jawa-sayap-kanan {
-        transform-origin: 82% 82%;
-        animation: introJawaSayapKanan 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both;
-    }
-    [data-intro-pembuka="adat-jawa"] .intro-jawa-halo {
-        animation: introJawaHaloNafas 3.2s ease-in-out infinite;
-    }
-    [data-intro-pembuka="adat-jawa"] .intro-jawa-sinar {
-        animation: introJawaSinarSapu 3.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.15s both;
-    }
-    [data-intro-pembuka="adat-jawa"] .intro-jawa-debu {
-        animation: introJawaDebuNaik 2.6s ease-out infinite;
-    }
-    [data-intro-pembuka="adat-jawa"].intro-keluar .intro-pusat,
-    [data-intro-pembuka="adat-jawa"].intro-keluar .intro-pendar,
-    [data-intro-pembuka="adat-jawa"].intro-keluar .intro-petunjuk {
-        animation: none !important;
-        opacity: 0;
-        transform: scale(1.08);
-        transition: opacity 0.42s ease, transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    /* === KOREOGRAFI KHUSUS INTRO ISLAMIC HEAVENLY (ASTROLAB SABIT -> KARTUS MIHRAB -> GERBANG BINTANG) === */
-    @keyframes introCelestialAstrolabBabak1 {
-        0% { opacity: 0; transform: scale(0.76) rotate(-14deg); }
-        34% { opacity: 1; transform: scale(1) rotate(0deg); }
-        74% { opacity: 1; transform: scale(1.03) rotate(4deg); }
-        100% { opacity: 0; transform: scale(1.16) rotate(12deg); }
-    }
-    @keyframes introCelestialLenteraMasukKiri {
-        0% { opacity: 0; transform: translate3d(-12px, -32px, 0) rotate(-6deg); }
-        100% { opacity: 0.9; transform: translate3d(0, 0, 0) rotate(0deg); }
-    }
-    @keyframes introCelestialLenteraMasukKanan {
-        0% { opacity: 0; transform: translate3d(12px, -32px, 0) scaleX(-1) rotate(-6deg); }
-        100% { opacity: 0.9; transform: translate3d(0, 0, 0) scaleX(-1) rotate(0deg); }
-    }
-    @keyframes introCelestialMeteorSapu {
-        0% { opacity: 0; transform: translate3d(40px, -24px, 0) rotate(-28deg) scaleX(0.3); }
-        18% { opacity: 0.95; transform: translate3d(-25px, 14px, 0) rotate(-28deg) scaleX(1); }
-        42%, 100% { opacity: 0; transform: translate3d(-230px, 130px, 0) rotate(-28deg) scaleX(0.5); }
-    }
-
-    [data-intro-pembuka="islamic-heavenly"] .intro-panel-kiri,
-    [data-intro-pembuka="islamic-heavenly"] .intro-panel-kanan {
-        transition: transform 0.94s cubic-bezier(0.76, 0, 0.24, 1);
-    }
-    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-astrolab {
-        animation: introCelestialAstrolabBabak1 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
-    }
-    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-tajuk-1 {
-        animation: introJawaTajukBabak1 1.48s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
-    }
-    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-eyebrow {
-        animation: introJawaEyebrowBentang 1.35s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
-    }
-    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-medali {
-        animation: introJawaMedaliMekar 0.78s cubic-bezier(0.16, 1, 0.3, 1) 1.44s both;
-    }
-    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-mahkota {
-        animation: introElemenNaik 0.58s cubic-bezier(0.22, 1, 0.36, 1) 1.62s both;
-    }
-    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-monogram {
-        animation: introMonogramMekar 0.72s cubic-bezier(0.16, 1, 0.3, 1) 1.72s both;
-    }
-    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-pemisah {
-        transform-origin: center;
-        animation: introGarisBentang 0.65s cubic-bezier(0.22, 1, 0.36, 1) 1.94s both;
-    }
-    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-nama {
-        animation: introElemenNaik 0.65s cubic-bezier(0.22, 1, 0.36, 1) 2.04s both;
-    }
-    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-tanggal {
-        animation: introElemenNaik 0.58s cubic-bezier(0.22, 1, 0.36, 1) 2.22s both;
-    }
-    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-lentera-kiri {
-        transform-origin: top center;
-        animation: introCelestialLenteraMasukKiri 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
-    }
-    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-lentera-kanan {
-        transform-origin: top center;
-        animation: introCelestialLenteraMasukKanan 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
-    }
-    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-halo {
-        animation: introJawaHaloNafas 3.2s ease-in-out infinite;
-    }
-    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-sinar {
-        animation: introJawaSinarSapu 3.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.15s both;
-    }
-    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-meteor {
-        animation: introCelestialMeteorSapu 2.8s ease-out 0.45s both;
-    }
-    [data-intro-pembuka="islamic-heavenly"] .intro-celestial-debu {
-        animation: introJawaDebuNaik 2.6s ease-out infinite;
-    }
-    [data-intro-pembuka="islamic-heavenly"].intro-keluar .intro-pusat,
-    [data-intro-pembuka="islamic-heavenly"].intro-keluar .intro-pendar,
-    [data-intro-pembuka="islamic-heavenly"].intro-keluar .intro-petunjuk {
-        animation: none !important;
-        opacity: 0;
-        transform: scale(1.08);
-        transition: opacity 0.42s ease, transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     @media (prefers-reduced-motion: reduce) {

@@ -545,8 +545,8 @@
                     });
                 }
 
-                // Tunda pemindaian DOM reveal/AOS hingga animasi gulir sampul selesai agar tidak memicu layout spike di tengah transisi
-                const jedaReveal = document.querySelector('.tirai-gulir-atas') ? 940 : 380;
+                // Tunda pemindaian DOM reveal/AOS hingga animasi transisi sampul selesai agar tidak memicu layout spike di tengah transisi
+                const jedaReveal = document.querySelector('.tirai-gulir-atas') ? 960 : 820;
                 window.setTimeout(() => {
                     document.querySelectorAll('.masuk-3d').forEach((el) => {
                         const rect = el.getBoundingClientRect();

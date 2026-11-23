@@ -29,12 +29,15 @@
         <div class="relative w-40 h-40 xl:w-48 xl:h-48 flex items-center justify-center">
             <span aria-hidden="true" class="absolute inset-0 rounded-full border border-dashed border-[#D9B664]/60 animasi-orbit"></span>
             <span aria-hidden="true" class="absolute inset-2.5 rounded-full border border-[#F3E5AB]/45 bg-[#091322]/45 animasi-orbit-balik shadow-[0_0_40px_-8px_rgba(217,182,100,0.26)]"></span>
-            <img
-                src="{{ $asetCelestial['sabit'] }}"
-                alt=""
+            <svg
                 aria-hidden="true"
-                class="pointer-events-none absolute -top-3 left-1/2 -translate-x-1/2 w-6 xl:w-7 opacity-95 drop-shadow"
+                viewBox="0 0 24 24"
+                class="pointer-events-none absolute -top-2.5 left-1/2 -translate-x-1/2 w-5 h-5 text-[#E5C474] bg-[#07101E] px-0.5 rounded-full drop-shadow"
+                fill="currentColor"
             >
+                <path d="M14.7 3.2a8.4 8.4 0 1 0 6.1 14.1 7.1 7.1 0 0 1-9.3-9.3 8.3 8.3 0 0 1 3.2-4.8Z" />
+                <path d="M18.4 5.2l.55 1.45 1.45.55-1.45.55-.55 1.45-.55-1.45-1.45-.55 1.45-.55.55-1.45Z" />
+            </svg>
             <div class="relative z-10 flex items-baseline justify-center gap-1.5 text-[#F3E5AB] drop-shadow">
                 <span class="font-serif text-4xl xl:text-5xl font-bold tracking-wide">{{ $undangan->inisialPria() }}</span>
                 <span class="font-kaligrafi text-3xl xl:text-4xl text-[#D9B664]">&amp;</span>

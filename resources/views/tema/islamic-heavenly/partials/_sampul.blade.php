@@ -1,4 +1,4 @@
-{{-- SAMPUL PEMBUKA ISLAMIC HEAVENLY: KUBAH CELESTIAL BERLENTERA & POTRET ARCH BESAR --}}
+{{-- SAMPUL PEMBUKA ISLAMIC HEAVENLY: EDITORIAL FULL-BLEED CELESTIAL NIGHT & MIHRAB TANPA FOTO --}}
 <section
     data-transisi-sampul="fade-halus"
     class="tirai-fade-halus tirai-gulir-atas fixed inset-0 mx-auto h-dvh w-full lg:w-[460px] xl:w-[490px] z-40 {{ $tampilBarDemo ? 'pt-28 sm:pt-20 lg:pt-14' : '' }}"
@@ -6,219 +6,214 @@
     :class="undanganTerbuka ? 'tirai-terbuka pointer-events-none' : ''"
 >
     @if ($pakaiFotoSampul)
-        {{-- MODE FOTO: KUBAH LANGIT MALAM BERLENTERA + POTRET ARCH BESAR BERBINGKAI EMAS + PLAKAT TAMU --}}
-        <div class="relative w-full h-full flex flex-col justify-evenly items-center px-5 py-4 sm:py-5 bg-[#060E1B] overflow-hidden">
-            {{-- Latar Langit Malam Bintang & Kubah Halus --}}
+        {{-- MODE FOTO: EDITORIAL FULL-BLEED BERSIH (FOTO MEMPELAI LEGA TANPA ORNAMEN MENGHALANGI + LOWER-THIRD MELAYANG) --}}
+        <div class="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#060E1B]">
+            {{-- Foto Prewedding Penuh Layar --}}
             <img
-                src="{{ empty($urlFotoLatarCustom) ? $asetCelestial['heroPoster'] : $urlFotoLatar }}"
-                alt=""
-                aria-hidden="true"
-                class="pointer-events-none absolute inset-0 w-full h-full object-cover object-center opacity-[0.26] scale-105 animasi-nafas"
+                src="{{ $urlFotoSampul }}"
+                alt="Sampul {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}"
+                fetchpriority="high"
+                decoding="sync"
+                class="absolute inset-0 w-full h-full object-cover object-top scale-[1.02] animasi-nafas"
             >
+
+            {{-- Gradasi Editorial Safir Malam (Jernih Penuh di Tengah/Wajah Mempelai, Kontras Rapi di Atas & Bawah) --}}
             <div
                 aria-hidden="true"
                 class="pointer-events-none absolute inset-0"
-                style="background: radial-gradient(ellipse 88% 58% at 50% 42%, rgba(24,52,92,0.48) 0%, rgba(9,19,34,0.88) 58%, rgba(4,10,19,0.98) 100%);"
+                style="background: linear-gradient(180deg, rgba(6,14,27,0.84) 0%, rgba(6,14,27,0.50) 16%, rgba(6,14,27,0.08) 30%, rgba(6,14,27,0.0) 40%, rgba(6,14,27,0.0) 54%, rgba(6,14,27,0.62) 70%, rgba(5,12,24,0.93) 84%, rgba(4,9,18,0.99) 100%);"
             ></div>
 
-            {{-- Pola Konstelasi Geometri Halus --}}
-            <svg aria-hidden="true" class="pointer-events-none absolute inset-0 h-full w-full opacity-[0.09] text-[#F3E5AB]">
-                <defs>
-                    <pattern id="celestial-tirai-lattice" width="36" height="36" patternUnits="userSpaceOnUse">
-                        <path d="M18 0 L36 18 L18 36 L0 18 Z" fill="none" stroke="currentColor" stroke-width="0.65" />
-                        <circle cx="18" cy="18" r="1.2" fill="currentColor" />
-                    </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#celestial-tirai-lattice)" />
-            </svg>
-
-            {{-- Pendar Cahaya Bulan & Emas Di Belakang Kubah Potret --}}
+            {{-- Bingkai Tunggal Garis Tipis Mihrab Emas (Clean Stationery Frame) --}}
             <div
                 aria-hidden="true"
-                class="pointer-events-none absolute top-[26%] left-1/2 -translate-x-1/2 h-84 w-84 rounded-full blur-3xl opacity-30"
-                style="background: radial-gradient(circle, #F3E5AB 0%, #D9B664 36%, transparent 72%);"
+                class="pointer-events-none absolute inset-3.5 rounded-t-[10.5rem] rounded-b-[1.5rem] border border-[#E5C474]/30 z-10"
             ></div>
 
-            {{-- Bingkai Kubah Celestial Ganda Tepi Luar --}}
-            <div aria-hidden="true" class="pointer-events-none absolute inset-3 rounded-t-[10.5rem] rounded-b-[1.75rem] border border-[#D9B664]/48 z-10"></div>
-            <div aria-hidden="true" class="pointer-events-none absolute inset-[18px] rounded-t-[9.9rem] rounded-b-[1.35rem] border border-dashed border-[#F3E5AB]/24 z-10"></div>
+            {{-- Kilau Bintang Mikro Sangat Halus Di Tepi Luar (Tidak Menghalangi Foto) --}}
+            <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden z-[12] opacity-70">
+                @foreach ([
+                    ['top: 22%; left: 9%;', 'w-1 h-1 bg-[#F3E5AB]', '0.2s'],
+                    ['top: 30%; right: 9%;', 'w-1.5 h-1.5 bg-[#E5C474]', '1.4s'],
+                    ['bottom: 32%; left: 10%;', 'w-1 h-1 bg-white/90', '2.1s'],
+                    ['bottom: 26%; right: 10%;', 'w-1 h-1 bg-[#F3E5AB]', '0.9s'],
+                ] as [$posisi, $ukuran, $jeda])
+                    <span
+                        class="absolute rounded-full {{ $ukuran }} animasi-bintang shadow-[0_0_8px_rgba(243,229,171,0.75)]"
+                        style="{{ $posisi }} animation-delay: {{ $jeda }};"
+                    ></span>
+                @endforeach
+            </div>
 
-            {{-- Sepasang Lentera Fanous Gantung Kiri & Kanan --}}
-            <img
-                src="{{ $asetCelestial['lentera'] }}"
-                alt=""
-                aria-hidden="true"
-                class="pointer-events-none absolute -top-2 left-1.5 w-16 sm:w-18 z-10 opacity-92 celestial-lentera-kiri"
-            >
-            <img
-                src="{{ $asetCelestial['lentera'] }}"
-                alt=""
-                aria-hidden="true"
-                class="pointer-events-none absolute -top-2 right-1.5 w-16 sm:w-18 z-10 opacity-92 celestial-lentera-kanan"
-            >
-
-            @include('komponen-undangan.lapisan-motion', ['efekMotion' => 'bintang', 'konteks' => 'sampul'])
-
-            {{-- BAGIAN ATAS: BASMALAH, WALIMATUL URSY & NAMA MEMPELAI --}}
-            <div class="relative z-20 px-6 text-center space-y-1.5">
-                <p class="text-lg sm:text-xl text-[#F3E5AB] drop-shadow" style="font-family: 'Amiri', serif;">
+            {{-- 1. MASTHEAD ATAS BERSIH: IKON SABIT MINIMALIS, BASMALAH, NAMA MEMPELAI & TANGGAL --}}
+            <header class="relative z-20 shrink-0 px-7 {{ $tampilBarDemo ? 'pt-5 sm:pt-6' : 'pt-7 sm:pt-8' }} text-center">
+                <svg
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    class="w-5 h-5 mx-auto text-[#E5C474]/92 drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]"
+                    fill="currentColor"
+                >
+                    <path d="M14.7 3.2a8.4 8.4 0 1 0 6.1 14.1 7.1 7.1 0 0 1-9.3-9.3 8.3 8.3 0 0 1 3.2-4.8Z" />
+                    <path d="M18.4 5.2l.55 1.45 1.45.55-1.45.55-.55 1.45-.55-1.45-1.45-.55 1.45-.55.55-1.45Z" />
+                </svg>
+                <p class="mt-1.5 text-[1.05rem] sm:text-lg text-[#F3E5AB]/95 drop-shadow-[0_2px_10px_rgba(0,0,0,0.65)]" style="font-family: 'Amiri', serif;">
                     بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
                 </p>
-                <div class="inline-flex items-center gap-2 rounded-full border border-[#D9B664]/45 bg-[#0D1E36]/70 px-3.5 py-0.5 backdrop-blur-xs">
-                    <span aria-hidden="true" class="text-[9px] text-[#F3E5AB]">&#10022;</span>
-                    <p class="text-[9.5px] font-bold uppercase tracking-[0.34em] text-[#D9B664]">
-                        Walimatul Ursy
-                    </p>
-                    <span aria-hidden="true" class="text-[9px] text-[#F3E5AB]">&#10022;</span>
-                </div>
-                <h1 class="pt-0.5 font-serif text-[2.35rem] sm:text-[2.75rem] font-bold leading-[1.06] text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.58)]">
+                <p class="mt-0.5 text-[9px] font-semibold uppercase tracking-[0.38em] text-[#D9B664]/92 drop-shadow">
+                    Walimatul Ursy
+                </p>
+                <h1 class="mt-1 font-serif text-[2.35rem] sm:text-[2.65rem] font-semibold tracking-[0.02em] leading-[1.06] text-white drop-shadow-[0_4px_18px_rgba(0,0,0,0.75)]">
                     {{ $undangan->nama_panggilan_pria }}
                     <span class="font-kaligrafi font-normal text-[#E5C474] mx-1">&amp;</span>
                     {{ $undangan->nama_panggilan_wanita }}
                 </h1>
-                <p class="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#F3E5AB]/92">
+                <p class="mt-1.5 text-[9.5px] sm:text-[10px] font-medium uppercase tracking-[0.28em] text-[#F3E5AB]/86 drop-shadow">
                     {{ $tanggalLengkap }}
                 </p>
-            </div>
+            </header>
 
-            {{-- BAGIAN TENGAH: KUBAH POTRET BESAR RESPONSIF BERBINGKAI GANDA EMAS & MAHKOTA SABIT --}}
-            <div class="relative z-20 flex items-center justify-center py-1">
-                <div class="relative">
-                    <span aria-hidden="true" class="pointer-events-none absolute -inset-2.5 rounded-t-full rounded-b-[1.9rem] border border-dashed border-[#E5C474]/48"></span>
-                    <svg aria-hidden="true" class="pointer-events-none absolute top-1/2 -left-5 -translate-y-1/2 h-3.5 w-3.5 text-[#F3E5AB]/90" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M8 0.5L9.9 6.1L15.5 8L9.9 9.9L8 15.5L6.1 9.9L0.5 8L6.1 6.1L8 0.5Z" />
-                    </svg>
-                    <svg aria-hidden="true" class="pointer-events-none absolute top-1/2 -right-5 -translate-y-1/2 h-3.5 w-3.5 text-[#F3E5AB]/90" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M8 0.5L9.9 6.1L15.5 8L9.9 9.9L8 15.5L6.1 9.9L0.5 8L6.1 6.1L8 0.5Z" />
-                    </svg>
+            {{-- Ruang Lega Penuh Untuk Potret Mempelai --}}
+            <div class="flex-1 min-h-0"></div>
 
-                    <div class="relative p-[4px] rounded-t-full rounded-b-[1.5rem] bg-gradient-to-b from-[#FFF1C2] via-[#D9B664] to-[#8C6D32] shadow-[0_24px_54px_-12px_rgba(0,0,0,0.85)]">
-                        <img
-                            src="{{ $asetCelestial['sabit'] }}"
-                            alt=""
-                            aria-hidden="true"
-                            class="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 w-10 sm:w-11 z-20 drop-shadow-[0_6px_14px_rgba(0,0,0,0.75)] animasi-ayun-3d"
-                        >
-                        <div
-                            class="relative overflow-hidden rounded-t-full rounded-b-[1.25rem] bg-[#091322] aspect-[4/4.85]"
-                            style="height: clamp(208px, 34.5dvh, 332px);"
-                        >
-                            <img
-                                src="{{ $urlFotoSampul }}"
-                                alt="Sampul {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}"
-                                fetchpriority="high"
-                                decoding="sync"
-                                class="w-full h-full object-cover object-top scale-[1.03] animasi-nafas"
-                            >
-                            <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#060E1B]/45 via-transparent to-[#060E1B]/12"></div>
-                        </div>
+            {{-- 2. KOMPOSISI EDITORIAL BAWAH: SAPAAN TAMU & TOMBOL MELAYANG BERSIH TANPA KOTAK --}}
+            <div class="relative z-20 shrink-0 px-7 pb-7 sm:pb-8 text-center text-[#E6EEF8]">
+                {{-- Garis Pemisah Tipis Celestial --}}
+                <div aria-hidden="true" class="mx-auto mb-3.5 flex items-center justify-center gap-2.5 w-28">
+                    <span class="h-px flex-1 bg-gradient-to-r from-transparent to-[#E5C474]/60"></span>
+                    <svg class="h-2.5 w-2.5 text-[#F3E5AB]/85 shrink-0" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0.5L9.7 6.3L15.5 8L9.7 9.7L8 15.5L6.3 9.7L0.5 8L6.3 6.3L8 0.5Z" />
+                    </svg>
+                    <span class="h-px flex-1 bg-gradient-to-l from-transparent to-[#E5C474]/60"></span>
+                </div>
+
+                <div class="space-y-2.5">
+                    <div class="space-y-0.5">
+                        <span class="sr-only">Kepada Yth. {{ $namaTamu }}</span>
+                        <p class="text-[9px] font-medium uppercase tracking-[0.26em] text-[#E5C474]/82">
+                            Kepada Yth. Bapak/Ibu/Saudara/i
+                        </p>
+                        <p class="font-serif text-[1.32rem] sm:text-[1.45rem] font-semibold text-white leading-snug tracking-[0.01em] drop-shadow-[0_2px_12px_rgba(0,0,0,0.75)]">
+                            {{ $namaTamu }}
+                        </p>
                     </div>
+
+                    <div class="pt-1">
+                        <button
+                            type="button"
+                            @click="bukaUndangan()"
+                            class="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#CFA756] via-[#EED694] to-[#CFA756] border border-[#FFF6D8]/60 px-8 py-2.5 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-[#091322] shadow-[0_14px_30px_-8px_rgba(217,182,100,0.45)] hover:brightness-105 active:scale-[0.98] transition cursor-pointer"
+                        >
+                            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect width="20" height="16" x="2" y="4" rx="2"/>
+                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                            </svg>
+                            <span>Buka Undangan</span>
+                        </button>
+                    </div>
+
+                    <p class="text-[9.5px] italic text-[#E6EEF8]/60 max-w-[240px] mx-auto leading-snug">
+                        Mohon maaf apabila ada kesalahan penulisan nama/gelar
+                    </p>
                 </div>
-            </div>
-
-            {{-- BAGIAN BAWAH: PLAKAT SAPAAN TAMU KACA SAFIR-EMAS DENGAN SHIMMER --}}
-            <div class="relative z-20 w-full max-w-[356px] rounded-[1.75rem] bg-gradient-to-b from-[#132642]/92 to-[#0A1629]/95 backdrop-blur-md border border-[#D9B664]/75 px-5 py-4 text-center text-[#E6EEF8] shadow-[0_22px_50px_-14px_rgba(0,0,0,0.82)] efek-shimmer-kartu">
-                <span aria-hidden="true" class="pointer-events-none absolute top-2.5 left-2.5 h-2.5 w-2.5 border-t border-l border-[#E5C474]/80"></span>
-                <span aria-hidden="true" class="pointer-events-none absolute top-2.5 right-2.5 h-2.5 w-2.5 border-t border-r border-[#E5C474]/80"></span>
-                <span aria-hidden="true" class="pointer-events-none absolute bottom-2.5 left-2.5 h-2.5 w-2.5 border-b border-l border-[#E5C474]/80"></span>
-                <span aria-hidden="true" class="pointer-events-none absolute bottom-2.5 right-2.5 h-2.5 w-2.5 border-b border-r border-[#E5C474]/80"></span>
-
-                <span class="sr-only">Kepada Yth. {{ $namaTamu }}</span>
-                <p class="text-[9.5px] font-bold uppercase tracking-[0.24em] text-[#D9B664]">
-                    Kepada Yth. Bapak/Ibu/Saudara/i
-                </p>
-                <p class="mt-1 font-serif text-xl sm:text-[1.35rem] font-bold text-[#F3E5AB] leading-snug drop-shadow-xs">
-                    {{ $namaTamu }}
-                </p>
-
-                <div class="pt-3">
-                    <button
-                        type="button"
-                        @click="bukaUndangan()"
-                        class="celestial-tombol-emas animasi-segel inline-flex items-center justify-center gap-2 rounded-full px-8 py-2.5 text-xs sm:text-[13px] font-bold uppercase tracking-[0.18em] active:scale-95 transition cursor-pointer"
-                    >
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <rect width="20" height="16" x="2" y="4" rx="2"/>
-                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                        </svg>
-                        <span>Buka Undangan</span>
-                    </button>
-                </div>
-
-                <p class="mt-2.5 text-[9.5px] italic text-[#E6EEF8]/68 leading-relaxed">
-                    Mohon maaf apabila ada kesalahan penulisan nama/gelar
-                </p>
             </div>
         </div>
     @else
-        {{-- MODE TANPA FOTO: KUBAH MIHRAB CELESTIAL TERPUSAT DI ATAS LANGIT BINTANG --}}
-        <div class="relative w-full h-full flex flex-col justify-center items-center px-6 py-8 overflow-hidden bg-[#060E1B]">
+        {{-- MODE TANPA FOTO: TIPOGRAFI EDITORIAL MELAYANG BERSIH DI DALAM GERBANG LANGIT BINTANG & TERATAI --}}
+        <div class="relative w-full h-full flex flex-col justify-center items-center px-9 pt-24 pb-24 overflow-hidden bg-[#060E1B]">
+            {{-- Karya Latar Penuh: Gerbang Emas, Bulan Sabit, Lentera Tepi & Kolam Teratai Putih --}}
             <img
                 src="{{ $urlFotoLatar }}"
                 alt="Sampul {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}"
                 fetchpriority="high"
                 decoding="sync"
-                class="absolute inset-0 w-full h-full object-cover object-center scale-105 animasi-nafas"
+                class="absolute inset-0 w-full h-full object-cover object-center scale-[1.02] animasi-nafas"
             >
-            <div class="absolute inset-0 bg-gradient-to-b from-[#071120]/80 via-[#0E1E36]/52 to-[#040A13]/94"></div>
-            <img src="{{ $asetCelestial['lentera'] }}" alt="" aria-hidden="true" class="pointer-events-none absolute -top-2 left-2 w-18 opacity-90 celestial-lentera-kiri">
-            <img src="{{ $asetCelestial['lentera'] }}" alt="" aria-hidden="true" class="pointer-events-none absolute -top-2 right-2 w-18 opacity-90 celestial-lentera-kanan">
 
-            @include('komponen-undangan.lapisan-motion', ['efekMotion' => 'bintang', 'konteks' => 'sampul'])
+            {{-- Kabut Safir Lembut Terpusat Agar Teks Tajam Tanpa Menutupi Lengkung Atas, Bulan & Teratai Bawah --}}
+            <div
+                aria-hidden="true"
+                class="pointer-events-none absolute inset-0"
+                style="background: radial-gradient(ellipse 68% 54% at 50% 52%, rgba(6,14,27,0.74) 0%, rgba(6,14,27,0.46) 48%, rgba(6,14,27,0.12) 78%, rgba(4,10,19,0.28) 100%);"
+            ></div>
 
-            <div class="relative z-20 w-full max-w-[354px]">
-                <div class="kartu-3d efek-shimmer-kartu rounded-t-[10.5rem] rounded-b-[2rem] bg-gradient-to-b from-[#132642]/94 to-[#0A1629]/96 backdrop-blur-md border-2 border-[#D9B664]/75 p-2 shadow-[0_28px_70px_-16px_rgba(0,0,0,0.85)]">
-                    <div class="rounded-t-[9.7rem] rounded-b-[1.5rem] border border-dashed border-[#D9B664]/40 px-6 pt-9 pb-7 text-center text-[#E6EEF8] space-y-4">
-                        <div class="space-y-1.5">
-                            <img src="{{ $asetCelestial['sabit'] }}" alt="" class="w-11 mx-auto opacity-95 animasi-ayun-3d">
-                            <p class="text-base sm:text-lg text-[#F3E5AB]" style="font-family: 'Amiri', serif;">
-                                بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
-                            </p>
-                            <p class="text-[10px] font-semibold uppercase tracking-[0.34em] text-[#D9B664]">
-                                Walimatul Ursy &bull; Celestial Night
-                            </p>
-                            <h1 class="font-serif text-4xl sm:text-[2.65rem] font-bold leading-[1.08] text-white pt-1">
-                                <span class="block">{{ $undangan->nama_panggilan_pria }}</span>
-                                <span class="block font-kaligrafi font-normal text-3xl text-[#E5C474] my-0.5">&amp;</span>
-                                <span class="block">{{ $undangan->nama_panggilan_wanita }}</span>
-                            </h1>
-                            <p class="text-[11px] uppercase tracking-[0.24em] text-[#E6EEF8]/85 pt-1">
-                                {{ $tanggalLengkap }}
-                            </p>
-                        </div>
+            {{-- Kilau Bintang Mikro Halus Di Sisi Tepi --}}
+            <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden z-10 opacity-75">
+                @foreach ([
+                    ['top: 26%; left: 16%;', 'w-1 h-1 bg-[#F3E5AB]', '0.2s'],
+                    ['top: 34%; right: 16%;', 'w-1.5 h-1.5 bg-[#E5C474]', '1.3s'],
+                    ['bottom: 28%; left: 18%;', 'w-1 h-1 bg-white/90', '2.1s'],
+                    ['bottom: 32%; right: 18%;', 'w-1 h-1 bg-[#F3E5AB]', '0.8s'],
+                ] as [$posisi, $ukuran, $jeda])
+                    <span
+                        class="absolute rounded-full {{ $ukuran }} animasi-bintang shadow-[0_0_8px_rgba(243,229,171,0.8)]"
+                        style="{{ $posisi }} animation-delay: {{ $jeda }};"
+                    ></span>
+                @endforeach
+            </div>
 
-                        <div class="flex items-center justify-center gap-3 px-6" aria-hidden="true">
-                            <span class="h-px flex-1 bg-[#D9B664]/45"></span>
-                            <span class="text-[10px] text-[#F3E5AB]">&#10022;</span>
-                            <span class="h-px flex-1 bg-[#D9B664]/45"></span>
-                        </div>
+            {{-- Komposisi Tipografi Editorial Bersih Tanpa Kotak Kartu --}}
+            <div class="relative z-20 w-full max-w-[300px] text-center text-[#F4F8FF] space-y-5">
+                <div class="space-y-1.5">
+                    <p class="text-[1.05rem] sm:text-lg text-[#F3E5AB] drop-shadow-[0_2px_10px_rgba(0,0,0,0.75)]" style="font-family: 'Amiri', serif;">
+                        بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
+                    </p>
+                    <p class="text-[9px] font-semibold uppercase tracking-[0.38em] text-[#E5C474]/95 drop-shadow">
+                        Walimatul Ursy
+                    </p>
 
-                        <div class="space-y-2.5 pt-0.5">
-                            <span class="sr-only">Kepada Yth. {{ $namaTamu }}</span>
-                            <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D9B664]">
-                                Kepada Yth. Bapak/Ibu/Saudara/i
-                            </p>
-                            <p class="font-serif text-xl sm:text-2xl font-bold text-[#F3E5AB] leading-snug">
-                                {{ $namaTamu }}
-                            </p>
-                            <div class="pt-2">
-                                <button
-                                    type="button"
-                                    @click="bukaUndangan()"
-                                    class="celestial-tombol-emas animasi-segel inline-flex items-center justify-center gap-2 rounded-full px-8 py-3 text-xs sm:text-sm font-bold uppercase tracking-[0.18em] active:scale-95 transition cursor-pointer"
-                                >
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        <rect width="20" height="16" x="2" y="4" rx="2"/>
-                                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                                    </svg>
-                                    <span>Buka Undangan</span>
-                                </button>
-                            </div>
-                            <p class="text-[10px] italic text-[#E6EEF8]/70 pt-1 max-w-xs mx-auto leading-relaxed">
-                                Mohon maaf apabila ada kesalahan penulisan nama/gelar
-                            </p>
-                        </div>
+                    <h1 class="pt-1 font-serif text-[2.45rem] sm:text-[2.75rem] font-semibold tracking-[0.03em] leading-[1.04] text-white drop-shadow-[0_4px_18px_rgba(4,10,19,0.85)]">
+                        <span class="block">{{ $undangan->nama_panggilan_pria }}</span>
+                        <span class="my-1 flex items-center justify-center gap-3">
+                            <span aria-hidden="true" class="h-px w-7 bg-gradient-to-r from-transparent to-[#E5C474]/75"></span>
+                            <span class="font-kaligrafi font-normal text-2xl sm:text-3xl text-[#E5C474] leading-none">&amp;</span>
+                            <span aria-hidden="true" class="h-px w-7 bg-gradient-to-l from-transparent to-[#E5C474]/75"></span>
+                        </span>
+                        <span class="block">{{ $undangan->nama_panggilan_wanita }}</span>
+                    </h1>
+
+                    <p class="pt-1.5 text-[9.5px] sm:text-[10px] font-medium uppercase tracking-[0.28em] text-[#F3E5AB]/90 drop-shadow">
+                        {{ $tanggalLengkap }}
+                    </p>
+                </div>
+
+                {{-- Garis Bintang Tipis Pemisah --}}
+                <div aria-hidden="true" class="mx-auto flex items-center justify-center gap-2.5 w-24">
+                    <span class="h-px flex-1 bg-gradient-to-r from-transparent to-[#E5C474]/60"></span>
+                    <svg class="h-2.5 w-2.5 text-[#F3E5AB]/90 shrink-0" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0.5L9.7 6.3L15.5 8L9.7 9.7L8 15.5L6.3 9.7L0.5 8L6.3 6.3L8 0.5Z" />
+                    </svg>
+                    <span class="h-px flex-1 bg-gradient-to-l from-transparent to-[#E5C474]/60"></span>
+                </div>
+
+                {{-- Sapaan Tamu & Tombol Melayang Bersih --}}
+                <div class="space-y-2.5">
+                    <div class="space-y-0.5">
+                        <span class="sr-only">Kepada Yth. {{ $namaTamu }}</span>
+                        <p class="text-[9px] font-medium uppercase tracking-[0.24em] text-[#E5C474]/85">
+                            Kepada Yth. Bapak/Ibu/Saudara/i
+                        </p>
+                        <p class="font-serif text-[1.32rem] sm:text-[1.45rem] font-semibold text-white leading-snug drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)]">
+                            {{ $namaTamu }}
+                        </p>
                     </div>
+
+                    <div class="pt-1">
+                        <button
+                            type="button"
+                            @click="bukaUndangan()"
+                            class="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#CFA756] via-[#EED694] to-[#CFA756] border border-[#FFF6D8]/60 px-8 py-2.5 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.2em] text-[#091322] shadow-[0_14px_30px_-8px_rgba(0,0,0,0.68)] hover:brightness-105 active:scale-[0.98] transition cursor-pointer"
+                        >
+                            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect width="20" height="16" x="2" y="4" rx="2"/>
+                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                            </svg>
+                            <span>Buka Undangan</span>
+                        </button>
+                    </div>
+
+                    <p class="text-[9.5px] italic text-[#E6EEF8]/65 max-w-[230px] mx-auto leading-snug drop-shadow">
+                        Mohon maaf apabila ada kesalahan penulisan nama/gelar
+                    </p>
                 </div>
             </div>
         </div>
