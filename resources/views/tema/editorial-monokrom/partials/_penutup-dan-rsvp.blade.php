@@ -1,6 +1,6 @@
 {{-- SEKSI 9: WEDDING REGISTRY / AMPLOP DIGITAL TAJAM --}}
 @if ($undangan->fiturAktif('amplop_digital') && ($undangan->daftarAmplop->isNotEmpty() || $alamatKado !== ''))
-<section class="relative bg-[#FAF9F6] px-5 py-12 overflow-hidden">
+<section class="relative bg-[#FAF9F6] px-5 pt-12 pb-6 overflow-hidden">
     <div class="max-w-md mx-auto bg-white border border-[#18181B] p-6 text-left space-y-5">
         <div class="border-b border-[#18181B]/20 pb-3">
             <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#52525B]">05 / Gift Registry</p>
@@ -39,37 +39,9 @@
 </section>
 @endif
 
-{{-- SEKSI 10: TURUT MENGUNDANG --}}
-@if ($adaTurutMengundang)
-<section data-section-turut-mengundang="editorial" class="relative bg-[#FAF9F6] px-5 pb-6 overflow-hidden">
-    <div class="max-w-md mx-auto bg-white border border-[#18181B]/30 p-6 text-left space-y-4">
-        <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#52525B]">Families</p>
-        <h2 data-gsap="naik" data-gsap-delay="0.05" class="ed-serif text-2xl uppercase text-[#18181B]">Turut Mengundang</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs border-t border-[#18181B]/20 pt-4">
-            @if (! empty($turutPria))
-                <div data-gsap="kiri" data-gsap-delay="0.08" class="space-y-1">
-                    <p class="font-bold uppercase tracking-widest text-[#18181B] text-[10px]">{{ $undangan->nama_panggilan_pria }}</p>
-                    @foreach ($turutPria as $baris)
-                        <p class="text-[#52525B]">{{ $baris }}</p>
-                    @endforeach
-                </div>
-            @endif
-            @if (! empty($turutWanita))
-                <div data-gsap="kanan" data-gsap-delay="0.1" class="space-y-1">
-                    <p class="font-bold uppercase tracking-widest text-[#18181B] text-[10px]">{{ $undangan->nama_panggilan_wanita }}</p>
-                    @foreach ($turutWanita as $baris)
-                        <p class="text-[#52525B]">{{ $baris }}</p>
-                    @endforeach
-                </div>
-            @endif
-        </div>
-    </div>
-</section>
-@endif
-
-{{-- SEKSI 11: MINIMALIST EDITORIAL RSVP --}}
+{{-- SEKSI 10: MINIMALIST EDITORIAL RSVP --}}
 @if ($undangan->fiturAktif('buku_tamu'))
-<section class="relative bg-[#FAF9F6] px-5 py-8 overflow-hidden">
+<section id="buku-tamu" class="relative bg-[#FAF9F6] px-5 py-6 overflow-hidden">
     <div class="max-w-md mx-auto bg-white border border-[#18181B] p-6 text-left space-y-5">
         <div class="border-b border-[#18181B]/20 pb-3">
             <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#52525B]">06 / Attendance</p>
@@ -190,6 +162,87 @@
     </div>
 </section>
 @endif
+
+{{-- SEKSI 11: DOA & HARAPAN PENGANTIN (EDITORIAL BLESSING) + TURUT MENGUNDANG --}}
+<section class="relative bg-[#FAF9F6] px-5 pt-6 pb-12 space-y-6 overflow-hidden">
+    {{-- Kartu Doa & Harapan (Versi Editorial Modern Universal) --}}
+    <div data-section-doa-pengantin="editorial" class="max-w-md mx-auto bg-white border border-[#18181B] p-2 kartu-3d">
+        <div class="border border-[#18181B]/20 px-6 py-7 text-center space-y-4">
+            <div data-gsap="turun" class="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.3em] text-[#52525B] border-b border-[#18181B]/15 pb-2.5">
+                <span>07 / Blessing &amp; Vow</span>
+                <span>Doa Restu</span>
+            </div>
+
+            <img
+                src="{{ $asetEditorial['bingkai'] }}"
+                alt=""
+                loading="lazy"
+                decoding="async"
+                data-gsap="mekar"
+                class="w-11 mx-auto opacity-80"
+            >
+
+            <h2 data-gsap="naik" class="ed-serif text-2xl sm:text-[1.85rem] uppercase tracking-[0.08em] text-[#18181B]">
+                Doa &amp; Harapan
+            </h2>
+
+            <p data-gsap="teks" data-gsap-delay="0.06" class="ed-serif italic text-base sm:text-[1.06rem] leading-relaxed text-[#18181B]">
+                &ldquo;May your home always be a quiet sanctuary of grace, patience, and enduring love &mdash; growing deeper with every passing season.&rdquo;
+            </p>
+
+            <div data-gsap="garis" class="flex items-center justify-center gap-3 px-10" aria-hidden="true">
+                <span class="h-px flex-1 bg-[#18181B]/25"></span>
+                <span class="w-1.5 h-1.5 bg-[#18181B]"></span>
+                <span class="h-px flex-1 bg-[#18181B]/25"></span>
+            </div>
+
+            <p data-gsap="teks" data-gsap-delay="0.1" class="text-xs sm:text-[13px] text-[#52525B] leading-relaxed">
+                Semoga cinta yang dipersatukan hari ini senantiasa dilimpahi keteduhan, keberkahan, kesetiaan, dan kebahagiaan dalam setiap langkah kehidupan bersama &mdash; hari ini, esok, dan selamanya.
+            </p>
+
+            <p data-gsap="naik" data-gsap-delay="0.12" class="pt-1 text-[9.5px] font-bold uppercase tracking-[0.34em] text-[#18181B]/75">
+                {{ $undangan->inisialPria() }} &amp; {{ $undangan->inisialWanita() }} &middot; Forever &amp; Always
+            </p>
+        </div>
+    </div>
+
+    {{-- Kartu Turut Mengundang (Di Bawah RSVP & Doa — Kontras Hitam Obsidian) --}}
+    @if ($adaTurutMengundang)
+        <div data-section-turut-mengundang="editorial" class="max-w-md mx-auto bg-[#18181B] text-[#FAF9F6] border border-[#18181B] p-6 text-left space-y-4 kartu-3d">
+            <div data-gsap="turun" class="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.32em] text-white/60 border-b border-white/20 pb-2.5">
+                <span>08 / Families</span>
+                <span>Keluarga Besar</span>
+            </div>
+
+            <h2 data-gsap="naik" data-gsap-delay="0.05" class="ed-serif text-2xl sm:text-[1.75rem] uppercase tracking-[0.06em] text-white">
+                Turut Mengundang
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs pt-1">
+                @if (! empty($turutPria))
+                    <div data-gsap="kiri" data-gsap-delay="0.08" class="border border-white/20 bg-white/[0.03] p-4 space-y-1.5">
+                        <p class="font-bold uppercase tracking-[0.22em] text-white text-[10px] border-b border-white/15 pb-1.5">
+                            Pihak {{ $undangan->nama_panggilan_pria }}
+                        </p>
+                        @foreach ($turutPria as $baris)
+                            <p class="text-white/80 leading-relaxed">{{ $baris }}</p>
+                        @endforeach
+                    </div>
+                @endif
+                @if (! empty($turutWanita))
+                    <div data-gsap="kanan" data-gsap-delay="0.1" class="border border-white/20 bg-white/[0.03] p-4 space-y-1.5">
+                        <p class="font-bold uppercase tracking-[0.22em] text-white text-[10px] border-b border-white/15 pb-1.5">
+                            Pihak {{ $undangan->nama_panggilan_wanita }}
+                        </p>
+                        @foreach ($turutWanita as $baris)
+                            <p class="text-white/80 leading-relaxed">{{ $baris }}</p>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
+</section>
 
 {{-- SEKSI 12: EDITORIAL COLOPHON PENUTUP & FOOTER --}}
 <section

@@ -71,7 +71,52 @@
     </div>
 </section>
 
-{{-- SEKSI 4: GIANT HAIRLINE-DIVIDED TICKER COUNTDOWN --}}
+{{-- SEKSI 4A: SLIDESHOW EDITORIAL MONOKROM TRANSISI KE COUNTDOWN (TERSEMBUNYI SAAT MODE TANPA FOTO) --}}
+@if ($fotoGaleriSlideshow->isNotEmpty())
+<div
+    data-slideshow-editorial
+    data-gsap="potret"
+    x-data="{
+        slideAktif: 0,
+        jumlah: {{ $fotoGaleriSlideshow->count() }},
+        init() {
+            if (this.jumlah > 1) {
+                setInterval(() => {
+                    this.slideAktif = (this.slideAktif + 1) % this.jumlah;
+                }, 4200);
+            }
+        }
+    }"
+    class="relative h-72 sm:h-80 w-full overflow-hidden bg-[#111113] border-t border-[#18181B]"
+>
+    @foreach ($fotoGaleriSlideshow as $idxSlide => $urlSlide)
+        <img
+            src="{{ $urlSlide }}"
+            alt="Potret Editorial {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}"
+            loading="lazy"
+            decoding="async"
+            class="absolute inset-0 w-full h-full object-cover object-top grayscale contrast-[1.06] transition-opacity duration-1000"
+            :class="slideAktif === {{ $idxSlide }} ? 'opacity-90 scale-105' : 'opacity-0 scale-100'"
+            style="transition: opacity 1.15s ease, transform 5.2s ease;"
+        >
+    @endforeach
+
+    {{-- Gradasi Editorial Halus Menyatu Ke Blok Hitam Countdown --}}
+    <div
+        aria-hidden="true"
+        class="pointer-events-none absolute inset-0"
+        style="background: linear-gradient(180deg, rgba(17,17,19,0.34) 0%, rgba(17,17,19,0.04) 28%, rgba(24,24,27,0.16) 62%, #18181B 100%);"
+    ></div>
+
+    {{-- Bingkai Hairline Arsitektural Vogue (Sudut Siku Tajam 90 Derajat — Tanpa Bullet) --}}
+    <div aria-hidden="true" class="pointer-events-none absolute inset-x-4 top-4 bottom-0 rounded-none border-x border-t border-white/25 z-10">
+        <span class="absolute -top-px -left-px h-3 w-3 border-t-2 border-l-2 border-white/75"></span>
+        <span class="absolute -top-px -right-px h-3 w-3 border-t-2 border-r-2 border-white/75"></span>
+    </div>
+</div>
+@endif
+
+{{-- SEKSI 4B: GIANT HAIRLINE-DIVIDED TICKER COUNTDOWN --}}
 @if ($undangan->fiturAktif('hitung_mundur') && $isoTarget)
 <section
     data-layout-countdown="editorial"
@@ -87,7 +132,7 @@
         },
         init() { this.perbarui(); setInterval(() => this.perbarui(), 1000); }
     }"
-    class="relative bg-[#18181B] text-[#FAF9F6] px-5 py-12 overflow-hidden"
+    class="relative bg-[#18181B] shadow-[0_-2px_0_0_#18181B] text-[#FAF9F6] px-5 {{ $fotoGaleriSlideshow->isNotEmpty() ? 'pt-7 pb-12' : 'py-12' }} overflow-hidden"
 >
     <div class="max-w-md mx-auto space-y-6">
         <div data-gsap="turun" class="flex items-center justify-between text-[10px] uppercase tracking-[0.34em] text-white/60 border-b border-white/20 pb-3">
@@ -101,7 +146,11 @@
         <div class="grid grid-cols-4 border-y border-white/25 divide-x divide-white/25 text-center">
             @foreach (['hari' => 'Hari', 'jam' => 'Jam', 'menit' => 'Menit', 'detik' => 'Detik'] as $var => $label)
                 <div data-gsap="mekar" data-gsap-delay="{{ number_format($loop->index * 0.06, 2, '.', '') }}" class="py-4 px-1">
-                    <div class="ed-serif text-3xl sm:text-4xl text-white leading-none" x-text="{{ $var }}">00</div>
+                    <div
+                        class="ed-serif text-3xl sm:text-4xl text-white leading-none tabular-nums"
+                        x-text="{{ $var }}"
+                        x-effect="if ({{ $var }}) { $el.classList.remove('angka-flip-3d'); void $el.offsetWidth; $el.classList.add('angka-flip-3d'); }"
+                    >00</div>
                     <div class="mt-2 text-[9px] uppercase tracking-[0.28em] text-white/60">{{ $label }}</div>
                 </div>
             @endforeach

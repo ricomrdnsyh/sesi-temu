@@ -722,4 +722,54 @@ class TemaMotion3DTest extends TestCase
             ->assertOk()
             ->assertSee('aset-tema/islamic-heavenly/hero-poster.webp', false);
     }
+
+    /**
+     * Tema Editorial Monokrom menampilkan slideshow foto monokrom transisi tepat di atas countdown
+     * dan otomatis menyembunyikannya pada Mode Tanpa Foto (?tf=1).
+     */
+    public function test_editorial_monokrom_memiliki_slideshow_di_atas_countdown(): void
+    {
+        Tema::create([
+            'nama_tema' => 'Editorial Monokrom',
+            'slug' => 'editorial-monokrom',
+            'kategori' => 'modern',
+            'tier' => 'premium',
+            'harga' => 79000,
+            'lokasi_view' => 'tema.editorial-monokrom.index',
+            'aktif' => true,
+        ]);
+
+        $respon = $this->get('/demo/editorial-monokrom?kanvas=1')
+            ->assertOk()
+            ->assertSee('data-slideshow-editorial', false)
+            ->assertSee('data-section-doa-pengantin="editorial"', false)
+            ->assertSee('Doa &amp; Harapan', false)
+            ->assertSee('data-section-turut-mengundang="editorial"', false);
+
+        $html = $respon->getContent();
+        $posMempelai = strpos($html, 'data-layout-mempelai="editorial"');
+        $posSlideshow = strpos($html, 'data-slideshow-editorial');
+        $posCountdown = strpos($html, 'data-layout-countdown="editorial"');
+        $posRsvp = strpos($html, 'id="buku-tamu"');
+        $posDoa = strpos($html, 'data-section-doa-pengantin="editorial"');
+        $posTurut = strpos($html, 'data-section-turut-mengundang="editorial"');
+        $posPenutup = strpos($html, 'data-layout-penutup="editorial"');
+
+        $this->assertNotFalse($posMempelai);
+        $this->assertNotFalse($posSlideshow);
+        $this->assertNotFalse($posCountdown);
+        $this->assertNotFalse($posRsvp);
+        $this->assertNotFalse($posDoa);
+        $this->assertNotFalse($posTurut);
+        $this->assertNotFalse($posPenutup);
+        $this->assertLessThan($posSlideshow, $posMempelai);
+        $this->assertLessThan($posCountdown, $posSlideshow);
+        $this->assertLessThan($posDoa, $posRsvp);
+        $this->assertLessThan($posTurut, $posDoa);
+        $this->assertLessThan($posPenutup, $posTurut);
+
+        $this->get('/demo/editorial-monokrom?kanvas=1&tf=1')
+            ->assertOk()
+            ->assertDontSee('data-slideshow-editorial', false);
+    }
 }
