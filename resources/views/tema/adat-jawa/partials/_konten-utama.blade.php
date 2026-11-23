@@ -1,7 +1,7 @@
 {{-- SEKSI 3: KUTIPAN / AYAT DI ATAS BLOK SOGAN BERBORDER BATIK KAWUNG --}}
 <section data-section-pembuka="keraton" class="relative bg-[#472A1C] shadow-[0_0_0_2px_#472A1C] text-[#2B180F] overflow-hidden">
     {{-- Border Batik Kawung Atas --}}
-    <img src="{{ $asetJawa['kawungAtas'] }}" alt="" aria-hidden="true" class="pointer-events-none w-full h-16 sm:h-20 object-cover object-bottom opacity-80">
+    <img src="{{ $asetJawa['kawungAtas'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" class="pointer-events-none w-full h-16 sm:h-20 object-cover object-bottom opacity-80">
 
     <div class="relative z-10 px-6 py-4">
         <div class="fx-rise relative rounded-[22px] bg-[#FFFAF5] shadow-2xl overflow-hidden border border-[#D7BB83]/50 kartu-3d">
@@ -10,6 +10,8 @@
                 src="{{ $urlFotoLatar }}"
                 alt=""
                 aria-hidden="true"
+                loading="lazy"
+                decoding="async"
                 class="pointer-events-none absolute inset-0 w-full h-full object-cover opacity-15"
             >
 
@@ -18,6 +20,8 @@
                     <img
                         src="{{ $urlFotoPembuka }}"
                         alt="{{ $undangan->nama_panggilan_pria }} & {{ $undangan->nama_panggilan_wanita }}"
+                        loading="lazy"
+                        decoding="async"
                         class="w-full aspect-[4/4.2] object-cover object-top shadow-md"
                     >
                 </div>
@@ -45,7 +49,7 @@
     </div>
 
     {{-- Border Batik Kawung Bawah --}}
-    <img src="{{ $asetJawa['kawungBawah'] }}" alt="" aria-hidden="true" class="pointer-events-none w-full h-16 sm:h-20 object-cover object-top opacity-80">
+    <img src="{{ $asetJawa['kawungBawah'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" class="pointer-events-none w-full h-16 sm:h-20 object-cover object-top opacity-80">
 </section>
 
 {{-- SEKSI 4: PROFIL KEDUA MEMPELAI — KAPSUL KUBAH RAKSASA DI ATAS DIORAMA TERPIN --}}
@@ -58,6 +62,8 @@
             <img
                 src="{{ $asetJawa['gununganKecil'] }}"
                 alt=""
+                loading="lazy"
+                decoding="async"
                 class="fx-rise-down w-14 mx-auto drop-shadow-md animasi-ayun-3d"
             >
 
@@ -77,12 +83,16 @@
                         src="{{ $asetJawa['sayapWayang'] }}"
                         alt=""
                         aria-hidden="true"
+                        loading="lazy"
+                        decoding="async"
                         class="pointer-events-none absolute -top-4 -left-10 w-28 opacity-92 z-0 -scale-x-100 ayun-kanan"
                     >
                     @if (! $tanpaFoto && $undangan->urlFotoWanita())
                         <img
                             src="{{ $undangan->urlFotoWanita() }}"
                             alt="{{ $undangan->nama_lengkap_wanita }}"
+                            loading="lazy"
+                            decoding="async"
                             class="fx-scale-out relative z-10 mx-auto w-44 h-72 rounded-[500px] object-cover object-top border-2 border-[#D7BB83] shadow-xl"
                         >
                     @else
@@ -94,6 +104,8 @@
                         src="{{ $asetJawa['bungaLili'] }}"
                         alt=""
                         aria-hidden="true"
+                        loading="lazy"
+                        decoding="async"
                         class="pointer-events-none absolute -bottom-5 -right-8 w-32 z-20 drop-shadow-lg ayun-kiri"
                     >
                 </div>
@@ -137,12 +149,16 @@
                         src="{{ $asetJawa['sayapWayang'] }}"
                         alt=""
                         aria-hidden="true"
+                        loading="lazy"
+                        decoding="async"
                         class="pointer-events-none absolute -top-4 -right-10 w-28 opacity-92 z-0 ayun-kiri"
                     >
                     @if (! $tanpaFoto && $undangan->urlFotoPria())
                         <img
                             src="{{ $undangan->urlFotoPria() }}"
                             alt="{{ $undangan->nama_lengkap_pria }}"
+                            loading="lazy"
+                            decoding="async"
                             class="fx-scale-out relative z-10 mx-auto w-44 h-72 rounded-[500px] object-cover object-top border-2 border-[#D7BB83] shadow-xl"
                         >
                     @else
@@ -154,6 +170,8 @@
                         src="{{ $asetJawa['bungaLili'] }}"
                         alt=""
                         aria-hidden="true"
+                        loading="lazy"
+                        decoding="async"
                         class="pointer-events-none absolute -bottom-5 -left-8 w-32 z-20 drop-shadow-lg -scale-x-100 ayun-kanan"
                     >
                 </div>
@@ -210,6 +228,8 @@
         <img
             src="{{ $urlSlide }}"
             alt="Momen Bahagia {{ $undangan->nama_panggilan_pria }} & {{ $undangan->nama_panggilan_wanita }}"
+            loading="lazy"
+            decoding="async"
             class="absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-1000"
             :class="slideAktif === {{ $idxSlide }} ? 'opacity-90 scale-105' : 'opacity-0 scale-100'"
             style="transition: opacity 1.1s ease, transform 5s ease;"
@@ -432,6 +452,8 @@
                             <img
                                 src="{{ $urlFotoBab }}"
                                 alt="{{ $cerita['judul'] ?? 'Cerita Cinta' }}"
+                                loading="lazy"
+                                decoding="async"
                                 class="w-full aspect-[4/3] object-cover object-center"
                             >
                         </div>
@@ -482,6 +504,8 @@
                 <img
                     src="{{ $galeri->urlFoto() }}"
                     alt="{{ $galeri->keterangan ?? 'Galeri Foto' }}"
+                    loading="lazy"
+                    decoding="async"
                     class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-700"
                 >
                 @if ($galeri->keterangan)

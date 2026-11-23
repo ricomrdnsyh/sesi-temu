@@ -373,15 +373,16 @@
     <div
         class="relative mx-auto max-w-[395px] rounded-[500px] border-[3px] border-[#D7BB83]/85 bg-[#FFFAF5]/92 px-7 pt-5 pb-36 text-center text-[#2B180F] shadow-2xl overflow-hidden kartu-3d">
         {{-- Sepasang Ornamen Sudut Bawah Miring Simetris di Belakang Teks agar Nama Mempelai 100% Terbaca --}}
-        <img src="{{ $asetJawa['bungaLili'] }}" alt="" aria-hidden="true"
+        <img src="{{ $asetJawa['bungaLili'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async"
             class="fx-slide-right pointer-events-none absolute -bottom-10 -left-9 w-32 opacity-75 z-0 jawa-potret-tutup-kiri">
-        <img src="{{ $asetJawa['bungaLili'] }}" alt="" aria-hidden="true"
+        <img src="{{ $asetJawa['bungaLili'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async"
             class="fx-slide-left pointer-events-none absolute -bottom-10 -right-9 w-32 opacity-75 z-0 jawa-potret-tutup-kanan">
 
         <div class="relative z-10 space-y-5">
             @if (!$tanpaFoto && !empty($urlFotoPenutup))
                 <img src="{{ $urlFotoPenutup }}"
                     alt="{{ $undangan->nama_panggilan_pria }} & {{ $undangan->nama_panggilan_wanita }}"
+                    loading="lazy" decoding="async"
                     class="fx-scale-in w-full h-80 rounded-t-[500px] rounded-b-[20px] object-cover object-top shadow-lg">
             @else
                 <div

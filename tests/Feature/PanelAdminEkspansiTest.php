@@ -817,12 +817,16 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSee('Pratinjau sampul tema')
             ->assertSee('Pakai Tema Ini');
 
-        // Saat client membuka demo dari katalog, bar demo kembali ke /dashboard/katalog dan lanjut pakai tema ke /dashboard/katalog?pakai=...
+        // Saat client membuka demo dari katalog, tampil pratinjau perangkat (Handphone / Tablet / Desktop) tanpa bar font lama
         $this->actingAs($client)
             ->get("/demo/{$temaPilihan->slug}?dari=katalog")
             ->assertOk()
-            ->assertSee(route('dashboard.katalog'), false)
-            ->assertSee(route('dashboard.katalog', ['pakai' => $temaPilihan->id]), false);
+            ->assertSee('Pratinjau Tema')
+            ->assertSee('Handphone')
+            ->assertSee('Tablet')
+            ->assertSee('Desktop')
+            ->assertDontSee('<div data-bar-pratinjau', false)
+            ->assertDontSee('Pilih Desain Font Demo');
 
         // Policy guard: tidak bisa menerapkan tema ke undangan milik orang lain
         $this->actingAs($client)

@@ -119,7 +119,7 @@ class TemaMotion3DTest extends TestCase
                 'aktif' => true,
             ]);
 
-            $respon = $this->get('/demo/'.$item['slug']);
+            $respon = $this->get('/demo/'.$item['slug'].'?kanvas=1');
             $respon->assertOk()
                 ->assertSee('panggung-3d', false)
                 ->assertSee('kartu-3d', false)
@@ -211,7 +211,7 @@ class TemaMotion3DTest extends TestCase
             'aktif' => true,
         ]);
 
-        $respon = $this->get('/demo/adat-jawa?to=Raden+Bagus');
+        $respon = $this->get('/demo/adat-jawa?kanvas=1&to=Raden+Bagus');
         $respon->assertOk()
             ->assertSee('Raden Bagus', false)
             ->assertSee('Pinyon+Script', false)
@@ -232,7 +232,7 @@ class TemaMotion3DTest extends TestCase
         }
 
         // Mode Tanpa Foto (?tf=1) menyembunyikan foto mempelai & galeri tanpa merusak diorama
-        $this->get('/demo/adat-jawa?tf=1')
+        $this->get('/demo/adat-jawa?kanvas=1&tf=1')
             ->assertOk()
             ->assertSee('jawa-bingkai-masuk', false)
             ->assertSee('Akmal', false)
@@ -567,7 +567,7 @@ class TemaMotion3DTest extends TestCase
                 ]
             );
 
-            $respon = $this->get("/demo/{$slug}")->assertOk();
+            $respon = $this->get("/demo/{$slug}?kanvas=1")->assertOk();
 
             foreach ($daftarJalur as $jalur) {
                 $penuh = public_path($jalur);

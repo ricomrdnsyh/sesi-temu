@@ -96,6 +96,28 @@ class HalamanUtamaController extends Controller
 
         $undangan = $this->buatUndanganDemoInMemory($tema, $tanpaFoto, $gayaFont);
 
+        if (! $request->boolean('embed') && ! $request->boolean('kanvas')) {
+            $parameterKanvas = array_filter([
+                'kanvas' => 1,
+                'to' => $request->query('to'),
+                'tf' => $request->has('tf') ? ($tanpaFoto ? '1' : '0') : null,
+                'font' => $request->query('font'),
+                'dari' => $request->query('dari'),
+            ], static fn ($nilai): bool => $nilai !== null && $nilai !== '');
+
+            $modePerangkat = in_array($request->query('perangkat'), ['handphone', 'tablet', 'desktop'], true)
+                ? (string) $request->query('perangkat')
+                : 'handphone';
+
+            return view('demo-pratinjau', [
+                'tema' => $tema,
+                'undangan' => $undangan,
+                'namaTamu' => $namaTamu,
+                'modePerangkat' => $modePerangkat,
+                'urlKanvas' => route('tema.demo', array_merge(['slugTema' => $tema->slug], $parameterKanvas)),
+            ]);
+        }
+
         return view($tema->lokasi_view, [
             'undangan' => $undangan,
             'namaTamu' => $namaTamu,

@@ -413,15 +413,21 @@
     body.siap-3d .masuk-3d {
         opacity: 0;
         transform: translate3d(0, 26px, 0) scale(0.98);
-        transition:
-            opacity 0.78s cubic-bezier(0.16, 1, 0.3, 1),
-            transform 0.88s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: none;
         backface-visibility: hidden;
+    }
+
+    body.siap-3d .masuk-3d.fx-dari-atas {
+        transform: translate3d(0, -24px, 0) scale(0.98);
     }
 
     body.siap-3d .masuk-3d.terlihat {
         opacity: 1;
         transform: translate3d(0, 0, 0) scale(1);
+        transition:
+            opacity 0.78s cubic-bezier(0.16, 1, 0.3, 1),
+            transform 0.88s cubic-bezier(0.16, 1, 0.3, 1),
+            box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @keyframes ayun3d {
@@ -1140,54 +1146,70 @@
         will-change: transform;
     }
 
-    /* Kit Reveal 60fps Berbasis Scroll (Murni GPU transform + opacity, bebas konflik tilt) */
+    /* Kit Reveal 60fps Berbasis Scroll Dua Arah (Aktif Saat Scroll Bawah & Kembali Scroll Atas, Reset Instan di Luar Layar) */
     body.siap-3d .fx-rise {
         opacity: 0;
-        transform: translate3d(0, 24px, 0);
-        transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.88s cubic-bezier(0.16, 1, 0.3, 1);
+        transform: translate3d(0, 26px, 0);
+        transition: none;
         backface-visibility: hidden;
+    }
+
+    body.siap-3d .fx-rise.fx-dari-atas {
+        transform: translate3d(0, -24px, 0);
     }
 
     body.siap-3d .fx-rise-down {
         opacity: 0;
         transform: translate3d(0, -20px, 0);
-        transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.88s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: none;
         backface-visibility: hidden;
+    }
+
+    body.siap-3d .fx-rise-down.fx-dari-atas {
+        transform: translate3d(0, 22px, 0);
     }
 
     body.siap-3d .fx-scale-in {
         opacity: 0;
-        transform: translate3d(0, 14px, 0) scale(0.93);
-        transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        transform: translate3d(0, 16px, 0) scale(0.93);
+        transition: none;
         backface-visibility: hidden;
+    }
+
+    body.siap-3d .fx-scale-in.fx-dari-atas {
+        transform: translate3d(0, -16px, 0) scale(0.93);
     }
 
     body.siap-3d .fx-scale-out {
         opacity: 0;
         transform: scale(1.06);
-        transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.95s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: none;
         backface-visibility: hidden;
     }
 
     body.siap-3d .fx-slide-left {
         opacity: 0;
         transform: translate3d(-28px, 0, 0);
-        transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: none;
         backface-visibility: hidden;
     }
 
     body.siap-3d .fx-slide-right {
         opacity: 0;
         transform: translate3d(28px, 0, 0);
-        transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: none;
         backface-visibility: hidden;
     }
 
     body.siap-3d .fx-flip-in {
         opacity: 0;
         transform: perspective(1000px) rotateY(-12deg) translate3d(0, 18px, 0) scale(0.96);
-        transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.95s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: none;
         backface-visibility: hidden;
+    }
+
+    body.siap-3d .fx-flip-in.fx-dari-atas {
+        transform: perspective(1000px) rotateY(12deg) translate3d(0, -18px, 0) scale(0.96);
     }
 
     body.siap-3d .fx-rise.active,
@@ -1199,6 +1221,10 @@
     body.siap-3d .fx-flip-in.active {
         opacity: 1;
         transform: translate3d(0, 0, 0) scale(1);
+        transition:
+            opacity 0.78s cubic-bezier(0.16, 1, 0.3, 1),
+            transform 0.88s cubic-bezier(0.16, 1, 0.3, 1),
+            box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .polaroid-3d-kiri {
@@ -1400,7 +1426,146 @@
     html.desktop-triptych [data-kolom-undangan] section[data-diorama-3d][class*="min-h-[96dvh]"] > div {
         min-height: calc(var(--tinggi-layar-inv, 100dvh) * 0.96 - 2rem) !important;
     }
+
+    /* === TATA LETAK PANGGUNG TABLET (KOLOM PORTRAIT TERPUSAT + SAYAP ARTWORK KIRI & KANAN) === */
+    @media (min-width: 680px) and (max-width: 1023px) {
+        html:not(.desktop-triptych):not(.tablet-stage) [data-tata-letak-tema] {
+            display: flex !important;
+        }
+
+        html:not(.desktop-triptych):not(.tablet-stage) [data-tata-letak-tema] > aside {
+            display: flex !important;
+            flex: 1 1 0% !important;
+            min-width: 0 !important;
+            position: sticky !important;
+            top: 0 !important;
+            height: 100vh !important;
+            height: 100dvh !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding-top: 0 !important;
+        }
+
+        html:not(.desktop-triptych):not(.tablet-stage) [data-tata-letak-tema] > aside > .lapis-3d.z-20 {
+            display: none !important;
+        }
+
+        html:not(.desktop-triptych):not(.tablet-stage) [data-kolom-undangan] {
+            box-sizing: content-box !important;
+            width: 440px !important;
+            flex-shrink: 0 !important;
+            border-left-width: 1px !important;
+            border-right-width: 1px !important;
+        }
+
+        html:not(.desktop-triptych):not(.tablet-stage) [data-kolom-undangan] > [data-progres-undangan],
+        html:not(.desktop-triptych):not(.tablet-stage) [data-kolom-undangan] > [data-latar-undangan],
+        html:not(.desktop-triptych):not(.tablet-stage) [data-kolom-undangan] > [data-transisi-sampul] {
+            width: 440px !important;
+            left: 0 !important;
+            right: 0 !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+    }
+
+    /* === KUNCI SKALA ANTI-ZOOM MODE TABLET (KUNJUNGAN LANGSUNG) === */
+    html.tablet-stage [data-tata-letak-tema] {
+        display: flex !important;
+    }
+
+    html.tablet-stage [data-tata-letak-tema] > aside {
+        display: flex !important;
+        flex: 1 1 0% !important;
+        min-width: 0 !important;
+        position: sticky !important;
+        top: 0 !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding-top: var(--tinggi-bar-demo-viewport, 0px) !important;
+    }
+
+    html.tablet-stage [data-tata-letak-tema] > aside > .lapis-3d.z-20 {
+        display: none !important;
+    }
+
+    html.tablet-stage [data-kolom-undangan] {
+        box-sizing: content-box !important;
+        width: var(--lebar-kolom-viewport, 440px) !important;
+        flex-shrink: 0 !important;
+        border-left-width: 1px !important;
+        border-right-width: 1px !important;
+    }
+
+    html.tablet-stage [data-kolom-undangan] > [data-progres-undangan],
+    html.tablet-stage [data-kolom-undangan] > [data-latar-undangan] {
+        width: var(--lebar-kolom-viewport, 440px) !important;
+        left: 0 !important;
+        right: 0 !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    html.tablet-stage [data-kolom-undangan] > [data-latar-undangan] {
+        top: 0 !important;
+        bottom: 0 !important;
+    }
+
+    html.tablet-stage [data-kolom-undangan] > [data-latar-undangan] > [data-latar-zoom] {
+        width: var(--lebar-kolom-undangan, 440px) !important;
+        height: var(--tinggi-layar-inv, 100dvh) !important;
+        zoom: var(--inv-zoom, 1);
+    }
+
+    html.tablet-stage [data-kolom-undangan] > [data-transisi-sampul] {
+        width: var(--lebar-kolom-viewport, 440px) !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        height: auto !important;
+        padding-top: var(--tinggi-bar-demo-viewport, 0px) !important;
+    }
+
+    html.tablet-stage [data-kolom-undangan] > [data-transisi-sampul] > div {
+        width: var(--lebar-kolom-undangan, 440px) !important;
+        height: var(--tinggi-tirai-dalam-inv, 100%) !important;
+        zoom: var(--inv-zoom, 1);
+    }
+
+    html.tablet-stage [data-kolom-undangan] > main[data-panggung-3d] {
+        width: var(--lebar-kolom-undangan, 440px) !important;
+        zoom: var(--inv-zoom, 1);
+        padding-top: var(--tinggi-bar-demo-inv, 0px) !important;
+    }
+
+    html.tablet-stage [data-kolom-undangan] .jawa-hero-layar-penuh,
+    html.tablet-stage [data-kolom-undangan] .rustic-hero-layar-penuh,
+    html.tablet-stage [data-kolom-undangan] .syari-hero-layar-penuh,
+    html.tablet-stage [data-kolom-undangan] section[data-diorama-3d].h-dvh {
+        height: var(--tinggi-tirai-dalam-inv, 100dvh) !important;
+        min-height: var(--tinggi-tirai-dalam-inv, 100dvh) !important;
+    }
 </style>
+@if (request()->boolean('kanvas'))
+<style>
+    @media (max-width: 1023px) {
+        html,
+        body {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            display: none;
+        }
+    }
+</style>
+@endif
 <script>
     (function () {
         if (window.self !== window.top) {
@@ -1478,6 +1643,7 @@
                 const tinggiBarInv = tinggiBarViewport / invZoom;
                 const tinggiSampulDalam = Math.max(320, (tinggiDalam - tinggiBarViewport) / invZoom);
 
+                root.classList.remove('tablet-stage');
                 root.classList.add('desktop-triptych');
                 root.style.setProperty('--browser-zoom', browserZoom.toFixed(4));
                 root.style.setProperty('--inv-zoom', String(invZoom));
@@ -1487,8 +1653,28 @@
                 root.style.setProperty('--tinggi-bar-demo-viewport', `${tinggiBarViewport}px`);
                 root.style.setProperty('--tinggi-bar-demo-inv', `${tinggiBarInv.toFixed(2)}px`);
                 root.style.setProperty('--tinggi-tirai-dalam-inv', `${tinggiSampulDalam.toFixed(2)}px`);
-            } else {
+            } else if (lebarTanpaZoom >= 680) {
+                const invZoom = Number((1 / browserZoom).toFixed(4));
+                const lebarKolom = 440;
+                const lebarViewport = Math.min(Math.max(320, lebarKlien - 2), lebarKolom * invZoom);
+
+                const barEl = document.querySelector('[data-bar-pratinjau]');
+                const tinggiBarViewport = barEl ? Math.ceil(barEl.getBoundingClientRect().height) : 0;
+                const tinggiBarInv = tinggiBarViewport / invZoom;
+                const tinggiSampulDalam = Math.max(320, (tinggiDalam - tinggiBarViewport) / invZoom);
+
                 root.classList.remove('desktop-triptych');
+                root.classList.add('tablet-stage');
+                root.style.setProperty('--browser-zoom', browserZoom.toFixed(4));
+                root.style.setProperty('--inv-zoom', String(invZoom));
+                root.style.setProperty('--lebar-kolom-undangan', `${lebarKolom}px`);
+                root.style.setProperty('--lebar-kolom-viewport', `${lebarViewport.toFixed(2)}px`);
+                root.style.setProperty('--tinggi-layar-inv', `${Math.round(tinggiTanpaZoom)}px`);
+                root.style.setProperty('--tinggi-bar-demo-viewport', `${tinggiBarViewport}px`);
+                root.style.setProperty('--tinggi-bar-demo-inv', `${tinggiBarInv.toFixed(2)}px`);
+                root.style.setProperty('--tinggi-tirai-dalam-inv', `${tinggiSampulDalam.toFixed(2)}px`);
+            } else {
+                root.classList.remove('desktop-triptych', 'tablet-stage');
                 root.style.removeProperty('--browser-zoom');
                 root.style.removeProperty('--inv-zoom');
                 root.style.removeProperty('--lebar-kolom-undangan');

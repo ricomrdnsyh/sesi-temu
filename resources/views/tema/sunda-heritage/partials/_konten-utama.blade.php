@@ -1,114 +1,310 @@
-{{-- SEKSI 3: PASANGAN PANGANTEN (TATA LETAK HORIZONTAL BERSEBERANGAN — BEDA TOTAL DARI ADAT JAWA) --}}
+{{-- SEKSI 3: PASANGAN PANGANTEN PRIANGAN (GALERI POTRET BINGKAI EMAS & ANGGREK BULAN) --}}
 <section
     data-layout-mempelai="priangan"
-    class="relative px-4 py-12 overflow-hidden"
+    class="relative px-4 py-14 overflow-hidden"
 >
-    <div class="max-w-md mx-auto space-y-6">
-        <div class="fx-rise text-center space-y-1.5">
-            <img src="{{ $asetSunda['siger'] }}" alt="" class="w-12 mx-auto">
-            <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#8E6620]">Pasangan Panganten</p>
-            <h2 class="font-serif text-3xl font-bold text-[#5A1E1E]">Mempelai Berbahagia</h2>
-            <p class="text-xs text-[#4A2020]/75 max-w-xs mx-auto leading-relaxed">
+    <div class="max-w-md mx-auto space-y-7">
+        {{-- Tajuk Seksi Bermahkota Siger Sunda --}}
+        <div class="fx-rise text-center space-y-2 px-2">
+            <img
+                src="{{ $asetSunda['siger'] }}"
+                alt=""
+                loading="lazy"
+                decoding="async"
+                class="w-16 mx-auto drop-shadow-[0_6px_14px_rgba(90,30,30,0.28)] animasi-ayun-3d"
+            >
+            <div class="flex items-center justify-center gap-2.5 pt-0.5">
+                <span aria-hidden="true" class="h-px w-8 bg-gradient-to-r from-transparent to-[#C59B43]"></span>
+                <span aria-hidden="true" class="w-1.5 h-1.5 rotate-45 bg-[#C59B43]"></span>
+                <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#8E6620]">
+                    Pasangan Panganten
+                </p>
+                <span aria-hidden="true" class="w-1.5 h-1.5 rotate-45 bg-[#C59B43]"></span>
+                <span aria-hidden="true" class="h-px w-8 bg-gradient-to-l from-transparent to-[#C59B43]"></span>
+            </div>
+            <h2 class="font-serif text-[2rem] sm:text-[2.2rem] font-bold leading-tight text-[#5A1E1E]">
+                Mempelai Berbahagia
+            </h2>
+            <p class="text-xs sm:text-[13px] text-[#4A2020]/80 max-w-xs mx-auto leading-relaxed">
                 Kalayan nyuhunkeun rido sareng rahmat Gusti Nu Maha Suci, sim kuring nyanggakeun pangulem nikah:
             </p>
+            <svg viewBox="0 0 280 24" class="w-36 mx-auto pt-1 opacity-80" aria-hidden="true">
+                <path d="M12 18 C36 4 68 4 92 14 C112 2 168 2 188 14 C212 4 244 4 268 18" fill="none" stroke="#C59B43" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
         </div>
 
-        {{-- KARTU MEMPELAI PRIA: FOTO KIRI, BIO KANAN --}}
-        <article class="fx-slide-left rounded-3xl bg-[#FFFBF4] border-2 border-[#C59B43]/65 p-5 shadow-xl kartu-3d">
-            <div class="flex {{ $tanpaFoto ? 'flex-col items-center text-center' : 'flex-col sm:flex-row items-center gap-4 text-center sm:text-left' }}">
-                @if (! $tanpaFoto && $undangan->urlFotoPria())
-                    <div class="relative shrink-0 w-32 h-32 p-1.5 rounded-full border-2 border-[#C59B43] bg-[#5A1E1E]/5">
-                        <img
-                            src="{{ $undangan->urlFotoPria() }}"
-                            alt="{{ $undangan->nama_lengkap_pria }}"
-                            class="w-full h-full rounded-full object-cover object-top"
-                        >
-                        <span aria-hidden="true" class="pointer-events-none absolute -inset-1 rounded-full border border-dashed border-[#C59B43]/65"></span>
+        {{-- KARTU PANGANTEN PAMEGET (PAVILIUN POTRET MARUN-EMAS PRIANGAN) --}}
+        <article class="fx-slide-left group relative rounded-[2rem] bg-[#FFFBF4] border-2 border-[#C59B43]/75 shadow-[0_24px_52px_-16px_rgba(74,23,23,0.34)] overflow-hidden kartu-3d">
+            {{-- Panggung Atas Beludru Marun + Bingkai Ukiran Priangan + Bunga Kamelia & Anggrek --}}
+            <div class="relative bg-gradient-to-b from-[#5F2222] via-[#4A1717] to-[#3B1414] px-5 pt-7 pb-11 overflow-hidden">
+                {{-- Siluet Tipis Gapura Priangan & Pendar Emas Hangat di Latar --}}
+                <img
+                    src="{{ $asetSunda['gapura'] }}"
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    decoding="async"
+                    class="pointer-events-none absolute inset-x-0 top-0 w-full h-full object-cover object-top opacity-[0.14] scale-105"
+                >
+                <div
+                    aria-hidden="true"
+                    class="pointer-events-none absolute inset-0"
+                    style="background: radial-gradient(circle at 50% 45%, rgba(231,200,125,0.24) 0%, rgba(90,30,30,0.08) 48%, rgba(43,14,14,0.62) 100%);"
+                ></div>
+
+                {{-- Untaian Ronce Melati Sudut Kiri & Kanan --}}
+                <svg aria-hidden="true" viewBox="0 0 48 130" class="pointer-events-none absolute top-0 left-3 w-8 opacity-80 ayun-kiri">
+                    <path d="M16 0 C14 38 20 80 15 118" stroke="#E7C87D" stroke-width="1" fill="none"/>
+                    <g fill="#FFFDF8" stroke="#C59B43" stroke-width="0.5">
+                        <circle cx="16" cy="18" r="3.4"/><circle cx="15" cy="38" r="3.2"/><circle cx="17" cy="58" r="3.6"/><circle cx="16" cy="78" r="3.2"/><circle cx="15" cy="98" r="3.4"/>
+                    </g>
+                    <path d="M12 115 L15 127 L18 115 Z" fill="#E7C87D"/>
+                </svg>
+                <svg aria-hidden="true" viewBox="0 0 48 130" class="pointer-events-none absolute top-0 right-3 w-8 opacity-80 -scale-x-100 ayun-kanan">
+                    <path d="M16 0 C14 38 20 80 15 118" stroke="#E7C87D" stroke-width="1" fill="none"/>
+                    <g fill="#FFFDF8" stroke="#C59B43" stroke-width="0.5">
+                        <circle cx="16" cy="18" r="3.4"/><circle cx="15" cy="38" r="3.2"/><circle cx="17" cy="58" r="3.6"/><circle cx="16" cy="78" r="3.2"/><circle cx="15" cy="98" r="3.4"/>
+                    </g>
+                    <path d="M12 115 L15 127 L18 115 Z" fill="#E7C87D"/>
+                </svg>
+
+                {{-- Potret Besar Panganten Pameget di Dalam Bingkai Emas Priangan (780x1043) --}}
+                <div class="fx-scale-in relative z-10 mx-auto w-[220px] sm:w-[238px] aspect-[780/1043] flex items-center justify-center">
+                    <div class="absolute inset-x-[13.5%] inset-y-[8.5%] rounded-[50%] overflow-hidden bg-[#2E0E0E] shadow-[0_14px_30px_rgba(16,4,4,0.65)]">
+                        @if (! $tanpaFoto && $undangan->urlFotoPria())
+                            <img
+                                src="{{ $undangan->urlFotoPria() }}"
+                                alt="{{ $undangan->nama_lengkap_pria }}"
+                                loading="lazy"
+                                decoding="async"
+                                class="w-full h-full object-cover object-top scale-[1.03] group-hover:scale-[1.07] transition duration-700"
+                            >
+                            <div aria-hidden="true" class="pointer-events-none absolute inset-0 rounded-[50%] shadow-[inset_0_0_24px_rgba(32,10,10,0.42)]"></div>
+                        @else
+                            <div class="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-gradient-to-b from-[#6E2C2C] via-[#4E1A1A] to-[#320F0F] text-[#F3E5AB]">
+                                <span class="text-[9px] uppercase tracking-[0.3em] text-[#E7C87D]/80">Panganten</span>
+                                <span class="font-serif text-6xl font-bold leading-none drop-shadow">{{ $undangan->inisialPria() }}</span>
+                            </div>
+                        @endif
                     </div>
-                @elseif ($tanpaFoto)
-                    <div class="w-16 h-16 rounded-full bg-[#5A1E1E] text-[#F3E5AB] border-2 border-[#C59B43] flex items-center justify-center font-serif text-2xl font-bold">
-                        {{ $undangan->inisialPria() }}
+
+                    <img
+                        src="{{ $asetSunda['bingkaiPriangan'] }}"
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        decoding="async"
+                        class="pointer-events-none relative z-10 w-full h-full object-contain drop-shadow-[0_12px_24px_rgba(20,5,5,0.7)]"
+                    >
+                </div>
+
+                {{-- Hamparan Bunga Kamelia Marun & Anggrek Bulan Memeluk Bagian Bawah Bingkai --}}
+                <img
+                    src="{{ $asetSunda['bungaDepan'] }}"
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    decoding="async"
+                    class="pointer-events-none absolute -bottom-2 inset-x-0 w-full z-20 drop-shadow-[0_-6px_14px_rgba(24,6,6,0.45)]"
+                >
+            </div>
+
+            {{-- Pita Gelar Panganten Emas Bertengger di Sambungan Panggung --}}
+            <div class="relative z-30 -mt-4 flex justify-center">
+                <span class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#DFC078] via-[#C59B43] to-[#DFC078] px-4 py-1 text-[10px] font-bold uppercase tracking-[0.26em] text-[#3B1414] border border-[#FFF7E2]/70 shadow-[0_8px_20px_-6px_rgba(59,20,20,0.55)]">
+                    <span aria-hidden="true" class="w-1 h-1 rotate-45 bg-[#5A1E1E]"></span>
+                    <span>Panganten Pameget</span>
+                    <span aria-hidden="true" class="w-1 h-1 rotate-45 bg-[#5A1E1E]"></span>
+                </span>
+            </div>
+
+            {{-- Panel Biografi Gading Hangat Priangan --}}
+            <div class="relative px-6 pt-5 pb-7 text-center space-y-2">
+                <span aria-hidden="true" class="pointer-events-none absolute bottom-3 left-3 h-4 w-4 border-b border-l border-[#C59B43]/60 rounded-bl-md"></span>
+                <span aria-hidden="true" class="pointer-events-none absolute bottom-3 right-3 h-4 w-4 border-b border-r border-[#C59B43]/60 rounded-br-md"></span>
+
+                <h3 class="font-kaligrafi text-[2.85rem] sm:text-[3.1rem] leading-[1.06] text-[#5A1E1E]">
+                    {{ $undangan->nama_panggilan_pria }}
+                </h3>
+                <p class="font-serif text-base sm:text-[1.08rem] font-bold tracking-wide text-[#4A2020]">
+                    {{ $undangan->nama_lengkap_pria }}
+                </p>
+
+                @if ($undangan->nama_ayah_pria || $undangan->nama_ibu_pria)
+                    <div class="pt-1.5 space-y-1">
+                        <div class="flex items-center justify-center gap-2.5 px-12" aria-hidden="true">
+                            <span class="h-px flex-1 bg-gradient-to-r from-transparent to-[#C59B43]/65"></span>
+                            <span class="w-1 h-1 rotate-45 bg-[#C59B43]"></span>
+                            <span class="h-px flex-1 bg-gradient-to-l from-transparent to-[#C59B43]/65"></span>
+                        </div>
+                        <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#8E6620] pt-1">
+                            Putra ti
+                        </p>
+                        <p class="text-xs sm:text-[13px] font-medium text-[#4A2020]/85 leading-relaxed max-w-xs mx-auto">
+                            {{ $undangan->nama_ayah_pria }} &amp; {{ $undangan->nama_ibu_pria }}
+                        </p>
                     </div>
                 @endif
 
-                <div class="flex-1 space-y-1.5">
-                    <span class="inline-block rounded-full bg-[#5A1E1E] px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-[#F3E5AB]">
-                        Panganten Pameget
-                    </span>
-                    <h3 class="font-kaligrafi text-4xl leading-tight text-[#5A1E1E]">
-                        {{ $undangan->nama_panggilan_pria }}
-                    </h3>
-                    <p class="font-serif text-sm font-bold text-[#4A2020]">
-                        {{ $undangan->nama_lengkap_pria }}
-                    </p>
-                    @if ($undangan->nama_ayah_pria || $undangan->nama_ibu_pria)
-                        <p class="text-xs text-[#4A2020]/75 leading-relaxed">
-                            Putra ti {{ $undangan->nama_ayah_pria }} &amp; {{ $undangan->nama_ibu_pria }}
-                        </p>
-                    @endif
-                    @if ($instagramPria !== '')
+                @if ($instagramPria !== '')
+                    <div class="pt-2.5">
                         <a
                             href="https://instagram.com/{{ $instagramPria }}"
                             target="_blank"
                             rel="noopener"
-                            class="mt-1 inline-flex items-center gap-1.5 rounded-full bg-[#5A1E1E]/10 border border-[#C59B43]/50 px-3 py-1 text-[11px] font-semibold text-[#5A1E1E] hover:bg-[#5A1E1E] hover:text-[#FAF4E8] transition"
+                            class="sunda-tombol-marun inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[11px] font-semibold tracking-wide transition active:scale-95"
                         >
+                            <svg class="w-3.5 h-3.5 text-[#E7C87D]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+                            </svg>
                             <span>&#64;{{ $instagramPria }}</span>
                         </a>
-                    @endif
-                </div>
+                    </div>
+                @endif
             </div>
         </article>
 
-        {{-- PEMISAH EMAS --}}
-        <div class="flex items-center justify-center gap-4 text-[#B58931]">
-            <span class="h-px w-16 bg-gradient-to-r from-transparent to-[#C59B43]"></span>
-            <span class="font-kaligrafi text-4xl text-[#5A1E1E]">&amp;</span>
-            <span class="h-px w-16 bg-gradient-to-l from-transparent to-[#C59B43]"></span>
+        {{-- SEGEL MEDALI PENGHUBUNG "&" EMAS-MARUN BERORBIT --}}
+        <div class="fx-scale-in flex items-center justify-center gap-4 py-1" aria-hidden="true">
+            <span class="h-px flex-1 max-w-[82px] bg-gradient-to-r from-transparent via-[#C59B43]/70 to-[#C59B43]"></span>
+            <div class="relative w-14 h-14 flex items-center justify-center">
+                <span class="absolute -inset-1.5 rounded-full border border-dashed border-[#C59B43]/65 animasi-orbit"></span>
+                <div class="w-12 h-12 rounded-full bg-gradient-to-b from-[#6E2C2C] to-[#4A1717] border-2 border-[#E7C87D] shadow-[0_10px_24px_-6px_rgba(90,30,30,0.6)] flex items-center justify-center">
+                    <span class="font-kaligrafi text-3xl text-[#F3E5AB] leading-none pt-0.5">&amp;</span>
+                </div>
+            </div>
+            <span class="h-px flex-1 max-w-[82px] bg-gradient-to-l from-transparent via-[#C59B43]/70 to-[#C59B43]"></span>
         </div>
 
-        {{-- KARTU MEMPELAI WANITA: BIO KIRI, FOTO KANAN (BERGANTIAN) --}}
-        <article class="fx-slide-right rounded-3xl bg-[#FFFBF4] border-2 border-[#C59B43]/65 p-5 shadow-xl kartu-3d">
-            <div class="flex {{ $tanpaFoto ? 'flex-col items-center text-center' : 'flex-col-reverse sm:flex-row items-center gap-4 text-center sm:text-right' }}">
-                <div class="flex-1 space-y-1.5">
-                    <span class="inline-block rounded-full bg-[#C59B43]/20 border border-[#C59B43]/55 px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-[#5A1E1E]">
-                        Panganten Istri
-                    </span>
-                    <h3 class="font-kaligrafi text-4xl leading-tight text-[#5A1E1E]">
-                        {{ $undangan->nama_panggilan_wanita }}
-                    </h3>
-                    <p class="font-serif text-sm font-bold text-[#4A2020]">
-                        {{ $undangan->nama_lengkap_wanita }}
-                    </p>
-                    @if ($undangan->nama_ayah_wanita || $undangan->nama_ibu_wanita)
-                        <p class="text-xs text-[#4A2020]/75 leading-relaxed">
-                            Putri ti {{ $undangan->nama_ayah_wanita }} &amp; {{ $undangan->nama_ibu_wanita }}
+        {{-- KARTU PANGANTEN ISTRI (PAVILIUN POTRET MARUN-EMAS PRIANGAN) --}}
+        <article class="fx-slide-right group relative rounded-[2rem] bg-[#FFFBF4] border-2 border-[#C59B43]/75 shadow-[0_24px_52px_-16px_rgba(74,23,23,0.34)] overflow-hidden kartu-3d">
+            {{-- Panggung Atas Beludru Marun + Bingkai Ukiran Priangan + Bunga Kamelia & Anggrek --}}
+            <div class="relative bg-gradient-to-b from-[#5F2222] via-[#4A1717] to-[#3B1414] px-5 pt-7 pb-11 overflow-hidden">
+                <img
+                    src="{{ $asetSunda['gapura'] }}"
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    decoding="async"
+                    class="pointer-events-none absolute inset-x-0 top-0 w-full h-full object-cover object-top opacity-[0.14] scale-105"
+                >
+                <div
+                    aria-hidden="true"
+                    class="pointer-events-none absolute inset-0"
+                    style="background: radial-gradient(circle at 50% 45%, rgba(231,200,125,0.24) 0%, rgba(90,30,30,0.08) 48%, rgba(43,14,14,0.62) 100%);"
+                ></div>
+
+                {{-- Untaian Ronce Melati Sudut Kiri & Kanan --}}
+                <svg aria-hidden="true" viewBox="0 0 48 130" class="pointer-events-none absolute top-0 left-3 w-8 opacity-80 ayun-kiri">
+                    <path d="M16 0 C14 38 20 80 15 118" stroke="#E7C87D" stroke-width="1" fill="none"/>
+                    <g fill="#FFFDF8" stroke="#C59B43" stroke-width="0.5">
+                        <circle cx="16" cy="18" r="3.4"/><circle cx="15" cy="38" r="3.2"/><circle cx="17" cy="58" r="3.6"/><circle cx="16" cy="78" r="3.2"/><circle cx="15" cy="98" r="3.4"/>
+                    </g>
+                    <path d="M12 115 L15 127 L18 115 Z" fill="#E7C87D"/>
+                </svg>
+                <svg aria-hidden="true" viewBox="0 0 48 130" class="pointer-events-none absolute top-0 right-3 w-8 opacity-80 -scale-x-100 ayun-kanan">
+                    <path d="M16 0 C14 38 20 80 15 118" stroke="#E7C87D" stroke-width="1" fill="none"/>
+                    <g fill="#FFFDF8" stroke="#C59B43" stroke-width="0.5">
+                        <circle cx="16" cy="18" r="3.4"/><circle cx="15" cy="38" r="3.2"/><circle cx="17" cy="58" r="3.6"/><circle cx="16" cy="78" r="3.2"/><circle cx="15" cy="98" r="3.4"/>
+                    </g>
+                    <path d="M12 115 L15 127 L18 115 Z" fill="#E7C87D"/>
+                </svg>
+
+                {{-- Potret Besar Panganten Istri di Dalam Bingkai Emas Priangan (780x1043) --}}
+                <div class="fx-scale-in relative z-10 mx-auto w-[220px] sm:w-[238px] aspect-[780/1043] flex items-center justify-center">
+                    <div class="absolute inset-x-[13.5%] inset-y-[8.5%] rounded-[50%] overflow-hidden bg-[#2E0E0E] shadow-[0_14px_30px_rgba(16,4,4,0.65)]">
+                        @if (! $tanpaFoto && $undangan->urlFotoWanita())
+                            <img
+                                src="{{ $undangan->urlFotoWanita() }}"
+                                alt="{{ $undangan->nama_lengkap_wanita }}"
+                                loading="lazy"
+                                decoding="async"
+                                class="w-full h-full object-cover object-top scale-[1.03] group-hover:scale-[1.07] transition duration-700"
+                            >
+                            <div aria-hidden="true" class="pointer-events-none absolute inset-0 rounded-[50%] shadow-[inset_0_0_24px_rgba(32,10,10,0.42)]"></div>
+                        @else
+                            <div class="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-gradient-to-b from-[#6E2C2C] via-[#4E1A1A] to-[#320F0F] text-[#F3E5AB]">
+                                <span class="text-[9px] uppercase tracking-[0.3em] text-[#E7C87D]/80">Panganten</span>
+                                <span class="font-serif text-6xl font-bold leading-none drop-shadow">{{ $undangan->inisialWanita() }}</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    <img
+                        src="{{ $asetSunda['bingkaiPriangan'] }}"
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        decoding="async"
+                        class="pointer-events-none relative z-10 w-full h-full object-contain drop-shadow-[0_12px_24px_rgba(20,5,5,0.7)]"
+                    >
+                </div>
+
+                {{-- Hamparan Bunga Kamelia Marun & Anggrek Bulan Memeluk Bagian Bawah Bingkai --}}
+                <img
+                    src="{{ $asetSunda['bungaDepan'] }}"
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    decoding="async"
+                    class="pointer-events-none absolute -bottom-2 inset-x-0 w-full z-20 drop-shadow-[0_-6px_14px_rgba(24,6,6,0.45)]"
+                >
+            </div>
+
+            {{-- Pita Gelar Panganten Emas Bertengger di Sambungan Panggung --}}
+            <div class="relative z-30 -mt-4 flex justify-center">
+                <span class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#DFC078] via-[#C59B43] to-[#DFC078] px-4 py-1 text-[10px] font-bold uppercase tracking-[0.26em] text-[#3B1414] border border-[#FFF7E2]/70 shadow-[0_8px_20px_-6px_rgba(59,20,20,0.55)]">
+                    <span aria-hidden="true" class="w-1 h-1 rotate-45 bg-[#5A1E1E]"></span>
+                    <span>Panganten Istri</span>
+                    <span aria-hidden="true" class="w-1 h-1 rotate-45 bg-[#5A1E1E]"></span>
+                </span>
+            </div>
+
+            {{-- Panel Biografi Gading Hangat Priangan --}}
+            <div class="relative px-6 pt-5 pb-7 text-center space-y-2">
+                <span aria-hidden="true" class="pointer-events-none absolute bottom-3 left-3 h-4 w-4 border-b border-l border-[#C59B43]/60 rounded-bl-md"></span>
+                <span aria-hidden="true" class="pointer-events-none absolute bottom-3 right-3 h-4 w-4 border-b border-r border-[#C59B43]/60 rounded-br-md"></span>
+
+                <h3 class="font-kaligrafi text-[2.85rem] sm:text-[3.1rem] leading-[1.06] text-[#5A1E1E]">
+                    {{ $undangan->nama_panggilan_wanita }}
+                </h3>
+                <p class="font-serif text-base sm:text-[1.08rem] font-bold tracking-wide text-[#4A2020]">
+                    {{ $undangan->nama_lengkap_wanita }}
+                </p>
+
+                @if ($undangan->nama_ayah_wanita || $undangan->nama_ibu_wanita)
+                    <div class="pt-1.5 space-y-1">
+                        <div class="flex items-center justify-center gap-2.5 px-12" aria-hidden="true">
+                            <span class="h-px flex-1 bg-gradient-to-r from-transparent to-[#C59B43]/65"></span>
+                            <span class="w-1 h-1 rotate-45 bg-[#C59B43]"></span>
+                            <span class="h-px flex-1 bg-gradient-to-l from-transparent to-[#C59B43]/65"></span>
+                        </div>
+                        <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#8E6620] pt-1">
+                            Putri ti
                         </p>
-                    @endif
-                    @if ($instagramWanita !== '')
+                        <p class="text-xs sm:text-[13px] font-medium text-[#4A2020]/85 leading-relaxed max-w-xs mx-auto">
+                            {{ $undangan->nama_ayah_wanita }} &amp; {{ $undangan->nama_ibu_wanita }}
+                        </p>
+                    </div>
+                @endif
+
+                @if ($instagramWanita !== '')
+                    <div class="pt-2.5">
                         <a
                             href="https://instagram.com/{{ $instagramWanita }}"
                             target="_blank"
                             rel="noopener"
-                            class="mt-1 inline-flex items-center gap-1.5 rounded-full bg-[#5A1E1E]/10 border border-[#C59B43]/50 px-3 py-1 text-[11px] font-semibold text-[#5A1E1E] hover:bg-[#5A1E1E] hover:text-[#FAF4E8] transition"
+                            class="sunda-tombol-marun inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[11px] font-semibold tracking-wide transition active:scale-95"
                         >
+                            <svg class="w-3.5 h-3.5 text-[#E7C87D]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+                            </svg>
                             <span>&#64;{{ $instagramWanita }}</span>
                         </a>
-                    @endif
-                </div>
-
-                @if (! $tanpaFoto && $undangan->urlFotoWanita())
-                    <div class="relative shrink-0 w-32 h-32 p-1.5 rounded-full border-2 border-[#C59B43] bg-[#5A1E1E]/5">
-                        <img
-                            src="{{ $undangan->urlFotoWanita() }}"
-                            alt="{{ $undangan->nama_lengkap_wanita }}"
-                            class="w-full h-full rounded-full object-cover object-top"
-                        >
-                        <span aria-hidden="true" class="pointer-events-none absolute -inset-1 rounded-full border border-dashed border-[#C59B43]/65"></span>
-                    </div>
-                @elseif ($tanpaFoto)
-                    <div class="w-16 h-16 rounded-full bg-[#5A1E1E] text-[#F3E5AB] border-2 border-[#C59B43] flex items-center justify-center font-serif text-2xl font-bold">
-                        {{ $undangan->inisialWanita() }}
                     </div>
                 @endif
             </div>
@@ -116,7 +312,69 @@
     </div>
 </section>
 
-{{-- SEKSI 4: HITUNG MUNDUR — 4 MEDALI EMAS BULAT DI ATAS PITA MARUN --}}
+{{-- SEKSI 4A: SLIDESHOW FOTO TRANSISI OTOMATIS MENUJU SAVE THE DATE --}}
+@if ($fotoGaleriSlideshow->isNotEmpty())
+<div
+    data-slideshow-sunda
+    x-data="{
+        slideAktif: 0,
+        jumlah: {{ $fotoGaleriSlideshow->count() }},
+        timerSlide: null,
+        mulai() {
+            if (this.jumlah > 1) {
+                clearInterval(this.timerSlide);
+                this.timerSlide = setInterval(() => {
+                    this.slideAktif = (this.slideAktif + 1) % this.jumlah;
+                }, 4000);
+            }
+        },
+        pilihSlide(idx) {
+            this.slideAktif = idx;
+            this.mulai();
+        },
+        init() {
+            this.mulai();
+        }
+    }"
+    class="relative h-80 sm:h-[21rem] w-full overflow-hidden bg-[#6E2C2C]"
+>
+    @foreach ($fotoGaleriSlideshow as $idxSlide => $urlSlide)
+        <img
+            src="{{ $urlSlide }}"
+            alt="Momen Bahagia {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}"
+            loading="lazy"
+            decoding="async"
+            class="absolute inset-0 w-full h-full object-cover object-top"
+            :class="slideAktif === {{ $idxSlide }} ? 'opacity-95 scale-105 z-[2]' : 'opacity-0 scale-100 z-[1]'"
+            style="transition: opacity 1.2s ease, transform 5.4s ease;"
+        >
+    @endforeach
+
+    {{-- Gradasi Halus Menyatu dari Latar Gading di Atas ke Blok Marun Save The Date di Bawah --}}
+    <div
+        aria-hidden="true"
+        class="pointer-events-none absolute inset-0 z-10"
+        style="background: linear-gradient(180deg, rgba(250,244,232,0.52) 0%, rgba(90,30,30,0.08) 22%, rgba(90,30,30,0.18) 50%, rgba(110,44,44,0.68) 78%, #6E2C2C 100%);"
+    ></div>
+
+    {{-- Indikator Titik Emas Halus (Bisa Diklik untuk Ganti Foto Manual) --}}
+    @if ($fotoGaleriSlideshow->count() > 1)
+        <div class="absolute bottom-4 inset-x-0 z-20 flex items-center justify-center gap-1.5">
+            @foreach ($fotoGaleriSlideshow as $idxTitik => $urlTitik)
+                <button
+                    type="button"
+                    @click="pilihSlide({{ $idxTitik }})"
+                    aria-label="Lihat foto momen {{ $idxTitik + 1 }}"
+                    class="h-1.5 rounded-full transition-all duration-500 cursor-pointer"
+                    :class="slideAktif === {{ $idxTitik }} ? 'w-6 bg-[#E7C87D] shadow-[0_0_10px_rgba(231,200,125,0.85)]' : 'w-1.5 bg-[#FAF4E8]/45 hover:bg-[#FAF4E8]/75'"
+                ></button>
+            @endforeach
+        </div>
+    @endif
+</div>
+@endif
+
+{{-- SEKSI 4B: HITUNG MUNDUR — 4 MEDALI EMAS BULAT DI ATAS PITA MARUN --}}
 @if ($undangan->fiturAktif('hitung_mundur') && $isoTarget)
 <section
     data-layout-countdown="priangan"
@@ -132,7 +390,7 @@
         },
         init() { this.perbarui(); setInterval(() => this.perbarui(), 1000); }
     }"
-    class="relative bg-gradient-to-b from-[#6E2C2C] to-[#4B1818] text-[#FAF4E8] px-5 py-12 text-center overflow-hidden"
+    class="relative bg-gradient-to-b from-[#6E2C2C] to-[#4B1818] shadow-[0_-2px_0_0_#6E2C2C] text-[#FAF4E8] px-5 pt-8 pb-12 text-center overflow-hidden"
 >
     <div class="max-w-md mx-auto space-y-5">
         <p class="text-[10px] font-bold uppercase tracking-[0.35em] text-[#E7C87D]">Waktos Nu Diantos-antos</p>
@@ -164,68 +422,123 @@
 </section>
 @endif
 
-{{-- SEKSI 5: RANGKAIAN ACARA — PIAGAM PITA MARUN PRIANGAN --}}
+{{-- SEKSI 5: RANGKAIAN ACARA — PIAGAM ELEGAN PRIANGAN (BERSIH, BERSAHAJA & MEWAH) --}}
 @if ($undangan->daftarAcara->isNotEmpty())
 <section
     data-layout-acara="priangan"
-    class="relative px-4 py-12 overflow-hidden"
+    class="relative px-4 py-14 overflow-hidden"
 >
     <div class="max-w-md mx-auto space-y-6">
-        <div class="fx-rise text-center space-y-1">
-            <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#8E6620]">Waktos &amp; Tempat</p>
-            <h2 class="font-serif text-3xl font-bold text-[#5A1E1E]">Rangkaian Acara</h2>
+        {{-- Tajuk Seksi Bersih & Terukur --}}
+        <div class="fx-rise text-center space-y-1.5">
+            <div class="flex items-center justify-center gap-2.5">
+                <span aria-hidden="true" class="h-px w-8 bg-gradient-to-r from-transparent to-[#C59B43]"></span>
+                <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#8E6620]">
+                    Waktos &amp; Tempat
+                </p>
+                <span aria-hidden="true" class="h-px w-8 bg-gradient-to-l from-transparent to-[#C59B43]"></span>
+            </div>
+            <h2 class="font-serif text-[2rem] sm:text-[2.15rem] font-bold leading-tight text-[#5A1E1E]">
+                Rangkaian Acara
+            </h2>
         </div>
 
-        @foreach ($undangan->daftarAcara as $acara)
-            <article class="fx-scale-in rounded-3xl bg-[#FFFBF4] border-2 border-[#C59B43]/65 overflow-hidden shadow-xl kartu-3d">
-                {{-- Header Pita Marun-Emas --}}
-                <div class="bg-[#5A1E1E] text-[#FAF4E8] px-5 py-4 text-center border-b-2 border-[#C59B43]">
-                    <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-[#E7C87D]">
-                        {{ $acara->tanggal_acara->locale('id')->translatedFormat('l') }}
-                    </p>
-                    <h3 class="mt-0.5 font-serif text-2xl font-bold text-white">
-                        {{ $acara->nama_acara }}
-                    </h3>
-                </div>
+        <div class="space-y-5">
+            @foreach ($undangan->daftarAcara as $acara)
+                @php
+                    $nomorProsesi = str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT);
+                    $kelasGerakAcara = $loop->even ? 'fx-slide-right' : 'fx-slide-left';
+                @endphp
 
-                {{-- Isi Piagam --}}
-                <div class="px-5 py-6 text-center space-y-3 text-[#4A2020]">
-                    <div class="inline-flex items-center gap-3 rounded-2xl bg-[#FAF4E8] border border-[#C59B43]/50 px-4 py-2">
-                        <span class="font-serif text-3xl font-bold text-[#5A1E1E]">{{ $acara->tanggal_acara->format('d') }}</span>
-                        <div class="text-left leading-tight">
-                            <p class="text-xs font-bold uppercase text-[#5A1E1E]">{{ $acara->tanggal_acara->locale('id')->translatedFormat('F Y') }}</p>
-                            <p class="text-[11px] font-semibold text-[#8E6620]">
-                                {{ \Illuminate\Support\Str::substr($acara->waktu_mulai, 0, 5) }}
-                                @if ($acara->waktu_selesai)
-                                    - {{ \Illuminate\Support\Str::substr($acara->waktu_selesai, 0, 5) }}
-                                @else
-                                    - Selesai
-                                @endif
-                                {{ $acara->zona_waktu }}
+                <article class="{{ $kelasGerakAcara }} relative rounded-[1.75rem] bg-[#FFFBF4] border border-[#C59B43]/70 overflow-hidden shadow-[0_18px_42px_-16px_rgba(74,23,23,0.24)] kartu-3d">
+                    {{-- Header Pita Marun Rapi & Berkelas --}}
+                    <div class="relative bg-gradient-to-b from-[#602121] to-[#4A1717] px-6 py-5 text-center text-[#FAF4E8] border-b border-[#C59B43]/65">
+                        <span aria-hidden="true" class="pointer-events-none absolute top-2.5 left-2.5 h-3 w-3 border-t border-l border-[#E7C87D]/55 rounded-tl-sm"></span>
+                        <span aria-hidden="true" class="pointer-events-none absolute top-2.5 right-2.5 h-3 w-3 border-t border-r border-[#E7C87D]/55 rounded-tr-sm"></span>
+
+                        <p class="text-[9.5px] font-bold uppercase tracking-[0.32em] text-[#E7C87D]">
+                            Prosesi {{ $nomorProsesi }} &bull; {{ $acara->tanggal_acara->locale('id')->translatedFormat('l') }}
+                        </p>
+                        <h3 class="mt-1 font-kaligrafi text-[2.4rem] sm:text-[2.65rem] leading-[1.08] text-[#FFFDF8]">
+                            {{ $acara->nama_acara }}
+                        </h3>
+                    </div>
+
+                    {{-- Badan Piagam Lega & Rapi Tanpa Ornamen Berlebihan --}}
+                    <div class="px-6 py-7 text-center text-[#4A2020] space-y-5">
+                        {{-- Baris Tanggal & Waktu 2 Kolom Simetris --}}
+                        <div class="flex items-center justify-center gap-5">
+                            <div class="flex items-center gap-2.5 text-left">
+                                <span class="font-serif text-[2.45rem] font-bold leading-none text-[#5A1E1E]">
+                                    {{ $acara->tanggal_acara->format('d') }}
+                                </span>
+                                <div class="leading-tight">
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.12em] text-[#5A1E1E]">
+                                        {{ $acara->tanggal_acara->locale('id')->translatedFormat('F') }}
+                                    </p>
+                                    <p class="text-[11px] font-semibold tracking-[0.16em] text-[#8E6620]">
+                                        {{ $acara->tanggal_acara->format('Y') }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <span aria-hidden="true" class="h-9 w-px bg-[#C59B43]/45"></span>
+
+                            <div class="text-left leading-tight">
+                                <p class="text-[9.5px] font-bold uppercase tracking-[0.22em] text-[#8E6620]">
+                                    Pukul
+                                </p>
+                                <p class="mt-0.5 text-xs sm:text-[13px] font-bold text-[#5A1E1E]">
+                                    {{ \Illuminate\Support\Str::substr($acara->waktu_mulai, 0, 5) }}
+                                    @if ($acara->waktu_selesai)
+                                        &ndash; {{ \Illuminate\Support\Str::substr($acara->waktu_selesai, 0, 5) }}
+                                    @else
+                                        &ndash; Selesai
+                                    @endif
+                                    <span class="font-semibold text-[#8E6620]">{{ $acara->zona_waktu }}</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        {{-- Garis Pemisah Emas Halus --}}
+                        <div class="flex items-center justify-center gap-3 px-10" aria-hidden="true">
+                            <span class="h-px flex-1 bg-gradient-to-r from-transparent to-[#C59B43]/55"></span>
+                            <span class="w-1.5 h-1.5 rotate-45 bg-[#C59B43]"></span>
+                            <span class="h-px flex-1 bg-gradient-to-l from-transparent to-[#C59B43]/55"></span>
+                        </div>
+
+                        {{-- Lokasi Acara Bersih --}}
+                        <div class="space-y-1.5">
+                            <svg class="w-4 h-4 mx-auto text-[#B58931]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z"/>
+                            </svg>
+                            <p class="font-serif text-base sm:text-[1.08rem] font-bold text-[#5A1E1E] leading-snug">
+                                {{ $acara->nama_tempat }}
+                            </p>
+                            <p class="text-xs sm:text-[13px] text-[#4A2020]/75 leading-relaxed max-w-[275px] mx-auto">
+                                {{ $acara->alamat_lengkap }}
                             </p>
                         </div>
-                    </div>
 
-                    <div class="pt-1 space-y-1">
-                        <p class="font-serif text-base font-bold text-[#5A1E1E]">{{ $acara->nama_tempat }}</p>
-                        <p class="text-xs text-[#4A2020]/75 leading-relaxed max-w-xs mx-auto">{{ $acara->alamat_lengkap }}</p>
+                        @if ($acara->link_maps)
+                            <div class="pt-1">
+                                <a
+                                    href="{{ $acara->link_maps }}"
+                                    target="_blank"
+                                    rel="noopener"
+                                    class="sunda-tombol-marun inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] transition active:scale-95"
+                                >
+                                    <svg class="w-3.5 h-3.5 text-[#E7C87D]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z"/>
+                                    </svg>
+                                    <span>Buka Google Maps</span>
+                                </a>
+                            </div>
+                        @endif
                     </div>
-
-                    @if ($acara->link_maps)
-                        <div class="pt-2">
-                            <a
-                                href="{{ $acara->link_maps }}"
-                                target="_blank"
-                                rel="noopener"
-                                class="sunda-tombol-marun inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-xs font-bold uppercase tracking-wider transition"
-                            >
-                                <span>Buka Google Maps</span>
-                            </a>
-                        </div>
-                    @endif
-                </div>
-            </article>
-        @endforeach
+                </article>
+            @endforeach
+        </div>
     </div>
 </section>
 @endif

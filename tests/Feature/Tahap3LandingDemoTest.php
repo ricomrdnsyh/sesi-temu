@@ -133,15 +133,33 @@ class Tahap3LandingDemoTest extends TestCase
     {
         $this->buatTemaBawaan();
 
+        // Halaman utama live demo menampilkan pratinjau perangkat (Handphone / Tablet / Desktop)
         $this->get('/demo/rustic-floral?to=Andi+Wijaya')
+            ->assertOk()
+            ->assertSee('Pratinjau Tema')
+            ->assertSee('Rustic Floral')
+            ->assertSee('Handphone')
+            ->assertSee('Tablet')
+            ->assertSee('Desktop')
+            ->assertSee('data-kanvas-demo', false)
+            ->assertSee('kanvas=1', false)
+            ->assertDontSee('Pilih Desain Font Demo');
+
+        // Kanvas undangan di dalam pratinjau tetap merender konten demo lengkap tanpa bar lama
+        $this->get('/demo/rustic-floral?kanvas=1&to=Andi+Wijaya')
             ->assertOk()
             ->assertSee('Dimas')
             ->assertSee('Rani')
             ->assertSee('Andi Wijaya')
-            ->assertSee('Pakai Tema Ini');
+            ->assertDontSee('<div data-bar-pratinjau', false)
+            ->assertDontSee('Pilih Desain Font Demo');
 
-        $this->get('/demo/adat-jawa')->assertOk()->assertSee('Budi Santoso & Partner');
-        $this->get('/demo/islami-syari')->assertOk()->assertSee('Budi Santoso & Partner');
+        $this->get('/demo/adat-jawa?kanvas=1')
+            ->assertOk()
+            ->assertSee('Budi Santoso & Partner')
+            ->assertDontSee('Lewati Intro')
+            ->assertDontSee('<div data-bar-pratinjau', false);
+        $this->get('/demo/islami-syari?kanvas=1')->assertOk()->assertSee('Budi Santoso & Partner');
         $this->get('/demo/tema-tidak-ada')->assertNotFound();
 
         $this->assertDatabaseCount('undangan', 0);
@@ -151,21 +169,21 @@ class Tahap3LandingDemoTest extends TestCase
     {
         $this->seed(DatabaseSeeder::class);
 
-        $this->get('/demo/editorial-monokrom?to=Ibu+Maya&font=editorial_gilda')
+        $this->get('/demo/editorial-monokrom?kanvas=1&to=Ibu+Maya&font=editorial_gilda')
             ->assertOk()
             ->assertSee('Ibu Maya')
             ->assertSee('Gilda+Display', false)
             ->assertSee('Editorial Monokrom');
 
-        $this->get('/demo/luxury-noir?tf=1')
+        $this->get('/demo/luxury-noir?kanvas=1&tf=1')
             ->assertOk()
-            ->assertSee('Mode: Tanpa Foto (TF)')
+            ->assertDontSee('<div data-bar-pratinjau', false)
             ->assertDontSee('mempelai-pria.webp')
             ->assertDontSee('galeri-1.webp');
 
-        $this->get('/demo/velvet-garden')->assertOk()->assertSee('animasi-melayang');
-        $this->get('/demo/sunda-heritage')->assertOk()->assertSee('Sampurasun');
-        $this->get('/demo/islamic-heavenly')->assertOk()->assertSee('animasi-bintang');
+        $this->get('/demo/velvet-garden?kanvas=1')->assertOk()->assertSee('animasi-melayang');
+        $this->get('/demo/sunda-heritage?kanvas=1')->assertOk()->assertSee('Sampurasun');
+        $this->get('/demo/islamic-heavenly?kanvas=1')->assertOk()->assertSee('animasi-bintang');
     }
 
     public function test_footer_beranda_menampilkan_tautan_kebijakan_privasi_dan_syarat_ketentuan(): void

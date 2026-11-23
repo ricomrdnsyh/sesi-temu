@@ -137,7 +137,15 @@ class LogoBrandingTest extends TestCase
         $this->get('/demo/rustic-floral')
             ->assertOk()
             ->assertSee('favicon.png', false)
-            ->assertSee('logo/logo-horizontal.webp', false)
+            ->assertSee('Pratinjau Tema')
+            ->assertSee('Handphone')
+            ->assertSee('Tablet')
+            ->assertSee('Desktop');
+
+        $this->get('/demo/rustic-floral?kanvas=1')
+            ->assertOk()
+            ->assertSee('favicon.png', false)
+            ->assertDontSee('<div data-bar-pratinjau', false)
             ->assertSee('logo/logo-gelap.webp', false)
             ->assertSee('Made with', false)
             ->assertSee('Sesi Temu', false);

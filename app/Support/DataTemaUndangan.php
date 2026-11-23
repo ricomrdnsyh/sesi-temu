@@ -55,6 +55,7 @@ class DataTemaUndangan
         $adaTurutMengundang = ! empty($turutWanita) || ! empty($turutPria);
 
         $galeriPanggungKanan = collect();
+        $fotoGaleriSlideshow = collect();
         if (! $tanpaFoto) {
             $galeriPanggungKanan = $undangan->daftarGaleri
                 ->take(3)
@@ -65,6 +66,12 @@ class DataTemaUndangan
                 ->filter(static fn($item) => ! empty($item['url']))
                 ->values();
 
+            $fotoGaleriSlideshow = $undangan->daftarGaleri
+                ->take(4)
+                ->map(static fn($item) => $item->urlFoto())
+                ->filter()
+                ->values();
+
             if ($galeriPanggungKanan->isEmpty()) {
                 foreach ([$urlFotoPembuka, $urlFotoPenutup] as $fotoAlternatif) {
                     if (! empty($fotoAlternatif)) {
@@ -72,6 +79,14 @@ class DataTemaUndangan
                             'url' => $fotoAlternatif,
                             'keterangan' => "{$undangan->nama_panggilan_pria} & {$undangan->nama_panggilan_wanita}",
                         ]);
+                    }
+                }
+            }
+
+            if ($fotoGaleriSlideshow->isEmpty()) {
+                foreach ([$urlFotoPembuka, $urlFotoPenutup] as $fotoAlternatif) {
+                    if (! empty($fotoAlternatif)) {
+                        $fotoGaleriSlideshow->push($fotoAlternatif);
                     }
                 }
             }
@@ -150,10 +165,11 @@ class DataTemaUndangan
             'turutPria' => $turutPria,
             'adaTurutMengundang' => $adaTurutMengundang,
             'galeriPanggungKanan' => $galeriPanggungKanan,
+            'fotoGaleriSlideshow' => $fotoGaleriSlideshow,
             'daftarUcapanAwal' => $daftarUcapanAwal,
             'isoTarget' => $isoTarget,
             'googleCalUrl' => $googleCalUrl,
-            'tampilBarDemo' => $modeDemo && ! request()->boolean('embed'),
+            'tampilBarDemo' => false,
             'modeDemo' => $modeDemo,
             'modePratinjau' => $modePratinjau,
         ];

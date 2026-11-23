@@ -144,7 +144,7 @@
     <div data-tata-letak-tema class="min-h-screen w-full lg:flex">
         {{-- PANGGUNG VISUAL DESKTOP KIRI (BERSIH & SEJAJAR TENGAH) --}}
         <aside data-panggung-3d
-            class="hidden lg:flex lg:flex-1 min-w-0 lg:sticky lg:top-0 lg:h-screen relative overflow-hidden select-none panggung-3d items-center justify-center {{ !empty($modeDemo) && !request()->boolean('embed') ? 'pt-14' : '' }}">
+            class="hidden lg:flex lg:flex-1 min-w-0 lg:sticky lg:top-0 lg:h-screen relative overflow-hidden select-none panggung-3d items-center justify-center">
             <div class="lapis-3d absolute -inset-4 pointer-events-none" style="--depth: -12px; --pz: -36px;">
                 <img src="{{ $latarUtamaUrl }}" alt="Ilustrasi {{ $undangan->tema?->nama_tema }}"
                     class="w-full h-full object-cover object-center scale-105 opacity-42 animasi-nafas {{ $modeMonokrom ? 'grayscale' : '' }}">
@@ -214,14 +214,14 @@
 
             @if ($ornamenUrl)
                 <img src="{{ $ornamenUrl }}" alt=""
-                    class="pointer-events-none fixed lg:hidden {{ !empty($modeDemo) && !request()->boolean('embed') ? 'top-16' : 'top-3' }} {{ $ornamenGantung ? 'left-3 w-10 sm:w-12' : 'left-2 w-16 sm:w-20' }} opacity-65 z-20 drop-shadow-lg animasi-ayun-3d">
+                    class="pointer-events-none fixed lg:hidden top-3 {{ $ornamenGantung ? 'left-3 w-10 sm:w-12' : 'left-2 w-16 sm:w-20' }} opacity-65 z-20 drop-shadow-lg animasi-ayun-3d">
                 <img src="{{ $ornamenUrl }}" alt=""
-                    class="pointer-events-none fixed lg:hidden {{ !empty($modeDemo) && !request()->boolean('embed') ? 'top-16' : 'top-3' }} {{ $ornamenGantung ? 'right-3 w-10 sm:w-12' : 'right-2 w-16 sm:w-20' }} opacity-65 z-20 drop-shadow-lg animasi-ayun-3d-balik">
+                    class="pointer-events-none fixed lg:hidden top-3 {{ $ornamenGantung ? 'right-3 w-10 sm:w-12' : 'right-2 w-16 sm:w-20' }} opacity-65 z-20 drop-shadow-lg animasi-ayun-3d-balik">
             @endif
 
             {{-- SAMPUL PEMBUKA DENGAN TRANSISI FADE HALUS (TANPA EFEK BUKA BUKU / BELAH PINTU) --}}
             <section data-transisi-sampul="fade-halus"
-                class="tirai-fade-halus fixed inset-0 mx-auto h-dvh w-full lg:w-[445px] xl:w-[475px] z-40 {{ !empty($modeDemo) && !request()->boolean('embed') ? 'pt-14' : '' }}"
+                class="tirai-fade-halus fixed inset-0 mx-auto h-dvh w-full lg:w-[445px] xl:w-[475px] z-40"
                 style="height: 100dvh;" :class="undanganTerbuka ? 'tirai-terbuka pointer-events-none' : ''">
                 <div class="relative w-full h-full flex flex-col justify-between">
                     <div class="absolute inset-0 overflow-hidden shadow-2xl">
@@ -323,7 +323,7 @@
 
             {{-- KONTEN UTAMA UNDANGAN (ARSITEKTUR MODULAR 9 TEMA UNIK + 3D MOTION SCROLL) --}}
             <main data-panggung-3d
-                class="panggung-3d relative z-10 {{ !empty($modeDemo) && !request()->boolean('embed') ? 'pt-14' : '' }}">
+                class="panggung-3d relative z-10">
                 {{-- 1 & 2. Hero Diorama 3D Multi-Lapis + Permukaan Pembuka & Ayat --}}
                 @include('komponen-undangan.bagian-hero-dan-ayat')
 
@@ -400,7 +400,7 @@
 
         {{-- PANGGUNG VISUAL DESKTOP KANAN (BERSIH & SEJAJAR TENGAH) --}}
         <aside data-panggung-3d
-            class="hidden lg:flex lg:flex-1 min-w-0 lg:sticky lg:top-0 lg:h-screen relative overflow-hidden select-none panggung-3d items-center justify-center {{ !empty($modeDemo) && !request()->boolean('embed') ? 'pt-14' : '' }}">
+            class="hidden lg:flex lg:flex-1 min-w-0 lg:sticky lg:top-0 lg:h-screen relative overflow-hidden select-none panggung-3d items-center justify-center">
             <div class="lapis-3d absolute -inset-4 pointer-events-none" style="--depth: -12px; --pz: -36px;">
                 <img src="{{ $latarUtamaUrl }}" alt=""
                     class="w-full h-full object-cover object-center scale-105 opacity-42 animasi-nafas {{ $modeMonokrom ? 'grayscale' : '' }}">

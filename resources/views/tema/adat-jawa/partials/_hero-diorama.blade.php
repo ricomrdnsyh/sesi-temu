@@ -1,18 +1,25 @@
 {{-- SEKSI 2: PANGGUNG HERO VIDEO MOTION ADAT JAWA KERATON (+ DIORAMA 3D FALLBACK / LATAR CUSTOM) --}}
 @php
     $pakaiVideoHeroJawa = empty($urlFotoLatarCustom);
+    $syaratFallbackAktif = $pakaiVideoHeroJawa ? '(undanganTerbuka && videoHeroGagal)' : 'undanganTerbuka';
 @endphp
 
 <section
     data-diorama-3d="{{ $tierAktif }}"
-    class="jawa-hero-layar-penuh {{ $tampilBarDemo ? 'dengan-bar-demo' : '' }} relative w-full overflow-hidden diorama-panggung-3d bg-[#D9C3B0]"
+    class="jawa-hero-layar-penuh {{ $tampilBarDemo ? 'dengan-bar-demo' : '' }} relative w-full overflow-hidden diorama-panggung-3d {{ $pakaiVideoHeroJawa ? 'bg-[#3B2316]' : 'bg-[#D9C3B0]' }}"
 >
-    <div class="relative w-full h-full diorama-kamera-3d">
-        {{-- LAPISAN FALLBACK DIORAMA 3D BERLAPIS (AKTIF BILA LATAR CUSTOM / VIDEO GAGAL / REDUCED MOTION) --}}
+    <div
+        class="relative w-full h-full diorama-kamera-3d"
+        @if ($pakaiVideoHeroJawa)
+            :class="!videoHeroGagal ? 'jawa-kamera-video-aktif' : ''"
+        @endif
+    >
+        {{-- LAPISAN FALLBACK DIORAMA 3D BERLAPIS (HANYA DIRENDER AKTIF BILA LATAR CUSTOM / VIDEO GAGAL) --}}
         <div
             class="absolute inset-0 w-full h-full {{ $pakaiVideoHeroJawa ? 'z-0' : 'z-10' }}"
             @if ($pakaiVideoHeroJawa)
-                :class="videoHeroGagal ? 'opacity-100' : 'opacity-0 pointer-events-none'"
+                x-show="videoHeroGagal"
+                x-cloak
             @endif
         >
             {{-- Z-0: Lukisan Hutan & Pegunungan Vintage / Foto Latar Custom --}}
@@ -20,8 +27,9 @@
                 <img
                     src="{{ $urlFotoLatar }}"
                     alt="Latar Hutan Adat Jawa Keraton"
+                    @if ($pakaiVideoHeroJawa) loading="lazy" decoding="async" @endif
                     class="w-full h-full object-cover object-center"
-                    :class="undanganTerbuka ? 'jawa-latar-dolly' : ''"
+                    :class="{{ $syaratFallbackAktif }} ? 'jawa-latar-dolly' : ''"
                 >
             </div>
 
@@ -54,7 +62,7 @@
             {{-- Z-2: Bingkai Ukiran Emas Keraton --}}
             <div
                 class="absolute top-[4%] inset-x-3 sm:inset-x-5 h-[69%] z-20 flex items-center justify-center"
-                :class="undanganTerbuka ? 'jawa-bingkai-masuk' : 'opacity-0'"
+                :class="{{ $syaratFallbackAktif }} ? 'jawa-bingkai-masuk' : 'opacity-0'"
             >
                 <div class="relative w-full max-w-[355px] aspect-[828/1129] flex items-center justify-center">
                     <div
@@ -65,6 +73,7 @@
                         src="{{ $asetJawa['bingkaiUkiran'] }}"
                         alt=""
                         aria-hidden="true"
+                        @if ($pakaiVideoHeroJawa) loading="lazy" decoding="async" @endif
                         class="pointer-events-none absolute inset-0 w-full h-full object-contain z-10"
                     >
                 </div>
@@ -75,54 +84,58 @@
                 src="{{ $asetJawa['janur'] }}"
                 alt=""
                 aria-hidden="true"
+                @if ($pakaiVideoHeroJawa) loading="lazy" decoding="async" @endif
                 class="pointer-events-none absolute bottom-[15%] -left-5 w-32 sm:w-40 z-30"
-                :class="undanganTerbuka ? 'jawa-janur-kiri' : 'opacity-0'"
+                :class="{{ $syaratFallbackAktif }} ? 'jawa-janur-kiri' : 'opacity-0'"
             >
             <img
                 src="{{ $asetJawa['janur'] }}"
                 alt=""
                 aria-hidden="true"
+                @if ($pakaiVideoHeroJawa) loading="lazy" decoding="async" @endif
                 class="pointer-events-none absolute bottom-[15%] -right-5 w-32 sm:w-40 z-30"
-                :class="undanganTerbuka ? 'jawa-janur-kanan' : 'opacity-0'"
+                :class="{{ $syaratFallbackAktif }} ? 'jawa-janur-kanan' : 'opacity-0'"
             >
             <div
                 class="pointer-events-none absolute bottom-[5%] inset-x-0 flex justify-center z-30"
-                :class="undanganTerbuka ? 'jawa-pendopo-masuk' : 'opacity-0'"
+                :class="{{ $syaratFallbackAktif }} ? 'jawa-pendopo-masuk' : 'opacity-0'"
             >
-                <img src="{{ $asetJawa['pendopo'] }}" alt="Pendopo Joglo Keraton" class="w-[86%] max-w-[380px]">
+                <img src="{{ $asetJawa['pendopo'] }}" alt="Pendopo Joglo Keraton" @if ($pakaiVideoHeroJawa) loading="lazy" decoding="async" @endif class="w-[86%] max-w-[380px]">
             </div>
             <img
                 src="{{ $asetJawa['bungaDepan'] }}"
                 alt=""
                 aria-hidden="true"
+                @if ($pakaiVideoHeroJawa) loading="lazy" decoding="async" @endif
                 class="pointer-events-none absolute -bottom-1 inset-x-0 w-full z-40"
-                :class="undanganTerbuka ? 'jawa-bunga-masuk' : 'opacity-0'"
+                :class="{{ $syaratFallbackAktif }} ? 'jawa-bunga-masuk' : 'opacity-0'"
             >
             <img
                 src="{{ $asetJawa['gununganBuka'] }}"
                 alt=""
                 aria-hidden="true"
+                @if ($pakaiVideoHeroJawa) loading="lazy" decoding="async" @endif
                 class="pointer-events-none absolute top-[6%] -left-10 w-[76%] max-w-[340px] z-50"
-                :class="undanganTerbuka ? 'jawa-sapu-kiri' : 'opacity-0'"
+                :class="{{ $syaratFallbackAktif }} ? 'jawa-sapu-kiri' : 'opacity-0'"
             >
             <img
                 src="{{ $asetJawa['gununganBuka'] }}"
                 alt=""
                 aria-hidden="true"
+                @if ($pakaiVideoHeroJawa) loading="lazy" decoding="async" @endif
                 class="pointer-events-none absolute top-[6%] -right-10 w-[76%] max-w-[340px] z-50"
-                :class="undanganTerbuka ? 'jawa-sapu-kanan' : 'opacity-0'"
+                :class="{{ $syaratFallbackAktif }} ? 'jawa-sapu-kanan' : 'opacity-0'"
             >
         </div>
 
-        {{-- LAPISAN VIDEO MOTION HD ADAT JAWA KERATON (00:00 GUNUNGAN -> 00:04 JOGLO & KUPU -> 00:13 BINGKAI EMAS) --}}
+        {{-- LAPISAN VIDEO MOTION HD ADAT JAWA KERATON (PRE-WARMED DI DETIK 0.72 -> GUNUNGAN LANGSUNG MEMBUKA TANPA JEDA) --}}
         @if ($pakaiVideoHeroJawa)
             <video
                 x-ref="heroVideo"
                 x-show="!videoHeroGagal"
                 src="{{ $asetJawa['videoHero'] }}"
-                poster="{{ $asetJawa['latarHutan'] }}"
+                data-start-at="0.72"
                 data-reveal-at="13.15"
-                data-settled-at="14.5"
                 muted
                 playsinline
                 webkit-playsinline
@@ -130,7 +143,8 @@
                 x-on:timeupdate="pantauVideoHero($event)"
                 x-on:ended="selesaiVideoHero()"
                 x-on:error="videoHeroGagal = true; teksHeroTampil = true; videoHeroSedangIntro = false;"
-                class="absolute inset-0 z-10 w-full h-full object-cover object-center pointer-events-none select-none"
+                style="transform: translateZ(0);"
+                class="absolute inset-0 z-10 w-full h-full object-cover object-center bg-[#3B2316] pointer-events-none select-none"
             ></video>
         @endif
 
@@ -170,26 +184,8 @@
             </div>
         </div>
 
-        {{-- KONTROL HALUS: LEWATI INTRO (SAAT VIDEO 00:00–00:13) & PUTAR ULANG (SETELAH SELESAI) --}}
+        {{-- KONTROL HALUS: PUTAR ULANG ANIMASI PEMBUKA (SETELAH VIDEO SELESAI) --}}
         @if ($pakaiVideoHeroJawa)
-            <div
-                x-show="undanganTerbuka && videoHeroSedangIntro && !teksHeroTampil && !videoHeroGagal"
-                x-cloak
-                x-transition.opacity.duration.300ms
-                class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30"
-            >
-                <button
-                    type="button"
-                    @click="lewatiIntroVideo()"
-                    class="inline-flex items-center gap-1.5 rounded-full bg-[#2B180F]/75 backdrop-blur-md border border-[#D7BB83]/60 px-4 py-1.5 text-[10.5px] font-semibold uppercase tracking-[0.2em] text-[#F3E5AB] shadow-lg hover:bg-[#472A1C] active:scale-95 transition cursor-pointer"
-                >
-                    <span>Lewati Intro</span>
-                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="m9 18 6-6-6-6"/>
-                    </svg>
-                </button>
-            </div>
-
             <button
                 type="button"
                 x-show="undanganTerbuka && videoHeroSelesai && !videoHeroGagal"

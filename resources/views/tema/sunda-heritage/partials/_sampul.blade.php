@@ -1,7 +1,7 @@
-{{-- SAMPUL PEMBUKA SUNDA SIGER HERITAGE (FADE HALUS TANPA BUKA BUKU) --}}
+{{-- SAMPUL PEMBUKA SUNDA SIGER HERITAGE (GULIR KE ATAS 60FPS) --}}
 <section
     data-transisi-sampul="fade-halus"
-    class="tirai-fade-halus fixed inset-0 mx-auto h-dvh w-full lg:w-[460px] xl:w-[490px] z-40 {{ $tampilBarDemo ? 'pt-28 sm:pt-20 lg:pt-14' : '' }}"
+    class="tirai-fade-halus tirai-gulir-atas fixed inset-0 mx-auto h-dvh w-full lg:w-[460px] xl:w-[490px] z-40 {{ $tampilBarDemo ? 'pt-28 sm:pt-20 lg:pt-14' : '' }}"
     style="height: 100dvh;"
     :class="undanganTerbuka ? 'tirai-terbuka pointer-events-none' : ''"
 >
@@ -9,6 +9,8 @@
         <img
             src="{{ $pakaiFotoSampul ? $urlFotoSampul : $urlFotoLatar }}"
             alt="Sampul {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}"
+            fetchpriority="high"
+            decoding="sync"
             class="absolute inset-0 w-full h-full object-cover {{ $pakaiFotoSampul ? 'object-top scale-[1.02] animasi-nafas' : 'object-center scale-105 animasi-nafas' }}"
         >
 

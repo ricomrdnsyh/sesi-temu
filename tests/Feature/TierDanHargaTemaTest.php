@@ -140,10 +140,10 @@ class TierDanHargaTemaTest extends TestCase
             ->assertSee('Eksklusif')
             ->assertSee('Rp 119.000');
 
-        $this->get('/demo/luxury-noir')
+        $this->get('/demo/luxury-noir?kanvas=1')
             ->assertOk()
-            ->assertSee('Eksklusif')
-            ->assertSee('Rp 119.000');
+            ->assertSee('data-diorama-3d="eksklusif"', false)
+            ->assertDontSee('<div data-bar-pratinjau', false);
     }
 
     public function test_setiap_tier_dan_tema_merender_karakter_tata_letak_dan_animasi_berbeda(): void
@@ -151,19 +151,19 @@ class TierDanHargaTemaTest extends TestCase
         $this->seed(DatabaseSeeder::class);
 
         // Basic: bersih & ringan tanpa marquee/shimmer pada elemen kartu
-        $this->get('/demo/rustic-floral')
+        $this->get('/demo/rustic-floral?kanvas=1')
             ->assertOk()
             ->assertSee('animasi-melayang')
             ->assertDontSee('animasi-marquee flex')
             ->assertDontSee('shadow-lg efek-shimmer-kartu');
 
-        $this->get('/demo/islami-syari')
+        $this->get('/demo/islami-syari?kanvas=1')
             ->assertOk()
             ->assertSee('بِسْمِ اللّٰهِ')
             ->assertDontSee('shadow-lg efek-shimmer-kartu');
 
         // Premium: layout & animasi sampul berkarakter + marquee + timeline + scroll progress
-        $this->get('/demo/editorial-monokrom')
+        $this->get('/demo/editorial-monokrom?kanvas=1')
             ->assertOk()
             ->assertSee('01 / The Groom')
             ->assertSee('02 / The Bride')
@@ -171,39 +171,39 @@ class TierDanHargaTemaTest extends TestCase
             ->assertSee('scrollPersen')
             ->assertDontSee('shadow-lg efek-shimmer-kartu');
 
-        $this->get('/demo/adat-jawa')
+        $this->get('/demo/adat-jawa?kanvas=1')
             ->assertOk()
             ->assertSee('tirai-fade-halus')
             ->assertSee('jawa-bingkai-masuk')
             ->assertSee('jawa-sapu-kiri');
 
-        $this->get('/demo/sunda-heritage')
+        $this->get('/demo/sunda-heritage?kanvas=1')
             ->assertOk()
             ->assertSee('animasi-kelopak-3d')
             ->assertSee('animasi-awan')
             ->assertSee('tirai-fade-halus');
 
-        $this->get('/demo/royal-ivory')
+        $this->get('/demo/royal-ivory?kanvas=1')
             ->assertOk()
             ->assertSee('animasi-segel')
             ->assertSee('tirai-fade-halus');
 
         // Eksklusif: tirai sinematik + partikel kaya + orbit crest + shimmer kartu + galeri unggulan
-        $this->get('/demo/luxury-noir')
+        $this->get('/demo/luxury-noir?kanvas=1')
             ->assertOk()
             ->assertSee('animasi-debu-emas')
             ->assertSee('animasi-orbit')
             ->assertSee('efek-shimmer-kartu')
             ->assertSee('col-span-2 aspect-[16/10]');
 
-        $this->get('/demo/velvet-garden')
+        $this->get('/demo/velvet-garden?kanvas=1')
             ->assertOk()
             ->assertSee('animasi-kelopak-3d')
             ->assertSee('animasi-kunang')
             ->assertSee('animasi-melayang')
             ->assertSee('efek-shimmer-kartu');
 
-        $this->get('/demo/islamic-heavenly')
+        $this->get('/demo/islamic-heavenly?kanvas=1')
             ->assertOk()
             ->assertSee('animasi-bintang')
             ->assertSee('animasi-bintang-jatuh')
@@ -216,7 +216,7 @@ class TierDanHargaTemaTest extends TestCase
     {
         $this->seed(DatabaseSeeder::class);
 
-        $this->get('/demo/adat-jawa')
+        $this->get('/demo/adat-jawa?kanvas=1')
             ->assertOk()
             ->assertSee('Akmal')
             ->assertSee('Aisyah')
@@ -225,7 +225,7 @@ class TierDanHargaTemaTest extends TestCase
             ->assertSee('animasi-gulir-roda')
             ->assertDontSee('Dimas Pratama');
 
-        $this->get('/demo/editorial-monokrom')
+        $this->get('/demo/editorial-monokrom?kanvas=1')
             ->assertOk()
             ->assertSee('Arsen')
             ->assertSee('Kaira')
@@ -234,21 +234,21 @@ class TierDanHargaTemaTest extends TestCase
             ->assertDontSee('Akmal')
             ->assertDontSee('Pendopo Agung Royal Ambarrukmo');
 
-        $this->get('/demo/sunda-heritage')
+        $this->get('/demo/sunda-heritage?kanvas=1')
             ->assertOk()
             ->assertSee('Bagja')
             ->assertSee('Nenden')
             ->assertSee('Gedung Pendopo Kota Bandung')
             ->assertSee('sampul-sunda.webp');
 
-        $this->get('/demo/islami-syari')
+        $this->get('/demo/islami-syari?kanvas=1')
             ->assertOk()
             ->assertSee('Zayd')
             ->assertSee('Fatimah')
             ->assertSee('Masjid Istiqlal')
             ->assertSee('sampul-islami.webp');
 
-        $this->get('/demo/luxury-noir')
+        $this->get('/demo/luxury-noir?kanvas=1')
             ->assertOk()
             ->assertSee('Alvaro')
             ->assertSee('Clarissa')
@@ -265,9 +265,9 @@ class TierDanHargaTemaTest extends TestCase
                 ? 'aset-tema/adat-jawa/latar-hutan-jawa.webp'
                 : "aset-tema/{$slugTema}/latar-utama.webp";
 
-            $this->get("/demo/{$slugTema}?tf=1")
+            $this->get("/demo/{$slugTema}?kanvas=1&tf=1")
                 ->assertOk()
-                ->assertSee('Mode: Tanpa Foto (TF)')
+                ->assertDontSee('<div data-bar-pratinjau', false)
                 ->assertSee($latarDiharapkan)
                 ->assertDontSee('sampul-')
                 ->assertDontSee('mempelai-pria.webp')
