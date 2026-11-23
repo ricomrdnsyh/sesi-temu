@@ -357,11 +357,14 @@
                 </div>
             </div>
 
+            {{-- INTRO PEMBUKA BESPOKE SEBELUM SAMPUL --}}
+            @include('komponen-undangan.intro-pembuka')
+
             {{-- SAMPUL PEMBUKA FADE HALUS --}}
             @include('tema.adat-jawa.partials._sampul')
 
             {{-- KONTEN UTAMA 13 SEKSI ADAT JAWA KERATON --}}
-            <main data-panggung-3d class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
+            <main data-panggung-3d data-sinema-gsap="jawa" class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
                 @include('tema.adat-jawa.partials._hero-diorama')
                 @include('tema.adat-jawa.partials._konten-utama')
                 @include('tema.adat-jawa.partials._penutup-dan-rsvp')

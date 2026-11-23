@@ -4,16 +4,18 @@
     class="relative px-4 py-14 overflow-hidden"
 >
     <div class="max-w-md mx-auto space-y-7">
-        {{-- Tajuk Seksi Bermahkota Siger Sunda --}}
-        <div class="fx-rise text-center space-y-2 px-2">
-            <img
-                src="{{ $asetSunda['siger'] }}"
-                alt=""
-                loading="lazy"
-                decoding="async"
-                class="w-16 mx-auto drop-shadow-[0_6px_14px_rgba(90,30,30,0.28)] animasi-ayun-3d"
-            >
-            <div class="flex items-center justify-center gap-2.5 pt-0.5">
+        {{-- Tajuk Seksi Bermahkota Siger Sunda (Animasi Rinci Per Komponen) --}}
+        <div class="text-center space-y-2 px-2">
+            <div data-gsap="turun">
+                <img
+                    src="{{ $asetSunda['siger'] }}"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    class="w-16 mx-auto drop-shadow-[0_6px_14px_rgba(90,30,30,0.28)] animasi-ayun-3d"
+                >
+            </div>
+            <div data-gsap="mekar" class="flex items-center justify-center gap-2.5 pt-0.5">
                 <span aria-hidden="true" class="h-px w-8 bg-gradient-to-r from-transparent to-[#C59B43]"></span>
                 <span aria-hidden="true" class="w-1.5 h-1.5 rotate-45 bg-[#C59B43]"></span>
                 <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#8E6620]">
@@ -22,19 +24,19 @@
                 <span aria-hidden="true" class="w-1.5 h-1.5 rotate-45 bg-[#C59B43]"></span>
                 <span aria-hidden="true" class="h-px w-8 bg-gradient-to-l from-transparent to-[#C59B43]"></span>
             </div>
-            <h2 class="font-serif text-[2rem] sm:text-[2.2rem] font-bold leading-tight text-[#5A1E1E]">
+            <h2 data-gsap="naik" class="font-serif text-[2rem] sm:text-[2.2rem] font-bold leading-tight text-[#5A1E1E]">
                 Mempelai Berbahagia
             </h2>
-            <p class="text-xs sm:text-[13px] text-[#4A2020]/80 max-w-xs mx-auto leading-relaxed">
+            <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs sm:text-[13px] text-[#4A2020]/80 max-w-xs mx-auto leading-relaxed">
                 Kalayan nyuhunkeun rido sareng rahmat Gusti Nu Maha Suci, sim kuring nyanggakeun pangulem nikah:
             </p>
-            <svg viewBox="0 0 280 24" class="w-36 mx-auto pt-1 opacity-80" aria-hidden="true">
+            <svg data-gsap="garis" viewBox="0 0 280 24" class="w-36 mx-auto pt-1 opacity-80" aria-hidden="true">
                 <path d="M12 18 C36 4 68 4 92 14 C112 2 168 2 188 14 C212 4 244 4 268 18" fill="none" stroke="#C59B43" stroke-width="1.8" stroke-linecap="round"/>
             </svg>
         </div>
 
-        {{-- KARTU PANGANTEN ISTRI (PAVILIUN POTRET MARUN-EMAS PRIANGAN) --}}
-        <article class="fx-slide-left group relative rounded-[2rem] bg-[#FFFBF4] border-2 border-[#C59B43]/75 shadow-[0_24px_52px_-16px_rgba(74,23,23,0.34)] overflow-hidden kartu-3d">
+        {{-- KARTU PANGANTEN ISTRI (PAVILIUN POTRET MARUN-EMAS PRIANGAN — ANIMASI RINCI PER KOMPONEN) --}}
+        <article class="group relative rounded-[2rem] bg-[#FFFBF4] border-2 border-[#C59B43]/75 shadow-[0_24px_52px_-16px_rgba(74,23,23,0.34)] overflow-hidden kartu-3d">
             {{-- Panggung Atas Beludru Marun + Bingkai Ukiran Priangan + Bunga Kamelia & Anggrek --}}
             <div class="relative bg-gradient-to-b from-[#5F2222] via-[#4A1717] to-[#3B1414] px-5 pt-7 pb-11 overflow-hidden">
                 <img
@@ -68,7 +70,7 @@
                 </svg>
 
                 {{-- Potret Besar Panganten Istri di Dalam Bingkai Emas Priangan (780x1043) --}}
-                <div class="fx-scale-in relative z-10 mx-auto w-[220px] sm:w-[238px] aspect-[780/1043] flex items-center justify-center">
+                <div data-gsap="potret" class="relative z-10 mx-auto w-[220px] sm:w-[238px] aspect-[780/1043] flex items-center justify-center">
                     <div class="absolute inset-x-[13.5%] inset-y-[8.5%] rounded-[50%] overflow-hidden bg-[#2E0E0E] shadow-[0_14px_30px_rgba(16,4,4,0.65)]">
                         @if (! $tanpaFoto && $undangan->urlFotoWanita())
                             <img
@@ -104,12 +106,13 @@
                     aria-hidden="true"
                     loading="lazy"
                     decoding="async"
+                    data-gsap="naik"
                     class="pointer-events-none absolute -bottom-2 inset-x-0 w-full z-20 drop-shadow-[0_-6px_14px_rgba(24,6,6,0.45)]"
                 >
             </div>
 
             {{-- Pita Gelar Panganten Emas Bertengger di Sambungan Panggung --}}
-            <div class="relative z-30 -mt-4 flex justify-center">
+            <div data-gsap="mekar" class="relative z-30 -mt-4 flex justify-center">
                 <span class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#DFC078] via-[#C59B43] to-[#DFC078] px-4 py-1 text-[10px] font-bold uppercase tracking-[0.26em] text-[#3B1414] border border-[#FFF7E2]/70 shadow-[0_8px_20px_-6px_rgba(59,20,20,0.55)]">
                     <span aria-hidden="true" class="w-1 h-1 rotate-45 bg-[#5A1E1E]"></span>
                     <span>Panganten Istri</span>
@@ -122,31 +125,31 @@
                 <span aria-hidden="true" class="pointer-events-none absolute bottom-3 left-3 h-4 w-4 border-b border-l border-[#C59B43]/60 rounded-bl-md"></span>
                 <span aria-hidden="true" class="pointer-events-none absolute bottom-3 right-3 h-4 w-4 border-b border-r border-[#C59B43]/60 rounded-br-md"></span>
 
-                <h3 class="font-kaligrafi text-[2.85rem] sm:text-[3.1rem] leading-[1.06] text-[#5A1E1E]">
+                <h3 data-gsap="kiri" class="font-kaligrafi text-[2.85rem] sm:text-[3.1rem] leading-[1.06] text-[#5A1E1E]">
                     {{ $undangan->nama_panggilan_wanita }}
                 </h3>
-                <p class="font-serif text-base sm:text-[1.08rem] font-bold tracking-wide text-[#4A2020]">
+                <p data-gsap="teks" data-gsap-delay="0.06" class="font-serif text-base sm:text-[1.08rem] font-bold tracking-wide text-[#4A2020]">
                     {{ $undangan->nama_lengkap_wanita }}
                 </p>
 
                 @if ($undangan->nama_ayah_wanita || $undangan->nama_ibu_wanita)
                     <div class="pt-1.5 space-y-1">
-                        <div class="flex items-center justify-center gap-2.5 px-12" aria-hidden="true">
+                        <div data-gsap="garis" class="flex items-center justify-center gap-2.5 px-12" aria-hidden="true">
                             <span class="h-px flex-1 bg-gradient-to-r from-transparent to-[#C59B43]/65"></span>
                             <span class="w-1 h-1 rotate-45 bg-[#C59B43]"></span>
                             <span class="h-px flex-1 bg-gradient-to-l from-transparent to-[#C59B43]/65"></span>
                         </div>
-                        <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#8E6620] pt-1">
+                        <p data-gsap="teks" class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#8E6620] pt-1">
                             Putri ti
                         </p>
-                        <p class="text-xs sm:text-[13px] font-medium text-[#4A2020]/85 leading-relaxed max-w-xs mx-auto">
+                        <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs sm:text-[13px] font-medium text-[#4A2020]/85 leading-relaxed max-w-xs mx-auto">
                             {{ $undangan->nama_ayah_wanita }} &amp; {{ $undangan->nama_ibu_wanita }}
                         </p>
                     </div>
                 @endif
 
                 @if ($instagramWanita !== '')
-                    <div class="pt-2.5">
+                    <div data-gsap="mekar" data-gsap-delay="0.08" class="pt-2.5">
                         <a
                             href="https://instagram.com/{{ $instagramWanita }}"
                             target="_blank"
@@ -166,19 +169,19 @@
         </article>
 
         {{-- SEGEL MEDALI PENGHUBUNG "&" EMAS-MARUN BERORBIT --}}
-        <div class="fx-scale-in flex items-center justify-center gap-4 py-1" aria-hidden="true">
-            <span class="h-px flex-1 max-w-[82px] bg-gradient-to-r from-transparent via-[#C59B43]/70 to-[#C59B43]"></span>
-            <div class="relative w-14 h-14 flex items-center justify-center">
+        <div class="flex items-center justify-center gap-4 py-1" aria-hidden="true">
+            <span data-gsap="garis" class="h-px flex-1 max-w-[82px] bg-gradient-to-r from-transparent via-[#C59B43]/70 to-[#C59B43]"></span>
+            <div data-gsap="mekar" class="relative w-14 h-14 flex items-center justify-center">
                 <span class="absolute -inset-1.5 rounded-full border border-dashed border-[#C59B43]/65 animasi-orbit"></span>
                 <div class="w-12 h-12 rounded-full bg-gradient-to-b from-[#6E2C2C] to-[#4A1717] border-2 border-[#E7C87D] shadow-[0_10px_24px_-6px_rgba(90,30,30,0.6)] flex items-center justify-center">
                     <span class="font-kaligrafi text-3xl text-[#F3E5AB] leading-none pt-0.5">&amp;</span>
                 </div>
             </div>
-            <span class="h-px flex-1 max-w-[82px] bg-gradient-to-l from-transparent via-[#C59B43]/70 to-[#C59B43]"></span>
+            <span data-gsap="garis" class="h-px flex-1 max-w-[82px] bg-gradient-to-l from-transparent via-[#C59B43]/70 to-[#C59B43]"></span>
         </div>
 
-        {{-- KARTU PANGANTEN PAMEGET (PAVILIUN POTRET MARUN-EMAS PRIANGAN) --}}
-        <article class="fx-slide-right group relative rounded-[2rem] bg-[#FFFBF4] border-2 border-[#C59B43]/75 shadow-[0_24px_52px_-16px_rgba(74,23,23,0.34)] overflow-hidden kartu-3d">
+        {{-- KARTU PANGANTEN PAMEGET (PAVILIUN POTRET MARUN-EMAS PRIANGAN — ANIMASI RINCI PER KOMPONEN) --}}
+        <article class="group relative rounded-[2rem] bg-[#FFFBF4] border-2 border-[#C59B43]/75 shadow-[0_24px_52px_-16px_rgba(74,23,23,0.34)] overflow-hidden kartu-3d">
             {{-- Panggung Atas Beludru Marun + Bingkai Ukiran Priangan + Bunga Kamelia & Anggrek --}}
             <div class="relative bg-gradient-to-b from-[#5F2222] via-[#4A1717] to-[#3B1414] px-5 pt-7 pb-11 overflow-hidden">
                 {{-- Siluet Tipis Gapura Priangan & Pendar Emas Hangat di Latar --}}
@@ -213,7 +216,7 @@
                 </svg>
 
                 {{-- Potret Besar Panganten Pameget di Dalam Bingkai Emas Priangan (780x1043) --}}
-                <div class="fx-scale-in relative z-10 mx-auto w-[220px] sm:w-[238px] aspect-[780/1043] flex items-center justify-center">
+                <div data-gsap="potret" class="relative z-10 mx-auto w-[220px] sm:w-[238px] aspect-[780/1043] flex items-center justify-center">
                     <div class="absolute inset-x-[13.5%] inset-y-[8.5%] rounded-[50%] overflow-hidden bg-[#2E0E0E] shadow-[0_14px_30px_rgba(16,4,4,0.65)]">
                         @if (! $tanpaFoto && $undangan->urlFotoPria())
                             <img
@@ -249,12 +252,13 @@
                     aria-hidden="true"
                     loading="lazy"
                     decoding="async"
+                    data-gsap="naik"
                     class="pointer-events-none absolute -bottom-2 inset-x-0 w-full z-20 drop-shadow-[0_-6px_14px_rgba(24,6,6,0.45)]"
                 >
             </div>
 
             {{-- Pita Gelar Panganten Emas Bertengger di Sambungan Panggung --}}
-            <div class="relative z-30 -mt-4 flex justify-center">
+            <div data-gsap="mekar" class="relative z-30 -mt-4 flex justify-center">
                 <span class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#DFC078] via-[#C59B43] to-[#DFC078] px-4 py-1 text-[10px] font-bold uppercase tracking-[0.26em] text-[#3B1414] border border-[#FFF7E2]/70 shadow-[0_8px_20px_-6px_rgba(59,20,20,0.55)]">
                     <span aria-hidden="true" class="w-1 h-1 rotate-45 bg-[#5A1E1E]"></span>
                     <span>Panganten Pameget</span>
@@ -267,31 +271,31 @@
                 <span aria-hidden="true" class="pointer-events-none absolute bottom-3 left-3 h-4 w-4 border-b border-l border-[#C59B43]/60 rounded-bl-md"></span>
                 <span aria-hidden="true" class="pointer-events-none absolute bottom-3 right-3 h-4 w-4 border-b border-r border-[#C59B43]/60 rounded-br-md"></span>
 
-                <h3 class="font-kaligrafi text-[2.85rem] sm:text-[3.1rem] leading-[1.06] text-[#5A1E1E]">
+                <h3 data-gsap="kanan" class="font-kaligrafi text-[2.85rem] sm:text-[3.1rem] leading-[1.06] text-[#5A1E1E]">
                     {{ $undangan->nama_panggilan_pria }}
                 </h3>
-                <p class="font-serif text-base sm:text-[1.08rem] font-bold tracking-wide text-[#4A2020]">
+                <p data-gsap="teks" data-gsap-delay="0.06" class="font-serif text-base sm:text-[1.08rem] font-bold tracking-wide text-[#4A2020]">
                     {{ $undangan->nama_lengkap_pria }}
                 </p>
 
                 @if ($undangan->nama_ayah_pria || $undangan->nama_ibu_pria)
                     <div class="pt-1.5 space-y-1">
-                        <div class="flex items-center justify-center gap-2.5 px-12" aria-hidden="true">
+                        <div data-gsap="garis" class="flex items-center justify-center gap-2.5 px-12" aria-hidden="true">
                             <span class="h-px flex-1 bg-gradient-to-r from-transparent to-[#C59B43]/65"></span>
                             <span class="w-1 h-1 rotate-45 bg-[#C59B43]"></span>
                             <span class="h-px flex-1 bg-gradient-to-l from-transparent to-[#C59B43]/65"></span>
                         </div>
-                        <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#8E6620] pt-1">
+                        <p data-gsap="teks" class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#8E6620] pt-1">
                             Putra ti
                         </p>
-                        <p class="text-xs sm:text-[13px] font-medium text-[#4A2020]/85 leading-relaxed max-w-xs mx-auto">
+                        <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs sm:text-[13px] font-medium text-[#4A2020]/85 leading-relaxed max-w-xs mx-auto">
                             {{ $undangan->nama_ayah_pria }} &amp; {{ $undangan->nama_ibu_pria }}
                         </p>
                     </div>
                 @endif
 
                 @if ($instagramPria !== '')
-                    <div class="pt-2.5">
+                    <div data-gsap="mekar" data-gsap-delay="0.08" class="pt-2.5">
                         <a
                             href="https://instagram.com/{{ $instagramPria }}"
                             target="_blank"
@@ -316,6 +320,7 @@
 @if ($fotoGaleriSlideshow->isNotEmpty())
 <div
     data-slideshow-sunda
+    data-gsap="potret"
     x-data="{
         slideAktif: 0,
         jumlah: {{ $fotoGaleriSlideshow->count() }},
@@ -372,16 +377,21 @@
             alt=""
             loading="lazy"
             decoding="async"
-            class="fx-rise-down w-14 mx-auto drop-shadow-lg"
+            data-gsap="turun"
+            class="w-14 mx-auto drop-shadow-lg"
         >
 
-        <div class="fx-rise space-y-1">
+        <div data-gsap="naik" class="space-y-1">
             <h2 class="font-kaligrafi text-5xl text-white leading-tight">Save The Date</h2>
         </div>
 
         <div class="grid grid-cols-4 gap-2.5 pt-1 panggung-3d">
             @foreach (['hari' => 'Hari', 'jam' => 'Jam', 'menit' => 'Menit', 'detik' => 'Detik'] as $var => $label)
-                <div class="rounded-2xl bg-[#E7C87D] text-[#3B1414] py-3.5 px-1.5 shadow-lg border border-[#F3E5AB]/65">
+                <div
+                    data-gsap="mekar"
+                    data-gsap-delay="{{ number_format($loop->index * 0.07, 2, '.', '') }}"
+                    class="rounded-2xl bg-[#E7C87D] text-[#3B1414] py-3.5 px-1.5 shadow-lg border border-[#F3E5AB]/65"
+                >
                     <div
                         class="font-serif text-2xl sm:text-3xl font-bold leading-none"
                         x-text="{{ $var }}"
@@ -392,12 +402,12 @@
             @endforeach
         </div>
 
-        <p class="text-xs text-[#FAF4E8]/85 max-w-xs mx-auto leading-relaxed pt-1">
+        <p data-gsap="teks" class="text-xs text-[#FAF4E8]/85 max-w-xs mx-auto leading-relaxed pt-1">
             Merupakan kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu.
         </p>
 
         @if ($googleCalUrl)
-            <div class="pt-1">
+            <div data-gsap="mekar" data-gsap-delay="0.06" class="pt-1">
                 <a
                     href="{{ $googleCalUrl }}"
                     target="_blank"
@@ -426,15 +436,15 @@
 >
     <div class="max-w-md mx-auto space-y-6">
         {{-- Tajuk Seksi Bersih & Terukur --}}
-        <div class="fx-rise text-center space-y-1.5">
-            <div class="flex items-center justify-center gap-2.5">
+        <div class="text-center space-y-1.5">
+            <div data-gsap="turun" class="flex items-center justify-center gap-2.5">
                 <span aria-hidden="true" class="h-px w-8 bg-gradient-to-r from-transparent to-[#C59B43]"></span>
                 <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#8E6620]">
                     Waktos &amp; Tempat
                 </p>
                 <span aria-hidden="true" class="h-px w-8 bg-gradient-to-l from-transparent to-[#C59B43]"></span>
             </div>
-            <h2 class="font-serif text-[2rem] sm:text-[2.15rem] font-bold leading-tight text-[#5A1E1E]">
+            <h2 data-gsap="naik" class="font-serif text-[2rem] sm:text-[2.15rem] font-bold leading-tight text-[#5A1E1E]">
                 Rangkaian Acara
             </h2>
         </div>
@@ -443,28 +453,27 @@
             @foreach ($undangan->daftarAcara as $acara)
                 @php
                     $nomorProsesi = str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT);
-                    $kelasGerakAcara = $loop->even ? 'fx-slide-right' : 'fx-slide-left';
                 @endphp
 
-                <article class="{{ $kelasGerakAcara }} relative rounded-[1.75rem] bg-[#FFFBF4] border border-[#C59B43]/70 overflow-hidden shadow-[0_18px_42px_-16px_rgba(74,23,23,0.24)] kartu-3d">
+                <article class="relative rounded-[1.75rem] bg-[#FFFBF4] border border-[#C59B43]/70 overflow-hidden shadow-[0_18px_42px_-16px_rgba(74,23,23,0.24)] kartu-3d">
                     {{-- Header Pita Marun Rapi & Berkelas --}}
                     <div class="relative bg-gradient-to-b from-[#602121] to-[#4A1717] px-6 py-5 text-center text-[#FAF4E8] border-b border-[#C59B43]/65">
                         <span aria-hidden="true" class="pointer-events-none absolute top-2.5 left-2.5 h-3 w-3 border-t border-l border-[#E7C87D]/55 rounded-tl-sm"></span>
                         <span aria-hidden="true" class="pointer-events-none absolute top-2.5 right-2.5 h-3 w-3 border-t border-r border-[#E7C87D]/55 rounded-tr-sm"></span>
 
-                        <p class="text-[9.5px] font-bold uppercase tracking-[0.32em] text-[#E7C87D]">
+                        <p data-gsap="turun" class="text-[9.5px] font-bold uppercase tracking-[0.32em] text-[#E7C87D]">
                             Prosesi {{ $nomorProsesi }} &bull; {{ $acara->tanggal_acara->locale('id')->translatedFormat('l') }}
                         </p>
-                        <h3 class="mt-1 font-kaligrafi text-[2.4rem] sm:text-[2.65rem] leading-[1.08] text-[#FFFDF8]">
+                        <h3 data-gsap="mekar" data-gsap-delay="0.06" class="mt-1 font-kaligrafi text-[2.4rem] sm:text-[2.65rem] leading-[1.08] text-[#FFFDF8]">
                             {{ $acara->nama_acara }}
                         </h3>
                     </div>
 
-                    {{-- Badan Piagam Lega & Rapi Tanpa Ornamen Berlebihan --}}
+                    {{-- Badan Piagam Lega & Rapi — Animasi Masuk & Keluar Per Komponen --}}
                     <div class="px-6 py-7 text-center text-[#4A2020] space-y-5">
                         {{-- Baris Tanggal & Waktu 2 Kolom Simetris --}}
                         <div class="flex items-center justify-center gap-5">
-                            <div class="flex items-center gap-2.5 text-left">
+                            <div data-gsap="kiri" class="flex items-center gap-2.5 text-left">
                                 <span class="font-serif text-[2.45rem] font-bold leading-none text-[#5A1E1E]">
                                     {{ $acara->tanggal_acara->format('d') }}
                                 </span>
@@ -478,9 +487,9 @@
                                 </div>
                             </div>
 
-                            <span aria-hidden="true" class="h-9 w-px bg-[#C59B43]/45"></span>
+                            <span data-gsap="mekar" aria-hidden="true" class="h-9 w-px bg-[#C59B43]/45"></span>
 
-                            <div class="text-left leading-tight">
+                            <div data-gsap="kanan" class="text-left leading-tight">
                                 <p class="text-[9.5px] font-bold uppercase tracking-[0.22em] text-[#8E6620]">
                                     Pukul
                                 </p>
@@ -497,7 +506,7 @@
                         </div>
 
                         {{-- Garis Pemisah Emas Halus --}}
-                        <div class="flex items-center justify-center gap-3 px-10" aria-hidden="true">
+                        <div data-gsap="garis" class="flex items-center justify-center gap-3 px-10" aria-hidden="true">
                             <span class="h-px flex-1 bg-gradient-to-r from-transparent to-[#C59B43]/55"></span>
                             <span class="w-1.5 h-1.5 rotate-45 bg-[#C59B43]"></span>
                             <span class="h-px flex-1 bg-gradient-to-l from-transparent to-[#C59B43]/55"></span>
@@ -505,19 +514,19 @@
 
                         {{-- Lokasi Acara Bersih --}}
                         <div class="space-y-1.5">
-                            <svg class="w-4 h-4 mx-auto text-[#B58931]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <svg data-gsap="turun" class="w-4 h-4 mx-auto text-[#B58931]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z"/>
                             </svg>
-                            <p class="font-serif text-base sm:text-[1.08rem] font-bold text-[#5A1E1E] leading-snug">
+                            <p data-gsap="naik" class="font-serif text-base sm:text-[1.08rem] font-bold text-[#5A1E1E] leading-snug">
                                 {{ $acara->nama_tempat }}
                             </p>
-                            <p class="text-xs sm:text-[13px] text-[#4A2020]/75 leading-relaxed max-w-[275px] mx-auto">
+                            <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs sm:text-[13px] text-[#4A2020]/75 leading-relaxed max-w-[275px] mx-auto">
                                 {{ $acara->alamat_lengkap }}
                             </p>
                         </div>
 
                         @if ($acara->link_maps)
-                            <div class="pt-1">
+                            <div data-gsap="mekar" data-gsap-delay="0.08" class="pt-1">
                                 <a
                                     href="{{ $acara->link_maps }}"
                                     target="_blank"
@@ -543,15 +552,15 @@
 @if ($adaDressCode || (! empty($live['aktif']) && ! empty($live['link'])))
 <section class="relative bg-[#5A1E1E] text-[#FAF4E8] px-5 py-11 space-y-5 overflow-hidden">
     @if ($adaDressCode)
-        <div data-section-dress-code="priangan" class="fx-rise max-w-md mx-auto rounded-3xl bg-[#3B1414]/80 border border-[#C59B43]/55 p-6 text-center space-y-3">
-            <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#E7C87D]">Raksukan / Dress Code</p>
+        <div data-section-dress-code="priangan" class="max-w-md mx-auto rounded-3xl bg-[#3B1414]/80 border border-[#C59B43]/55 p-6 text-center space-y-3">
+            <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#E7C87D]">Raksukan / Dress Code</p>
             @if ($dressCodeCatatan !== '')
-                <p class="text-xs sm:text-sm text-[#FAF4E8]/90 leading-relaxed">{{ $dressCodeCatatan }}</p>
+                <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs sm:text-sm text-[#FAF4E8]/90 leading-relaxed">{{ $dressCodeCatatan }}</p>
             @endif
             @if (! empty($dressCodeWarna))
                 <div class="flex flex-wrap items-center justify-center gap-3 pt-1">
                     @foreach ($dressCodeWarna as $hex)
-                        <div class="flex flex-col items-center gap-1">
+                        <div data-gsap="mekar" data-gsap-delay="{{ number_format($loop->index * 0.06, 2, '.', '') }}" class="flex flex-col items-center gap-1">
                             <span class="h-9 w-9 rounded-full border-2 border-[#F3E5AB] shadow-md" style="background-color: {{ $hex }};"></span>
                             <span class="text-[9px] font-mono text-[#F3E5AB]/80">{{ $hex }}</span>
                         </div>
@@ -562,20 +571,22 @@
     @endif
 
     @if (! empty($live['aktif']) && ! empty($live['link']))
-        <div class="fx-rise max-w-md mx-auto rounded-3xl bg-[#FFFBF4] text-[#4A2020] border-2 border-[#C59B43]/70 p-6 text-center space-y-3 shadow-xl">
-            <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#8E6620]">Siaran Langsung</p>
-            <h3 class="font-serif text-2xl font-bold text-[#5A1E1E]">Live Streaming</h3>
-            <p class="text-xs text-[#4A2020]/75 leading-relaxed">
+        <div class="max-w-md mx-auto rounded-3xl bg-[#FFFBF4] text-[#4A2020] border-2 border-[#C59B43]/70 p-6 text-center space-y-3 shadow-xl">
+            <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#8E6620]">Siaran Langsung</p>
+            <h3 data-gsap="naik" class="font-serif text-2xl font-bold text-[#5A1E1E]">Live Streaming</h3>
+            <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs text-[#4A2020]/75 leading-relaxed">
                 Saksikan prosesi ijab qabul sareng sawer panganten secara langsung melalui {{ $live['platform'] ?? 'YouTube Live' }}.
             </p>
-            <a
-                href="{{ $live['link'] }}"
-                target="_blank"
-                rel="noopener"
-                class="sunda-tombol-marun inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-xs font-bold uppercase tracking-wider transition"
-            >
-                <span>Tonton Live Streaming</span>
-            </a>
+            <div data-gsap="mekar" data-gsap-delay="0.08">
+                <a
+                    href="{{ $live['link'] }}"
+                    target="_blank"
+                    rel="noopener"
+                    class="sunda-tombol-marun inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-xs font-bold uppercase tracking-wider transition"
+                >
+                    <span>Tonton Live Streaming</span>
+                </a>
+            </div>
         </div>
     @endif
 </section>
@@ -588,8 +599,12 @@
     class="relative px-4 py-12 overflow-hidden"
 >
     <div data-scroll-scrub class="text-center mb-7 overflow-hidden py-1">
-        <p class="scroll-scrub-kiri text-[11px] font-bold uppercase tracking-[0.34em] text-[#8E6620]">Lalakon Tresna</p>
-        <h2 class="scroll-scrub-kanan mt-1 font-serif text-3xl font-bold text-[#5A1E1E]">Cerita Cinta</h2>
+        <div data-gsap="kiri">
+            <p class="scroll-scrub-kiri text-[11px] font-bold uppercase tracking-[0.34em] text-[#8E6620]">Lalakon Tresna</p>
+        </div>
+        <div data-gsap="kanan" data-gsap-delay="0.06">
+            <h2 class="scroll-scrub-kanan mt-1 font-serif text-3xl font-bold text-[#5A1E1E]">Cerita Cinta</h2>
+        </div>
     </div>
 
     <div class="max-w-md mx-auto space-y-4">
@@ -599,9 +614,9 @@
                     ? \App\Support\MediaPublik::url((string) $cerita['foto'])
                     : null;
             @endphp
-            <article class="{{ $idx % 2 === 0 ? 'fx-slide-left mr-4' : 'fx-slide-right ml-4' }} rounded-3xl bg-[#FFFBF4] border-2 border-[#C59B43]/60 p-4 sm:p-5 text-[#4A2020] shadow-lg kartu-3d">
+            <article class="{{ $idx % 2 === 0 ? 'mr-4' : 'ml-4' }} rounded-3xl bg-[#FFFBF4] border-2 border-[#C59B43]/60 p-4 sm:p-5 text-[#4A2020] shadow-lg kartu-3d">
                 @if ($urlFotoBab)
-                    <div class="mb-3 overflow-hidden rounded-2xl border border-[#C59B43]/45">
+                    <div data-gsap="potret" class="mb-3 overflow-hidden rounded-2xl border border-[#C59B43]/45">
                         <img
                             src="{{ $urlFotoBab }}"
                             alt="{{ $cerita['judul'] ?? 'Cerita Cinta' }}"
@@ -610,16 +625,16 @@
                     </div>
                 @endif
                 <div class="flex items-center justify-between gap-2">
-                    <span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#8E6620]">
+                    <span data-gsap="kiri" class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#8E6620]">
                         <span aria-hidden="true" class="w-1.5 h-1.5 rotate-45 bg-[#C59B43]"></span>
                         <span>Bab {{ $idx + 1 }}</span>
                     </span>
                     @if (! empty($cerita['tanggal']))
-                        <span class="rounded-full bg-[#5A1E1E] px-2.5 py-0.5 text-[10px] font-semibold text-[#FAF4E8]">{{ $cerita['tanggal'] }}</span>
+                        <span data-gsap="kanan" class="rounded-full bg-[#5A1E1E] px-2.5 py-0.5 text-[10px] font-semibold text-[#FAF4E8]">{{ $cerita['tanggal'] }}</span>
                     @endif
                 </div>
-                <h3 class="mt-2 font-serif text-lg font-bold text-[#5A1E1E]">{{ $cerita['judul'] ?? '' }}</h3>
-                <p class="mt-1 text-xs sm:text-sm text-[#4A2020]/80 leading-relaxed">{{ $cerita['cerita'] ?? '' }}</p>
+                <h3 data-gsap="naik" class="mt-2 font-serif text-lg font-bold text-[#5A1E1E]">{{ $cerita['judul'] ?? '' }}</h3>
+                <p data-gsap="teks" data-gsap-delay="0.06" class="mt-1 text-xs sm:text-sm text-[#4A2020]/80 leading-relaxed">{{ $cerita['cerita'] ?? '' }}</p>
             </article>
         @endforeach
     </div>
@@ -633,11 +648,15 @@
     class="relative bg-[#3B1414]/95 py-14 px-5 text-white overflow-hidden"
 >
     <div data-scroll-scrub class="text-center mb-6 overflow-hidden space-y-2">
-        <h2 class="scroll-scrub-kiri font-kaligrafi text-5xl text-white leading-tight">Our Gallery</h2>
-        <div class="scroll-scrub-kanan flex items-center justify-center gap-3 text-[10px] font-semibold uppercase tracking-[0.34em] text-[#E7C87D]">
-            <span class="h-px w-10 bg-[#E7C87D]/60"></span>
-            <span>{{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}</span>
-            <span class="h-px w-10 bg-[#E7C87D]/60"></span>
+        <div data-gsap="kiri">
+            <h2 class="scroll-scrub-kiri font-kaligrafi text-5xl text-white leading-tight">Our Gallery</h2>
+        </div>
+        <div data-gsap="kanan" data-gsap-delay="0.06">
+            <div class="scroll-scrub-kanan flex items-center justify-center gap-3 text-[10px] font-semibold uppercase tracking-[0.34em] text-[#E7C87D]">
+                <span class="h-px w-10 bg-[#E7C87D]/60"></span>
+                <span>{{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}</span>
+                <span class="h-px w-10 bg-[#E7C87D]/60"></span>
+            </div>
         </div>
     </div>
 
@@ -649,7 +668,9 @@
             <button
                 type="button"
                 @click="bukaGaleri(@js($galeri->urlFoto()), @js($galeri->keterangan))"
-                class="fx-scale-in group relative overflow-hidden border border-[#E7C87D]/55 bg-[#2B0E0E] shadow-xl cursor-pointer kartu-3d {{ $kelasTile }}"
+                data-gsap="potret"
+                data-gsap-delay="{{ number_format(($loop->index % 3) * 0.06, 2, '.', '') }}"
+                class="group relative overflow-hidden border border-[#E7C87D]/55 bg-[#2B0E0E] shadow-xl cursor-pointer kartu-3d {{ $kelasTile }}"
             >
                 <img
                     src="{{ $galeri->urlFoto() }}"
@@ -667,7 +688,7 @@
         @endforeach
     </div>
 
-    <div class="mt-7 flex items-center justify-center gap-3 text-[10px] font-semibold uppercase tracking-[0.34em] text-[#E7C87D]/85">
+    <div data-gsap="garis" class="mt-7 flex items-center justify-center gap-3 text-[10px] font-semibold uppercase tracking-[0.34em] text-[#E7C87D]/85">
         <span class="h-px w-10 bg-[#E7C87D]/50"></span>
         <span>{{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}</span>
         <span class="h-px w-10 bg-[#E7C87D]/50"></span>

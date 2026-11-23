@@ -16,16 +16,16 @@ class Tema extends Model
     protected $table = 'tema';
 
     /**
-     * Daftar kategori tema undangan yang tersedia pada katalog.
+     * Daftar kategori gaya tema undangan yang tersedia pada katalog.
      *
      * @var array<string, string>
      */
     public const KATEGORI_TERSEDIA = [
-        'modern' => 'Modern',
-        'luxury' => 'Luxury',
-        'motion' => 'Motion',
         'adat' => 'Adat',
         'islami' => 'Islami',
+        'floral' => 'Floral',
+        'elegan' => 'Elegan',
+        'modern' => 'Modern',
     ];
 
     /**
@@ -93,9 +93,105 @@ class Tema extends Model
         return $this->hasMany(Transaksi::class, 'tema_id');
     }
 
+    public function kategoriKode(): string
+    {
+        $nilai = strtolower(trim((string) ($this->kategori ?: 'modern')));
+
+        $normalisasi = match ($nilai) {
+            'luxury' => 'elegan',
+            'motion' => 'floral',
+            default => $nilai,
+        };
+
+        return array_key_exists($normalisasi, self::KATEGORI_TERSEDIA) ? $normalisasi : 'modern';
+    }
+
     public function kategoriLabel(): string
     {
-        return self::KATEGORI_TERSEDIA[$this->kategori] ?? ucfirst($this->kategori);
+        return self::KATEGORI_TERSEDIA[$this->kategoriKode()];
+    }
+
+    /**
+     * Menghitung ringkasan jumlah tema dan harga mulai per kategori gaya.
+     *
+     * @param  EloquentCollection<int, Tema>|Collection<int, Tema>  $daftarTema
+     * @return Collection<string, array{kode: string, label: string, jumlah: int, harga_mulai: int}>
+     */
+    public static function ringkasanKategori(EloquentCollection|Collection $daftarTema): Collection
+    {
+        return collect(self::KATEGORI_TERSEDIA)->map(function (string $label, string $kode) use ($daftarTema): array {
+            $temaKategori = $daftarTema->filter(fn (Tema $tema): bool => $tema->kategoriKode() === $kode);
+            $hargaMinimal = $temaKategori->min(fn (Tema $tema): int => $tema->hargaNominal());
+
+            return [
+                'kode' => $kode,
+                'label' => $label,
+                'jumlah' => $temaKategori->count(),
+                'harga_mulai' => $hargaMinimal ?? self::HARGA_BAWAAN_TIER['basic'],
+            ];
+        });
+    }
+
+    /**
+     * Metadata tampilan badge dan ringkasan gaya per kategori tema.
+     *
+     * @return array{
+     *     kode: string,
+     *     label: string,
+     *     ringkasan: string,
+     *     badge_class: string,
+     *     chip_class: string,
+     *     card_ring: string
+     * }
+     */
+    public function infoKategori(): array
+    {
+        $kode = $this->kategoriKode();
+
+        $daftar = [
+            'adat' => [
+                'kode' => 'adat',
+                'label' => 'Adat',
+                'ringkasan' => 'Budaya & Adat Nusantara',
+                'badge_class' => 'bg-champagne text-charcoal ring-1 ring-white/40 shadow-xs',
+                'chip_class' => 'bg-champagne/15 text-[#7A5B22] ring-1 ring-champagne/40',
+                'card_ring' => 'ring-1 ring-champagne/45',
+            ],
+            'islami' => [
+                'kode' => 'islami',
+                'label' => 'Islami',
+                'ringkasan' => 'Syar\'i & Penuh Makna',
+                'badge_class' => 'bg-[#184D47] text-white ring-1 ring-white/30 shadow-xs',
+                'chip_class' => 'bg-[#184D47]/10 text-[#184D47] ring-1 ring-[#184D47]/25',
+                'card_ring' => 'ring-1 ring-champagne/35',
+            ],
+            'floral' => [
+                'kode' => 'floral',
+                'label' => 'Floral',
+                'ringkasan' => 'Taman & Nuansa Bunga',
+                'badge_class' => 'bg-sage text-white ring-1 ring-white/30 shadow-xs',
+                'chip_class' => 'bg-sage/10 text-sage ring-1 ring-sage/25',
+                'card_ring' => 'ring-1 ring-champagne/35',
+            ],
+            'elegan' => [
+                'kode' => 'elegan',
+                'label' => 'Elegan',
+                'ringkasan' => 'Klasik & Berkelas',
+                'badge_class' => 'bg-charcoal text-champagne ring-1 ring-champagne/55 shadow-xs',
+                'chip_class' => 'bg-charcoal text-champagne ring-1 ring-champagne/45',
+                'card_ring' => 'ring-1 ring-champagne/55',
+            ],
+            'modern' => [
+                'kode' => 'modern',
+                'label' => 'Modern',
+                'ringkasan' => 'Minimalis & Estetik',
+                'badge_class' => 'bg-zinc-800 text-white ring-1 ring-white/25 shadow-xs',
+                'chip_class' => 'bg-zinc-100 text-zinc-700 ring-1 ring-zinc-300/70',
+                'card_ring' => 'ring-1 ring-champagne/30',
+            ],
+        ];
+
+        return $daftar[$kode];
     }
 
     public function tierKode(): string
@@ -493,46 +589,46 @@ class Tema extends Model
                 'islami' => false,
             ],
             'adat-jawa' => [
-                'latar_css' => 'radial-gradient(circle at 50% 22%, #6E4730 0%, #4A2D1C 58%, #23150E 100%)',
-                'lantai_hex' => '#EFECE5',
-                'layar_kiri_bg' => 'linear-gradient(180deg, #4A2E1E 0%, #29180F 100%)',
-                'layar_kiri_teks' => '#FAF3E6',
-                'kotak_countdown_bg' => '#FCF7EB',
-                'kotak_countdown_teks' => '#332012',
-                'tombol_kiri_bg' => '#D4AF37',
-                'tombol_kiri_teks' => '#1C100A',
-                'kartu_arch_bg' => '#FCF7EB',
-                'kartu_arch_teks' => '#332012',
-                'tengah_scrim' => 'radial-gradient(ellipse at center, rgba(252,247,235,0.90) 28%, rgba(252,247,235,0.45) 70%, rgba(252,247,235,0.02) 100%)',
-                'tengah_teks' => '#3B1D12',
-                'tengah_aksen' => '#A8823B',
-                'kanan_bg' => '#FCF7EB',
-                'kanan_teks' => '#332012',
-                'tanggal_pendek' => '12 · 12 · 26',
-                'tagline' => 'Pawiwahan Ageng',
-                'gelap' => false,
+                'latar_css' => 'radial-gradient(circle at 50% 42%, #7D5337 0%, #472A1C 52%, #1E110A 100%)',
+                'lantai_hex' => '#F3EEE6',
+                'layar_kiri_bg' => 'linear-gradient(180deg, #472A1C 0%, #2B180F 100%)',
+                'layar_kiri_teks' => '#FFFAF5',
+                'kotak_countdown_bg' => '#D7BB83',
+                'kotak_countdown_teks' => '#2B180F',
+                'tombol_kiri_bg' => 'linear-gradient(135deg, #ECD298 0%, #C79F4B 100%)',
+                'tombol_kiri_teks' => '#24130A',
+                'kartu_arch_bg' => '#FFFAF5',
+                'kartu_arch_teks' => '#2B180F',
+                'tengah_scrim' => 'linear-gradient(180deg, rgba(20,10,5,0.58) 0%, rgba(20,10,5,0.08) 20%, rgba(20,10,5,0.0) 44%, rgba(24,12,6,0.16) 56%, rgba(22,11,6,0.88) 76%, rgba(16,8,4,0.98) 100%)',
+                'tengah_teks' => '#FFFBF4',
+                'tengah_aksen' => '#E5C98B',
+                'kanan_bg' => '#FFFAF5',
+                'kanan_teks' => '#2B180F',
+                'tanggal_pendek' => '28 · 12 · 26',
+                'tagline' => 'Pawiwahan',
+                'gelap' => true,
                 'editorial' => false,
                 'islami' => false,
             ],
             'sunda-heritage' => [
-                'latar_css' => 'radial-gradient(circle at 50% 22%, #862C3B 0%, #631B28 58%, #410F18 100%)',
-                'lantai_hex' => '#EFECE5',
-                'layar_kiri_bg' => 'linear-gradient(180deg, #6E2C2C 0%, #4B1818 100%)',
+                'latar_css' => 'radial-gradient(circle at 50% 42%, #922D3C 0%, #581822 52%, #290A10 100%)',
+                'lantai_hex' => '#F3EEE6',
+                'layar_kiri_bg' => 'linear-gradient(180deg, #5A1E1E 0%, #3E1212 100%)',
                 'layar_kiri_teks' => '#FAF4E8',
-                'kotak_countdown_bg' => '#FFFBF4',
-                'kotak_countdown_teks' => '#4A2020',
-                'tombol_kiri_bg' => '#FFFBF4',
-                'tombol_kiri_teks' => '#5A1E1E',
+                'kotak_countdown_bg' => '#E7C87D',
+                'kotak_countdown_teks' => '#3B1414',
+                'tombol_kiri_bg' => 'linear-gradient(135deg, #E4C578 0%, #B88B32 100%)',
+                'tombol_kiri_teks' => '#351010',
                 'kartu_arch_bg' => '#FFFBF4',
                 'kartu_arch_teks' => '#4A2020',
-                'tengah_scrim' => 'radial-gradient(ellipse at center, rgba(250,244,232,0.90) 30%, rgba(250,244,232,0.48) 72%, rgba(250,244,232,0.02) 100%)',
-                'tengah_teks' => '#5A1E1E',
-                'tengah_aksen' => '#B58931',
+                'tengah_scrim' => 'linear-gradient(180deg, rgba(40,12,14,0.72) 0%, rgba(40,12,14,0.12) 22%, rgba(40,12,14,0.0) 46%, rgba(40,12,14,0.18) 58%, rgba(40,12,14,0.90) 78%, rgba(28,8,10,0.98) 100%)',
+                'tengah_teks' => '#FFFDF8',
+                'tengah_aksen' => '#E7C87D',
                 'kanan_bg' => '#FAF4E8',
                 'kanan_teks' => '#4A2020',
                 'tanggal_pendek' => '19 · 12 · 26',
-                'tagline' => 'Sampurasun • Sunda Heritage',
-                'gelap' => false,
+                'tagline' => 'Sampurasun',
+                'gelap' => true,
                 'editorial' => false,
                 'islami' => false,
             ],

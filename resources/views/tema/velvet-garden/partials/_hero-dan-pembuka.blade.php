@@ -103,17 +103,17 @@
 >
     <div class="max-w-md mx-auto text-center space-y-6">
         <div class="grid grid-cols-3 items-center max-w-[200px] mx-auto">
-            <span class="fx-slide-left font-serif text-4xl sm:text-5xl font-bold text-[#F3DFA2]">
+            <span data-gsap="kiri" class="fx-slide-left font-serif text-4xl sm:text-5xl font-bold text-[#F3DFA2]">
                 {{ $undangan->inisialPria() }}
             </span>
-            <span class="fx-scale-in font-kaligrafi text-3xl text-[#EEDAD4]">&amp;</span>
-            <span class="fx-slide-right font-serif text-4xl sm:text-5xl font-bold text-[#F3DFA2]">
+            <span data-gsap="mekar" data-gsap-delay="0.07" class="font-kaligrafi text-3xl text-[#EEDAD4]">&amp;</span>
+            <span data-gsap="kanan" class="fx-slide-right font-serif text-4xl sm:text-5xl font-bold text-[#F3DFA2]">
                 {{ $undangan->inisialWanita() }}
             </span>
         </div>
 
         @if ($urlFotoPembuka)
-            <div class="fx-scale-in mx-auto w-56 sm:w-64 p-2 rounded-t-[9rem] rounded-b-3xl bg-[#FDFBF7]/10 border border-[#C8A464]/70 shadow-2xl">
+            <div data-gsap="potret" class="mx-auto w-56 sm:w-64 p-2 rounded-t-[9rem] rounded-b-3xl bg-[#FDFBF7]/10 border border-[#C8A464]/70 shadow-2xl">
                 <div class="overflow-hidden rounded-t-[8.5rem] rounded-b-2xl aspect-[4/5]">
                     <img
                         src="{{ $urlFotoPembuka }}"
@@ -125,9 +125,11 @@
         @endif
 
         @if ($undangan->kutipan_ayat)
-            <blockquote class="fx-rise rounded-3xl bg-[#FDFBF7] text-[#1F3431] border-2 border-[#C8A464]/65 p-6 shadow-xl kartu-3d efek-shimmer-kartu">
-                <img src="{{ $asetGarden['botani'] }}" alt="" class="w-10 mx-auto mb-2.5 opacity-90 animasi-melayang">
-                <p class="italic text-xs sm:text-sm leading-relaxed text-[#1F3431]/85">
+            <blockquote class="rounded-3xl bg-[#FDFBF7] text-[#1F3431] border-2 border-[#C8A464]/65 p-6 shadow-xl kartu-3d efek-shimmer-kartu">
+                <div data-gsap="turun">
+                    <img src="{{ $asetGarden['botani'] }}" alt="" class="w-10 mx-auto mb-2.5 opacity-90 animasi-melayang">
+                </div>
+                <p data-gsap="naik" data-gsap-delay="0.06" class="italic text-xs sm:text-sm leading-relaxed text-[#1F3431]/85">
                     &ldquo;{{ $undangan->kutipan_ayat }}&rdquo;
                 </p>
             </blockquote>

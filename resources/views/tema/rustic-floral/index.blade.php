@@ -139,11 +139,14 @@
                 <div class="absolute inset-0 bg-gradient-to-b from-[#FDFBF7]/72 via-[#FDFBF7]/45 to-[#F4ECE1]/78"></div>
             </div>
 
+            {{-- INTRO PEMBUKA BESPOKE SEBELUM SAMPUL --}}
+            @include('komponen-undangan.intro-pembuka')
+
             {{-- SAMPUL PEMBUKA FADE HALUS --}}
             @include('tema.rustic-floral.partials._sampul')
 
             {{-- KONTEN UTAMA RUSTIC FLORAL SCRAPBOOK --}}
-            <main data-panggung-3d class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
+            <main data-panggung-3d data-sinema-gsap="rustic-floral" class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
                 @include('tema.rustic-floral.partials._hero-dan-pembuka')
                 @include('tema.rustic-floral.partials._konten-utama')
                 @include('tema.rustic-floral.partials._penutup-dan-rsvp')

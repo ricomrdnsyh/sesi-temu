@@ -96,18 +96,18 @@
 >
     <div class="max-w-md mx-auto text-center space-y-6">
         {{-- Segel Bintang 8 Sudut Monogram --}}
-        <div class="fx-scale-in relative mx-auto h-24 w-24 flex items-center justify-center">
+        <div data-gsap="mekar" class="relative mx-auto h-24 w-24 flex items-center justify-center">
             <span aria-hidden="true" class="absolute inset-2 bg-[#0E3A36] border border-[#C5A059] shadow-md"></span>
             <span aria-hidden="true" class="absolute inset-2 rotate-45 bg-[#0E3A36] border border-[#C5A059] shadow-md"></span>
             <div class="relative z-10 flex items-baseline gap-1 text-[#F3E5AB]">
-                <span class="fx-slide-left font-serif text-2xl font-bold">{{ $undangan->inisialPria() }}</span>
+                <span data-gsap="kiri" class="fx-slide-left font-serif text-2xl font-bold">{{ $undangan->inisialPria() }}</span>
                 <span class="font-kaligrafi text-xl text-[#E6D19C]">&amp;</span>
-                <span class="fx-slide-right font-serif text-2xl font-bold">{{ $undangan->inisialWanita() }}</span>
+                <span data-gsap="kanan" class="fx-slide-right font-serif text-2xl font-bold">{{ $undangan->inisialWanita() }}</span>
             </div>
         </div>
 
         @if ($urlFotoPembuka)
-            <div class="fx-scale-in relative mx-auto w-60 sm:w-64 p-2 rounded-t-[8.5rem] rounded-b-2xl bg-white border border-[#C5A059]/70 shadow-[0_18px_40px_-16px_rgba(14,58,54,0.28)]">
+            <div data-gsap="potret" class="relative mx-auto w-60 sm:w-64 p-2 rounded-t-[8.5rem] rounded-b-2xl bg-white border border-[#C5A059]/70 shadow-[0_18px_40px_-16px_rgba(14,58,54,0.28)]">
                 <div class="overflow-hidden rounded-t-[7.8rem] rounded-b-xl aspect-[4/5] border border-[#0E3A36]/12">
                     <img src="{{ $urlFotoPembuka }}" alt="Foto Pembuka {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}" class="w-full h-full object-cover object-top">
                 </div>
@@ -116,19 +116,19 @@
 
         @if ($undangan->kutipan_ayat)
             {{-- Kartu Manuskrip Ayat Zamrud-Emas --}}
-            <blockquote class="fx-rise relative rounded-3xl bg-gradient-to-br from-[#0E3A36] via-[#134842] to-[#0B2D2A] text-[#F7FBF8] border border-[#C5A059]/60 px-6 py-6 shadow-[0_18px_38px_-14px_rgba(14,58,54,0.45)] kartu-3d">
+            <blockquote class="relative rounded-3xl bg-gradient-to-br from-[#0E3A36] via-[#134842] to-[#0B2D2A] text-[#F7FBF8] border border-[#C5A059]/60 px-6 py-6 shadow-[0_18px_38px_-14px_rgba(14,58,54,0.45)] kartu-3d">
                 <span aria-hidden="true" class="pointer-events-none absolute top-2.5 left-2.5 h-3 w-3 border-t border-l border-[#E6D19C]/75"></span>
                 <span aria-hidden="true" class="pointer-events-none absolute top-2.5 right-2.5 h-3 w-3 border-t border-r border-[#E6D19C]/75"></span>
                 <span aria-hidden="true" class="pointer-events-none absolute bottom-2.5 left-2.5 h-3 w-3 border-b border-l border-[#E6D19C]/75"></span>
                 <span aria-hidden="true" class="pointer-events-none absolute bottom-2.5 right-2.5 h-3 w-3 border-b border-r border-[#E6D19C]/75"></span>
 
-                <p class="text-lg text-[#F3E5AB] mb-2" style="font-family: 'Amiri', serif;">
+                <p data-gsap="turun" class="text-lg text-[#F3E5AB] mb-2" style="font-family: 'Amiri', serif;">
                     بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
                 </p>
-                <p class="italic text-xs sm:text-sm text-[#F7FBF8]/90 leading-relaxed">
+                <p data-gsap="naik" data-gsap-delay="0.06" class="italic text-xs sm:text-sm text-[#F7FBF8]/90 leading-relaxed">
                     &ldquo;{{ $undangan->kutipan_ayat }}&rdquo;
                 </p>
-                <div class="mt-3.5 flex items-center justify-center gap-2" aria-hidden="true">
+                <div data-gsap="garis" class="mt-3.5 flex items-center justify-center gap-2" aria-hidden="true">
                     <span class="h-px w-10 bg-[#C5A059]/55"></span>
                     <span class="h-1.5 w-1.5 rotate-45 bg-[#E6D19C]"></span>
                     <span class="h-px w-10 bg-[#C5A059]/55"></span>

@@ -53,9 +53,9 @@
             'id' => $temaAktifEditor->id,
             'slug' => $temaAktifEditor->slug,
             'nama_tema' => $temaAktifEditor->nama_tema,
-            'tier' => $temaAktifEditor->tierLabel(),
-            'tier_kode' => $temaAktifEditor->tierKode(),
-            'ringkasan_tier' => $temaAktifEditor->infoTier()['ringkasan'],
+            'kategori' => $temaAktifEditor->kategoriLabel(),
+            'kategori_kode' => $temaAktifEditor->kategoriKode(),
+            'ringkasan_kategori' => $temaAktifEditor->infoKategori()['ringkasan'],
             'deskripsi' => $temaAktifEditor->infoDesain()['deskripsi'],
             'harga_nominal' => $temaAktifEditor->hargaNominal(),
             'harga' => $temaAktifEditor->hargaFormatted(),
@@ -118,7 +118,7 @@
         acaraEdit: null,
         galeriLightbox: null,
         drawerTemaTerbuka: false,
-        tierDrawerTema: 'semua',
+        kategoriDrawerTema: 'semua',
         cariDrawerTema: '',
         tabMobileStudio: 'daftar',
         sumberPreviewStudio: 'undangan',
@@ -270,11 +270,11 @@
         pilihTemaKonfirmasi(payload) {
             this.temaKonfirmasi = payload;
         },
-        temaCocokDrawer(tier, teks) {
-            const cocokTier = this.tierDrawerTema === 'semua' || this.tierDrawerTema === tier;
+        temaCocokDrawer(kategori, teks) {
+            const cocokKategori = this.kategoriDrawerTema === 'semua' || this.kategoriDrawerTema === kategori;
             const q = this.cariDrawerTema.trim().toLowerCase();
             const cocokCari = !q || teks.toLowerCase().includes(q);
-            return cocokTier && cocokCari;
+            return cocokKategori && cocokCari;
         },
         urlMusikAktif() {
             return this.musikDipilih ? (this.daftarUrlMusik[this.musikDipilih] || '') : '';
@@ -660,7 +660,7 @@
 
                                 <div class="min-w-0 flex-1">
                                     <span class="inline-flex items-center rounded-full bg-ivory px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#8A6D33] ring-1 ring-champagne/35">
-                                        Tier {{ $temaAktifEditor?->tierLabel() }}
+                                        {{ $temaAktifEditor?->kategoriLabel() }}
                                     </span>
                                     <p class="mt-1 font-sans text-sm font-bold text-charcoal truncate">
                                         {{ $temaAktifEditor?->nama_tema ?? 'Rustic Floral' }}

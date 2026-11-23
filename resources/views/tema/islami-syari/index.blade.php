@@ -134,11 +134,14 @@
                 <div class="absolute inset-0 bg-gradient-to-b from-[#F7FBF8]/82 via-[#F7FBF8]/62 to-[#EAF3ED]/88"></div>
             </div>
 
+            {{-- INTRO PEMBUKA BESPOKE SEBELUM SAMPUL --}}
+            @include('komponen-undangan.intro-pembuka')
+
             {{-- SAMPUL PEMBUKA ISLAMI SYAR'I --}}
             @include('tema.islami-syari.partials._sampul')
 
             {{-- KONTEN UTAMA ANDALUSIAN SANCTUARY --}}
-            <main data-panggung-3d class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
+            <main data-panggung-3d data-sinema-gsap="islami-syari" class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
                 @include('tema.islami-syari.partials._hero-dan-pembuka')
                 @include('tema.islami-syari.partials._konten-utama')
                 @include('tema.islami-syari.partials._penutup-dan-rsvp')

@@ -39,8 +39,8 @@ class Tahap5UndanganPublikTemaTest extends TestCase
         $kategori = match ($slugTema) {
             'adat-jawa', 'sunda-heritage' => 'adat',
             'islami-syari', 'islamic-heavenly' => 'islami',
-            'luxury-noir', 'royal-ivory' => 'luxury',
-            'velvet-garden' => 'motion',
+            'rustic-floral', 'velvet-garden' => 'floral',
+            'luxury-noir', 'royal-ivory' => 'elegan',
             default => 'modern',
         };
 

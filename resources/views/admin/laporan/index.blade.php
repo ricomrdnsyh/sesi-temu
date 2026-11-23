@@ -42,7 +42,7 @@
     </div>
 </div>
 
-{{-- Tren 6 Bulan & Distribusi Tier --}}
+{{-- Tren 6 Bulan & Distribusi Kategori --}}
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-champagne/20">
         <h2 class="text-base font-bold text-charcoal mb-1">Tren 6 Bulan Terakhir</h2>
@@ -71,18 +71,18 @@
     </div>
 
     <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-champagne/20">
-        <h2 class="text-base font-bold text-charcoal mb-1">Distribusi Tier Katalog Tema</h2>
+        <h2 class="text-base font-bold text-charcoal mb-1">Distribusi Kategori Katalog Tema</h2>
         <p class="text-xs text-charcoal/60 mb-4">Total {{ $totalUndangan }} undangan • {{ $totalClient }} client • {{ $totalUcapan }} ucapan tamu</p>
 
         <div class="space-y-3">
-            @foreach ($distribusiTier as $tierItem)
+            @foreach ($distribusiKategori as $kategoriItem)
                 <div class="flex items-center justify-between rounded-xl border border-champagne/20 bg-ivory/60 px-4 py-3">
                     <div>
-                        <p class="text-sm font-bold text-charcoal">{{ $tierItem['label'] }}</p>
-                        <p class="text-xs text-charcoal/60">{{ $tierItem['jumlah_tema'] }} desain tersedia</p>
+                        <p class="text-sm font-bold text-charcoal">{{ $kategoriItem['label'] }}</p>
+                        <p class="text-xs text-charcoal/60">{{ $kategoriItem['jumlah_tema'] }} desain tersedia</p>
                     </div>
                     <span class="rounded-full bg-champagne/20 px-3 py-1 text-xs font-bold text-charcoal">
-                        {{ $tierItem['jumlah_undangan'] }} dipakai
+                        {{ $kategoriItem['jumlah_undangan'] }} dipakai
                     </span>
                 </div>
             @endforeach
@@ -97,7 +97,6 @@
         <thead>
             <tr class="border-b border-champagne/20 text-left text-xs uppercase text-charcoal/60">
                 <th class="py-3 pr-4">Nama Tema</th>
-                <th class="py-3 pr-4">Tier</th>
                 <th class="py-3 pr-4">Kategori</th>
                 <th class="py-3 pr-4">Harga Dasar</th>
                 <th class="py-3 pr-4 dt-left">Jumlah Undangan</th>
@@ -107,7 +106,6 @@
             @foreach ($temaTerlaris as $tema)
                 <tr>
                     <td class="py-3 pr-4 font-semibold text-charcoal">{{ $tema->nama_tema }}</td>
-                    <td class="py-3 pr-4">{{ $tema->tierLabel() }}</td>
                     <td class="py-3 pr-4">{{ $tema->kategoriLabel() }}</td>
                     <td class="py-3 pr-4 font-medium">{{ $tema->hargaFormatted() }}</td>
                     <td class="py-3 pr-4 font-bold text-sage dt-left">{{ $tema->undangan_count }}</td>

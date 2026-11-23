@@ -171,7 +171,7 @@
             </span>
             <div class="min-w-0">
                 <p class="text-sm font-semibold text-charcoal group-hover:text-sage transition truncate">Katalog Tema</p>
-                <p class="text-xs text-charcoal/60 truncate">Atur tier &amp; harga tema</p>
+                <p class="text-xs text-charcoal/60 truncate">Atur kategori &amp; harga tema</p>
             </div>
         </a>
 

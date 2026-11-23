@@ -5,16 +5,15 @@
     style="height: 100dvh;"
     :class="undanganTerbuka ? 'tirai-terbuka pointer-events-none' : ''"
 >
-    <div class="relative w-full h-full flex flex-col {{ $pakaiFotoSampul ? 'justify-between' : 'justify-center items-center px-6 py-8' }} overflow-hidden bg-[#3B1414]">
-        <img
-            src="{{ $pakaiFotoSampul ? $urlFotoSampul : $urlFotoLatar }}"
-            alt="Sampul {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}"
-            fetchpriority="high"
-            decoding="sync"
-            class="absolute inset-0 w-full h-full object-cover {{ $pakaiFotoSampul ? 'object-top scale-[1.02] animasi-nafas' : 'object-center scale-105 animasi-nafas' }}"
-        >
-
+    <div class="relative w-full h-full flex flex-col {{ $pakaiFotoSampul ? 'justify-between bg-[#3B1414]' : 'justify-between bg-[#F3ECE1]' }} overflow-hidden">
         @if ($pakaiFotoSampul)
+            <img
+                src="{{ $urlFotoSampul }}"
+                alt="Sampul {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}"
+                fetchpriority="high"
+                decoding="sync"
+                class="absolute inset-0 w-full h-full object-cover object-top scale-[1.02] animasi-nafas"
+            >
             <div
                 aria-hidden="true"
                 class="pointer-events-none absolute inset-0"
@@ -22,12 +21,49 @@
             ></div>
             <div aria-hidden="true" class="pointer-events-none absolute inset-3.5 rounded-t-[10rem] rounded-b-[1.75rem] border border-[#E7C87D]/45 z-10"></div>
         @else
-            <div class="absolute inset-0 bg-gradient-to-b from-[#3B1414]/72 via-[#4A1717]/42 to-[#2B0E0E]/88"></div>
+            {{-- Latar Kertas Gading Priangan & Bingkai Arch Penuh Berhiaskan Bunga Kamelia-Anggrek Atas & Bawah --}}
             <img
-                src="{{ $asetSunda['gapura'] }}"
+                src="{{ $urlFotoLatar }}"
+                alt="Sampul Sunda Siger Heritage"
+                fetchpriority="high"
+                decoding="sync"
+                class="absolute inset-0 w-full h-full object-cover object-bottom opacity-22"
+            >
+            <div
+                aria-hidden="true"
+                class="pointer-events-none absolute inset-0"
+                style="background: linear-gradient(180deg, rgba(243,236,225,0.86) 0%, rgba(250,244,232,0.78) 48%, rgba(243,236,225,0.62) 100%);"
+            ></div>
+
+            {{-- Kanvas Arch Emas Penuh Tinggi Layar dengan Siluet Rumah Panggung Halus di Bawah --}}
+            <div
+                aria-hidden="true"
+                class="pointer-events-none absolute inset-x-3.5 top-5 bottom-4 rounded-t-[13rem] rounded-b-[2rem] border-[2px] border-[#C59B43]/85 bg-[#FAF4E8]/90 shadow-[0_24px_60px_-20px_rgba(74,23,23,0.28)] overflow-hidden z-[8]"
+            >
+                <img
+                    src="{{ $urlFotoLatar }}"
+                    alt=""
+                    class="absolute inset-0 w-full h-full object-cover object-bottom opacity-24"
+                >
+                <div
+                    class="absolute inset-0"
+                    style="background: linear-gradient(180deg, #FAF4E8 0%, rgba(250,244,232,0.94) 48%, rgba(250,244,232,0.68) 76%, rgba(250,244,232,0.22) 100%);"
+                ></div>
+                <div class="absolute inset-2 rounded-t-[12.4rem] rounded-b-[1.6rem] border border-[#C59B43]/35"></div>
+            </div>
+
+            {{-- Rangkaian Bunga Kamelia Marun & Anggrek Bulan Membingkai Tepi Atas & Bawah --}}
+            <img
+                src="{{ $asetSunda['bungaDepan'] }}"
                 alt=""
                 aria-hidden="true"
-                class="pointer-events-none absolute inset-x-3 top-6 bottom-6 h-[calc(100%-3rem)] w-[calc(100%-1.5rem)] object-contain opacity-28"
+                class="pointer-events-none absolute -top-4 inset-x-0 w-full rotate-180 opacity-92 drop-shadow-[0_6px_14px_rgba(59,20,20,0.25)] z-[14]"
+            >
+            <img
+                src="{{ $asetSunda['bungaDepan'] }}"
+                alt=""
+                aria-hidden="true"
+                class="pointer-events-none absolute -bottom-1 inset-x-0 w-full opacity-96 drop-shadow-[0_-8px_18px_rgba(59,20,20,0.3)] z-[14]"
             >
         @endif
 
@@ -82,53 +118,56 @@
                 </p>
             </div>
         @else
-            {{-- Mode Tanpa Foto: Kartu Gapura Priangan Terpusat di Tengah --}}
-            <div class="relative z-20 w-full max-w-[360px]">
-                <div class="kartu-3d rounded-t-[10rem] rounded-b-[2rem] bg-[#FFFBF4]/94 backdrop-blur-md border-2 border-[#C59B43]/75 p-2 shadow-[0_28px_70px_-16px_rgba(0,0,0,0.65)]">
-                    <div class="rounded-t-[9.3rem] rounded-b-[1.5rem] border border-[#C59B43]/40 px-6 pt-9 pb-7 text-center text-[#4A2020] space-y-4">
-                        <div class="space-y-1.5">
-                            <img src="{{ $asetSunda['siger'] }}" alt="" class="w-14 mx-auto opacity-95 animasi-ayun-3d">
-                            <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#8E6620]">
-                                Sampurasun &bull; Walimatul Ursy
-                            </p>
-                            <h1 class="font-serif text-4xl sm:text-[2.65rem] font-bold leading-[1.08] text-[#5A1E1E] pt-1">
-                                <span class="block">{{ $undangan->nama_panggilan_pria }}</span>
-                                <span class="block font-kaligrafi font-normal text-3xl text-[#B58931] my-0.5">&amp;</span>
-                                <span class="block">{{ $undangan->nama_panggilan_wanita }}</span>
-                            </h1>
-                            <p class="text-[11px] font-medium uppercase tracking-[0.24em] text-[#4A2020]/80 pt-1">
-                                {{ $tanggalLengkap }}
-                            </p>
-                        </div>
-
-                        <div class="flex items-center justify-center gap-3 px-6" aria-hidden="true">
-                            <span class="h-px flex-1 bg-[#C59B43]/50"></span>
-                            <span class="w-1.5 h-1.5 rotate-45 bg-[#5A1E1E]"></span>
-                            <span class="h-px flex-1 bg-[#C59B43]/50"></span>
-                        </div>
-
-                        <div class="space-y-2.5 pt-0.5">
-                            <span class="sr-only">Kepada Yth. {{ $namaTamu }}</span>
-                            <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-[#8E6620]">
-                                Kepada Yth. Bapak/Ibu/Saudara/i
-                            </p>
-                            <p class="font-serif text-xl sm:text-2xl font-bold text-[#5A1E1E] leading-snug">
-                                {{ $namaTamu }}
-                            </p>
-                            <div class="pt-2">
-                                <button
-                                    type="button"
-                                    @click="bukaUndangan()"
-                                    class="sunda-tombol-marun inline-flex items-center justify-center gap-2 rounded-full px-8 py-3 text-xs sm:text-sm font-bold uppercase tracking-[0.18em] transition cursor-pointer"
-                                >
-                                    <span>Buka Undangan</span>
-                                </button>
-                            </div>
-                            <p class="text-[10px] italic text-[#4A2020]/70 pt-1 max-w-xs mx-auto leading-relaxed">
-                                Mohon maaf apabila ada kesalahan penulisan nama/gelar
-                            </p>
-                        </div>
+            {{-- Mode Tanpa Foto: Tipografi Editorial Bersih di Dalam Arch Emas Berhiaskan Kamelia & Anggrek --}}
+            <div class="relative z-20 flex-1 flex flex-col items-center justify-center px-9 pt-20 pb-28 text-center text-[#4A2020]">
+                <div class="w-full max-w-[300px] space-y-5">
+                    <div class="space-y-2">
+                        <img
+                            src="{{ $asetSunda['siger'] }}"
+                            alt=""
+                            class="w-11 sm:w-12 mx-auto opacity-95 drop-shadow-[0_4px_10px_rgba(90,30,30,0.2)]"
+                        >
+                        <p class="text-[9.5px] font-semibold uppercase tracking-[0.34em] text-[#8E6620]">
+                            The Wedding Of
+                        </p>
+                        <h1 class="font-serif text-[2.35rem] sm:text-[2.65rem] font-semibold uppercase tracking-[0.1em] leading-[1.08] text-[#5A1E1E] pt-0.5">
+                            <span class="block">{{ $undangan->nama_panggilan_pria }}</span>
+                            <span class="block font-kaligrafi normal-case font-normal text-3xl text-[#B58931] my-0.5">&amp;</span>
+                            <span class="block">{{ $undangan->nama_panggilan_wanita }}</span>
+                        </h1>
+                        <p class="text-[10.5px] font-medium uppercase tracking-[0.22em] text-[#5A1E1E]/75 pt-1">
+                            {{ $tanggalLengkap }}
+                        </p>
                     </div>
+
+                    <div class="space-y-1.5 pt-2">
+                        <span class="sr-only">Kepada Yth. {{ $namaTamu }}</span>
+                        <p class="text-[10px] font-medium tracking-[0.12em] text-[#6E3434]/85 leading-relaxed">
+                            Kepada Yth.<br>
+                            Bapak/Ibu/Saudara/i
+                        </p>
+                        <p class="font-serif text-xl sm:text-[1.4rem] font-bold text-[#4A1818] leading-snug pt-0.5">
+                            {{ $namaTamu }}
+                        </p>
+                    </div>
+
+                    <div class="pt-1.5">
+                        <button
+                            type="button"
+                            @click="bukaUndangan()"
+                            class="sunda-tombol-marun inline-flex items-center justify-center gap-2 rounded-full px-8 py-2.5 text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] shadow-[0_12px_26px_-8px_rgba(90,30,30,0.55)] active:scale-[0.98] transition cursor-pointer"
+                        >
+                            <svg class="w-3.5 h-3.5 text-[#F3E5AB]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect width="20" height="16" x="2" y="4" rx="2"/>
+                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                            </svg>
+                            <span>Buka Undangan</span>
+                        </button>
+                    </div>
+
+                    <p class="text-[9.5px] italic text-[#4A2020]/68 max-w-[230px] mx-auto leading-relaxed">
+                        Mohon maaf apabila ada kesalahan penulisan nama/gelar
+                    </p>
                 </div>
             </div>
         @endif

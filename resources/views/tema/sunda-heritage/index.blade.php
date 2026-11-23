@@ -414,11 +414,14 @@
                 <div class="absolute inset-0 bg-gradient-to-b from-[#FAF4E8]/70 via-[#FAF4E8]/45 to-[#FAF4E8]/75"></div>
             </div>
 
+            {{-- INTRO PEMBUKA BESPOKE SEBELUM SAMPUL --}}
+            @include('komponen-undangan.intro-pembuka')
+
             {{-- SAMPUL PEMBUKA FADE HALUS --}}
             @include('tema.sunda-heritage.partials._sampul')
 
             {{-- KONTEN UTAMA SUNDA SIGER HERITAGE --}}
-            <main data-panggung-3d class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
+            <main data-panggung-3d data-sinema-gsap="sunda" class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
                 @include('tema.sunda-heritage.partials._hero-dan-pembuka')
                 @include('tema.sunda-heritage.partials._konten-utama')
                 @include('tema.sunda-heritage.partials._penutup-dan-rsvp')

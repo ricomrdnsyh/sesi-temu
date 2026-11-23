@@ -17,16 +17,6 @@
         data-swal-loading
         data-swal-loading-title="{{ $modeEdit ? 'Memperbarui Tema...' : 'Menyimpan Tema Baru...' }}"
         data-swal-loading-text="Sedang mengunggah aset dan menyimpan konfigurasi tema..."
-        x-data="{
-            tierTerpilih: '{{ old('tier', $tema->tierKode()) }}',
-            hargaTersimpan: '{{ old('harga', $tema->hargaAsliNominal()) }}',
-            hargaBawaan: {{ json_encode(\App\Models\Tema::HARGA_BAWAAN_TIER) }},
-            terapkanHargaSaran(tier) {
-                if (this.hargaBawaan[tier] !== undefined) {
-                    this.hargaTersimpan = this.hargaBawaan[tier];
-                }
-            }
-        }"
     >
         @csrf
         @if ($modeEdit)
@@ -48,60 +38,19 @@
                 <label for="kategori" class="block text-sm font-medium text-charcoal">Kategori</label>
                 <select id="kategori" name="kategori" class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm">
                     @foreach (\App\Models\Tema::KATEGORI_TERSEDIA as $val => $label)
-                        <option value="{{ $val }}" @selected(old('kategori', $tema->kategori) === $val)>{{ $label }}</option>
+                        <option value="{{ $val }}" @selected(old('kategori', $tema->kategoriKode()) === $val)>{{ $label }}</option>
                     @endforeach
                 </select>
             </div>
 
             <div>
-                <label for="lokasi_view" class="block text-sm font-medium text-charcoal">Template View Blade</label>
-                @php
-                    $daftarLokasiView = $daftarLokasiView ?? \App\Models\Tema::daftarLokasiViewTersedia();
-                    $nilaiLokasiView = old('lokasi_view', $tema->lokasi_view ?: 'tema.rustic-floral.index');
-                @endphp
-                <select id="lokasi_view" name="lokasi_view" required class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm">
-                    @foreach ($daftarLokasiView as $viewDot => $viewLabel)
-                        <option value="{{ $viewDot }}" @selected($nilaiLokasiView === $viewDot)>{{ $viewLabel }}</option>
-                    @endforeach
-                </select>
-                <p class="mt-1 text-xs text-charcoal/60">Dipindai otomatis dari folder <code class="font-mono">resources/views/tema/</code>.</p>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-                <label for="tier" class="block text-sm font-medium text-charcoal">Tingkatan Kualitas (Tier)</label>
-                <select
-                    id="tier"
-                    name="tier"
-                    x-model="tierTerpilih"
-                    required
-                    class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm"
-                >
-                    @foreach (\App\Models\Tema::TIER_TERSEDIA as $val => $label)
-                        <option value="{{ $val }}" @selected(old('tier', $tema->tierKode()) === $val)>{{ $label }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <div class="flex items-center justify-between">
-                    <label for="harga" class="block text-sm font-medium text-charcoal">Harga Tema (Rp)</label>
-                    <button
-                        type="button"
-                        @click="terapkanHargaSaran(tierTerpilih)"
-                        class="text-xs font-semibold text-sage hover:underline cursor-pointer"
-                    >
-                        Pakai saran tier
-                    </button>
-                </div>
+                <label for="harga" class="block text-sm font-medium text-charcoal">Harga Tema (Rp)</label>
                 <input
                     id="harga"
                     name="harga"
                     type="number"
                     min="0"
                     step="1000"
-                    x-model="hargaTersimpan"
                     value="{{ old('harga', $tema->hargaAsliNominal()) }}"
                     required
                     class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm font-semibold"
@@ -110,6 +59,20 @@
                     Terima Beres otomatis menjadi harga tema + {{ \App\Models\Tema::formatRupiah(\App\Models\Tema::BIAYA_JASA_TERIMA_BERES) }} jasa input admin.
                 </p>
             </div>
+        </div>
+
+        <div>
+            <label for="lokasi_view" class="block text-sm font-medium text-charcoal">Template View Blade</label>
+            @php
+                $daftarLokasiView = $daftarLokasiView ?? \App\Models\Tema::daftarLokasiViewTersedia();
+                $nilaiLokasiView = old('lokasi_view', $tema->lokasi_view ?: 'tema.rustic-floral.index');
+            @endphp
+            <select id="lokasi_view" name="lokasi_view" required class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm">
+                @foreach ($daftarLokasiView as $viewDot => $viewLabel)
+                    <option value="{{ $viewDot }}" @selected($nilaiLokasiView === $viewDot)>{{ $viewLabel }}</option>
+                @endforeach
+            </select>
+            <p class="mt-1 text-xs text-charcoal/60">Dipindai otomatis dari folder <code class="font-mono">resources/views/tema/</code>.</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-2xl border border-champagne/25 bg-ivory/50 p-4">

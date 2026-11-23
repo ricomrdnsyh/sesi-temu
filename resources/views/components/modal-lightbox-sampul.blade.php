@@ -54,7 +54,7 @@
                                     <span class="font-sans tabular-nums font-bold text-champagne">{{ $temaLightbox->hargaFormatted() }}</span>
                                 @endif
                                 <span class="text-white/40">&bull;</span>
-                                <span>{{ $temaLightbox->tierLabel() }}</span>
+                                <span>{{ $temaLightbox->kategoriLabel() }}</span>
                             </div>
                         </div>
 
@@ -80,7 +80,6 @@
                                         'id' => $temaLightbox->id,
                                         'nama_tema' => $temaLightbox->nama_tema,
                                         'kategori' => $temaLightbox->kategoriLabel(),
-                                        'tier' => $temaLightbox->tierLabel(),
                                         'harga' => $temaLightbox->hargaFormatted(),
                                         'harga_asli' => $temaLightbox->adaDiskon() ? $temaLightbox->hargaAsliFormatted() : null,
                                         'badge_diskon' => $temaLightbox->labelBadgeDiskon(),

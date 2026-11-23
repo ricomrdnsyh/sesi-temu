@@ -55,17 +55,19 @@ class GantiTemaVisualDanKunciTest extends TestCase
             'status_publikasi' => false,
         ]);
 
-        // Halaman kelola menampilkan Studio Modal Tengah dengan filter Tier saja (tanpa filter kategori) & live try-on preview
+        // Halaman kelola menampilkan Studio Modal Tengah dengan filter kategori gaya & live try-on preview
         $this->actingAs($client)
             ->get("/dashboard/undangan/{$draft->id}/kelola")
             ->assertOk()
             ->assertSee('data-modal-ganti-tema', false)
-            ->assertSee('data-filter-tier-studio', false)
-            ->assertSee('data-filter-tier="semua"', false)
-            ->assertSee('data-filter-tier="basic"', false)
-            ->assertSee('data-filter-tier="premium"', false)
-            ->assertSee('data-filter-tier="eksklusif"', false)
-            ->assertDontSee('kategoriDrawerTema', false)
+            ->assertSee('data-filter-kategori-studio', false)
+            ->assertSee('data-filter-kategori="semua"', false)
+            ->assertSee('data-filter-kategori="adat"', false)
+            ->assertSee('data-filter-kategori="islami"', false)
+            ->assertSee('data-filter-kategori="floral"', false)
+            ->assertSee('data-filter-kategori="elegan"', false)
+            ->assertSee('data-filter-kategori="modern"', false)
+            ->assertDontSee('data-filter-tier-studio', false)
             ->assertSee('Studio Pilih Tema')
             ->assertSee('Data Anda')
             ->assertSee('Contoh Penuh')

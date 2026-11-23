@@ -115,6 +115,19 @@
                 this.inisialisasiJedaHeroOffscreen();
                 this.inisialisasiMasuk3D();
                 this.inisialisasiFxReveal();
+
+                if (window.SesiTemuSinema) {
+                    window.SesiTemuSinema.inisialisasi();
+                }
+
+                this.$watch('galeriModalTerbuka', (terbuka) => {
+                    if (!window.SesiTemuSinema) return;
+                    if (terbuka) {
+                        window.SesiTemuSinema.jedaLenis();
+                    } else if (this.undanganTerbuka && !this.autoScrollAktif) {
+                        window.SesiTemuSinema.lanjutLenis();
+                    }
+                });
             },
             inisialisasiParallax3D() {
                 const mediaKurangiGerak = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -223,15 +236,17 @@
             },
             inisialisasiFxReveal() {
                 const selektor =
-                    '.fx-rise, .fx-rise-down, .fx-scale-in, .fx-scale-out, .fx-slide-left, .fx-slide-right, .fx-flip-in';
+                    '.fx-rise:not([data-gsap]), .fx-rise-down:not([data-gsap]), .fx-scale-in:not([data-gsap]), .fx-scale-out:not([data-gsap]), .fx-slide-left:not([data-gsap]), .fx-slide-right:not([data-gsap]), .fx-flip-in:not([data-gsap])';
 
                 // Pastikan seluruh bagian tema (termasuk Amplop, Turut Mengundang, Buku Tamu & RSVP) ikut memiliki animasi scroll
-                document.querySelectorAll('main[data-panggung-3d] > section:not([data-diorama-3d])').forEach((seksi) => {
-                    if (!seksi.matches(selektor) && !seksi.querySelector(selektor) && !seksi.querySelector('.masuk-3d')) {
-                        const wadahUtama = seksi.querySelector(':scope > div, :scope > article');
-                        (wadahUtama || seksi).classList.add('fx-rise');
-                    }
-                });
+                if (!document.querySelector('main[data-sinema-gsap]')) {
+                    document.querySelectorAll('main[data-panggung-3d] > section:not([data-diorama-3d])').forEach((seksi) => {
+                        if (!seksi.matches(selektor) && !seksi.querySelector(selektor) && !seksi.querySelector('.masuk-3d')) {
+                            const wadahUtama = seksi.querySelector(':scope > div, :scope > article');
+                            (wadahUtama || seksi).classList.add('fx-rise');
+                        }
+                    });
+                }
 
                 const elemen = document.querySelectorAll(selektor);
                 if (!elemen.length) {
@@ -530,7 +545,7 @@
                         }
                     });
                     document.querySelectorAll(
-                        '.fx-rise, .fx-rise-down, .fx-scale-in, .fx-scale-out, .fx-slide-left, .fx-slide-right, .fx-flip-in'
+                        '.fx-rise:not([data-gsap]), .fx-rise-down:not([data-gsap]), .fx-scale-in:not([data-gsap]), .fx-scale-out:not([data-gsap]), .fx-slide-left:not([data-gsap]), .fx-slide-right:not([data-gsap]), .fx-flip-in:not([data-gsap])'
                     ).forEach((el) => {
                         const rect = el.getBoundingClientRect();
                         if (rect.top < window.innerHeight * 1.15 && rect.bottom > 0) {
@@ -542,6 +557,9 @@
                             }, 740);
                         }
                     });
+                    if (window.SesiTemuSinema) {
+                        window.SesiTemuSinema.aktifkanLenis();
+                    }
                     if (window.AOS && document.querySelector('[data-aos]')) {
                         window.AOS.refreshHard();
                     }
@@ -644,6 +662,9 @@
                 this.autoScrollPosY = window.scrollY;
                 this.autoScrollWaktuLalu = performance.now();
                 this.autoScrollMulaiMs = this.autoScrollWaktuLalu;
+                if (window.SesiTemuSinema) {
+                    window.SesiTemuSinema.jedaLenis();
+                }
                 document.documentElement.classList.add('mode-autoscroll');
                 this.tampilkanToastAutoScroll();
 
@@ -691,6 +712,9 @@
                 }
                 document.documentElement.classList.remove('mode-autoscroll');
                 this.autoScrollToast = false;
+                if (window.SesiTemuSinema && this.undanganTerbuka && !this.galeriModalTerbuka) {
+                    window.SesiTemuSinema.lanjutLenis();
+                }
             },
             toggleAutoScroll() {
                 if (this.autoScrollAktif) {
@@ -724,6 +748,9 @@
             },
             gulirKeAtas() {
                 this.hentikanAutoScroll(true);
+                if (window.SesiTemuSinema && window.SesiTemuSinema.gulirKeAtas()) {
+                    return;
+                }
                 window.scrollTo({
                     top: 0,
                     behavior: 'smooth'

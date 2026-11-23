@@ -113,17 +113,17 @@
 
         {{-- Monogram Bertemu --}}
         <div class="grid grid-cols-3 items-center max-w-[200px] mx-auto">
-            <span class="fx-slide-left noir-font-judul text-4xl font-bold text-[#F3E5AB]">
+            <span data-gsap="kiri" class="fx-slide-left noir-font-judul text-4xl font-bold text-[#F3E5AB]">
                 {{ $undangan->inisialPria() }}
             </span>
-            <span class="fx-scale-in font-kaligrafi text-3xl text-[#D4AF37]">&amp;</span>
-            <span class="fx-slide-right noir-font-judul text-4xl font-bold text-[#F3E5AB]">
+            <span data-gsap="mekar" data-gsap-delay="0.06" class="font-kaligrafi text-3xl text-[#D4AF37]">&amp;</span>
+            <span data-gsap="kanan" data-gsap-delay="0.08" class="fx-slide-right noir-font-judul text-4xl font-bold text-[#F3E5AB]">
                 {{ $undangan->inisialWanita() }}
             </span>
         </div>
 
         @if ($urlFotoPembuka)
-            <div class="fx-scale-in overflow-hidden rounded-lg border border-[#D4AF37]/60 bg-black p-1 shadow-xl">
+            <div data-gsap="potret" data-gsap-delay="0.1" class="overflow-hidden rounded-lg border border-[#D4AF37]/60 bg-black p-1 shadow-xl">
                 <img
                     src="{{ $urlFotoPembuka }}"
                     alt="Foto Pembuka {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}"
@@ -133,7 +133,7 @@
         @endif
 
         @if ($undangan->kutipan_ayat)
-            <blockquote class="fx-rise border-t border-[#D4AF37]/30 pt-4">
+            <blockquote data-gsap="naik" data-gsap-delay="0.06" class="border-t border-[#D4AF37]/30 pt-4">
                 <p class="italic text-xs sm:text-sm text-[#F5EFE6]/85 leading-relaxed">
                     &ldquo;{{ $undangan->kutipan_ayat }}&rdquo;
                 </p>

@@ -80,17 +80,17 @@
     <div class="max-w-md mx-auto rounded-3xl bg-[#FBF8F3] border border-[#9E7B4F]/50 p-2 shadow-xl">
         <div class="rounded-[1.2rem] border border-dashed border-[#9E7B4F]/45 px-5 py-8 text-center space-y-6">
             <div class="grid grid-cols-3 items-center max-w-[200px] mx-auto">
-                <span class="fx-slide-left font-serif text-4xl sm:text-5xl font-bold text-[#7B603F]">
+                <span data-gsap="kiri" class="fx-slide-left font-serif text-4xl sm:text-5xl font-bold text-[#7B603F]">
                     {{ $undangan->inisialPria() }}
                 </span>
-                <span class="fx-scale-in font-kaligrafi text-3xl text-[#9E7B4F]">&amp;</span>
-                <span class="fx-slide-right font-serif text-4xl sm:text-5xl font-bold text-[#7B603F]">
+                <span data-gsap="mekar" data-gsap-delay="0.06" class="font-kaligrafi text-3xl text-[#9E7B4F]">&amp;</span>
+                <span data-gsap="kanan" data-gsap-delay="0.08" class="fx-slide-right font-serif text-4xl sm:text-5xl font-bold text-[#7B603F]">
                     {{ $undangan->inisialWanita() }}
                 </span>
             </div>
 
             @if ($urlFotoPembuka)
-                <div class="fx-scale-in mx-auto w-56 sm:w-64 p-1.5 rounded-t-[9rem] rounded-b-2xl border-2 border-[#9E7B4F]/55 bg-white shadow-lg">
+                <div data-gsap="potret" data-gsap-delay="0.1" class="mx-auto w-56 sm:w-64 p-1.5 rounded-t-[9rem] rounded-b-2xl border-2 border-[#9E7B4F]/55 bg-white shadow-lg">
                     <div class="overflow-hidden rounded-t-[8.5rem] rounded-b-xl aspect-[4/5]">
                         <img src="{{ $urlFotoPembuka }}" alt="Foto Pembuka {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}" class="w-full h-full object-cover object-top">
                     </div>
@@ -98,7 +98,7 @@
             @endif
 
             @if ($undangan->kutipan_ayat)
-                <blockquote class="fx-rise border-t border-double border-[#9E7B4F]/45 pt-5">
+                <blockquote data-gsap="naik" data-gsap-delay="0.06" class="border-t border-double border-[#9E7B4F]/45 pt-5">
                     <p class="italic text-xs sm:text-sm text-[#3B2E25]/85 leading-relaxed">
                         &ldquo;{{ $undangan->kutipan_ayat }}&rdquo;
                     </p>

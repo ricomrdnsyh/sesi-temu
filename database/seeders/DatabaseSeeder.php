@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
             [
                 'nama_tema' => 'Rustic Floral',
                 'slug' => 'rustic-floral',
-                'kategori' => 'modern',
+                'kategori' => 'floral',
                 'tier' => 'basic',
                 'harga' => 59000,
                 'lokasi_view' => 'tema.rustic-floral.index',
@@ -60,7 +60,7 @@ class DatabaseSeeder extends Seeder
             [
                 'nama_tema' => 'Luxury Noir Monogram',
                 'slug' => 'luxury-noir',
-                'kategori' => 'luxury',
+                'kategori' => 'elegan',
                 'tier' => 'eksklusif',
                 'harga' => 119000,
                 'lokasi_view' => 'tema.luxury-noir.index',
@@ -70,7 +70,7 @@ class DatabaseSeeder extends Seeder
             [
                 'nama_tema' => 'Luxury Royal Ivory',
                 'slug' => 'royal-ivory',
-                'kategori' => 'luxury',
+                'kategori' => 'elegan',
                 'tier' => 'premium',
                 'harga' => 99000,
                 'lokasi_view' => 'tema.royal-ivory.index',
@@ -80,7 +80,7 @@ class DatabaseSeeder extends Seeder
             [
                 'nama_tema' => 'Velvet Garden Motion',
                 'slug' => 'velvet-garden',
-                'kategori' => 'motion',
+                'kategori' => 'floral',
                 'tier' => 'eksklusif',
                 'harga' => 129000,
                 'lokasi_view' => 'tema.velvet-garden.index',

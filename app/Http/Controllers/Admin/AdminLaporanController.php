@@ -33,14 +33,14 @@ class AdminLaporanController extends Controller
             ->orderBy('id')
             ->get();
 
-        $distribusiTier = collect(Tema::TIER_TERSEDIA)->map(function (string $label, string $kode) use ($temaTerlaris): array {
-            $temaDiTier = $temaTerlaris->filter(fn (Tema $tema): bool => $tema->tierKode() === $kode);
+        $distribusiKategori = collect(Tema::KATEGORI_TERSEDIA)->map(function (string $label, string $kode) use ($temaTerlaris): array {
+            $temaDiKategori = $temaTerlaris->filter(fn (Tema $tema): bool => $tema->kategoriKode() === $kode);
 
             return [
                 'kode' => $kode,
                 'label' => $label,
-                'jumlah_tema' => $temaDiTier->count(),
-                'jumlah_undangan' => (int) $temaDiTier->sum('undangan_count'),
+                'jumlah_tema' => $temaDiKategori->count(),
+                'jumlah_undangan' => (int) $temaDiKategori->sum('undangan_count'),
             ];
         });
 
@@ -88,7 +88,7 @@ class AdminLaporanController extends Controller
             'totalUndangan' => Undangan::count(),
             'totalUcapan' => BukuTamu::count(),
             'temaTerlaris' => $temaTerlaris,
-            'distribusiTier' => $distribusiTier,
+            'distribusiKategori' => $distribusiKategori,
             'rekapBulanan' => $rekapBulanan,
             'undanganAkanKedaluwarsa' => $undanganAkanKedaluwarsa,
         ]);

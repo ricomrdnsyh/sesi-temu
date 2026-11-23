@@ -1,12 +1,12 @@
 @php
-    $ringkasanTierModal = \App\Models\Tema::ringkasanTier($daftarTema);
+    $ringkasanKategoriModal = \App\Models\Tema::ringkasanKategori($daftarTema);
     $indeksTemaStudio = $daftarTema->map(fn (\App\Models\Tema $item): array => [
-        'tier' => $item->tierKode(),
-        'teks' => strtolower($item->nama_tema.' '.$item->tierLabel()),
+        'kategori' => $item->kategoriKode(),
+        'teks' => strtolower($item->nama_tema.' '.$item->kategoriLabel()),
     ])->values()->all();
 @endphp
 
-{{-- Studio Modal Terpusat Ganti Tema (Filter Tier + Live Try-On Preview) --}}
+{{-- Studio Modal Terpusat Ganti Tema (Filter Kategori Gaya + Live Try-On Preview) --}}
 <div
     x-data="{ indeksTemaStudio: @js($indeksTemaStudio) }"
     x-show="drawerTemaTerbuka"
@@ -44,7 +44,7 @@
         @click.stop
         class="relative z-10 w-full max-w-6xl h-[92dvh] lg:h-[86dvh] max-h-[840px] rounded-[1.75rem] bg-[#FDFBF7] shadow-[0_30px_90px_-18px_rgba(20,32,26,0.48)] ring-1 ring-champagne/40 overflow-hidden flex flex-col"
     >
-        {{-- Header Modal + Filter Tier Saja --}}
+        {{-- Header Modal + Filter Kategori Gaya --}}
         <div class="bg-white border-b border-champagne/25 px-4 sm:px-6 pt-4 pb-3.5 space-y-3.5 shrink-0">
             <div class="flex items-start sm:items-center justify-between gap-3">
                 <div class="flex items-center gap-3 min-w-0">
@@ -117,20 +117,20 @@
                 </div>
             </div>
 
-            {{-- Filter Tier Saja (Semua Tier, Basic, Premium, Eksklusif) --}}
-            <div data-filter-tier-studio class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {{-- Filter Kategori Gaya (Semua, Adat, Islami, Floral, Elegan, Modern) --}}
+            <div data-filter-kategori-studio class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
                 <button
                     type="button"
-                    data-filter-tier="semua"
-                    @click="tierDrawerTema = 'semua'"
-                    :class="tierDrawerTema === 'semua'
+                    data-filter-kategori="semua"
+                    @click="kategoriDrawerTema = 'semua'"
+                    :class="kategoriDrawerTema === 'semua'
                         ? 'bg-[#3B4F45] text-white ring-1 ring-[#3B4F45] shadow-sm'
                         : 'bg-[#FAF7F0] text-charcoal/75 ring-1 ring-champagne/30 hover:bg-white hover:ring-champagne/65 hover:text-charcoal'"
                     class="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-left transition cursor-pointer"
                 >
                     <span class="flex items-center gap-2 min-w-0">
                         <span
-                            :class="tierDrawerTema === 'semua' ? 'bg-white/15 text-[#F5E3B8]' : 'bg-white text-sage ring-1 ring-champagne/25'"
+                            :class="kategoriDrawerTema === 'semua' ? 'bg-white/15 text-[#F5E3B8]' : 'bg-white text-sage ring-1 ring-champagne/25'"
                             class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
                         >
                             <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -140,58 +140,85 @@
                                 <rect width="7" height="7" x="3" y="14" rx="1.5"/>
                             </svg>
                         </span>
-                        <span class="text-xs font-bold truncate">Semua Tier</span>
+                        <span class="text-xs font-bold truncate">Semua</span>
                     </span>
                     <span
-                        :class="tierDrawerTema === 'semua' ? 'bg-white/20 text-ivory' : 'bg-white text-charcoal/60 ring-1 ring-charcoal/10'"
+                        :class="kategoriDrawerTema === 'semua' ? 'bg-white/20 text-ivory' : 'bg-white text-charcoal/60 ring-1 ring-charcoal/10'"
                         class="rounded-full px-2 py-0.5 font-sans tabular-nums text-[10px] font-bold shrink-0"
                     >{{ $daftarTema->count() }}</span>
                 </button>
 
                 @foreach ([
-                    'basic' => [
+                    'adat' => [
+                        'ikon' => 'landmark',
+                        'active' => 'bg-gradient-to-r from-[#BFA15F] to-[#A68743] text-white ring-1 ring-champagne shadow-sm',
+                        'icon_active' => 'bg-white/20 text-white',
+                        'icon_idle' => 'bg-white text-[#8A6D33] ring-1 ring-champagne/25',
+                        'badge_active' => 'bg-white/20 text-white',
+                    ],
+                    'islami' => [
+                        'ikon' => 'moon',
+                        'active' => 'bg-gradient-to-r from-[#184D47] to-[#236B62] text-white ring-1 ring-[#184D47] shadow-sm',
+                        'icon_active' => 'bg-white/15 text-[#F3DFB0]',
+                        'icon_idle' => 'bg-white text-[#184D47] ring-1 ring-champagne/25',
+                        'badge_active' => 'bg-white/20 text-ivory',
+                    ],
+                    'floral' => [
                         'ikon' => 'leaf',
                         'active' => 'bg-gradient-to-r from-[#2D4439] to-sage text-white ring-1 ring-sage shadow-sm',
                         'icon_active' => 'bg-white/15 text-ivory',
                         'icon_idle' => 'bg-white text-sage ring-1 ring-champagne/25',
                         'badge_active' => 'bg-white/20 text-ivory',
                     ],
-                    'premium' => [
+                    'elegan' => [
                         'ikon' => 'gem',
-                        'active' => 'bg-gradient-to-r from-[#BFA15F] to-[#A68743] text-white ring-1 ring-champagne shadow-sm',
-                        'icon_active' => 'bg-white/20 text-white',
-                        'icon_idle' => 'bg-white text-[#8A6D33] ring-1 ring-champagne/25',
-                        'badge_active' => 'bg-white/20 text-white',
-                    ],
-                    'eksklusif' => [
-                        'ikon' => 'crown',
                         'active' => 'bg-gradient-to-r from-[#141C24] via-charcoal to-[#262E38] text-[#F3DFB0] ring-1 ring-champagne/70 shadow-sm',
                         'icon_active' => 'bg-champagne/20 text-[#F3DFB0]',
                         'icon_idle' => 'bg-white text-charcoal ring-1 ring-champagne/25',
                         'badge_active' => 'bg-champagne/20 text-[#F3DFB0]',
                     ],
-                ] as $kodeTier => $metaTier)
-                    @php $dataTier = $ringkasanTierModal[$kodeTier]; @endphp
+                    'modern' => [
+                        'ikon' => 'sparkles',
+                        'active' => 'bg-gradient-to-r from-zinc-800 to-zinc-700 text-white ring-1 ring-zinc-700 shadow-sm',
+                        'icon_active' => 'bg-white/15 text-white',
+                        'icon_idle' => 'bg-white text-zinc-700 ring-1 ring-champagne/25',
+                        'badge_active' => 'bg-white/20 text-white',
+                    ],
+                ] as $kodeKategori => $metaKategori)
+                    @php $dataKategori = $ringkasanKategoriModal[$kodeKategori]; @endphp
                     <button
                         type="button"
-                        data-filter-tier="{{ $kodeTier }}"
-                        @click="tierDrawerTema = '{{ $kodeTier }}'"
-                        :class="tierDrawerTema === '{{ $kodeTier }}'
-                            ? '{{ $metaTier['active'] }}'
+                        data-filter-kategori="{{ $kodeKategori }}"
+                        @click="kategoriDrawerTema = '{{ $kodeKategori }}'"
+                        :class="kategoriDrawerTema === '{{ $kodeKategori }}'
+                            ? '{{ $metaKategori['active'] }}'
                             : 'bg-[#FAF7F0] text-charcoal/75 ring-1 ring-champagne/30 hover:bg-white hover:ring-champagne/65 hover:text-charcoal'"
                         class="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-left transition cursor-pointer"
                     >
                         <span class="flex items-center gap-2 min-w-0">
                             <span
-                                :class="tierDrawerTema === '{{ $kodeTier }}' ? '{{ $metaTier['icon_active'] }}' : '{{ $metaTier['icon_idle'] }}'"
+                                :class="kategoriDrawerTema === '{{ $kodeKategori }}' ? '{{ $metaKategori['icon_active'] }}' : '{{ $metaKategori['icon_idle'] }}'"
                                 class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
                             >
-                                @if ($metaTier['ikon'] === 'leaf')
+                                @if ($metaKategori['ikon'] === 'landmark')
+                                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M12 2 3 7h18l-9-5Z"/>
+                                        <path d="M5 10v8"/>
+                                        <path d="M9 10v8"/>
+                                        <path d="M15 10v8"/>
+                                        <path d="M19 10v8"/>
+                                        <path d="M3 21h18"/>
+                                    </svg>
+                                @elseif ($metaKategori['ikon'] === 'moon')
+                                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+                                    </svg>
+                                @elseif ($metaKategori['ikon'] === 'leaf')
                                     <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
                                         <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
                                     </svg>
-                                @elseif ($metaTier['ikon'] === 'gem')
+                                @elseif ($metaKategori['ikon'] === 'gem')
                                     <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M6 3h12l4 6-10 13L2 9Z"/>
                                         <path d="M11 3 8 9l4 13 4-13-3-6"/>
@@ -199,23 +226,16 @@
                                     </svg>
                                 @else
                                     <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/>
-                                        <path d="M5 21h14"/>
+                                        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
                                     </svg>
                                 @endif
                             </span>
-                            <span class="min-w-0">
-                                <span class="block text-xs font-bold leading-tight truncate">{{ $dataTier['label'] }}</span>
-                                <span
-                                    :class="tierDrawerTema === '{{ $kodeTier }}' ? 'opacity-80' : 'text-charcoal/50'"
-                                    class="hidden sm:block font-sans tabular-nums text-[10px] leading-tight truncate"
-                                >Mulai {{ \App\Models\Tema::formatRupiah($dataTier['harga_mulai']) }}</span>
-                            </span>
+                            <span class="text-xs font-bold leading-tight truncate">{{ $dataKategori['label'] }}</span>
                         </span>
                         <span
-                            :class="tierDrawerTema === '{{ $kodeTier }}' ? '{{ $metaTier['badge_active'] }}' : 'bg-white text-charcoal/60 ring-1 ring-charcoal/10'"
+                            :class="kategoriDrawerTema === '{{ $kodeKategori }}' ? '{{ $metaKategori['badge_active'] }}' : 'bg-white text-charcoal/60 ring-1 ring-charcoal/10'"
                             class="rounded-full px-2 py-0.5 font-sans tabular-nums text-[10px] font-bold shrink-0"
-                        >{{ $dataTier['jumlah'] }}</span>
+                        >{{ $dataKategori['jumlah'] }}</span>
                     </button>
                 @endforeach
             </div>
@@ -268,15 +288,15 @@
                     @foreach ($daftarTema as $itemTema)
                         @php
                             $sedangDipakai = (int) $undangan->tema_id === (int) $itemTema->id;
-                            $infoTierStudio = $itemTema->infoTier();
+                            $infoKategoriStudio = $itemTema->infoKategori();
                             $infoDesainStudio = $itemTema->infoDesain();
                             $payloadStudioTema = [
                                 'id' => $itemTema->id,
                                 'slug' => $itemTema->slug,
                                 'nama_tema' => $itemTema->nama_tema,
-                                'tier' => $infoTierStudio['label'],
-                                'tier_kode' => $infoTierStudio['kode'],
-                                'ringkasan_tier' => $infoTierStudio['ringkasan'],
+                                'kategori' => $infoKategoriStudio['label'],
+                                'kategori_kode' => $infoKategoriStudio['kode'],
+                                'ringkasan_kategori' => $infoKategoriStudio['ringkasan'],
                                 'deskripsi' => $infoDesainStudio['deskripsi'],
                                 'harga_nominal' => $itemTema->hargaNominal(),
                                 'harga' => $itemTema->hargaFormatted(),
@@ -286,12 +306,12 @@
                                 'url_demo_embed' => route('tema.demo', ['slugTema' => $itemTema->slug, 'embed' => 1]),
                                 'url_demo' => route('tema.demo', ['slugTema' => $itemTema->slug]),
                             ];
-                            $kataKunciTema = $itemTema->nama_tema.' '.$infoTierStudio['label'];
+                            $kataKunciTema = $itemTema->nama_tema.' '.$infoKategoriStudio['label'];
                         @endphp
 
                         <button
                             type="button"
-                            x-show="temaCocokDrawer('{{ $infoTierStudio['kode'] }}', @js($kataKunciTema))"
+                            x-show="temaCocokDrawer('{{ $infoKategoriStudio['kode'] }}', @js($kataKunciTema))"
                             x-transition.opacity.duration.150ms
                             @click="pilihTemaStudio(@js($payloadStudioTema))"
                             data-drawer-tema-card="{{ $itemTema->id }}"
@@ -319,7 +339,7 @@
                                     <span>Dipilih</span>
                                 </span>
 
-                                {{-- Badge Status Dipakai / Tier (Kiri Bawah) --}}
+                                {{-- Badge Status Dipakai / Kategori (Kiri Bawah) --}}
                                 @if ($sedangDipakai)
                                     <span class="pointer-events-none absolute bottom-2 left-2 z-20 inline-flex items-center gap-1 rounded-full bg-sage px-2 py-0.5 text-[10px] font-bold text-white shadow-sm ring-1 ring-white/40">
                                         <svg class="h-2.5 w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -328,8 +348,8 @@
                                         <span>Dipakai</span>
                                     </span>
                                 @else
-                                    <span class="pointer-events-none absolute bottom-2 left-2 z-20 inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider {{ $infoTierStudio['badge_class'] }}">
-                                        {{ $infoTierStudio['label'] }}
+                                    <span class="pointer-events-none absolute bottom-2 left-2 z-20 inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider {{ $infoKategoriStudio['badge_class'] }}">
+                                        {{ $infoKategoriStudio['label'] }}
                                     </span>
                                 @endif
                             </div>
@@ -341,7 +361,7 @@
                                         {{ $itemTema->nama_tema }}
                                     </p>
                                     <p class="mt-0.5 text-[10px] {{ $sedangDipakai ? 'font-semibold italic text-sage' : 'text-charcoal/55 truncate' }}">
-                                        {{ $sedangDipakai ? 'Tema saat ini' : $infoTierStudio['ringkasan'] }}
+                                        {{ $sedangDipakai ? 'Tema saat ini' : $infoKategoriStudio['ringkasan'] }}
                                     </p>
                                 </div>
 
@@ -369,17 +389,17 @@
 
                 {{-- Status Kosong Saat Filter Tidak Cocok --}}
                 <div
-                    x-show="!indeksTemaStudio.some((item) => temaCocokDrawer(item.tier, item.teks))"
+                    x-show="!indeksTemaStudio.some((item) => temaCocokDrawer(item.kategori, item.teks))"
                     x-cloak
                     class="rounded-2xl bg-white p-8 text-center ring-1 ring-champagne/30 space-y-2.5"
                 >
                     <p class="text-sm font-semibold text-charcoal">Tidak ada tema yang cocok dengan filter ini.</p>
                     <button
                         type="button"
-                        @click="tierDrawerTema = 'semua'; cariDrawerTema = ''"
+                        @click="kategoriDrawerTema = 'semua'; cariDrawerTema = ''"
                         class="inline-flex items-center justify-center rounded-full bg-sage px-4 py-2 text-xs font-semibold text-white hover:bg-[#3b5047] transition cursor-pointer"
                     >
-                        Tampilkan Semua Tier
+                        Tampilkan Semua Kategori
                     </button>
                 </div>
             </div>
@@ -462,7 +482,7 @@
                             <div class="flex items-center gap-1.5">
                                 <span
                                     class="inline-flex items-center rounded-full bg-ivory px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#8A6D33] ring-1 ring-champagne/35"
-                                    x-text="temaPreviewStudio?.tier || ''"
+                                    x-text="temaPreviewStudio?.kategori || ''"
                                 ></span>
                                 <span
                                     x-show="temaPreviewStudio && temaPreviewStudio.id !== temaAktifEditorId"
@@ -512,7 +532,7 @@
         >
             <div class="min-w-0">
                 <p class="text-xs font-bold text-charcoal truncate" x-text="temaPreviewStudio?.nama_tema"></p>
-                <p class="font-sans tabular-nums text-[11px] font-semibold text-sage" x-text="(temaPreviewStudio?.tier || '') + ' • ' + (temaPreviewStudio?.harga || '')"></p>
+                <p class="font-sans tabular-nums text-[11px] font-semibold text-sage" x-text="(temaPreviewStudio?.kategori || '') + ' • ' + (temaPreviewStudio?.harga || '')"></p>
             </div>
             <div class="flex items-center gap-2 shrink-0">
                 <button
@@ -586,7 +606,7 @@
 
         <div class="mt-4 rounded-2xl bg-ivory/80 px-4 py-3 ring-1 ring-champagne/30 flex items-center justify-between gap-3">
             <div class="min-w-0">
-                <p class="text-[10px] font-bold uppercase tracking-wider text-sage" x-text="'Tier ' + (temaKonfirmasi?.tier || '')"></p>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-sage" x-text="'Kategori ' + (temaKonfirmasi?.kategori || '')"></p>
                 <p class="mt-0.5 font-sans text-sm font-bold text-charcoal truncate" x-text="temaKonfirmasi?.nama_tema"></p>
             </div>
             <div class="text-right shrink-0">

@@ -368,7 +368,7 @@ class Tahap4DashboardAdminWebpTest extends TestCase
             ->post('/admin/tema', [
                 'nama_tema' => 'Starry Ballroom',
                 'slug' => 'starry-ballroom',
-                'kategori' => 'luxury',
+                'kategori' => 'elegan',
                 'lokasi_view' => 'tema.luxury-noir.index',
                 'aktif' => '1',
             ])
@@ -376,7 +376,7 @@ class Tahap4DashboardAdminWebpTest extends TestCase
 
         $this->assertDatabaseHas('tema', [
             'slug' => 'starry-ballroom',
-            'kategori' => 'luxury',
+            'kategori' => 'elegan',
         ]);
     }
 

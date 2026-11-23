@@ -120,7 +120,7 @@ class DashboardUndanganController extends Controller
     public function katalog(Request $request): View
     {
         $daftarTema = Tema::where('aktif', true)->orderBy('id')->get();
-        $ringkasanTier = Tema::ringkasanTier($daftarTema);
+        $ringkasanKategori = Tema::ringkasanKategori($daftarTema);
         $daftarUndanganSaya = $request->user()
             ->undangan()
             ->with(['tema', 'transaksi'])
@@ -132,7 +132,7 @@ class DashboardUndanganController extends Controller
 
         return view('dashboard.katalog', [
             'daftarTema' => $daftarTema,
-            'ringkasanTier' => $ringkasanTier,
+            'ringkasanKategori' => $ringkasanKategori,
             'daftarUndanganSaya' => $daftarUndanganSaya,
             'temaPrepilih' => $temaPrepilih,
             'durasiAktifBulan' => PengaturanSesiTemu::masaAktifBulan(),

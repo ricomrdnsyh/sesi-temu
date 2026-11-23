@@ -92,11 +92,14 @@
                 <div class="absolute inset-0 bg-gradient-to-b from-[#132623]/70 via-[#1D3532]/50 to-[#132623]/80"></div>
             </div>
 
+            {{-- INTRO PEMBUKA BESPOKE SEBELUM SAMPUL --}}
+            @include('komponen-undangan.intro-pembuka')
+
             {{-- SAMPUL PEMBUKA FADE HALUS --}}
             @include('tema.velvet-garden.partials._sampul')
 
             {{-- KONTEN UTAMA VELVET GARDEN --}}
-            <main data-panggung-3d class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
+            <main data-panggung-3d data-sinema-gsap="velvet-garden" class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
                 @include('tema.velvet-garden.partials._hero-dan-pembuka')
                 @include('tema.velvet-garden.partials._konten-utama')
                 @include('tema.velvet-garden.partials._penutup-dan-rsvp')

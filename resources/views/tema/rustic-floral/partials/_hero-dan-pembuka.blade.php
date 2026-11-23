@@ -111,27 +111,28 @@
 
 {{-- SEKSI 2: SCRAPBOOK SNAPSHOT WASHI-TAPE + MONOGRAM + AYAT --}}
 <section
-    data-aos="fade-up"
     data-section-pembuka="klasik"
     class="relative bg-[#3E5349] text-[#FDFBF7] px-5 py-12 overflow-hidden"
 >
     <div class="max-w-md mx-auto text-center space-y-6">
         <div class="grid grid-cols-3 items-center max-w-[200px] mx-auto">
-            <span class="fx-slide-left font-serif text-4xl sm:text-5xl font-bold text-[#E5D5C0]">{{ $undangan->inisialPria() }}</span>
-            <span class="fx-scale-in font-kaligrafi text-3xl text-[#BFA15F]">&amp;</span>
-            <span class="fx-slide-right font-serif text-4xl sm:text-5xl font-bold text-[#E5D5C0]">{{ $undangan->inisialWanita() }}</span>
+            <span data-gsap="kiri" class="fx-slide-left font-serif text-4xl sm:text-5xl font-bold text-[#E5D5C0]">{{ $undangan->inisialPria() }}</span>
+            <span data-gsap="mekar" data-gsap-delay="0.07" class="font-kaligrafi text-3xl text-[#BFA15F]">&amp;</span>
+            <span data-gsap="kanan" class="fx-slide-right font-serif text-4xl sm:text-5xl font-bold text-[#E5D5C0]">{{ $undangan->inisialWanita() }}</span>
         </div>
 
         @if ($urlFotoPembuka)
-            <div class="fx-scale-in relative mx-auto w-56 sm:w-64 bg-white p-2 pb-5 shadow-2xl -rotate-1">
-                <span aria-hidden="true" class="pointer-events-none absolute -top-2.5 left-1/2 -translate-x-1/2 w-20 h-5 bg-[#E5D5C0]/90 rotate-1 shadow-xs"></span>
-                <img src="{{ $urlFotoPembuka }}" alt="Foto Pembuka {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}" class="w-full aspect-[4/5] object-cover object-top">
-                <p class="mt-2 font-kaligrafi text-lg text-[#4B6358]">{{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}</p>
+            <div data-gsap="potret" class="mx-auto w-56 sm:w-64">
+                <div class="relative bg-white p-2 pb-5 shadow-2xl -rotate-1">
+                    <span aria-hidden="true" class="pointer-events-none absolute -top-2.5 left-1/2 -translate-x-1/2 w-20 h-5 bg-[#E5D5C0]/90 rotate-1 shadow-xs"></span>
+                    <img src="{{ $urlFotoPembuka }}" alt="Foto Pembuka {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}" class="w-full aspect-[4/5] object-cover object-top">
+                    <p class="mt-2 font-kaligrafi text-lg text-[#4B6358]">{{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}</p>
+                </div>
             </div>
         @endif
 
         @if ($undangan->kutipan_ayat)
-            <blockquote class="fx-rise rounded-2xl bg-[#FDFBF7] text-[#1F2937] border border-[#BFA15F]/45 px-6 py-6 shadow-md kartu-3d">
+            <blockquote data-gsap="naik" class="rounded-2xl bg-[#FDFBF7] text-[#1F2937] border border-[#BFA15F]/45 px-6 py-6 shadow-md kartu-3d">
                 <p class="italic text-xs sm:text-sm text-[#1F2937]/85 leading-relaxed">
                     &ldquo;{{ $undangan->kutipan_ayat }}&rdquo;
                 </p>

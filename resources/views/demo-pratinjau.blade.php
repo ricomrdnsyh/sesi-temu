@@ -372,7 +372,7 @@
                         </p>
                         <span class="inline-block h-1 w-1 rounded-full bg-[#BFA15F]/70" aria-hidden="true"></span>
                         <span class="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-charcoal/50 leading-none">
-                            {{ $tema->tierLabel() }}
+                            {{ $tema->kategoriLabel() }}
                         </span>
                     </div>
                     <h1 class="mt-1 font-logo text-[16px] font-bold text-charcoal leading-tight truncate">

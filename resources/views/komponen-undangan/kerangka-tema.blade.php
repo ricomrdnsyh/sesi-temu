@@ -219,6 +219,11 @@
                     class="pointer-events-none fixed lg:hidden top-3 {{ $ornamenGantung ? 'right-3 w-10 sm:w-12' : 'right-2 w-16 sm:w-20' }} opacity-65 z-20 drop-shadow-lg animasi-ayun-3d-balik">
             @endif
 
+            {{-- INTRO PEMBUKA BESPOKE SEBELUM SAMPUL --}}
+            @include('komponen-undangan.intro-pembuka', [
+                'lebarKolomIntro' => 'lg:w-[445px] xl:w-[475px]',
+            ])
+
             {{-- SAMPUL PEMBUKA DENGAN TRANSISI FADE HALUS (TANPA EFEK BUKA BUKU / BELAH PINTU) --}}
             <section data-transisi-sampul="fade-halus"
                 class="tirai-fade-halus fixed inset-0 mx-auto h-dvh w-full lg:w-[445px] xl:w-[475px] z-40"
@@ -322,7 +327,7 @@
             </section>
 
             {{-- KONTEN UTAMA UNDANGAN (ARSITEKTUR MODULAR 9 TEMA UNIK + 3D MOTION SCROLL) --}}
-            <main data-panggung-3d
+            <main data-panggung-3d data-sinema-gsap="kerangka"
                 class="panggung-3d relative z-10">
                 {{-- 1 & 2. Hero Diorama 3D Multi-Lapis + Permukaan Pembuka & Ayat --}}
                 @include('komponen-undangan.bagian-hero-dan-ayat')

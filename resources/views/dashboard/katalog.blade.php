@@ -24,7 +24,6 @@
                 'id' => $temaPrepilih->id,
                 'nama_tema' => $temaPrepilih->nama_tema,
                 'kategori' => $temaPrepilih->kategoriLabel(),
-                'tier' => $temaPrepilih->tierLabel(),
                 'harga' => $temaPrepilih->hargaFormatted(),
                 'harga_asli' => $temaPrepilih->adaDiskon() ? $temaPrepilih->hargaAsliFormatted() : null,
                 'badge_diskon' => $temaPrepilih->labelBadgeDiskon(),
@@ -34,7 +33,7 @@
     @endphp
 
     <div x-data="{
-        tierAktif: 'semua',
+        kategoriAktif: 'semua',
         kataCariTema: '',
         previewTerbukaId: null,
         sampulLightboxSlug: null,
@@ -52,7 +51,6 @@
         'id' => null,
         'nama_tema' => '',
         'kategori' => '',
-        'tier' => '',
         'harga' => '',
         'harga_asli' => null,
         'badge_diskon' => null,
@@ -84,14 +82,14 @@
             this.alurPakai = 'buat';
             this.modalPakaiTerbuka = true;
         },
-        temaCocok(tier, nama = '') {
-            const cocokTier = this.tierAktif === 'semua' || this.tierAktif === tier;
+        temaCocok(kategori, nama = '') {
+            const cocokKategori = this.kategoriAktif === 'semua' || this.kategoriAktif === kategori;
             const kata = this.kataCariTema.trim().toLowerCase();
             const cocokCari = !kata || nama.toLowerCase().includes(kata);
-            return cocokTier && cocokCari;
+            return cocokKategori && cocokCari;
         },
         resetFilter() {
-            this.tierAktif = 'semua';
+            this.kategoriAktif = 'semua';
             this.kataCariTema = '';
         },
         bukaLightboxSampul(slug) {
@@ -108,7 +106,7 @@
             @include('dashboard._top-nav', ['halamanAktif' => 'katalog'])
 
             <main class="flex-1 w-full px-4 sm:px-6 lg:px-8 xl:px-10 pt-4 sm:pt-6 pb-28 md:py-8 space-y-5 md:space-y-6">
-            {{-- Header & Filter Katalog Terpadu (Light Surface Command Bar + Filter Tier Landing Page) --}}
+            {{-- Header & Filter Katalog Terpadu (Light Surface Command Bar + Filter Kategori Gaya) --}}
             <section class="rounded-[1.5rem] bg-white p-4 sm:p-5 shadow-xs ring-1 ring-champagne/25 space-y-4">
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5">
                     <div class="flex items-start sm:items-center gap-3.5 min-w-0">
@@ -161,19 +159,17 @@
                     </div>
                 </div>
 
-                {{-- Pilihan Tingkatan Kualitas (Tier) Tema: 4 Tab Berikon (Identik dengan Landing Page) --}}
-                <div class="pt-3.5 border-t border-champagne/15 grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
-                    <button type="button" @click="tierAktif = 'semua'"
-                        :class="tierAktif === 'semua'
-                            ?
-                            'bg-white text-charcoal ring-2 ring-sage shadow-sm' :
-                            'bg-[#FAF7F0] text-charcoal/75 ring-1 ring-champagne/30 hover:bg-white hover:ring-champagne/65 hover:text-charcoal'"
-                        class="group flex items-center justify-between gap-2.5 rounded-2xl px-3.5 sm:px-4 py-3 sm:py-3.5 text-left transition-all duration-200 cursor-pointer">
-                        <span class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                {{-- Pilihan Kategori Gaya Tema: Semua, Adat, Islami, Floral, Elegan, Modern --}}
+                <div data-filter-kategori-katalog class="pt-3.5 border-t border-champagne/15 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+                    <button type="button" data-filter-kategori="semua" @click="kategoriAktif = 'semua'"
+                        :class="kategoriAktif === 'semua'
+                            ? 'bg-white text-charcoal ring-2 ring-sage shadow-sm'
+                            : 'bg-[#FAF7F0] text-charcoal/75 ring-1 ring-champagne/30 hover:bg-white hover:ring-champagne/65 hover:text-charcoal'"
+                        class="group flex items-center justify-between gap-2 rounded-2xl px-3.5 py-3 text-left transition-all duration-150 cursor-pointer">
+                        <span class="flex items-center gap-2.5 min-w-0">
                             <span
-                                :class="tierAktif === 'semua' ? 'bg-sage/12 text-sage' :
-                                    'bg-white text-charcoal/50 ring-1 ring-champagne/25 group-hover:text-sage'"
-                                class="inline-flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl transition-colors">
+                                :class="kategoriAktif === 'semua' ? 'bg-sage/12 text-sage' : 'bg-white text-charcoal/50 ring-1 ring-champagne/25 group-hover:text-sage'"
+                                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors">
                                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                     <rect width="7" height="7" x="3" y="3" rx="1.5" />
@@ -182,81 +178,99 @@
                                     <rect width="7" height="7" x="3" y="14" rx="1.5" />
                                 </svg>
                             </span>
-                            <span class="text-xs sm:text-sm font-bold tracking-tight truncate">Semua Tier</span>
+                            <span class="text-xs sm:text-sm font-bold tracking-tight truncate">Semua</span>
                         </span>
                         <span
-                            :class="tierAktif === 'semua' ? 'bg-sage ring-4 ring-sage/20' :
-                                'bg-charcoal/15 group-hover:bg-sage/40'"
+                            :class="kategoriAktif === 'semua' ? 'bg-sage ring-4 ring-sage/20' : 'bg-charcoal/15 group-hover:bg-sage/40'"
                             class="h-2 w-2 rounded-full shrink-0 transition-all" aria-hidden="true"></span>
                     </button>
 
                     @foreach ([
-            'basic' => [
-                'ikon' => 'leaf',
-                'active' => 'bg-gradient-to-r from-[#2D4439] to-sage text-white ring-1 ring-sage shadow-md shadow-sage/20',
-                'icon_active' => 'bg-white/15 text-ivory',
-                'icon_idle' => 'bg-white text-sage ring-1 ring-champagne/25',
-                'dot_active' => 'bg-[#F3DFB0] ring-4 ring-white/20',
-            ],
-            'premium' => [
-                'ikon' => 'gem',
-                'active' => 'bg-gradient-to-r from-[#BFA15F] to-[#A68743] text-white ring-1 ring-champagne shadow-md shadow-champagne/25',
-                'icon_active' => 'bg-white/20 text-white',
-                'icon_idle' => 'bg-white text-[#8A6D33] ring-1 ring-champagne/25',
-                'dot_active' => 'bg-white ring-4 ring-white/25',
-            ],
-            'eksklusif' => [
-                'ikon' => 'crown',
-                'active' => 'bg-gradient-to-r from-[#141C24] via-charcoal to-[#262E38] text-[#F3DFB0] ring-2 ring-champagne/65 shadow-lg',
-                'icon_active' => 'bg-champagne/20 text-[#F3DFB0]',
-                'icon_idle' => 'bg-white text-charcoal ring-1 ring-champagne/25',
-                'dot_active' => 'bg-champagne ring-4 ring-champagne/25',
-            ],
-        ] as $kodeTier => $metaTier)
-                        @php $dataTier = $ringkasanTier[$kodeTier]; @endphp
-                        <button type="button" @click="tierAktif = '{{ $kodeTier }}'"
-                            :class="tierAktif === '{{ $kodeTier }}'
-                                ?
-                                '{{ $metaTier['active'] }}' :
-                                'bg-[#FAF7F0] text-charcoal/75 ring-1 ring-champagne/30 hover:bg-white hover:ring-champagne/65 hover:text-charcoal'"
-                            class="group flex items-center justify-between gap-2.5 rounded-2xl px-3.5 sm:px-4 py-3 sm:py-3.5 text-left transition-all duration-200 cursor-pointer">
-                            <span class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                        'adat' => [
+                            'ikon' => 'landmark',
+                            'active' => 'bg-gradient-to-r from-[#BFA15F] to-[#A68743] text-white ring-1 ring-champagne shadow-md shadow-champagne/25',
+                            'icon_active' => 'bg-white/20 text-white',
+                            'icon_idle' => 'bg-white text-[#8A6D33] ring-1 ring-champagne/25',
+                            'dot_active' => 'bg-white ring-4 ring-white/25',
+                        ],
+                        'islami' => [
+                            'ikon' => 'moon',
+                            'active' => 'bg-gradient-to-r from-[#184D47] to-[#236B62] text-white ring-1 ring-[#184D47] shadow-md shadow-[#184D47]/20',
+                            'icon_active' => 'bg-white/15 text-[#F3DFB0]',
+                            'icon_idle' => 'bg-white text-[#184D47] ring-1 ring-champagne/25',
+                            'dot_active' => 'bg-[#F3DFB0] ring-4 ring-white/20',
+                        ],
+                        'floral' => [
+                            'ikon' => 'leaf',
+                            'active' => 'bg-gradient-to-r from-[#2D4439] to-sage text-white ring-1 ring-sage shadow-md shadow-sage/20',
+                            'icon_active' => 'bg-white/15 text-ivory',
+                            'icon_idle' => 'bg-white text-sage ring-1 ring-champagne/25',
+                            'dot_active' => 'bg-[#F3DFB0] ring-4 ring-white/20',
+                        ],
+                        'elegan' => [
+                            'ikon' => 'gem',
+                            'active' => 'bg-gradient-to-r from-[#141C24] via-charcoal to-[#262E38] text-[#F3DFB0] ring-2 ring-champagne/65 shadow-lg',
+                            'icon_active' => 'bg-champagne/20 text-[#F3DFB0]',
+                            'icon_idle' => 'bg-white text-charcoal ring-1 ring-champagne/25',
+                            'dot_active' => 'bg-champagne ring-4 ring-champagne/25',
+                        ],
+                        'modern' => [
+                            'ikon' => 'sparkles',
+                            'active' => 'bg-gradient-to-r from-zinc-800 to-zinc-700 text-white ring-1 ring-zinc-700 shadow-md',
+                            'icon_active' => 'bg-white/15 text-white',
+                            'icon_idle' => 'bg-white text-zinc-700 ring-1 ring-champagne/25',
+                            'dot_active' => 'bg-white ring-4 ring-white/25',
+                        ],
+                    ] as $kodeKategori => $metaKategori)
+                        @php $dataKategori = $ringkasanKategori[$kodeKategori]; @endphp
+                        <button type="button" data-filter-kategori="{{ $kodeKategori }}" @click="kategoriAktif = '{{ $kodeKategori }}'"
+                            :class="kategoriAktif === '{{ $kodeKategori }}'
+                                ? '{{ $metaKategori['active'] }}'
+                                : 'bg-[#FAF7F0] text-charcoal/75 ring-1 ring-champagne/30 hover:bg-white hover:ring-champagne/65 hover:text-charcoal'"
+                            class="group flex items-center justify-between gap-2 rounded-2xl px-3.5 py-3 text-left transition-all duration-150 cursor-pointer">
+                            <span class="flex items-center gap-2.5 min-w-0">
                                 <span
-                                    :class="tierAktif === '{{ $kodeTier }}' ? '{{ $metaTier['icon_active'] }}' :
-                                        '{{ $metaTier['icon_idle'] }}'"
-                                    class="inline-flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl transition-colors">
-                                    @if ($metaTier['ikon'] === 'leaf')
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                            aria-hidden="true">
-                                            <path
-                                                d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                                    :class="kategoriAktif === '{{ $kodeKategori }}' ? '{{ $metaKategori['icon_active'] }}' : '{{ $metaKategori['icon_idle'] }}'"
+                                    class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors">
+                                    @if ($metaKategori['ikon'] === 'landmark')
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M12 2 3 7h18l-9-5Z" />
+                                            <path d="M5 10v8" />
+                                            <path d="M9 10v8" />
+                                            <path d="M15 10v8" />
+                                            <path d="M19 10v8" />
+                                            <path d="M3 21h18" />
+                                        </svg>
+                                    @elseif ($metaKategori['ikon'] === 'moon')
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                                        </svg>
+                                    @elseif ($metaKategori['ikon'] === 'leaf')
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
                                             <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
                                         </svg>
-                                    @elseif ($metaTier['ikon'] === 'gem')
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                            aria-hidden="true">
+                                    @elseif ($metaKategori['ikon'] === 'gem')
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                             <path d="M6 3h12l4 6-10 13L2 9Z" />
                                             <path d="M11 3 8 9l4 13 4-13-3-6" />
                                             <path d="M2 9h20" />
                                         </svg>
                                     @else
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                            aria-hidden="true">
-                                            <path
-                                                d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" />
-                                            <path d="M5 21h14" />
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
                                         </svg>
                                     @endif
                                 </span>
-                                <span
-                                    class="text-xs sm:text-sm font-bold tracking-tight truncate">{{ $dataTier['label'] }}</span>
+                                <span class="text-xs sm:text-sm font-bold tracking-tight truncate">{{ $dataKategori['label'] }}</span>
                             </span>
                             <span
-                                :class="tierAktif === '{{ $kodeTier }}' ? '{{ $metaTier['dot_active'] }}' :
-                                    'bg-charcoal/15 group-hover:bg-champagne/60'"
+                                :class="kategoriAktif === '{{ $kodeKategori }}' ? '{{ $metaKategori['dot_active'] }}' : 'bg-charcoal/15 group-hover:bg-champagne/60'"
                                 class="h-2 w-2 rounded-full shrink-0 transition-all" aria-hidden="true"></span>
                         </button>
                     @endforeach
@@ -268,21 +282,20 @@
                 @forelse ($daftarTema as $tema)
                     @php
                         $infoDesain = $tema->infoDesain();
-                        $infoTier = $tema->infoTier();
+                        $infoKategori = $tema->infoKategori();
                         $payloadTema = [
                             'id' => $tema->id,
                             'nama_tema' => $tema->nama_tema,
                             'kategori' => $tema->kategoriLabel(),
-                            'tier' => $infoTier['label'],
                             'harga' => $tema->hargaFormatted(),
                             'harga_asli' => $tema->adaDiskon() ? $tema->hargaAsliFormatted() : null,
                             'badge_diskon' => $tema->labelBadgeDiskon(),
                             'gambar_url' => $tema->urlGambarPratinjau(),
                         ];
                     @endphp
-                    <div x-show="temaCocok('{{ $infoTier['kode'] }}', '{{ e($tema->nama_tema . ' ' . $tema->kategoriLabel()) }}')"
+                    <div x-show="temaCocok('{{ $infoKategori['kode'] }}', '{{ e($tema->nama_tema . ' ' . $tema->kategoriLabel()) }}')"
                         x-transition
-                        class="group rounded-2xl bg-white {{ $infoTier['card_ring'] }} flex flex-col transition duration-300 hover:shadow-xl hover:-translate-y-0.5 relative">
+                        class="group rounded-2xl bg-white {{ $infoKategori['card_ring'] }} flex flex-col transition duration-300 hover:shadow-xl hover:-translate-y-0.5 relative">
                         <button type="button" @click="bukaLightboxSampul('{{ $tema->slug }}')"
                             aria-label="Perbesar sampul {{ $tema->nama_tema }}"
                             class="group/poster relative block w-full overflow-hidden rounded-t-2xl bg-ivory text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-sage">
@@ -306,15 +319,10 @@
                         <div class="p-4 sm:p-6 bg-white rounded-b-2xl flex-1 flex flex-col justify-between">
                             <div>
                                 <div class="flex flex-wrap items-center justify-between gap-2 text-[11px]">
-                                    <div class="flex items-center gap-1.5">
-                                        <span
-                                            class="font-bold uppercase tracking-wider text-[#8A6D33]">{{ $tema->kategoriLabel() }}</span>
-                                        <span class="text-charcoal/25">&bull;</span>
-                                        <span
-                                            class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider {{ $infoTier['badge_class'] }}">
-                                            <span>{{ $infoTier['label'] }}</span>
-                                        </span>
-                                    </div>
+                                    <span
+                                        class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider {{ $infoKategori['badge_class'] }}">
+                                        <span>{{ $infoKategori['label'] }}</span>
+                                    </span>
                                     @if ($infoDesain['dukungan_tf'])
                                         <span
                                             class="rounded-full bg-ivory px-2.5 py-0.5 font-medium text-charcoal/75 ring-1 ring-champagne/30">
@@ -344,10 +352,10 @@
                                     </div>
 
                                     <span
-                                        class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-semibold {{ $infoTier['chip_class'] }}">
+                                        class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-semibold {{ $infoKategori['chip_class'] }}">
                                         <span class="inline-block w-1.5 h-1.5 rounded-full"
                                             style="background-color: {{ $infoDesain['warna_aksen'] }}"></span>
-                                        <span>{{ $infoTier['ringkasan'] }}</span>
+                                        <span>{{ $infoKategori['ringkasan'] }}</span>
                                     </span>
                                 </div>
                             </div>
@@ -544,7 +552,7 @@
                         <div class="flex flex-wrap items-center gap-1.5">
                             <span
                                 class="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold uppercase text-charcoal ring-1 ring-charcoal/10"
-                                x-text="temaDipilih.tier"></span>
+                                x-text="temaDipilih.kategori"></span>
                             <span x-show="temaDipilih.badge_diskon"
                                 class="rounded-full bg-rose-600 px-2 py-0.5 text-[10px] font-bold text-white"
                                 x-text="temaDipilih.badge_diskon"></span>

@@ -62,7 +62,7 @@
 
             <button
                 type="button"
-                @click="amplopTerbuka = !amplopTerbuka"
+                @click="amplopTerbuka = !amplopTerbuka; window.SesiTemuSinema?.refresh(360)"
                 class="mt-4 inline-flex items-center gap-2 {{ $kelasRadiusPill }} px-5 py-2 text-xs font-semibold transition cursor-pointer {{ $kelasTombol ?? 'bg-sage text-white hover:bg-sage/90' }}"
             >
                 <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -206,7 +206,7 @@
                     {{-- Daftar Ucapan Demo Scrollable --}}
                     <div class="pt-5 border-t border-current/15 space-y-3">
                         <h3 class="font-serif text-lg font-bold">Doa &amp; Ucapan (<span x-text="daftarUcapan.length">{{ count($ucapanDemoFallback) }}</span>)</h3>
-                        <div x-ref="daftarUcapanScroll" class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
+                        <div x-ref="daftarUcapanScroll" data-lenis-prevent class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
                             <template x-for="ucapan in daftarUcapan" :key="ucapan.id">
                                 <div class="{{ $kelasRadiusSedang }} p-4 border border-current/10 bg-current/[0.03] space-y-1.5">
                                     <div class="flex items-center justify-between gap-2">
@@ -286,7 +286,7 @@
                 {{-- Daftar Ucapan --}}
                 <div class="mt-7 pt-5 border-t border-current/15 space-y-3">
                     <h3 class="font-serif text-lg font-bold">Doa &amp; Ucapan ({{ $undangan->bukuTamu->count() }})</h3>
-                    <div class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
+                    <div data-lenis-prevent class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
                         @forelse ($undangan->bukuTamu as $ucapan)
                             <div class="{{ $kelasRadiusSedang }} p-4 border border-current/10 bg-current/[0.03] space-y-1.5">
                                 <div class="flex items-center justify-between gap-2">

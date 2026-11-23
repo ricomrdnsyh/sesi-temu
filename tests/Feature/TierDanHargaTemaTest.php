@@ -38,10 +38,13 @@ class TierDanHargaTemaTest extends TestCase
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('Semua Tier')
-            ->assertSee('Basic')
-            ->assertSee('Premium')
-            ->assertSee('Eksklusif')
+            ->assertSee('data-filter-kategori="semua"', false)
+            ->assertSee('Adat')
+            ->assertSee('Islami')
+            ->assertSee('Floral')
+            ->assertSee('Elegan')
+            ->assertSee('Modern')
+            ->assertDontSee('Semua Tier')
             ->assertSee('Rp 59.000')
             ->assertSee('Rp 79.000')
             ->assertSee('Rp 89.000')
@@ -57,7 +60,7 @@ class TierDanHargaTemaTest extends TestCase
         $tema = Tema::create([
             'nama_tema' => 'Tema Custom Sultan',
             'slug' => 'custom-sultan',
-            'kategori' => 'luxury',
+            'kategori' => 'elegan',
             'tier' => 'eksklusif',
             'harga' => 175000,
             'lokasi_view' => 'tema.luxury-noir.index',
@@ -67,14 +70,15 @@ class TierDanHargaTemaTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('Tema Custom Sultan')
-            ->assertSee('Eksklusif')
+            ->assertSee('Elegan')
             ->assertSee('Rp 175.000')
             ->assertSee('Total mulai Rp 225.000');
 
-        $tema->update(['tier' => 'premium', 'harga' => 95000]);
+        $tema->update(['kategori' => 'adat', 'tier' => 'premium', 'harga' => 95000]);
 
         $this->get('/')
             ->assertOk()
+            ->assertSee('Adat')
             ->assertSee('Rp 95.000')
             ->assertSee('Total mulai Rp 145.000')
             ->assertDontSee('Rp 175.000');
@@ -137,7 +141,7 @@ class TierDanHargaTemaTest extends TestCase
         $this->get('/daftar?tema='.$tema->id)
             ->assertOk()
             ->assertSee('Luxury Noir Monogram')
-            ->assertSee('Eksklusif')
+            ->assertSee('Elegan')
             ->assertSee('Rp 119.000');
 
         $this->get('/demo/luxury-noir?kanvas=1')

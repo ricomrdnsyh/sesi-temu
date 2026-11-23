@@ -163,11 +163,11 @@ class Tahap1DatabaseModelSeederTest extends TestCase
         $this->assertSame('client', $client->peran);
 
         $this->assertSame(9, Tema::count());
-        $this->assertDatabaseHas('tema', ['slug' => 'rustic-floral', 'kategori' => 'modern']);
+        $this->assertDatabaseHas('tema', ['slug' => 'rustic-floral', 'kategori' => 'floral']);
         $this->assertDatabaseHas('tema', ['slug' => 'editorial-monokrom', 'kategori' => 'modern']);
-        $this->assertDatabaseHas('tema', ['slug' => 'luxury-noir', 'kategori' => 'luxury']);
-        $this->assertDatabaseHas('tema', ['slug' => 'royal-ivory', 'kategori' => 'luxury']);
-        $this->assertDatabaseHas('tema', ['slug' => 'velvet-garden', 'kategori' => 'motion']);
+        $this->assertDatabaseHas('tema', ['slug' => 'luxury-noir', 'kategori' => 'elegan']);
+        $this->assertDatabaseHas('tema', ['slug' => 'royal-ivory', 'kategori' => 'elegan']);
+        $this->assertDatabaseHas('tema', ['slug' => 'velvet-garden', 'kategori' => 'floral']);
         $this->assertDatabaseHas('tema', ['slug' => 'adat-jawa', 'kategori' => 'adat']);
         $this->assertDatabaseHas('tema', ['slug' => 'sunda-heritage', 'kategori' => 'adat']);
         $this->assertDatabaseHas('tema', ['slug' => 'islami-syari', 'kategori' => 'islami']);

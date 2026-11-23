@@ -64,11 +64,14 @@
                 <div class="absolute inset-0 bg-gradient-to-b from-[#FBF8F3]/75 via-[#FBF8F3]/50 to-[#EFE7DA]/80"></div>
             </div>
 
+            {{-- INTRO PEMBUKA BESPOKE SEBELUM SAMPUL --}}
+            @include('komponen-undangan.intro-pembuka')
+
             {{-- SAMPUL PEMBUKA FADE HALUS --}}
             @include('tema.royal-ivory.partials._sampul')
 
             {{-- KONTEN UTAMA ROYAL IVORY CATHEDRAL --}}
-            <main data-panggung-3d class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
+            <main data-panggung-3d data-sinema-gsap="royal-ivory" class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
                 @include('tema.royal-ivory.partials._hero-dan-pembuka')
                 @include('tema.royal-ivory.partials._konten-utama')
                 @include('tema.royal-ivory.partials._penutup-dan-rsvp')

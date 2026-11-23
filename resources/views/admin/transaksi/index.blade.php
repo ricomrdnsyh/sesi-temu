@@ -91,7 +91,7 @@
                 <select name="tema_id" required class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2 text-sm">
                     @foreach ($daftarTema as $temaItem)
                         <option value="{{ $temaItem->id }}">
-                            {{ $temaItem->nama_tema }} ({{ $temaItem->tierLabel() }} — {{ $temaItem->hargaFormatted() }})
+                            {{ $temaItem->nama_tema }} ({{ $temaItem->kategoriLabel() }} — {{ $temaItem->hargaFormatted() }})
                         </option>
                     @endforeach
                 </select>

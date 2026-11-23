@@ -35,7 +35,7 @@ class AdminTemaController extends Controller
 
         return view('admin.tema.form', [
             'tema' => new Tema([
-                'kategori' => 'modern',
+                'kategori' => 'adat',
                 'tier' => 'basic',
                 'harga' => Tema::HARGA_BAWAAN_TIER['basic'],
                 'lokasi_view' => $lokasiBawaan,
@@ -176,7 +176,7 @@ class AdminTemaController extends Controller
     public function terapkanDiskonMassal(Request $request): RedirectResponse
     {
         $tervalidasi = $request->validate([
-            'target_tier' => ['required', Rule::in(['semua', ...array_keys(Tema::TIER_TERSEDIA)])],
+            'target_kategori' => ['required', Rule::in(['semua', ...array_keys(Tema::KATEGORI_TERSEDIA)])],
             'diskon_tipe' => ['required', Rule::in(['nominal', 'persen'])],
             'diskon_nilai' => ['required', 'integer', 'min:1', 'max:100000000'],
         ], [
@@ -191,8 +191,8 @@ class AdminTemaController extends Controller
         }
 
         $query = Tema::query();
-        if ($tervalidasi['target_tier'] !== 'semua') {
-            $query->where('tier', $tervalidasi['target_tier']);
+        if ($tervalidasi['target_kategori'] !== 'semua') {
+            $query->where('kategori', $tervalidasi['target_kategori']);
         }
 
         $jumlahTerpengaruh = $query->update([
@@ -200,9 +200,9 @@ class AdminTemaController extends Controller
             'diskon_nilai' => (int) $tervalidasi['diskon_nilai'],
         ]);
 
-        $labelTarget = $tervalidasi['target_tier'] === 'semua'
+        $labelTarget = $tervalidasi['target_kategori'] === 'semua'
             ? 'semua tema katalog'
-            : 'tema tier '.(Tema::TIER_TERSEDIA[$tervalidasi['target_tier']] ?? $tervalidasi['target_tier']);
+            : 'tema kategori '.(Tema::KATEGORI_TERSEDIA[$tervalidasi['target_kategori']] ?? $tervalidasi['target_kategori']);
 
         return redirect()
             ->route('admin.tema.index')
@@ -211,11 +211,11 @@ class AdminTemaController extends Controller
 
     public function resetDiskonMassal(Request $request): RedirectResponse
     {
-        $targetTier = (string) $request->input('target_tier', 'semua');
+        $targetKategori = (string) $request->input('target_kategori', 'semua');
 
         $query = Tema::query();
-        if (array_key_exists($targetTier, Tema::TIER_TERSEDIA)) {
-            $query->where('tier', $targetTier);
+        if (array_key_exists($targetKategori, Tema::KATEGORI_TERSEDIA)) {
+            $query->where('kategori', $targetKategori);
         }
 
         $jumlah = $query->update([

@@ -72,11 +72,14 @@
                 </div>
             </div>
 
+            {{-- INTRO PEMBUKA BESPOKE SEBELUM SAMPUL --}}
+            @include('komponen-undangan.intro-pembuka')
+
             {{-- SAMPUL PEMBUKA FADE HALUS (VOGUE COVER) --}}
             @include('tema.editorial-monokrom.partials._sampul')
 
             {{-- KONTEN UTAMA EDITORIAL MONOKROM --}}
-            <main data-panggung-3d class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
+            <main data-panggung-3d data-sinema-gsap="editorial-monokrom" class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
                 @include('tema.editorial-monokrom.partials._hero-dan-pembuka')
                 @include('tema.editorial-monokrom.partials._konten-utama')
                 @include('tema.editorial-monokrom.partials._penutup-dan-rsvp')

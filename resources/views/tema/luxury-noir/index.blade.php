@@ -109,11 +109,14 @@
                 <div class="absolute inset-0 bg-gradient-to-b from-[#09090D]/80 via-[#0B0B0F]/65 to-[#09090D]/90"></div>
             </div>
 
+            {{-- INTRO PEMBUKA BESPOKE SEBELUM SAMPUL --}}
+            @include('komponen-undangan.intro-pembuka')
+
             {{-- SAMPUL PEMBUKA FADE HALUS --}}
             @include('tema.luxury-noir.partials._sampul')
 
             {{-- KONTEN UTAMA LUXURY NOIR --}}
-            <main data-panggung-3d class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
+            <main data-panggung-3d data-sinema-gsap="luxury-noir" class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
                 @include('tema.luxury-noir.partials._hero-dan-pembuka')
                 @include('tema.luxury-noir.partials._konten-utama')
                 @include('tema.luxury-noir.partials._penutup-dan-rsvp')

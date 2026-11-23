@@ -34,7 +34,7 @@
                 <label for="tema_id" class="block text-sm font-medium text-charcoal">Pilih Tema</label>
                 <select id="tema_id" name="tema_id" x-model="temaTerpilihModal" required class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none">
                     @foreach ($daftarTema as $tema)
-                        <option value="{{ $tema->id }}">{{ $tema->nama_tema }} ({{ $tema->kategoriLabel() }} • {{ $tema->tierLabel() }} — {{ $tema->hargaFormatted() }})</option>
+                        <option value="{{ $tema->id }}">{{ $tema->nama_tema }} ({{ $tema->kategoriLabel() }} — {{ $tema->hargaFormatted() }})</option>
                     @endforeach
                 </select>
             </div>

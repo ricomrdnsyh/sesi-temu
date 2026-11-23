@@ -3,13 +3,13 @@
 <section class="relative bg-[#FAF9F6] px-5 py-12 overflow-hidden">
     <div class="max-w-md mx-auto bg-white border border-[#18181B] p-6 text-left space-y-5">
         <div class="border-b border-[#18181B]/20 pb-3">
-            <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#52525B]">05 / Gift Registry</p>
-            <h2 class="mt-1 ed-serif text-3xl uppercase text-[#18181B]">Amplop Digital</h2>
+            <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#52525B]">05 / Gift Registry</p>
+            <h2 data-gsap="naik" data-gsap-delay="0.05" class="mt-1 ed-serif text-3xl uppercase text-[#18181B]">Amplop Digital</h2>
         </div>
 
         <div class="space-y-3.5">
             @foreach ($undangan->daftarAmplop as $amplop)
-                <div class="bg-[#18181B] text-white p-5 space-y-3">
+                <div data-gsap="naik" data-gsap-delay="{{ number_format($loop->index * 0.07, 2, '.', '') }}" class="bg-[#18181B] text-white p-5 space-y-3">
                     <div class="flex items-center justify-between text-[10px] uppercase tracking-[0.28em] text-white/65">
                         <span>{{ $amplop->nama_bank }}</span>
                         <span>WIRE TRANSFER</span>
@@ -29,7 +29,7 @@
             @endforeach
 
             @if ($alamatKado !== '')
-                <div class="border border-[#18181B]/25 bg-[#FAF9F6] p-4 space-y-1">
+                <div data-gsap="naik" data-gsap-delay="0.1" class="border border-[#18181B]/25 bg-[#FAF9F6] p-4 space-y-1">
                     <p class="text-[10px] font-bold uppercase tracking-[0.28em] text-[#52525B]">Gift Shipping Address</p>
                     <p class="text-xs text-[#18181B]/85 leading-relaxed">{{ $alamatKado }}</p>
                 </div>
@@ -43,11 +43,11 @@
 @if ($adaTurutMengundang)
 <section data-section-turut-mengundang="editorial" class="relative bg-[#FAF9F6] px-5 pb-6 overflow-hidden">
     <div class="max-w-md mx-auto bg-white border border-[#18181B]/30 p-6 text-left space-y-4">
-        <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#52525B]">Families</p>
-        <h2 class="ed-serif text-2xl uppercase text-[#18181B]">Turut Mengundang</h2>
+        <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#52525B]">Families</p>
+        <h2 data-gsap="naik" data-gsap-delay="0.05" class="ed-serif text-2xl uppercase text-[#18181B]">Turut Mengundang</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs border-t border-[#18181B]/20 pt-4">
             @if (! empty($turutPria))
-                <div class="space-y-1">
+                <div data-gsap="kiri" data-gsap-delay="0.08" class="space-y-1">
                     <p class="font-bold uppercase tracking-widest text-[#18181B] text-[10px]">{{ $undangan->nama_panggilan_pria }}</p>
                     @foreach ($turutPria as $baris)
                         <p class="text-[#52525B]">{{ $baris }}</p>
@@ -55,7 +55,7 @@
                 </div>
             @endif
             @if (! empty($turutWanita))
-                <div class="space-y-1">
+                <div data-gsap="kanan" data-gsap-delay="0.1" class="space-y-1">
                     <p class="font-bold uppercase tracking-widest text-[#18181B] text-[10px]">{{ $undangan->nama_panggilan_wanita }}</p>
                     @foreach ($turutWanita as $baris)
                         <p class="text-[#52525B]">{{ $baris }}</p>
@@ -72,8 +72,8 @@
 <section class="relative bg-[#FAF9F6] px-5 py-8 overflow-hidden">
     <div class="max-w-md mx-auto bg-white border border-[#18181B] p-6 text-left space-y-5">
         <div class="border-b border-[#18181B]/20 pb-3">
-            <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#52525B]">06 / Attendance</p>
-            <h2 class="mt-1 ed-serif text-3xl uppercase text-[#18181B]">RSVP &amp; Notes</h2>
+            <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#52525B]">06 / Attendance</p>
+            <h2 data-gsap="mekar" data-gsap-delay="0.06" class="mt-1 ed-serif text-3xl uppercase text-[#18181B]">RSVP &amp; Notes</h2>
         </div>
 
         @if (! empty($modeDemo))
@@ -115,7 +115,7 @@
                         </h3>
                         <span class="text-[9px] uppercase tracking-[0.22em] text-[#52525B]">Scroll</span>
                     </div>
-                    <div x-ref="daftarUcapanScroll" class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
+                    <div x-ref="daftarUcapanScroll" data-lenis-prevent class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
                         <template x-for="ucapan in daftarUcapan" :key="ucapan.id">
                             <div
                                 class="rounded-none border bg-[#FAF9F6] p-3.5 space-y-1.5 transition"
@@ -170,7 +170,7 @@
 
             <div class="pt-4 border-t border-[#18181B]/20 space-y-3">
                 <h3 class="text-[11px] font-bold uppercase tracking-[0.26em] text-[#18181B]">Guest Notes ({{ $undangan->bukuTamu->count() }})</h3>
-                <div class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
+                <div data-lenis-prevent class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
                     @forelse ($undangan->bukuTamu as $ucapan)
                         <div class="border border-[#18181B]/15 bg-[#FAF9F6] p-3.5 space-y-1">
                             <div class="flex items-center justify-between gap-2">
@@ -196,24 +196,24 @@
     data-layout-penutup="editorial"
     class="relative bg-[#111113] text-[#FAF9F6] px-5 py-12 overflow-hidden"
 >
-    <div class="fx-scale-in max-w-md mx-auto border border-white/25 p-6 text-center space-y-5">
+    <div class="max-w-md mx-auto border border-white/25 p-6 text-center space-y-5">
         @if ($urlFotoPenutup)
-            <div class="mx-auto w-48 border border-white/30 p-1 bg-black">
+            <div data-gsap="potret" class="mx-auto w-48 border border-white/30 p-1 bg-black">
                 <img src="{{ $urlFotoPenutup }}" alt="Foto Penutup {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}" class="w-full aspect-[4/5] object-cover object-top grayscale">
             </div>
         @endif
 
-        <p class="text-[10px] font-bold uppercase tracking-[0.36em] text-white/60">Fin &bull; Colophon</p>
-        <p class="text-xs text-white/80 leading-relaxed max-w-xs mx-auto">
+        <p data-gsap="turun" data-gsap-delay="0.06" class="text-[10px] font-bold uppercase tracking-[0.36em] text-white/60">Fin &bull; Colophon</p>
+        <p data-gsap="teks" data-gsap-delay="0.1" class="text-xs text-white/80 leading-relaxed max-w-xs mx-auto">
             Merupakan kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir merayakan hari bahagia kami.
         </p>
 
         <div class="border-t border-white/20 pt-4">
-            <p class="text-[10px] uppercase tracking-[0.3em] text-white/60">Kami Yang Berbahagia</p>
-            <p class="mt-2 ed-serif text-3xl uppercase tracking-[0.12em] text-white">
+            <p data-gsap="naik" data-gsap-delay="0.13" class="text-[10px] uppercase tracking-[0.3em] text-white/60">Kami Yang Berbahagia</p>
+            <p data-gsap="mekar" data-gsap-delay="0.16" class="mt-2 ed-serif text-3xl uppercase tracking-[0.12em] text-white">
                 {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}
             </p>
-            <p class="mt-1.5 text-[10px] uppercase tracking-[0.26em] text-white/65">{{ $hashtagPasangan }}</p>
+            <p data-gsap="naik" data-gsap-delay="0.19" class="mt-1.5 text-[10px] uppercase tracking-[0.26em] text-white/65">{{ $hashtagPasangan }}</p>
         </div>
     </div>
 </section>

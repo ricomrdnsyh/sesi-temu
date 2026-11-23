@@ -61,7 +61,7 @@ class TemaMotion3DTest extends TestCase
             [
                 'slug' => 'luxury-noir',
                 'nama' => 'Luxury Noir Gold',
-                'kategori' => 'luxury',
+                'kategori' => 'elegan',
                 'tier' => 'eksklusif',
                 'gaya' => 'artdeco',
                 'ornamen' => 'aset-tema/luxury-noir/ornamen-emas.webp',
@@ -70,7 +70,7 @@ class TemaMotion3DTest extends TestCase
             [
                 'slug' => 'royal-ivory',
                 'nama' => 'Royal Ivory Cathedral',
-                'kategori' => 'luxury',
+                'kategori' => 'elegan',
                 'tier' => 'premium',
                 'gaya' => 'katedral',
                 'ornamen' => 'aset-tema/royal-ivory/ornamen-katedral.webp',
@@ -79,7 +79,7 @@ class TemaMotion3DTest extends TestCase
             [
                 'slug' => 'velvet-garden',
                 'nama' => 'Velvet Garden Motion',
-                'kategori' => 'motion',
+                'kategori' => 'floral',
                 'tier' => 'eksklusif',
                 'gaya' => 'taman',
                 'ornamen' => 'aset-tema/velvet-garden/ornamen-botani.webp',
@@ -88,7 +88,7 @@ class TemaMotion3DTest extends TestCase
             [
                 'slug' => 'rustic-floral',
                 'nama' => 'Rustic Floral',
-                'kategori' => 'modern',
+                'kategori' => 'floral',
                 'tier' => 'basic',
                 'gaya' => 'klasik',
                 'ornamen' => 'aset-tema/rustic-floral/ornamen-sudut.webp',
@@ -126,10 +126,15 @@ class TemaMotion3DTest extends TestCase
                 ->assertSee('animasi-ayun-3d', false)
                 ->assertSee('data-panggung-3d', false)
                 ->assertSee('data-diorama-3d="'.$item['tier'].'"', false)
+                ->assertSee('data-intro-pembuka="'.$item['slug'].'"', false)
+                ->assertSee('data-intro-keluar="', false)
                 ->assertSee('data-transisi-sampul="fade-halus"', false)
                 ->assertSee('tirai-fade-halus', false)
                 ->assertSee('data-autoscroll-dock', false)
                 ->assertSee('data-scroll-scrub', false)
+                ->assertSee('data-sinema-gsap=', false)
+                ->assertSee('data-gsap="potret"', false)
+                ->assertSee('data-lenis-prevent', false)
                 ->assertSee('data-layout-mempelai="'.$item['gaya'].'"', false)
                 ->assertSee('data-layout-countdown="'.$item['gaya'].'"', false)
                 ->assertSee('data-layout-acara="'.$item['gaya'].'"', false)
@@ -164,7 +169,25 @@ class TemaMotion3DTest extends TestCase
 
             if ($item['slug'] === 'adat-jawa') {
                 $respon->assertSee('rounded-[500px]', false)
-                    ->assertSee('diorama-kamera-3d', false);
+                    ->assertSee('diorama-kamera-3d', false)
+                    ->assertSee('intro-jawa-panggung', false)
+                    ->assertSee('intro-jawa-gunungan', false)
+                    ->assertSee('data-sinema-gsap="jawa"', false)
+                    ->assertSee('data-gsap="potret"', false)
+                    ->assertSee('data-lenis-prevent', false);
+
+                // Mode embed (Studio Ganti Tema) tidak merender intro splash agar pergantian tema instan
+                $this->get('/demo/'.$item['slug'].'?kanvas=1&embed=1')
+                    ->assertOk()
+                    ->assertDontSee('class="intro-pembuka-tirai', false)
+                    ->assertDontSee('intro-jawa-panggung', false);
+            } elseif ($item['slug'] === 'sunda-heritage') {
+                $respon->assertSee('diorama-kamera-3d', false)
+                    ->assertSee('rounded-t-[10.5rem]', false)
+                    ->assertSee('data-sinema-gsap="sunda"', false)
+                    ->assertSee('data-gsap="potret"', false)
+                    ->assertSee('data-gsap="garis"', false)
+                    ->assertSee('data-lenis-prevent', false);
             } elseif ($item['tier'] === 'eksklusif' || $item['tier'] === 'premium') {
                 $respon->assertSee('diorama-kamera-3d', false);
                 if ($item['slug'] !== 'editorial-monokrom') {
@@ -560,7 +583,7 @@ class TemaMotion3DTest extends TestCase
                 ['slug' => $slug],
                 [
                     'nama_tema' => ucwords(str_replace('-', ' ', $slug)),
-                    'kategori' => 'luxury',
+                    'kategori' => 'elegan',
                     'tier' => $slug === 'sunda-heritage' ? 'premium' : 'eksklusif',
                     'lokasi_view' => "tema.{$slug}.index",
                     'aktif' => true,

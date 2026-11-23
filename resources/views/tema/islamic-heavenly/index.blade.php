@@ -126,11 +126,14 @@
                 <div class="absolute inset-0 bg-gradient-to-b from-[#091322]/75 via-[#0E1B2A]/55 to-[#091322]/85"></div>
             </div>
 
+            {{-- INTRO PEMBUKA BESPOKE SEBELUM SAMPUL --}}
+            @include('komponen-undangan.intro-pembuka')
+
             {{-- SAMPUL PEMBUKA FADE HALUS --}}
             @include('tema.islamic-heavenly.partials._sampul')
 
             {{-- KONTEN UTAMA ISLAMIC HEAVENLY --}}
-            <main data-panggung-3d class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
+            <main data-panggung-3d data-sinema-gsap="islamic-heavenly" class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
                 @include('tema.islamic-heavenly.partials._hero-dan-pembuka')
                 @include('tema.islamic-heavenly.partials._konten-utama')
                 @include('tema.islamic-heavenly.partials._penutup-dan-rsvp')

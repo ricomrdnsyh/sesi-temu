@@ -77,17 +77,17 @@
     <div class="max-w-md mx-auto rounded-t-[10.5rem] rounded-b-3xl bg-[#132438] border border-[#D9B664]/50 px-6 pt-12 pb-8 text-center shadow-2xl space-y-6 efek-shimmer-kartu">
         {{-- Monogram Pasangan Bertemu --}}
         <div class="grid grid-cols-3 items-center max-w-[200px] mx-auto">
-            <span class="fx-slide-left font-serif text-4xl sm:text-5xl font-bold text-[#F3E5AB]">
+            <span data-gsap="kiri" class="fx-slide-left font-serif text-4xl sm:text-5xl font-bold text-[#F3E5AB]">
                 {{ $undangan->inisialPria() }}
             </span>
-            <span class="fx-scale-in font-kaligrafi text-3xl text-[#D9B664]">&amp;</span>
-            <span class="fx-slide-right font-serif text-4xl sm:text-5xl font-bold text-[#F3E5AB]">
+            <span data-gsap="mekar" data-gsap-delay="0.07" class="font-kaligrafi text-3xl text-[#D9B664]">&amp;</span>
+            <span data-gsap="kanan" class="fx-slide-right font-serif text-4xl sm:text-5xl font-bold text-[#F3E5AB]">
                 {{ $undangan->inisialWanita() }}
             </span>
         </div>
 
         @if ($urlFotoPembuka)
-            <div class="fx-scale-in mx-auto w-56 sm:w-64 p-1.5 rounded-t-[9rem] rounded-b-2xl border border-[#D9B664]/75 bg-[#091322] shadow-xl">
+            <div data-gsap="potret" class="mx-auto w-56 sm:w-64 p-1.5 rounded-t-[9rem] rounded-b-2xl border border-[#D9B664]/75 bg-[#091322] shadow-xl">
                 <div class="overflow-hidden rounded-t-[8.5rem] rounded-b-xl aspect-[4/5]">
                     <img
                         src="{{ $urlFotoPembuka }}"
@@ -99,11 +99,11 @@
         @endif
 
         @if ($undangan->kutipan_ayat)
-            <blockquote class="fx-rise space-y-3 border-t border-[#D9B664]/30 pt-5">
-                <p class="text-base text-[#F3E5AB]" style="font-family: 'Amiri', serif;">
+            <blockquote class="space-y-3 border-t border-[#D9B664]/30 pt-5">
+                <p data-gsap="turun" class="text-base text-[#F3E5AB]" style="font-family: 'Amiri', serif;">
                     بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
                 </p>
-                <p class="italic text-xs sm:text-sm text-[#E6EEF8]/90 leading-relaxed">
+                <p data-gsap="naik" data-gsap-delay="0.06" class="italic text-xs sm:text-sm text-[#E6EEF8]/90 leading-relaxed">
                     &ldquo;{{ $undangan->kutipan_ayat }}&rdquo;
                 </p>
             </blockquote>

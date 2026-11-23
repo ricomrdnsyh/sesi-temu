@@ -2,9 +2,11 @@ import Alpine from 'alpinejs';
 import DataTable from 'datatables.net-dt';
 import Swal from 'sweetalert2';
 import { amatiSelect2Baru, inisialisasiSemuaSelect2 } from './select2-init';
+import { buatPengendaliSinemaScroll } from './sinema-scroll';
 
 window.Alpine = Alpine;
 window.Swal = Swal;
+window.SesiTemuSinema = buatPengendaliSinemaScroll();
 
 Alpine.start();
 

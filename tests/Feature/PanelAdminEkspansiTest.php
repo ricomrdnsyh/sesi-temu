@@ -25,7 +25,7 @@ class PanelAdminEkspansiTest extends TestCase
         return Tema::create([
             'nama_tema' => 'Velvet Garden',
             'slug' => 'velvet-garden-uji',
-            'kategori' => 'luxury',
+            'kategori' => 'elegan',
             'tier' => 'eksklusif',
             'harga' => 129000,
             'lokasi_view' => 'tema.velvet-garden.index',
@@ -492,10 +492,10 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSee('Rp 60.000')
             ->assertSee('Rp 45.000');
 
-        // Diskon massal 20% khusus tier eksklusif => Rp 129.000 - Rp 25.800 = Rp 103.200; tier basic tidak berubah
+        // Diskon massal 20% khusus kategori elegan => Rp 129.000 - Rp 25.800 = Rp 103.200; kategori modern tidak berubah
         $this->actingAs($admin)
             ->post('/admin/tema-diskon-massal', [
-                'target_tier' => 'eksklusif',
+                'target_kategori' => 'elegan',
                 'diskon_tipe' => 'persen',
                 'diskon_nilai' => 20,
             ])
@@ -536,7 +536,7 @@ class PanelAdminEkspansiTest extends TestCase
         // Diskon massal ke semua tema 10%, lalu reset semua diskon
         $this->actingAs($admin)
             ->post('/admin/tema-diskon-massal', [
-                'target_tier' => 'semua',
+                'target_kategori' => 'semua',
                 'diskon_tipe' => 'persen',
                 'diskon_nilai' => 10,
             ])
@@ -548,7 +548,7 @@ class PanelAdminEkspansiTest extends TestCase
 
         $this->actingAs($admin)
             ->post('/admin/tema-reset-diskon', [
-                'target_tier' => 'semua',
+                'target_kategori' => 'semua',
             ])
             ->assertRedirect('/admin/tema')
             ->assertSessionHas('sukses');

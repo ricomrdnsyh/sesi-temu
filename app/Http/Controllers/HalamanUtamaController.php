@@ -23,7 +23,7 @@ class HalamanUtamaController extends Controller
             ->orderBy('id')
             ->get();
 
-        $ringkasanTier = Tema::ringkasanTier($daftarTema);
+        $ringkasanKategori = Tema::ringkasanKategori($daftarTema);
 
         $hargaTermurah = $daftarTema->min(fn (Tema $tema): int => $tema->hargaNominal())
             ?? Tema::HARGA_BAWAAN_TIER['basic'];
@@ -32,7 +32,7 @@ class HalamanUtamaController extends Controller
 
         return view('beranda', [
             'daftarTema' => $daftarTema,
-            'ringkasanTier' => $ringkasanTier,
+            'ringkasanKategori' => $ringkasanKategori,
             'hargaTermurah' => $hargaTermurah,
             'hargaTermahal' => $hargaTermahal,
             'biayaTerimaBeres' => PengaturanSesiTemu::biayaTerimaBeres(),

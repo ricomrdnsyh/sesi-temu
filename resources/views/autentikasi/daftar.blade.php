@@ -25,8 +25,8 @@
                 <p class="flex flex-wrap items-center gap-1.5">
                     <span>Tema Pilihan:</span>
                     <span class="font-semibold text-sage">{{ $temaTerpilih->nama_tema }}</span>
-                    <span class="inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold {{ $temaTerpilih->infoTier()['chip_class'] }}">
-                        {{ $temaTerpilih->tierLabel() }} — {{ $temaTerpilih->hargaFormatted() }}
+                    <span class="inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold {{ $temaTerpilih->infoKategori()['chip_class'] }}">
+                        {{ $temaTerpilih->kategoriLabel() }} — {{ $temaTerpilih->hargaFormatted() }}
                     </span>
                 </p>
             @endif

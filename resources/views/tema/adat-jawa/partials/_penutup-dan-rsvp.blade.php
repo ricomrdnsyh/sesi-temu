@@ -2,24 +2,26 @@
 @if ($undangan->fiturAktif('amplop_digital') && ($undangan->daftarAmplop->isNotEmpty() || $alamatKado !== ''))
     <section x-data="{ amplopTerbuka: false }" class="relative py-12 px-5">
         <div
-            class="fx-rise rounded-[22px] border-[3px] border-[#D7BB83] bg-[#FFFAF5]/93 px-6 py-9 text-center text-[#2B180F] shadow-2xl space-y-4 kartu-3d">
-            <h2 class="font-kaligrafi text-4xl text-[#472A1C] leading-tight">Wedding Gift</h2>
-            <p class="text-xs sm:text-sm text-[#472A1C]/85 leading-relaxed max-w-xs mx-auto">
+            class="rounded-[22px] border-[3px] border-[#D7BB83] bg-[#FFFAF5]/93 px-6 py-9 text-center text-[#2B180F] shadow-2xl space-y-4 kartu-3d">
+            <h2 data-gsap="naik" class="font-kaligrafi text-4xl text-[#472A1C] leading-tight">Wedding Gift</h2>
+            <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs sm:text-sm text-[#472A1C]/85 leading-relaxed max-w-xs mx-auto">
                 Tanpa mengurangi rasa hormat, bagi Bapak/Ibu/Saudara/i yang ingin memberikan tanda kasih untuk kami,
                 dapat melalui:
             </p>
 
-            <button type="button" @click="amplopTerbuka = !amplopTerbuka"
-                class="jawa-tombol-emas inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-xs font-medium transition cursor-pointer">
-                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect x="3" y="8" width="18" height="4" rx="1" />
-                    <path d="M12 8v13" />
-                    <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7" />
-                    <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5" />
-                </svg>
-                <span x-text="amplopTerbuka ? 'Tutup Rekening' : 'Klik Disini'"></span>
-            </button>
+            <div data-gsap="mekar" data-gsap-delay="0.09">
+                <button type="button" @click="amplopTerbuka = !amplopTerbuka; window.SesiTemuSinema?.refresh(360)"
+                    class="jawa-tombol-emas inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-xs font-medium transition cursor-pointer">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="8" width="18" height="4" rx="1" />
+                        <path d="M12 8v13" />
+                        <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7" />
+                        <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5" />
+                    </svg>
+                    <span x-text="amplopTerbuka ? 'Tutup Rekening' : 'Klik Disini'"></span>
+                </button>
+            </div>
 
             <div x-show="amplopTerbuka" x-cloak x-transition class="pt-4 space-y-4 text-left panggung-3d">
                 @foreach ($undangan->daftarAmplop as $amplop)
@@ -93,20 +95,22 @@
     <section id="buku-tamu" class="relative bg-[#472A1C] shadow-[0_0_0_2px_#472A1C] text-[#FFFAF5] py-14 px-5">
         <div class="max-w-md mx-auto">
             <div class="text-center space-y-2">
-                <img src="{{ $asetJawa['gununganKecil'] }}" alt="" class="fx-rise-down w-14 mx-auto">
+                <img src="{{ $asetJawa['gununganKecil'] }}" alt="" data-gsap="turun" class="w-14 mx-auto">
                 <h2
-                    class="fx-scale-in font-serif text-4xl sm:text-5xl font-bold uppercase tracking-[0.12em] text-white leading-tight">
+                    data-gsap="mekar"
+                    class="font-serif text-4xl sm:text-5xl font-bold uppercase tracking-[0.12em] text-white leading-tight">
                     RSVP &amp; Wishes
                 </h2>
-                <p class="text-xs text-[#FFFAF5]/80 max-w-xs mx-auto leading-relaxed">
+                <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs text-[#FFFAF5]/80 max-w-xs mx-auto leading-relaxed">
                     Kami mempersilakan Bapak/Ibu/Saudara/i untuk menyampaikan ucapan selamat, doa restu, serta
                     konfirmasi kehadiran.
                 </p>
-                <div aria-hidden="true" class="mx-auto w-24 h-px bg-[#D7BB83]/55 pt-1"></div>
+                <div data-gsap="garis" aria-hidden="true" class="mx-auto w-24 h-px bg-[#D7BB83]/55 pt-1"></div>
             </div>
 
             <div
-                class="mt-7 fx-rise relative rounded-[22px] bg-[#FFFAF5]/95 p-5 sm:p-6 text-[#2B180F] shadow-2xl border border-[#D7BB83]/50 overflow-hidden kartu-3d">
+                data-gsap="naik"
+                class="mt-7 relative rounded-[22px] bg-[#FFFAF5]/95 p-5 sm:p-6 text-[#2B180F] shadow-2xl border border-[#D7BB83]/50 overflow-hidden kartu-3d">
                 <img src="{{ $urlFotoLatar }}" alt="" aria-hidden="true"
                     class="pointer-events-none absolute inset-0 w-full h-full object-cover opacity-10">
 
@@ -182,7 +186,7 @@
                                     <span class="text-[10px] uppercase tracking-wider text-[#8C6823]">Gulir untuk
                                         lainnya</span>
                                 </div>
-                                <div x-ref="daftarUcapanScroll"
+                                <div x-ref="daftarUcapanScroll" data-lenis-prevent
                                     class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
                                     <template x-for="ucapan in daftarUcapan" :key="ucapan.id">
                                         <div class="rounded-2xl p-4 border bg-white/85 space-y-1.5 transition"
@@ -285,7 +289,7 @@
                                 <h3 class="font-serif text-lg font-bold text-[#472A1C]">
                                     Doa &amp; Ucapan ({{ $undangan->bukuTamu->count() }})
                                 </h3>
-                                <div class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
+                                <div data-lenis-prevent class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
                                     @forelse ($undangan->bukuTamu as $ucapan)
                                         <div
                                             class="rounded-2xl p-4 border border-[#D7BB83]/40 bg-white/80 space-y-1.5">
@@ -318,18 +322,18 @@
 <section class="relative py-12 px-5 space-y-6">
     {{-- Kartu Doa Untuk Pengantin --}}
     <div data-section-doa-pengantin="keraton"
-        class="fx-scale-in rounded-[22px] border-[4px] border-[#D7BB83] bg-[#FFFAF5]/93 px-6 py-10 text-center text-[#2B180F] shadow-xl space-y-4 kartu-3d">
-        <h2 class="font-serif text-2xl sm:text-3xl font-bold uppercase tracking-[0.14em] text-[#2B180F]">
+        class="rounded-[22px] border-[4px] border-[#D7BB83] bg-[#FFFAF5]/93 px-6 py-10 text-center text-[#2B180F] shadow-xl space-y-4 kartu-3d">
+        <h2 data-gsap="naik" class="font-serif text-2xl sm:text-3xl font-bold uppercase tracking-[0.14em] text-[#2B180F]">
             Doa Untuk Pengantin
         </h2>
-        <p class="text-xl sm:text-2xl leading-loose text-[#472A1C]" style="font-family: 'Amiri', serif;"
+        <p data-gsap="mekar" data-gsap-delay="0.06" class="text-xl sm:text-2xl leading-loose text-[#472A1C]" style="font-family: 'Amiri', serif;"
             dir="rtl">
             بَارَكَ اللّٰهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ
         </p>
-        <p class="text-xs italic text-[#8C6823]">
+        <p data-gsap="teks" data-gsap-delay="0.08" class="text-xs italic text-[#8C6823]">
             &ldquo;Baarakallahu laka wa baaraka &lsquo;alaika wa jama&lsquo;a bainakuma fii khair.&rdquo;
         </p>
-        <p class="text-xs sm:text-sm text-[#472A1C]/85 leading-relaxed">
+        <p data-gsap="teks" data-gsap-delay="0.10" class="text-xs sm:text-sm text-[#472A1C]/85 leading-relaxed">
             Semoga Allah memberkahimu di waktu bahagia dan memberkahimu di waktu susah, serta semoga Allah mempersatukan
             kalian berdua dalam kebaikan. <span class="font-semibold">(HR. Abu Daud)</span>
         </p>
@@ -338,17 +342,17 @@
     {{-- Kartu Turut Mengundang (Opsional) --}}
     @if ($adaTurutMengundang)
         <div data-section-turut-mengundang="keraton"
-            class="fx-rise rounded-[22px] border-[4px] border-[#D7BB83] bg-[#FFFAF5]/93 px-6 py-10 text-center text-[#2B180F] shadow-xl space-y-6 kartu-3d">
-            <h2 class="font-serif text-2xl sm:text-3xl font-bold uppercase tracking-[0.14em] text-[#2B180F]">
+            class="rounded-[22px] border-[4px] border-[#D7BB83] bg-[#FFFAF5]/93 px-6 py-10 text-center text-[#2B180F] shadow-xl space-y-6 kartu-3d">
+            <h2 data-gsap="naik" class="font-serif text-2xl sm:text-3xl font-bold uppercase tracking-[0.14em] text-[#2B180F]">
                 Turut Mengundang
             </h2>
 
             @if (!empty($turutWanita))
                 <div class="space-y-1.5">
-                    <p class="text-[11px] font-bold uppercase tracking-[0.26em] text-[#8C6823]">Pihak Wanita</p>
+                    <p data-gsap="kiri" class="text-[11px] font-bold uppercase tracking-[0.26em] text-[#8C6823]">Pihak Wanita</p>
                     <ul class="space-y-1 text-xs sm:text-sm text-[#472A1C]/90">
                         @foreach ($turutWanita as $baris)
-                            <li>{{ $baris }}</li>
+                            <li data-gsap="teks" data-gsap-delay="{{ number_format(min($loop->index, 5) * 0.04, 2, '.', '') }}">{{ $baris }}</li>
                         @endforeach
                     </ul>
                 </div>
@@ -356,10 +360,10 @@
 
             @if (!empty($turutPria))
                 <div class="space-y-1.5 {{ !empty($turutWanita) ? 'pt-4 border-t border-[#D7BB83]/45' : '' }}">
-                    <p class="text-[11px] font-bold uppercase tracking-[0.26em] text-[#8C6823]">Pihak Pria</p>
+                    <p data-gsap="kanan" class="text-[11px] font-bold uppercase tracking-[0.26em] text-[#8C6823]">Pihak Pria</p>
                     <ul class="space-y-1 text-xs sm:text-sm text-[#472A1C]/90">
                         @foreach ($turutPria as $baris)
-                            <li>{{ $baris }}</li>
+                            <li data-gsap="teks" data-gsap-delay="{{ number_format(min($loop->index, 5) * 0.04, 2, '.', '') }}">{{ $baris }}</li>
                         @endforeach
                     </ul>
                 </div>
@@ -373,33 +377,41 @@
     <div
         class="relative mx-auto max-w-[395px] rounded-[500px] border-[3px] border-[#D7BB83]/85 bg-[#FFFAF5]/92 px-7 pt-5 pb-36 text-center text-[#2B180F] shadow-2xl overflow-hidden kartu-3d">
         {{-- Sepasang Ornamen Sudut Bawah Miring Simetris di Belakang Teks agar Nama Mempelai 100% Terbaca --}}
-        <img src="{{ $asetJawa['bungaLili'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async"
-            class="fx-slide-right pointer-events-none absolute -bottom-10 -left-9 w-32 opacity-75 z-0 jawa-potret-tutup-kiri">
-        <img src="{{ $asetJawa['bungaLili'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async"
-            class="fx-slide-left pointer-events-none absolute -bottom-10 -right-9 w-32 opacity-75 z-0 jawa-potret-tutup-kanan">
+        <div data-gsap="kiri" class="pointer-events-none absolute -bottom-10 -left-9 w-32 z-0">
+            <img src="{{ $asetJawa['bungaLili'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async"
+                class="w-full opacity-75 jawa-potret-tutup-kiri">
+        </div>
+        <div data-gsap="kanan" class="pointer-events-none absolute -bottom-10 -right-9 w-32 z-0">
+            <img src="{{ $asetJawa['bungaLili'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async"
+                class="w-full opacity-75 jawa-potret-tutup-kanan">
+        </div>
 
         <div class="relative z-10 space-y-5">
             @if (!$tanpaFoto && !empty($urlFotoPenutup))
                 <img src="{{ $urlFotoPenutup }}"
                     alt="{{ $undangan->nama_panggilan_pria }} & {{ $undangan->nama_panggilan_wanita }}"
                     loading="lazy" decoding="async"
-                    class="fx-scale-in w-full h-80 rounded-t-[500px] rounded-b-[20px] object-cover object-top shadow-lg">
+                    data-gsap="potret"
+                    class="w-full h-80 rounded-t-[500px] rounded-b-[20px] object-cover object-top shadow-lg">
             @else
                 <div
-                    class="fx-scale-in mx-auto mt-6 w-36 h-44 rounded-t-[500px] rounded-b-2xl border-2 border-[#D7BB83] bg-[#472A1C] text-[#F3E5AB] flex flex-col items-center justify-center shadow-lg">
+                    data-gsap="potret"
+                    class="mx-auto mt-6 w-36 h-44 rounded-t-[500px] rounded-b-2xl border-2 border-[#D7BB83] bg-[#472A1C] text-[#F3E5AB] flex flex-col items-center justify-center shadow-lg">
                     <span class="font-serif text-4xl font-semibold">{{ $undangan->inisialPria() }} &amp;
                         {{ $undangan->inisialWanita() }}</span>
                 </div>
             @endif
 
-            <p class="text-xs sm:text-sm text-[#472A1C]/85 leading-relaxed px-2">
+            <p data-gsap="teks" class="text-xs sm:text-sm text-[#472A1C]/85 leading-relaxed px-2">
                 Atas kehadiran dan doa restu yang Bapak/Ibu/Saudara/i berikan, kami ucapkan terima kasih. Semoga Allah
                 SWT senantiasa melimpahkan rahmat dan berkah-Nya kepada kita semua.
             </p>
 
             <div class="pt-2 space-y-1.5">
-                <p class="text-xs font-semibold text-[#472A1C]">Kami Yang Berbahagia,</p>
+                <p data-gsap="naik" class="text-xs font-semibold text-[#472A1C]">Kami Yang Berbahagia,</p>
                 <p
+                    data-gsap="mekar"
+                    data-gsap-delay="0.08"
                     class="font-serif text-2xl sm:text-3xl font-bold uppercase tracking-[0.14em] text-[#472A1C] drop-shadow-[0_1px_4px_rgba(255,250,245,0.95)]">
                     {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}
                 </p>

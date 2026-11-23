@@ -300,7 +300,7 @@
     <div class="relative z-10 max-w-md mx-auto text-center space-y-7">
         {{-- Foto Pembuka Berbingkai Oval Filigree Emas Ganda (Tersembunyi pada Mode Tanpa Foto) --}}
         @if ($urlFotoPembuka)
-            <div class="fx-scale-in relative mx-auto w-56 sm:w-60">
+            <div data-gsap="potret" class="relative mx-auto w-56 sm:w-60">
                 <span aria-hidden="true" class="pointer-events-none absolute -inset-2 rounded-[999px] border border-[#E7C87D]/30"></span>
                 <div class="p-2 rounded-[999px] border-2 border-[#C59B43]/85 bg-[#321010]/70 shadow-[0_22px_48px_-12px_rgba(14,4,4,0.75)]">
                     <div class="overflow-hidden rounded-[999px] aspect-[4/5] border border-[#F3E5AB]/50">
@@ -318,22 +318,22 @@
 
         {{-- Monogram Pasangan Bertemu Kiri <-> Kanan dengan Garis Emas --}}
         <div class="flex items-center justify-center gap-4 px-4">
-            <span aria-hidden="true" class="h-px flex-1 max-w-[54px] bg-gradient-to-r from-transparent to-[#E7C87D]/65"></span>
+            <span data-gsap="garis" aria-hidden="true" class="h-px flex-1 max-w-[54px] bg-gradient-to-r from-transparent to-[#E7C87D]/65"></span>
             <div class="grid grid-cols-3 items-center gap-2 min-w-[140px]">
-                <span class="fx-slide-left font-serif text-4xl sm:text-[2.75rem] font-bold text-[#F3E5AB] drop-shadow-[0_3px_10px_rgba(16,4,4,0.5)]">
+                <span data-gsap="kiri" class="fx-slide-left font-serif text-4xl sm:text-[2.75rem] font-bold text-[#F3E5AB] drop-shadow-[0_3px_10px_rgba(16,4,4,0.5)]">
                     {{ $undangan->inisialPria() }}
                 </span>
-                <span class="fx-scale-in font-kaligrafi text-3xl text-[#E7C87D]/90">&amp;</span>
-                <span class="fx-slide-right font-serif text-4xl sm:text-[2.75rem] font-bold text-[#F3E5AB] drop-shadow-[0_3px_10px_rgba(16,4,4,0.5)]">
+                <span data-gsap="mekar" data-gsap-delay="0.07" class="font-kaligrafi text-3xl text-[#E7C87D]/90">&amp;</span>
+                <span data-gsap="kanan" class="fx-slide-right font-serif text-4xl sm:text-[2.75rem] font-bold text-[#F3E5AB] drop-shadow-[0_3px_10px_rgba(16,4,4,0.5)]">
                     {{ $undangan->inisialWanita() }}
                 </span>
             </div>
-            <span aria-hidden="true" class="h-px flex-1 max-w-[54px] bg-gradient-to-l from-transparent to-[#E7C87D]/65"></span>
+            <span data-gsap="garis" aria-hidden="true" class="h-px flex-1 max-w-[54px] bg-gradient-to-l from-transparent to-[#E7C87D]/65"></span>
         </div>
 
-        {{-- Petuah / Kutipan Ayat Bergaya Editorial Beludru-Emas Menyatu --}}
+        {{-- Petuah / Kutipan Ayat Bergaya Editorial Beludru-Emas Menyatu (Animasi Rinci Per Komponen) --}}
         @if ($undangan->kutipan_ayat)
-            <div class="fx-rise pt-4">
+            <div class="pt-4">
                 <blockquote class="relative rounded-[1.75rem] bg-gradient-to-b from-[#3B1414]/88 via-[#441717]/78 to-[#310F0F]/92 backdrop-blur-sm border border-[#E7C87D]/45 px-6 sm:px-7 pt-9 pb-7 shadow-[0_20px_46px_-14px_rgba(14,4,4,0.7),inset_0_1px_0_rgba(243,229,171,0.22)] kartu-3d">
                     {{-- Aksen Sudut Halus Emas --}}
                     <span aria-hidden="true" class="pointer-events-none absolute top-2.5 left-2.5 h-3.5 w-3.5 border-t border-l border-[#E7C87D]/65 rounded-tl-md"></span>
@@ -342,7 +342,7 @@
                     <span aria-hidden="true" class="pointer-events-none absolute bottom-2.5 right-2.5 h-3.5 w-3.5 border-b border-r border-[#E7C87D]/65 rounded-br-md"></span>
 
                     {{-- Mahkota Siger Bertengger Anggun di Tepi Atas Bingkai Kutipan --}}
-                    <div class="absolute -top-6 left-1/2 -translate-x-1/2 rounded-full bg-[#4A1717] border border-[#E7C87D]/60 px-3 py-1.5 shadow-[0_8px_18px_rgba(16,4,4,0.65)]">
+                    <div data-gsap="turun" class="absolute -top-6 inset-x-0 mx-auto w-fit rounded-full bg-[#4A1717] border border-[#E7C87D]/60 px-3 py-1.5 shadow-[0_8px_18px_rgba(16,4,4,0.65)]">
                         <img
                             src="{{ $asetSunda['siger'] }}"
                             alt=""
@@ -352,25 +352,25 @@
                         >
                     </div>
 
-                    <p class="text-[9.5px] font-bold uppercase tracking-[0.34em] text-[#E7C87D] pt-1">
+                    <p data-gsap="teks" class="text-[9.5px] font-bold uppercase tracking-[0.34em] text-[#E7C87D] pt-1">
                         Petuah &amp; Doa
                     </p>
 
-                    <span aria-hidden="true" class="block font-serif text-5xl leading-[0.65] text-[#E7C87D]/30 pt-3 select-none">
+                    <span data-gsap="mekar" aria-hidden="true" class="block font-serif text-5xl leading-[0.65] text-[#E7C87D]/30 pt-3 select-none">
                         &ldquo;
                     </span>
 
-                    <p class="font-serif italic text-[15px] sm:text-base leading-[1.78] text-[#FFF8EC]/95 pt-1">
+                    <p data-gsap="naik" data-gsap-delay="0.06" class="font-serif italic text-[15px] sm:text-base leading-[1.78] text-[#FFF8EC]/95 pt-1">
                         {{ $undangan->kutipan_ayat }}
                     </p>
 
-                    <div class="mt-5 flex items-center justify-center gap-3 px-8" aria-hidden="true">
+                    <div data-gsap="garis" class="mt-5 flex items-center justify-center gap-3 px-8" aria-hidden="true">
                         <span class="h-px flex-1 bg-gradient-to-r from-transparent to-[#E7C87D]/55"></span>
                         <span class="w-1.5 h-1.5 rotate-45 bg-[#E7C87D]/85"></span>
                         <span class="h-px flex-1 bg-gradient-to-l from-transparent to-[#E7C87D]/55"></span>
                     </div>
 
-                    <p class="mt-2.5 text-[10px] font-medium tracking-[0.22em] text-[#F3E5AB]/80">
+                    <p data-gsap="mekar" data-gsap-delay="0.06" class="mt-2.5 text-[10px] font-medium tracking-[0.22em] text-[#F3E5AB]/80">
                         {{ $hashtagPasangan }}
                     </p>
                 </blockquote>

@@ -5,7 +5,7 @@
 @section('isi_admin')
 @php
     $adaGalat = $errors->any();
-    $galatDariDiskonMassal = $adaGalat && old('target_tier') !== null;
+    $galatDariDiskonMassal = $adaGalat && old('target_kategori') !== null;
     $galatDariModalTema = $adaGalat && ! $galatDariDiskonMassal;
     $modeAwalEdit = $galatDariModalTema && old('_modal_mode') === 'edit';
     $biayaTerimaBeres = \App\Support\PengaturanSesiTemu::biayaTerimaBeres();
@@ -22,16 +22,14 @@
         'form' => [
             'nama_tema' => (string) ($galatDariModalTema ? old('nama_tema', '') : ''),
             'slug' => (string) ($galatDariModalTema ? old('slug', '') : ''),
-            'kategori' => (string) ($galatDariModalTema ? old('kategori', 'modern') : 'modern'),
+            'kategori' => (string) ($galatDariModalTema ? old('kategori', 'adat') : 'adat'),
             'lokasi_view' => (string) ($galatDariModalTema ? old('lokasi_view', $lokasiViewBawaan) : $lokasiViewBawaan),
-            'tier' => (string) ($galatDariModalTema ? old('tier', 'basic') : 'basic'),
-            'harga' => (int) ($galatDariModalTema ? old('harga', \App\Models\Tema::HARGA_BAWAAN_TIER['basic']) : \App\Models\Tema::HARGA_BAWAAN_TIER['basic']),
+            'harga' => (int) ($galatDariModalTema ? old('harga', 59000) : 59000),
             'diskon_tipe' => (string) ($galatDariModalTema ? old('diskon_tipe', '') : ''),
             'diskon_nilai' => (int) ($galatDariModalTema ? old('diskon_nilai', 0) : 0),
             'aktif' => $galatDariModalTema ? (bool) old('aktif', false) : true,
             'gambar_url' => '',
         ],
-        'hargaBawaan' => \App\Models\Tema::HARGA_BAWAAN_TIER,
         'lokasiViewBawaan' => $lokasiViewBawaan,
         'biayaTerimaBeres' => $biayaTerimaBeres,
         'storeUrl' => route('admin.tema.store'),
@@ -54,16 +52,14 @@
         form: {
             nama_tema: '',
             slug: '',
-            kategori: 'modern',
+            kategori: 'adat',
             lokasi_view: 'tema.rustic-floral.index',
-            tier: 'basic',
             harga: 59000,
             diskon_tipe: '',
             diskon_nilai: 0,
             aktif: true,
             gambar_url: '',
         },
-        hargaBawaan: {},
         storeUrl: '',
         updateBaseUrl: '',
         init() {
@@ -76,7 +72,6 @@
                 this.editId = data.editId ?? null;
                 this.lokasiViewBawaan = data.lokasiViewBawaan ?? 'tema.rustic-floral.index';
                 this.form = { ...this.form, ...(data.form ?? {}) };
-                this.hargaBawaan = data.hargaBawaan ?? {};
                 this.biayaTerimaBeres = Number(data.biayaTerimaBeres ?? 50000);
                 this.storeUrl = data.storeUrl ?? '';
                 this.updateBaseUrl = data.updateBaseUrl ?? '';
@@ -99,10 +94,9 @@
             this.form = {
                 nama_tema: '',
                 slug: '',
-                kategori: 'modern',
+                kategori: 'adat',
                 lokasi_view: this.lokasiViewBawaan,
-                tier: 'basic',
-                harga: this.hargaBawaan.basic ?? 59000,
+                harga: 59000,
                 diskon_tipe: '',
                 diskon_nilai: 0,
                 aktif: true,
@@ -117,9 +111,8 @@
             this.form = {
                 nama_tema: tema.nama_tema || '',
                 slug: tema.slug || '',
-                kategori: tema.kategori || 'modern',
+                kategori: tema.kategori || 'adat',
                 lokasi_view: tema.lokasi_view || this.lokasiViewBawaan,
-                tier: tema.tier || 'basic',
                 harga: Number(tema.harga ?? 59000),
                 diskon_tipe: tema.diskon_tipe || '',
                 diskon_nilai: Number(tema.diskon_nilai ?? 0),
@@ -134,11 +127,6 @@
         tutupModal() {
             this.modalTerbuka = false;
             this.modalDiskonMassalTerbuka = false;
-        },
-        terapkanHargaSaran(tier) {
-            if (this.hargaBawaan[tier] !== undefined) {
-                this.form.harga = this.hargaBawaan[tier];
-            }
         },
         hargaAkhirEstimasi() {
             const hargaDasar = Math.max(0, Number(this.form.harga || 0));
@@ -263,14 +251,13 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
         @foreach ($daftarTema as $tema)
             @php
-                $infoTier = $tema->infoTier();
+                $infoKategori = $tema->infoKategori();
                 $payloadTema = json_encode([
                     'id' => $tema->id,
                     'nama_tema' => $tema->nama_tema,
                     'slug' => $tema->slug,
-                    'kategori' => $tema->kategori,
+                    'kategori' => $tema->kategoriKode(),
                     'lokasi_view' => $tema->lokasi_view,
-                    'tier' => $tema->tierKode(),
                     'harga' => $tema->hargaAsliNominal(),
                     'diskon_tipe' => $tema->diskonTipe() ?? '',
                     'diskon_nilai' => $tema->diskonNilai(),
@@ -287,8 +274,8 @@
                             {{ $tema->nama_tema }}
                         </div>
                     @endif
-                    <span class="absolute top-3 left-3 rounded-full px-3 py-1 text-xs font-semibold {{ $infoTier['badge_class'] }}">
-                        {{ $infoTier['label'] }}
+                    <span class="absolute top-3 left-3 rounded-full px-3 py-1 text-xs font-semibold {{ $infoKategori['badge_class'] }}">
+                        {{ $infoKategori['label'] }}
                     </span>
                     <span class="absolute top-3 right-3 rounded-full px-3 py-1 text-xs font-semibold {{ $tema->aktif ? 'bg-sage text-white' : 'bg-charcoal/80 text-white' }}">
                         {{ $tema->aktif ? 'Aktif' : 'Nonaktif' }}
@@ -303,7 +290,7 @@
                 <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
                     <div>
                         <div class="flex items-start justify-between gap-2">
-                            <p class="text-xs font-semibold uppercase tracking-wider text-champagne">{{ $tema->kategoriLabel() }}</p>
+                            <p class="text-xs font-semibold text-charcoal/60">{{ $infoKategori['ringkasan'] }}</p>
                             <div class="text-right leading-tight">
                                 @if ($tema->adaDiskon())
                                     <span class="block text-[11px] text-charcoal/45 line-through">{{ $tema->hargaAsliFormatted() }}</span>
@@ -370,7 +357,7 @@
             <div class="flex items-start justify-between gap-4 pb-5 border-b border-champagne/20">
                 <div>
                     <h2 id="judul-modal-tema" class="font-serif text-2xl sm:text-3xl font-bold text-charcoal" x-text="modeEdit ? 'Edit Tema Katalog' : 'Tambah Tema Baru'"></h2>
-                    <p class="text-xs sm:text-sm text-charcoal/65 mt-1" x-text="modeEdit ? 'Perbarui desain thumbnail, harga tier, diskon katalog, view Blade, atau status aktif tema.' : 'Lengkapi informasi tema baru beserta gambar pratinjau untuk katalog SesiTemu.'"></p>
+                    <p class="text-xs sm:text-sm text-charcoal/65 mt-1" x-text="modeEdit ? 'Perbarui desain thumbnail, kategori, harga, diskon katalog, view Blade, atau status aktif tema.' : 'Lengkapi informasi tema baru beserta gambar pratinjau untuk katalog SesiTemu.'"></p>
                 </div>
 
                 <button
@@ -496,7 +483,7 @@
                         </div>
                     </div>
 
-                    {{-- Kolom Kanan: Pengaturan Metadata, Tier, Harga, & Diskon --}}
+                    {{-- Kolom Kanan: Pengaturan Metadata, Kategori, Harga, & Diskon --}}
                     <div class="lg:col-span-7 space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
@@ -539,6 +526,20 @@
                             </div>
 
                             <div>
+                                <label for="modal_harga" class="block text-xs font-semibold text-charcoal/80 mb-1">Harga Normal (Rp)</label>
+                                <input
+                                    id="modal_harga"
+                                    name="harga"
+                                    type="number"
+                                    min="0"
+                                    step="1000"
+                                    x-model="form.harga"
+                                    required
+                                    class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm font-semibold focus:border-champagne focus:bg-white focus:outline-none"
+                                >
+                            </div>
+
+                            <div class="sm:col-span-2">
                                 <label for="modal_lokasi_view" class="block text-xs font-semibold text-charcoal/80 mb-1">Template View Blade</label>
                                 <select
                                     id="modal_lokasi_view"
@@ -552,44 +553,6 @@
                                     @endforeach
                                 </select>
                                 <p class="mt-1 text-[11px] text-charcoal/55">Otomatis membaca file Blade di <code class="font-mono">resources/views/tema/</code>.</p>
-                            </div>
-
-                            <div>
-                                <label for="modal_tier" class="block text-xs font-semibold text-charcoal/80 mb-1">Tingkatan Kualitas (Tier)</label>
-                                <select
-                                    id="modal_tier"
-                                    name="tier"
-                                    x-model="form.tier"
-                                    required
-                                    class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none"
-                                >
-                                    @foreach (\App\Models\Tema::TIER_TERSEDIA as $val => $label)
-                                        <option value="{{ $val }}">{{ $label }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-                                <div class="flex items-center justify-between mb-1">
-                                    <label for="modal_harga" class="block text-xs font-semibold text-charcoal/80">Harga Normal (Rp)</label>
-                                    <button
-                                        type="button"
-                                        @click="terapkanHargaSaran(form.tier)"
-                                        class="text-[11px] font-semibold text-sage hover:underline cursor-pointer"
-                                    >
-                                        Pakai saran tier
-                                    </button>
-                                </div>
-                                <input
-                                    id="modal_harga"
-                                    name="harga"
-                                    type="number"
-                                    min="0"
-                                    step="1000"
-                                    x-model="form.harga"
-                                    required
-                                    class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm font-semibold focus:border-champagne focus:bg-white focus:outline-none"
-                                >
                             </div>
                         </div>
 
@@ -672,7 +635,7 @@
             <div class="flex items-start justify-between gap-4 pb-4 border-b border-champagne/20">
                 <div>
                     <h2 id="judul-modal-diskon-massal" class="font-serif text-2xl font-bold text-charcoal">Terapkan Diskon Massal</h2>
-                    <p class="text-xs sm:text-sm text-charcoal/65 mt-1">Pasang harga promo ke seluruh katalog tema atau khusus tier tertentu secara bersamaan.</p>
+                    <p class="text-xs sm:text-sm text-charcoal/65 mt-1">Pasang harga promo ke seluruh katalog tema atau khusus kategori tertentu secara bersamaan.</p>
                 </div>
 
                 <button
@@ -698,15 +661,15 @@
                 @csrf
 
                 <div>
-                    <label for="massal_target_tier" class="block text-xs font-semibold text-charcoal/80 mb-1">Target Penerapan</label>
+                    <label for="massal_target_kategori" class="block text-xs font-semibold text-charcoal/80 mb-1">Target Penerapan</label>
                     <select
-                        id="massal_target_tier"
-                        name="target_tier"
+                        id="massal_target_kategori"
+                        name="target_kategori"
                         class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:outline-none"
                     >
-                        <option value="semua" @selected(old('target_tier') === 'semua')>Semua Tema Katalog ({{ $daftarTema->count() }} tema)</option>
-                        @foreach (\App\Models\Tema::TIER_TERSEDIA as $val => $label)
-                            <option value="{{ $val }}" @selected(old('target_tier') === $val)>Hanya Tier {{ $label }}</option>
+                        <option value="semua" @selected(old('target_kategori') === 'semua')>Semua Tema Katalog ({{ $daftarTema->count() }} tema)</option>
+                        @foreach (\App\Models\Tema::KATEGORI_TERSEDIA as $val => $label)
+                            <option value="{{ $val }}" @selected(old('target_kategori') === $val)>Hanya Kategori {{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
