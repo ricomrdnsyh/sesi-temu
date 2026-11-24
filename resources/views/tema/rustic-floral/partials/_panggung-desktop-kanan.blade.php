@@ -5,14 +5,14 @@
 >
     <div class="lapis-3d absolute -inset-4 pointer-events-none" style="--depth: -12px; --pz: -36px;">
         <img
-            src="{{ $urlFotoLatar }}"
+            src="{{ empty($urlFotoLatarCustom) ? $asetRustic['heroPoster'] : $urlFotoLatar }}"
             alt=""
-            class="w-full h-full object-cover object-center scale-105 opacity-62 animasi-nafas {{ empty($urlFotoLatarCustom) ? '-scale-x-100' : '' }}"
+            class="w-full h-full object-cover object-center scale-105 opacity-48 blur-[1px] animasi-nafas {{ empty($urlFotoLatarCustom) ? '-scale-x-100' : '' }}"
         >
     </div>
-    <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#1F2D25]/66 via-[#2A3C32]/52 to-[#19241E]/80"></div>
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#1F2D25]/76 via-[#2A3C32]/66 to-[#19241E]/86"></div>
     <div aria-hidden="true" class="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-black/38 to-transparent z-30"></div>
-    <div aria-hidden="true" class="pointer-events-none absolute inset-5 xl:inset-7 {{ $tampilBarDemo ? 'top-18 xl:top-20' : '' }} rounded-3xl border border-[#E5D5C0]/28 z-10"></div>
+    <div aria-hidden="true" class="pointer-events-none absolute inset-5 xl:inset-7 {{ $tampilBarDemo ? 'top-18 xl:top-20' : '' }} rounded-t-[10rem] rounded-b-3xl border border-[#E5D5C0]/30 z-10"></div>
 
     @include('komponen-undangan.lapisan-motion', ['efekMotion' => 'kelopak', 'konteks' => 'panggung'])
 

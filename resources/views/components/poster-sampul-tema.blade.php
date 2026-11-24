@@ -10,6 +10,7 @@
     $wanitaPanggilan = $demo['wanita']['panggilan'] ?? 'Rani';
     $wanitaLengkap = $demo['wanita']['lengkap'] ?? $wanitaPanggilan;
     $wanitaAyah = $demo['wanita']['ayah'] ?? 'Keluarga Mempelai';
+    $wanitaIbu = $demo['wanita']['ibu'] ?? null;
     $instagramWanita = $demo['sosial_media']['instagram_wanita'] ?? null;
     $namaAcaraUtama = $demo['acara'][0]['nama_acara'] ?? 'Akad Nikah';
     $tempatAcara = $demo['acara'][0]['nama_tempat'] ?? 'Venue Pernikahan';
@@ -19,7 +20,8 @@
     $adalahSundaHeritage = $tema->slug === 'sunda-heritage';
     $adalahIslamiSyari = $tema->slug === 'islami-syari';
     $adalahIslamicHeavenly = $tema->slug === 'islamic-heavenly';
-    $adalahAdatShowcase = $adalahAdatJawa || $adalahSundaHeritage || $adalahIslamiSyari || $adalahIslamicHeavenly;
+    $adalahRusticFloral = $tema->slug === 'rustic-floral';
+    $adalahAdatShowcase = $adalahAdatJawa || $adalahSundaHeritage || $adalahIslamiSyari || $adalahIslamicHeavenly || $adalahRusticFloral;
 
     $relatifLatarTema = "aset-tema/{$tema->slug}/latar-utama.webp";
     $gambarLatarTemaUrl = is_file(public_path($relatifLatarTema))
@@ -55,6 +57,13 @@
     $asetPosterHeavenly = $adalahIslamicHeavenly ? [
         'sabit' => asset('aset-tema/islamic-heavenly/ornamen-sabit.webp'),
         'heroPoster' => asset('aset-tema/islamic-heavenly/hero-poster.webp'),
+    ] : [];
+
+    $asetPosterRustic = $adalahRusticFloral ? [
+        'sudut' => asset('aset-tema/rustic-floral/ornamen-sudut.webp?v=2'),
+        'garland' => asset('aset-tema/rustic-floral/garland-bunga-rustic.webp?v=1'),
+        'bingkaiMempelai' => asset('aset-tema/rustic-floral/bingkai-bunga-mempelai.webp?v=2'),
+        'heroPoster' => asset('aset-tema/rustic-floral/hero-poster.webp'),
     ] : [];
 
     $adalahEditorial = !empty($poster['editorial']);
@@ -142,9 +151,152 @@
                 ></div>
 
                 <div
-                    class="relative w-full h-full overflow-hidden flex flex-col justify-between"
-                    style="border-radius: 2.85cqw; background: {{ $poster['layar_kiri_bg'] }}; color: {{ $poster['layar_kiri_teks'] }};"
+                    class="relative w-full h-full overflow-hidden flex flex-col {{ $adalahRusticFloral ? '' : 'justify-between' }}"
+                    style="border-radius: 2.85cqw; background: {{ $adalahRusticFloral ? '#FAF5EC' : $poster['layar_kiri_bg'] }}; color: {{ $poster['layar_kiri_teks'] }};"
                 >
+                    @if ($adalahRusticFloral)
+                        {{-- PONSEL KIRI RUSTIC FLORAL: Save The Date Sage + Rangkaian Acara Paviliun Lengkung --}}
+                        <div
+                            class="relative z-10 text-center"
+                            style="background: linear-gradient(180deg, #4B6358 0%, #3A4E45 55%, #2C3C34 100%); color: #FDFBF7; padding: 3.15cqw 2.05cqw 2.05cqw 1.15cqw;"
+                        >
+                            <img
+                                src="{{ $asetPosterRustic['garland'] }}"
+                                alt=""
+                                aria-hidden="true"
+                                loading="lazy"
+                                class="mx-auto drop-shadow"
+                                style="width: 8.4cqw;"
+                            >
+                            <p class="uppercase font-semibold leading-none" style="margin-top: 0.35cqw; font-size: 0.64cqw; letter-spacing: 0.22em; color: #E5D5C0;">
+                                Menuju Hari Bahagia
+                            </p>
+                            <p class="font-serif-poster font-bold leading-tight text-white" style="margin-top: 0.22cqw; font-size: 2.15cqw;">
+                                Save The Date
+                            </p>
+                            <p class="leading-none" style="margin-top: 0.22cqw; font-size: 0.7cqw; color: rgba(229,213,192,0.9);">
+                                Sabtu, 24 Oktober 2026
+                            </p>
+
+                            <div class="grid grid-cols-4 gap-[0.52cqw]" style="margin-top: 1.25cqw;">
+                                @foreach ([[$hariLagi, 'Hari'], ['18', 'Jam'], ['33', 'Menit'], ['30', 'Detik']] as [$angka, $satuan])
+                                    <div
+                                        class="shadow-xs"
+                                        style="border-radius: 0.85cqw; padding: 0.85cqw 0.1cqw; background-color: #FDFBF7; border: 0.14cqw solid rgba(229,213,192,0.72);"
+                                    >
+                                        <div class="font-serif-poster font-bold leading-none" style="font-size: 1.6cqw; color: #4B6358;">{{ $angka }}</div>
+                                        <div class="uppercase font-bold leading-none" style="margin-top: 0.3cqw; font-size: 0.56cqw; color: #B86B4B;">{{ $satuan }}</div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <div
+                                class="inline-flex items-center justify-center font-bold uppercase shadow-xs"
+                                style="margin-top: 1.25cqw; gap: 0.45cqw; padding: 0.52cqw 1.45cqw; font-size: 0.7cqw; letter-spacing: 0.08em; border-radius: 9999px; background-color: #FDFBF7; border: 0.14cqw solid rgba(229,213,192,0.85); color: #2F4037;"
+                            >
+                                <svg style="width: 0.9cqw; height: 0.9cqw; color: #B86B4B;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <rect width="18" height="18" x="3" y="4" rx="2"/>
+                                    <line x1="16" x2="16" y1="2" y2="6"/>
+                                    <line x1="8" x2="8" y1="2" y2="6"/>
+                                    <line x1="3" x2="21" y1="10" y2="10"/>
+                                </svg>
+                                <span>Simpan ke Kalender</span>
+                            </div>
+                        </div>
+
+                        {{-- Bagian Bawah: Tajuk Rangkaian Acara & Kartu Paviliun Lengkung Taman --}}
+                        <div
+                            class="relative z-10 flex-1 flex flex-col text-center overflow-hidden"
+                            style="background: linear-gradient(180deg, #FAF5EC 0%, #F7F1E7 55%, #F4ECE1 100%); color: #1F2937; padding: 1.65cqw 2.05cqw 0 1.15cqw;"
+                        >
+                            <img
+                                src="{{ $asetPosterRustic['garland'] }}"
+                                alt=""
+                                aria-hidden="true"
+                                loading="lazy"
+                                class="mx-auto drop-shadow-xs"
+                                style="width: 8.6cqw;"
+                            >
+                            <p class="uppercase font-bold leading-none" style="margin-top: 0.3cqw; font-size: 0.64cqw; letter-spacing: 0.24em; color: #B86B4B;">
+                                Jadwal &amp; Lokasi
+                            </p>
+                            <p class="font-serif-poster font-bold leading-tight" style="margin-top: 0.24cqw; font-size: 1.85cqw; color: #1F2937;">
+                                Rangkaian Acara
+                            </p>
+                            <p class="leading-[1.32]" style="margin-top: 0.3cqw; font-size: 0.62cqw; color: rgba(75,99,88,0.84); padding: 0 0.35cqw;">
+                                Dengan penuh suka cita, kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri momen bahagia kami:
+                            </p>
+
+                            {{-- Kartu Paviliun Lengkung Taman & Medali Tanggal Melayang --}}
+                            <div
+                                class="relative mt-auto w-full overflow-hidden shadow-md flex flex-col"
+                                style="margin-top: 1.25cqw; flex: 1; border-radius: 9cqw 9cqw 0 0; background-color: #FDFBF7; border: 0.2cqw solid rgba(191,161,95,0.62); border-bottom: 0;"
+                            >
+                                {{-- Kubah Lengkung Forest-Sage --}}
+                                <div
+                                    class="relative text-center text-[#FDFBF7] overflow-hidden"
+                                    style="background: linear-gradient(180deg, #34483E 0%, #465E53 55%, #2C3D34 100%); padding: 2.65cqw 1cqw 3.85cqw;"
+                                >
+                                    @if ($gambarLatarTemaUrl)
+                                        <img
+                                            src="{{ $gambarLatarTemaUrl }}"
+                                            alt=""
+                                            aria-hidden="true"
+                                            loading="lazy"
+                                            class="pointer-events-none absolute inset-0 w-full h-full object-cover object-center opacity-[0.16] mix-blend-luminosity"
+                                        >
+                                    @endif
+                                    <div
+                                        aria-hidden="true"
+                                        class="pointer-events-none absolute"
+                                        style="inset: 0.55cqw 0.55cqw 0 0.55cqw; border-radius: 8.4cqw 8.4cqw 0 0; border-top: 0.14cqw solid rgba(243,229,171,0.42); border-left: 0.14cqw solid rgba(243,229,171,0.42); border-right: 0.14cqw solid rgba(243,229,171,0.42);"
+                                    ></div>
+                                    <div
+                                        aria-hidden="true"
+                                        class="pointer-events-none absolute left-1/2 -translate-x-1/2 flex items-center"
+                                        style="top: 1.15cqw; gap: 0.45cqw;"
+                                    >
+                                        <span style="height: 0.12cqw; width: 1.5cqw; background: linear-gradient(90deg, transparent, rgba(243,229,171,0.75));"></span>
+                                        <span style="width: 0.4cqw; height: 0.4cqw; transform: rotate(45deg); background: #F3E5AB;"></span>
+                                        <span style="height: 0.12cqw; width: 1.5cqw; background: linear-gradient(270deg, transparent, rgba(243,229,171,0.75));"></span>
+                                    </div>
+
+                                    <p class="relative z-10 uppercase font-bold leading-none" style="font-size: 0.6cqw; letter-spacing: 0.2em; color: #F3E5AB;">
+                                        Acara 01 &bull; Sabtu
+                                    </p>
+                                    <p class="relative z-10 font-script leading-[1.06] text-[#FDFBF7]" style="margin-top: 0.3cqw; font-size: 2.95cqw;">
+                                        Akad Nikah
+                                    </p>
+                                </div>
+
+                                {{-- Medali Segel Tanggal Melayang --}}
+                                <div class="relative z-20 flex items-center justify-center" style="margin-top: -2.85cqw; padding: 0 1.4cqw;">
+                                    <span aria-hidden="true" style="height: 0.14cqw; flex: 1; background: linear-gradient(90deg, transparent, #BFA15F);"></span>
+                                    <div
+                                        class="shrink-0 flex flex-col items-center justify-center text-center"
+                                        style="margin: 0 0.7cqw; width: 5.7cqw; height: 5.7cqw; border-radius: 9999px; background-color: #FDFBF7; border: 0.24cqw solid #BFA15F; box-shadow: 0 0 0 0.36cqw #FDFBF7, 0 0.6cqw 1.4cqw rgba(47,64,55,0.28);"
+                                    >
+                                        <span class="font-serif-poster font-bold leading-none" style="font-size: 1.85cqw; color: #2F4037;">24</span>
+                                        <span class="uppercase font-bold leading-none" style="margin-top: 0.2cqw; font-size: 0.56cqw; letter-spacing: 0.1em; color: #B86B4B;">OKT 2026</span>
+                                    </div>
+                                    <span aria-hidden="true" style="height: 0.14cqw; flex: 1; background: linear-gradient(270deg, transparent, #BFA15F);"></span>
+                                </div>
+
+                                {{-- Isi Singkat Waktu & Venue --}}
+                                <div class="relative z-10 flex-1 flex flex-col items-center justify-start" style="padding: 0.85cqw 0.9cqw 0.8cqw;">
+                                    <span
+                                        class="inline-block font-semibold leading-none"
+                                        style="padding: 0.34cqw 0.95cqw; border-radius: 9999px; background-color: #F5EFE4; border: 0.12cqw solid rgba(191,161,95,0.45); font-size: 0.62cqw; color: #35493F;"
+                                    >
+                                        Pukul 08:00 - 10:00 WIB
+                                    </span>
+                                    <p class="font-serif-poster font-bold truncate w-full leading-tight" style="margin-top: 0.55cqw; font-size: 0.88cqw; color: #1F2937;">
+                                        Plataran Kemang
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    @else
                     <div>
                         <div class="relative w-full overflow-hidden" style="height: 22.2cqw;">
                             <img
@@ -264,6 +416,7 @@
                             </div>
                         @endif
                     </div>
+                    @endif
 
                     {{-- Bayangan Kedalaman Halus di Tepi Dalam (Tertimpa Ponsel Tengah) --}}
                     <div
@@ -469,6 +622,132 @@
                             aria-hidden="true"
                             class="pointer-events-none absolute inset-y-0 left-0 z-20"
                             style="width: 3.4cqw; background: linear-gradient(270deg, transparent, rgba(0,0,0,0.22));"
+                        ></div>
+                    </div>
+                @elseif ($adalahRusticFloral)
+                    {{-- PONSEL KANAN RUSTIC FLORAL: Seksi Mempelai Berbahagia & Kartu Paviliun Botani Mempelai Wanita --}}
+                    <div
+                        class="relative w-full h-full overflow-hidden flex flex-col justify-between text-center"
+                        style="border-radius: 2.85cqw; background-color: #F8F3EA; color: #2F4037; padding: 2.8cqw 1.15cqw 1.65cqw 2.05cqw;"
+                    >
+                        @if ($gambarLatarTemaUrl)
+                            <img
+                                src="{{ $gambarLatarTemaUrl }}"
+                                alt=""
+                                aria-hidden="true"
+                                loading="lazy"
+                                class="pointer-events-none absolute inset-0 w-full h-full object-cover opacity-14"
+                            >
+                        @endif
+
+                        {{-- Header Seksi Mempelai Berbahagia (Selaras Tema Asli) --}}
+                        <div class="relative z-10 w-full">
+                            <img
+                                src="{{ $asetPosterRustic['garland'] }}"
+                                alt=""
+                                aria-hidden="true"
+                                loading="lazy"
+                                class="mx-auto drop-shadow-xs"
+                                style="width: 9.2cqw;"
+                            >
+                            <p class="uppercase font-bold leading-none" style="margin-top: 0.3cqw; font-size: 0.7cqw; letter-spacing: 0.24em; color: #B86B4B;">
+                                The Couple
+                            </p>
+                            <p class="font-serif-poster font-bold leading-tight" style="margin-top: 0.28cqw; font-size: 1.72cqw; color: #1F2937;">
+                                Mempelai Berbahagia
+                            </p>
+                            <p class="leading-[1.3]" style="margin-top: 0.3cqw; font-size: 0.64cqw; color: rgba(75,99,88,0.82); padding: 0 0.4cqw;">
+                                Dengan memohon rahmat dan ridho Tuhan Yang Maha Esa, kami bermaksud menyelenggarakan pernikahan putra-putri kami:
+                            </p>
+                        </div>
+
+                        {{-- Kartu Paviliun Botani Mempelai Wanita (Panggung Atas Cat Air + Bingkai Lengkung Emas & Bunga) --}}
+                        <div
+                            class="relative z-10 w-full overflow-hidden shadow-md flex flex-col"
+                            style="margin-top: 0.95cqw; flex: 1; border-radius: 1.7cqw; background-color: #FDFBF7; border: 0.22cqw solid rgba(191,161,95,0.62);"
+                        >
+                            {{-- Panggung Atas Potret Mempelai Wanita --}}
+                            <div
+                                class="relative w-full flex items-center justify-center overflow-hidden"
+                                style="background: linear-gradient(180deg, #F5EFE2 0%, #FAF6ED 68%, #FDFBF7 100%); padding: 1.45cqw 0.7cqw 0.55cqw;"
+                            >
+                                @if ($gambarLatarTemaUrl)
+                                    <img
+                                        src="{{ $gambarLatarTemaUrl }}"
+                                        alt=""
+                                        aria-hidden="true"
+                                        loading="lazy"
+                                        class="pointer-events-none absolute inset-0 w-full h-full object-cover object-center opacity-[0.14] -scale-x-100"
+                                    >
+                                @endif
+
+                                <div
+                                    class="relative z-10 flex items-center justify-center"
+                                    style="width: 19.6cqw; aspect-ratio: 780 / 960;"
+                                >
+                                    <div
+                                        class="absolute overflow-hidden"
+                                        style="inset: 8.5% 12.5% 11.5% 12.5%; border-radius: 999px 999px 0.95cqw 0.95cqw; background-color: #2F4037; box-shadow: 0 0.8cqw 1.6cqw rgba(35,51,43,0.24);"
+                                    >
+                                        <img
+                                            src="{{ $fotoWanitaUrl }}"
+                                            alt="{{ $wanitaLengkap }}"
+                                            loading="lazy"
+                                            class="w-full h-full object-cover object-top scale-[1.04]"
+                                        >
+                                    </div>
+                                    <img
+                                        src="{{ $asetPosterRustic['bingkaiMempelai'] }}"
+                                        alt=""
+                                        aria-hidden="true"
+                                        loading="lazy"
+                                        class="pointer-events-none relative z-10 w-full h-full object-contain -scale-x-100 drop-shadow-xs"
+                                    >
+                                </div>
+                            </div>
+
+                            {{-- Panel Biografi Mempelai Wanita --}}
+                            <div
+                                class="relative z-10 flex-1 flex flex-col items-center justify-center text-center w-full"
+                                style="background-color: #FDFBF7; padding: 0.35cqw 0.9cqw 1.4cqw;"
+                            >
+                                <span
+                                    class="inline-block uppercase font-bold leading-none"
+                                    style="font-size: 0.62cqw; letter-spacing: 0.16em; padding: 0.26cqw 1.05cqw; border-radius: 9999px; background-color: rgba(75,99,88,0.12); border: 0.12cqw solid rgba(75,99,88,0.3); color: #4B6358;"
+                                >
+                                    Mempelai Wanita
+                                </span>
+
+                                <p class="font-script leading-none" style="margin-top: 0.65cqw; font-size: 3.3cqw; color: #4B6358;">
+                                    {{ $wanitaPanggilan }}
+                                </p>
+                                <p class="font-serif-poster font-bold truncate w-full leading-tight" style="margin-top: 0.4cqw; font-size: 1cqw; color: #1F2937;">
+                                    {{ $wanitaLengkap }}
+                                </p>
+                                <p class="leading-[1.32] w-full" style="margin-top: 0.28cqw; font-size: 0.7cqw; color: rgba(31,41,55,0.72);">
+                                    Putri dari {{ $wanitaAyah }}@if ($wanitaIbu) &amp; {{ $wanitaIbu }}@endif
+                                </p>
+
+                                @if ($instagramWanita)
+                                    <div
+                                        class="inline-flex items-center justify-center font-semibold"
+                                        style="margin-top: 0.75cqw; gap: 0.42cqw; padding: 0.32cqw 1.15cqw; font-size: 0.76cqw; border-radius: 9999px; background-color: rgba(75,99,88,0.1); border: 0.14cqw solid rgba(75,99,88,0.26); color: #4B6358;"
+                                    >
+                                        <svg style="width: 1cqw; height: 1cqw; color: #B86B4B;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                                            <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+                                        </svg>
+                                        <span>&#64;{{ $instagramWanita }}</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div
+                            aria-hidden="true"
+                            class="pointer-events-none absolute inset-y-0 left-0 z-20"
+                            style="width: 3.4cqw; background: linear-gradient(270deg, transparent, rgba(0,0,0,0.2));"
                         ></div>
                     </div>
                 @elseif ($adalahIslamicHeavenly)
@@ -808,6 +1087,43 @@
                                 {{ $wanitaPanggilan }}
                             </p>
                             <p class="uppercase font-semibold leading-none drop-shadow-xs" style="margin-top: 0.8cqw; font-size: 0.86cqw; letter-spacing: 0.2em; color: #F3E5AB;">
+                                {{ $poster['tanggal_pendek'] }}
+                            </p>
+                        </div>
+                    </div>
+                @elseif ($adalahRusticFloral)
+                    {{-- PONSEL TENGAH RUSTIC FLORAL: Visual Hero Video Motion Watercolor Garden (Kartu Lengkung Ivory, Pergola & Bunga Terakota) --}}
+                    <div
+                        class="relative w-full h-full overflow-hidden text-center"
+                        style="border-radius: 3.25cqw; background: #FBF7EE;"
+                    >
+                        <img
+                            src="{{ $asetPosterRustic['heroPoster'] }}"
+                            alt="{{ $tema->nama_tema }}"
+                            loading="lazy"
+                            class="absolute inset-0 w-full h-full object-cover object-center"
+                        >
+
+                        {{-- Tipografi Fine-Art Botani Tepat Di Dalam Lengkungan Ivory Semi-Transparan Video Hero --}}
+                        <div
+                            class="absolute z-20 flex flex-col items-center justify-center text-center"
+                            style="inset: 14.5% 14% 25% 14%;"
+                        >
+                            <p class="uppercase font-bold leading-none" style="font-size: 0.85cqw; letter-spacing: 0.24em; color: #4B6358;">
+                                The Wedding Of
+                            </p>
+                            <p class="font-serif-poster font-bold leading-[1.06]" style="margin-top: 0.9cqw; font-size: 3.25cqw; color: #223029;">
+                                {{ $priaPanggilan }}
+                            </p>
+                            <div class="flex items-center justify-center gap-[0.75cqw]" style="margin: 0.2cqw 0;">
+                                <span style="height: 0.14cqw; width: 2.3cqw; background: rgba(191,161,95,0.85);"></span>
+                                <span class="font-script leading-none" style="font-size: 2.65cqw; color: #B86B4B;">&amp;</span>
+                                <span style="height: 0.14cqw; width: 2.3cqw; background: rgba(191,161,95,0.85);"></span>
+                            </div>
+                            <p class="font-serif-poster font-bold leading-[1.06]" style="font-size: 3.25cqw; color: #223029;">
+                                {{ $wanitaPanggilan }}
+                            </p>
+                            <p class="uppercase font-bold leading-none" style="margin-top: 1.15cqw; font-size: 0.98cqw; letter-spacing: 0.24em; color: #4B6358;">
                                 {{ $poster['tanggal_pendek'] }}
                             </p>
                         </div>

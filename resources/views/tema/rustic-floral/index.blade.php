@@ -1,7 +1,13 @@
 @php
+    $jalurVideoRustic = public_path('aset-tema/rustic-floral/rustic-floral-motion-hero.mp4');
     $asetRustic = [
         'latar' => asset('aset-tema/rustic-floral/latar-utama.webp?v=2'),
-        'sudut' => asset('aset-tema/rustic-floral/ornamen-sudut.webp'),
+        'sudut' => asset('aset-tema/rustic-floral/ornamen-sudut.webp?v=2'),
+        'bingkaiMempelai' => asset('aset-tema/rustic-floral/bingkai-bunga-mempelai.webp?v=2'),
+        'bungaPenutup' => asset('aset-tema/rustic-floral/bunga-depan-penutup.webp?v=2'),
+        'garland' => asset('aset-tema/rustic-floral/garland-bunga-rustic.webp?v=1'),
+        'heroPoster' => asset('aset-tema/rustic-floral/hero-poster.webp'),
+        'videoHero' => file_exists($jalurVideoRustic) ? asset('aset-tema/rustic-floral/rustic-floral-motion-hero.mp4?v=1') : null,
     ];
 
     $dataTema = \App\Support\DataTemaUndangan::siapkan(
@@ -30,15 +36,16 @@
             filter: brightness(1.07);
         }
 
-        /* Transisi Sampul Scroll-Ke-Atas Khusus Rustic Floral */
+        /* Transisi Sampul Scroll-Ke-Atas 60fps Khusus Rustic Floral */
         .tirai-fade-halus.tirai-gulir-atas {
             opacity: 1;
             transform: translate3d(0, 0, 0);
             visibility: visible;
             transition:
-                transform 0.95s cubic-bezier(0.65, 0, 0.35, 1),
+                transform 0.9s cubic-bezier(0.32, 0.72, 0, 1),
                 visibility 0s linear 0s;
             will-change: transform;
+            backface-visibility: hidden;
         }
 
         .tirai-fade-halus.tirai-gulir-atas > div {
@@ -50,26 +57,39 @@
             transform: translate3d(0, -105%, 0);
             visibility: hidden;
             transition:
-                transform 0.95s cubic-bezier(0.65, 0, 0.35, 1),
-                visibility 0s linear 0.96s;
+                transform 0.9s cubic-bezier(0.32, 0.72, 0, 1),
+                visibility 0s linear 0.92s;
         }
 
-        /* Tinggi Hero Pas 1 Layar HP & Terkunci Proporsional di Desktop Anti-Zoom */
+        /* Hero Sinema Video Penuh 1 Layar HP, Tablet & Desktop Anti-Zoom */
         .rustic-hero-layar-penuh {
-            min-height: 100svh;
-            min-height: 100dvh;
+            height: 100svh;
+            height: 100dvh;
+            min-height: 520px;
         }
 
-        .rustic-hero-layar-penuh.dengan-bar-demo {
-            min-height: calc(100svh - 3.5rem);
-            min-height: calc(100dvh - 3.5rem);
-        }
-
-        html.desktop-triptych [data-kolom-undangan] .rustic-hero-layar-penuh {
+        html.desktop-triptych [data-kolom-undangan] .rustic-hero-layar-penuh,
+        html.tablet-stage [data-kolom-undangan] .rustic-hero-layar-penuh {
+            height: var(--tinggi-tirai-dalam-inv, 100dvh) !important;
             min-height: var(--tinggi-tirai-dalam-inv, 100dvh) !important;
         }
 
-        /* Gerak Naik Sinkron Saat Sampul Digulir Ke Atas */
+        /* Stabilisasi Kamera Video Hero Tanpa Transform 3D Agar Teks Tajam */
+        .diorama-kamera-3d.rustic-kamera-video-aktif {
+            animation: none !important;
+            transform-style: flat !important;
+            transform: none !important;
+        }
+
+        /* Kemunculan Tipografi Botani Sinkron Tepat Di Dalam Lengkungan Ivory Video */
+        .rustic-video-teks {
+            transition:
+                opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 1.15s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: opacity, transform;
+        }
+
+        /* Gerak Naik Sinkron Fallback Diorama */
         .rustic-hero-kartu {
             transform: translate3d(0, 38px, 0) scale(0.985);
             transition: transform 0.98s cubic-bezier(0.22, 1, 0.36, 1);
@@ -105,6 +125,7 @@
         @media (prefers-reduced-motion: reduce) {
             .tirai-fade-halus.tirai-gulir-atas,
             .tirai-fade-halus.tirai-gulir-atas.tirai-terbuka,
+            .rustic-video-teks,
             .rustic-hero-kartu,
             .rustic-hero-stagger-1,
             .rustic-hero-stagger-2,
@@ -132,6 +153,13 @@
         <div
             data-kolom-undangan
             class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-[0_0_70px_rgba(0,0,0,0.45)] lg:border-x border-[#BFA15F]/45 bg-[#FDFBF7]">
+            {{-- Progres Baca Hijau Sage & Sampanye --}}
+            <div data-progres-undangan aria-hidden="true" x-show="undanganTerbuka" x-cloak
+                class="fixed top-0 inset-x-0 mx-auto w-full lg:w-[460px] xl:w-[490px] z-[60] h-[3px] bg-black/15">
+                <div class="h-full transition-all duration-150 bg-gradient-to-r from-[#4B6358] via-[#BFA15F] to-[#B86B4B]"
+                    :style="'width: ' + scrollPersen + '%'"></div>
+            </div>
+
             {{-- Jendela Latar Linen Terpin --}}
             <div data-latar-undangan aria-hidden="true"
                 class="pointer-events-none fixed inset-y-0 inset-x-0 mx-auto w-full lg:w-[460px] xl:w-[490px] z-0 overflow-hidden bg-[#FDFBF7]">

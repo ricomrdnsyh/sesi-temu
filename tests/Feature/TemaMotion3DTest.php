@@ -253,6 +253,8 @@ class TemaMotion3DTest extends TestCase
             ->assertSee('data-section-dress-code="keraton"', false)
             ->assertSee('data-section-doa-pengantin="keraton"', false)
             ->assertSee('data-section-turut-mengundang="keraton"', false)
+            ->assertSee('Amplop Digital', false)
+            ->assertSee('Buka Amplop Digital', false)
             ->assertSee('Doa Untuk Pengantin', false)
             ->assertSee('Turut Mengundang', false)
             ->assertSee('akmal.hadiningrat', false)
@@ -771,5 +773,93 @@ class TemaMotion3DTest extends TestCase
         $this->get('/demo/editorial-monokrom?kanvas=1&tf=1')
             ->assertOk()
             ->assertDontSee('data-slideshow-editorial', false);
+    }
+
+    /**
+     * Tema Rustic Floral merender video motion hero Watercolor Garden 15 detik,
+     * poster katalog triple-phone, slideshow foto di atas countdown, amplop buka-tutup,
+     * galeri kolase bervariasi rasio, doa pengantin, turut mengundang, dan aman Mode Tanpa Foto.
+     */
+    public function test_rustic_floral_merender_video_hero_poster_dan_seksi_lengkap(): void
+    {
+        $this->assertFileExists(public_path('aset-tema/rustic-floral/rustic-floral-motion-hero.mp4'));
+        $this->assertFileExists(public_path('aset-tema/rustic-floral/hero-poster.webp'));
+        $this->assertFileExists(public_path('aset-tema/rustic-floral/bingkai-bunga-mempelai.webp'));
+        $this->assertFileExists(public_path('aset-tema/rustic-floral/bunga-depan-penutup.webp'));
+        $this->assertFileExists(public_path('aset-tema/rustic-floral/garland-bunga-rustic.webp'));
+
+        Tema::create([
+            'nama_tema' => 'Rustic Floral',
+            'slug' => 'rustic-floral',
+            'kategori' => 'floral',
+            'tier' => 'basic',
+            'harga' => 59000,
+            'lokasi_view' => 'tema.rustic-floral.index',
+            'aktif' => true,
+        ]);
+
+        $respon = $this->get('/demo/rustic-floral?kanvas=1')
+            ->assertOk()
+            ->assertSee('aset-tema/rustic-floral/rustic-floral-motion-hero.mp4', false)
+            ->assertSee('aset-tema/rustic-floral/bingkai-bunga-mempelai.webp', false)
+            ->assertSee('aset-tema/rustic-floral/bunga-depan-penutup.webp', false)
+            ->assertSee('aset-tema/rustic-floral/garland-bunga-rustic.webp', false)
+            ->assertSee('translate3d(2.2%, 0, 0) scale(1.06)', false)
+            ->assertSee('data-start-at="0"', false)
+            ->assertSee('data-playback-rate="1"', false)
+            ->assertSee('data-reveal-at="11.6"', false)
+            ->assertSee('data-settled-at="14.2"', false)
+            ->assertSee('putarUlangVideoHero()', false)
+            ->assertSee('data-slideshow-rustic', false)
+            ->assertSee('data-acara-paviliun-rustic', false)
+            ->assertSee('data-cerita-herbarium-rustic', false)
+            ->assertSee('M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z', false)
+            ->assertSee('data-galeri-kolase-rustic', false)
+            ->assertSee('aspect-[16/10]', false)
+            ->assertSee('h-48 sm:h-56', false)
+            ->assertSee('Buka Amplop Digital', false)
+            ->assertSee('RSVP &amp; Wishes', false)
+            ->assertSee('data-section-doa-pengantin="klasik"', false)
+            ->assertSee('Doa Untuk Pengantin', false)
+            ->assertSee('data-section-turut-mengundang="klasik"', false);
+
+        $html = $respon->getContent();
+        $posMempelai = strpos($html, 'data-layout-mempelai="klasik"');
+        $posSlideshow = strpos($html, 'data-slideshow-rustic');
+        $posCountdown = strpos($html, 'data-layout-countdown="klasik"');
+        $posAcara = strpos($html, 'data-layout-acara="klasik"');
+        $posRsvp = strpos($html, 'id="buku-tamu"');
+        $posDoa = strpos($html, 'data-section-doa-pengantin="klasik"');
+        $posTurut = strpos($html, 'data-section-turut-mengundang="klasik"');
+        $posPenutup = strpos($html, 'data-layout-penutup="klasik"');
+
+        $this->assertNotFalse($posMempelai);
+        $this->assertNotFalse($posSlideshow);
+        $this->assertNotFalse($posCountdown);
+        $this->assertNotFalse($posAcara);
+        $this->assertNotFalse($posRsvp);
+        $this->assertNotFalse($posDoa);
+        $this->assertNotFalse($posTurut);
+        $this->assertNotFalse($posPenutup);
+        $this->assertLessThan($posSlideshow, $posMempelai);
+        $this->assertLessThan($posCountdown, $posSlideshow);
+        $this->assertLessThan($posAcara, $posCountdown);
+        $this->assertLessThan($posDoa, $posRsvp);
+        $this->assertLessThan($posTurut, $posDoa);
+        $this->assertLessThan($posPenutup, $posTurut);
+
+        $this->get('/demo/rustic-floral?kanvas=1&tf=1')
+            ->assertOk()
+            ->assertSee('aset-tema/rustic-floral/rustic-floral-motion-hero.mp4', false)
+            ->assertDontSee('data-slideshow-rustic', false)
+            ->assertDontSee('sampul-rustic.webp', false);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('aset-tema/rustic-floral/hero-poster.webp', false)
+            ->assertSee('aset-tema/rustic-floral/garland-bunga-rustic.webp', false)
+            ->assertSee('Menuju Hari Bahagia', false)
+            ->assertSee('Rangkaian Acara', false)
+            ->assertSee('Mempelai Wanita', false);
     }
 }

@@ -1,29 +1,50 @@
-{{-- SEKSI 10: WEDDING GIFT / AMPLOP DIGITAL (TOGGLE KARTU ATM GLOSSY) --}}
+{{-- SEKSI 10: AMPLOP DIGITAL KERATON (BUKA-TUTUP KARTU BANK GLOSSY) --}}
 @if ($undangan->fiturAktif('amplop_digital') && ($undangan->daftarAmplop->isNotEmpty() || $alamatKado !== ''))
     <section x-data="{ amplopTerbuka: false }" class="relative py-12 px-5">
         <div
             class="rounded-[22px] border-[3px] border-[#D7BB83] bg-[#FFFAF5]/93 px-6 py-9 text-center text-[#2B180F] shadow-2xl space-y-4 kartu-3d">
-            <h2 data-gsap="naik" class="font-kaligrafi text-4xl text-[#472A1C] leading-tight">Wedding Gift</h2>
+            <div class="space-y-1">
+                <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.32em] text-[#8C6823]">Tanda Kasih</p>
+                <h2 data-gsap="naik" class="font-kaligrafi text-[2.65rem] text-[#472A1C] leading-tight">Amplop Digital</h2>
+            </div>
             <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs sm:text-sm text-[#472A1C]/85 leading-relaxed max-w-xs mx-auto">
                 Tanpa mengurangi rasa hormat, bagi Bapak/Ibu/Saudara/i yang ingin memberikan tanda kasih untuk kami,
                 dapat melalui:
             </p>
 
             <div data-gsap="mekar" data-gsap-delay="0.09">
-                <button type="button" @click="amplopTerbuka = !amplopTerbuka; window.SesiTemuSinema?.refresh(360)"
-                    class="jawa-tombol-emas inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-xs font-medium transition cursor-pointer">
-                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                <button
+                    type="button"
+                    @click="amplopTerbuka = !amplopTerbuka; window.SesiTemuSinema?.refresh(360)"
+                    :aria-expanded="amplopTerbuka.toString()"
+                    class="jawa-tombol-emas inline-flex items-center justify-center gap-2 rounded-full px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] transition active:scale-95 cursor-pointer"
+                >
+                    <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <rect x="3" y="8" width="18" height="4" rx="1" />
-                        <path d="M12 8v13" />
-                        <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7" />
-                        <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5" />
+                        <rect width="20" height="16" x="2" y="4" rx="2" />
+                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                     </svg>
-                    <span x-text="amplopTerbuka ? 'Tutup Rekening' : 'Klik Disini'"></span>
+                    <span x-text="amplopTerbuka ? 'Tutup Amplop Digital' : 'Buka Amplop Digital'">Buka Amplop Digital</span>
+                    <svg class="h-3.5 w-3.5 shrink-0 transition-transform duration-300"
+                        :class="amplopTerbuka ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+                        aria-hidden="true">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
                 </button>
             </div>
 
-            <div x-show="amplopTerbuka" x-cloak x-transition class="pt-4 space-y-4 text-left panggung-3d">
+            <div
+                x-show="amplopTerbuka"
+                x-cloak
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 -translate-y-2 scale-[0.98]"
+                x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                x-transition:leave-end="opacity-0 -translate-y-2 scale-[0.98]"
+                class="pt-4 space-y-4 text-left panggung-3d"
+            >
                 @foreach ($undangan->daftarAmplop as $amplop)
                     @php
                         $gayaBank = \App\Support\GayaKartuBank::untukNamaBank($amplop->nama_bank);
