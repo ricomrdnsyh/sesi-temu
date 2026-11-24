@@ -49,6 +49,26 @@
     font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
 }
 
+@keyframes kedip-kursor-ketik {
+    0%, 48% {
+        opacity: 1;
+    }
+    52%, 100% {
+        opacity: 0;
+    }
+}
+
+.kursor-ketik {
+    animation: kedip-kursor-ketik 0.85s steps(1, end) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .kursor-ketik {
+        animation: none;
+        opacity: 0.7;
+    }
+}
+
 /* SesiTemu Admin DataTables Theme */
 div.dt-container {
     --dt-header_border: 1px solid rgba(191, 161, 95, 0.22);

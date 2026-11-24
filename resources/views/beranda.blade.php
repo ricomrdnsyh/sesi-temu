@@ -9,47 +9,81 @@
             ->map(
                 fn($t) => [
                     'kategori' => $t->kategoriKode(),
-                    'nama' => $t->nama_tema.' '.$t->kategoriLabel(),
+                    'nama' => $t->nama_tema . ' ' . $t->kategoriLabel(),
                 ],
             )
             ->values();
 
+        $slugHeroJawa = $daftarTema->firstWhere('slug', 'adat-jawa')?->slug ?? ($daftarTema->first()?->slug ?? 'adat-jawa');
+        $slugHeroSunda = $daftarTema->firstWhere('slug', 'sunda-heritage')?->slug ?? ($daftarTema->skip(1)->first()?->slug ?? ($daftarTema->first()?->slug ?? 'sunda-heritage'));
+        $slugHeroSyari = $daftarTema->firstWhere('slug', 'islami-syari')?->slug ?? ($daftarTema->skip(2)->first()?->slug ?? ($daftarTema->first()?->slug ?? 'islami-syari'));
+
         $fallbackHeroSlides = [
             [
-                'slug' =>
-                    $daftarTema->firstWhere('slug', 'rustic-floral')?->slug ??
-                    ($daftarTema->first()?->slug ?? 'rustic-floral'),
-                'label' => 'Floral Pastel',
-                'nama_tema' => $daftarTema->firstWhere('slug', 'rustic-floral')?->nama_tema ?? 'Rustic Floral',
-                'pasangan' => 'Dimas & Rani',
-                'domain' => 'sesitemu.id/dimas-rani',
-                'tanggal' => 'Sabtu, 24 Oktober 2026',
-                'gambar' => asset('aset-demo/sampul-rustic.webp'),
-                'gelap' => false,
-            ],
-            [
-                'slug' =>
-                    $daftarTema->firstWhere('slug', 'luxury-noir')?->slug ??
-                    ($daftarTema->skip(1)->first()?->slug ?? ($daftarTema->first()?->slug ?? 'luxury-noir')),
-                'label' => 'Luxury Noir',
-                'nama_tema' => $daftarTema->firstWhere('slug', 'luxury-noir')?->nama_tema ?? 'Luxury Noir Monogram',
-                'pasangan' => 'Arga & Nadira',
-                'domain' => 'sesitemu.id/arga-nadira',
-                'tanggal' => 'Minggu, 08 November 2026',
-                'gambar' => asset('aset-demo/sampul-luxury.webp'),
-                'gelap' => true,
-            ],
-            [
-                'slug' =>
-                    $daftarTema->firstWhere('slug', 'adat-jawa')?->slug ??
-                    ($daftarTema->skip(2)->first()?->slug ?? ($daftarTema->first()?->slug ?? 'adat-jawa')),
-                'label' => 'Adat Keraton',
+                'slug' => $slugHeroJawa,
+                'url_demo_foto' => route('tema.demo', ['slugTema' => $slugHeroJawa]),
+                'url_demo_tanpa_foto' => route('tema.demo', ['slugTema' => $slugHeroJawa, 'tf' => 1]),
+                'label' => 'Adat Jawa',
+                'tagline' => 'The Wedding Of',
                 'nama_tema' => $daftarTema->firstWhere('slug', 'adat-jawa')?->nama_tema ?? 'Adat Jawa Keraton',
-                'pasangan' => 'Bagas & Laras',
-                'domain' => 'sesitemu.id/bagas-laras',
-                'tanggal' => 'Sabtu, 19 Desember 2026',
-                'gambar' => asset('aset-demo/sampul-jawa.webp'),
-                'gelap' => false,
+                'pria' => 'Akmal',
+                'wanita' => 'Aisyah',
+                'pasangan' => 'Akmal & Aisyah',
+                'domain' => 'sesitemu.id/akmal-aisyah',
+                'tanggal' => '28 . 12 . 2026',
+                'gambar' => asset('aset-tema/adat-jawa/hero-poster.webp'),
+                'gelap' => true,
+                'posisi_teks' => 'inset-x-[16%] top-[9%] bottom-[44%]',
+                'latar_bg' => '#3E2519',
+                'warna_teks' => '#F3E5AB',
+                'warna_aksen' => '#FFF8EC',
+                'warna_garis' => '#D7BB83',
+                'kartu_tamu_kelas' => 'bg-[#2B180F]/84 border-[#D7BB83]/60 text-[#FFFAF5] shadow-lg',
+                'tombol_kelas' => 'bg-gradient-to-r from-[#DFC078] to-[#C59B43] text-[#2B180F] hover:brightness-105',
+            ],
+            [
+                'slug' => $slugHeroSunda,
+                'url_demo_foto' => route('tema.demo', ['slugTema' => $slugHeroSunda]),
+                'url_demo_tanpa_foto' => route('tema.demo', ['slugTema' => $slugHeroSunda, 'tf' => 1]),
+                'label' => 'Sunda',
+                'tagline' => 'Wilujeng Sumping',
+                'nama_tema' => $daftarTema->firstWhere('slug', 'sunda-heritage')?->nama_tema ?? 'Sunda Siger Heritage',
+                'pria' => 'Bagja',
+                'wanita' => 'Nenden',
+                'pasangan' => 'Bagja & Nenden',
+                'domain' => 'sesitemu.id/bagja-nenden',
+                'tanggal' => '19 . 12 . 2026',
+                'gambar' => asset('aset-tema/sunda-heritage/hero-poster.webp'),
+                'gelap' => true,
+                'posisi_teks' => 'inset-x-[20%] top-[13%] bottom-[43%]',
+                'latar_bg' => '#3E1212',
+                'warna_teks' => '#FFFDF8',
+                'warna_aksen' => '#F3E5AB',
+                'warna_garis' => '#E7C87D',
+                'kartu_tamu_kelas' => 'bg-[#351010]/85 border-[#E7C87D]/60 text-[#FAF4E8] shadow-lg',
+                'tombol_kelas' => 'bg-gradient-to-r from-[#E7C87D] to-[#C59B43] text-[#351010] hover:brightness-105',
+            ],
+            [
+                'slug' => $slugHeroSyari,
+                'url_demo_foto' => route('tema.demo', ['slugTema' => $slugHeroSyari]),
+                'url_demo_tanpa_foto' => route('tema.demo', ['slugTema' => $slugHeroSyari, 'tf' => 1]),
+                'label' => "Islami Syar'i",
+                'tagline' => 'Walimatul Ursy',
+                'nama_tema' => $daftarTema->firstWhere('slug', 'islami-syari')?->nama_tema ?? 'Islami Syari Emerald',
+                'pria' => 'Zayd',
+                'wanita' => 'Fatimah',
+                'pasangan' => 'Zayd & Fatimah',
+                'domain' => 'sesitemu.id/zayd-fatimah',
+                'tanggal' => '26 . 12 . 2026',
+                'gambar' => asset('aset-tema/islami-syari/hero-poster.webp'),
+                'gelap' => true,
+                'posisi_teks' => 'inset-x-[22%] top-[15%] bottom-[47%]',
+                'latar_bg' => '#0E3A36',
+                'warna_teks' => '#FFFDF8',
+                'warna_aksen' => '#E6D19C',
+                'warna_garis' => '#E6D19C',
+                'kartu_tamu_kelas' => 'bg-[#0A2B28]/86 border-[#C5A059]/60 text-[#F7FBF8] shadow-lg',
+                'tombol_kelas' => 'bg-gradient-to-r from-[#EFE0B4] to-[#C5A059] text-[#092623] hover:brightness-105',
             ],
         ];
 
@@ -59,7 +93,7 @@
         $subTabAwalPaket = in_array(request()->query('sub'), ['harga', 'faq'], true)
             ? request()->query('sub')
             : 'harga';
-        $bukaSheetAwal = (session('saran_link') || $errors->has('slug') || request()->boolean('buat')) ? 'true' : 'false';
+        $bukaSheetAwal = session('saran_link') || $errors->has('slug') || request()->boolean('buat') ? 'true' : 'false';
     @endphp
 
     <div x-data="{
@@ -70,6 +104,7 @@
         kategoriAktif: 'semua',
         kataCariTema: '',
         previewTerbukaId: null,
+        heroPreviewTerbuka: false,
         sampulLightboxSlug: null,
         daftarFilter: @js($daftarFilterJson),
         heroTemaIndex: 0,
@@ -89,6 +124,7 @@
                 this.subTabPaket = sub;
             }
             this.previewTerbukaId = null;
+            this.heroPreviewTerbuka = false;
             if (window.innerWidth < 768) {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
@@ -220,8 +256,7 @@
         </header>
 
         {{-- Hero Section: Responsif Hybrid (Tab Beranda Gaya App di Mobile, Full Section di Desktop) --}}
-        <section id="beranda"
-            :class="tabMobile === 'beranda' ? 'block' : 'hidden md:block'"
+        <section id="beranda" :class="tabMobile === 'beranda' ? 'block' : 'hidden md:block'"
             class="relative overflow-hidden bg-gradient-to-b from-ivory via-[#FAF5EC] to-white pt-5 pb-8 sm:pt-9 sm:pb-12 lg:py-12 px-4 sm:px-6 lg:px-8">
             <div aria-hidden="true"
                 class="pointer-events-none absolute right-0 lg:right-16 top-8 w-[26rem] sm:w-[34rem] h-[24rem] rounded-full bg-champagne/18 blur-3xl">
@@ -234,19 +269,68 @@
                     <div
                         class="inline-flex items-center gap-2 rounded-full bg-white/95 border border-champagne/35 px-3.5 sm:px-4 py-1.5 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.16em] sm:tracking-[0.18em] text-[#8A6D33] shadow-2xs">
                         <span class="h-1.5 w-1.5 rounded-full bg-sage"></span>
-                        <span>Website Undangan Pernikahan Digital</span>
+                        <span>Website Undangan Digital</span>
                     </div>
 
                     <h1
                         class="mt-3.5 sm:mt-4 font-logo text-[1.85rem] sm:text-4xl lg:text-[2.85rem] xl:text-[3.2rem] font-bold text-charcoal leading-[1.15] tracking-tight">
-                        Bagikan Kabar Pernikahan
-                        <span class="text-sage">Dengan Lebih Berkesan</span>
+                        Buat Undangan Digital,
+                        <span x-data="{
+                            daftarKalimat: [
+                                'Jadi Dulu, Baru Bayar',
+                                'Siap dalam 5 Menit',
+                                'Tamu Unlimited 1 Tahun',
+                                'Bebas Edit Kapan Saja',
+                                'Bisa Terima Beres',
+                            ],
+                            indeks: 0,
+                            teks: 'Jadi Dulu, Baru Bayar',
+                            menghapus: false,
+                            timer: null,
+                            init() {
+                                if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                                    return;
+                                }
+                                this.teks = '';
+                                this.timer = setTimeout(() => this.langkah(), 220);
+                            },
+                            langkah() {
+                                const target = this.daftarKalimat[this.indeks];
+                                if (!this.menghapus) {
+                                    this.teks = target.slice(0, this.teks.length + 1);
+                                    if (this.teks === target) {
+                                        this.menghapus = true;
+                                        this.timer = setTimeout(() => this.langkah(), 2100);
+                                        return;
+                                    }
+                                    this.timer = setTimeout(() => this.langkah(), 68);
+                                } else {
+                                    this.teks = target.slice(0, Math.max(0, this.teks.length - 1));
+                                    if (this.teks.length === 0) {
+                                        this.menghapus = false;
+                                        this.indeks = (this.indeks + 1) % this.daftarKalimat.length;
+                                        this.timer = setTimeout(() => this.langkah(), 320);
+                                        return;
+                                    }
+                                    this.timer = setTimeout(() => this.langkah(), 36);
+                                }
+                            },
+                            destroy() {
+                                if (this.timer) {
+                                    clearTimeout(this.timer);
+                                }
+                            }
+                        }" data-hero-typewriter
+                            class="block min-h-[1.2em] text-sage"><span x-text="teks">Jadi Dulu, Baru Bayar</span><span
+                                aria-hidden="true"
+                                class="kursor-ketik inline-block w-[3px] h-[0.86em] bg-champagne ml-1 align-[-0.08em] rounded-full"></span></span>
                     </h1>
 
                     <p
                         class="mt-3 sm:mt-4 text-[13px] sm:text-base text-charcoal/75 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-                        Rancang <strong>website undangan pernikahan</strong> berkelas dalam hitungan menit — lengkap dengan
-                        galeri ringan, musik romantis, RSVP tamu, amplop digital, dan link personal WhatsApp.
+                        Atur undangan acaramu secara mandiri atau pilih <strong>Terima Beres</strong> — lengkap dengan
+                        animasi pembuka, mode pakai foto &amp; tanpa foto, RSVP, amplop digital, hingga link tamu
+                        WhatsApp tanpa batas.
                     </p>
 
                     <div
@@ -282,11 +366,12 @@
 
                 {{-- Kolom Stage Mockup HP Undangan Digital (Paling Atas di Mobile, Kanan di Desktop) --}}
                 <div class="order-1 lg:order-2 lg:col-span-6 text-center">
-                    <div class="mx-auto xl:ml-auto xl:mr-28 max-w-[245px] sm:max-w-[285px] xl:max-w-[305px] flex flex-col items-center">
+                    <div
+                        class="mx-auto xl:ml-auto xl:mr-28 max-w-[245px] sm:max-w-[285px] xl:max-w-[305px] flex flex-col items-center">
                         <div
                             class="inline-flex items-center justify-center gap-1 rounded-full bg-white/95 p-1 ring-1 ring-champagne/30 shadow-xs mb-4 sm:mb-5 whitespace-nowrap">
                             <template x-for="(slide, idx) in heroSlides" :key="idx">
-                                <button type="button" @click="heroTemaIndex = idx"
+                                <button type="button" @click="heroTemaIndex = idx; heroPreviewTerbuka = false"
                                     :class="heroTemaIndex === idx ?
                                         'bg-charcoal text-champagne shadow-xs' :
                                         'text-charcoal/70 hover:text-charcoal'"
@@ -296,141 +381,224 @@
                         </div>
 
                         <div class="relative w-full">
-                        {{-- Pratinjau Samping Kiri --}}
-                        <button type="button" @click="heroTemaIndex = heroSlideKiriIdx"
-                            :aria-label="'Pilih pratinjau ' + heroSlideKiri.label"
-                            :class="heroSlideKiri.gelap ? 'bg-charcoal text-ivory' : 'bg-ivory text-charcoal'"
-                            class="flex flex-col justify-between p-3 sm:p-4 text-left absolute -left-14 sm:-left-24 xl:-left-28 top-8 sm:top-11 w-28 sm:w-40 h-48 sm:h-60 -rotate-6 rounded-[1.5rem] sm:rounded-3xl overflow-hidden shadow-lg ring-1 ring-champagne/40 opacity-85 hover:opacity-100 hover:-translate-y-1 transition duration-300 cursor-pointer">
-                            <img :src="heroSlideKiri.gambar" :alt="heroSlideKiri.nama_tema"
-                                class="absolute inset-0 w-full h-full object-cover"
-                                :class="heroSlideKiri.gelap ? 'opacity-65' : 'opacity-90'">
-                            <div class="absolute inset-0"
-                                :class="heroSlideKiri.gelap ?
-                                    'bg-gradient-to-b from-black/20 via-transparent to-black/80' :
-                                    'bg-gradient-to-b from-white/30 via-transparent to-ivory/95'">
-                            </div>
-                            <div class="relative z-10 mt-auto">
-                                <p class="text-[8px] sm:text-[9px] font-semibold uppercase tracking-widest"
-                                    :class="heroSlideKiri.gelap ? 'text-champagne/90' : 'text-[#8A6D33]'"
-                                    x-text="heroSlideKiri.label"></p>
-                                <p class="font-logo text-xs sm:text-sm font-bold"
-                                    :class="heroSlideKiri.gelap ? 'text-white' : 'text-charcoal'"
-                                    x-text="heroSlideKiri.pasangan"></p>
-                            </div>
-                        </button>
-
-                        {{-- Pratinjau Samping Kanan --}}
-                        <button type="button" @click="heroTemaIndex = heroSlideKananIdx"
-                            :aria-label="'Pilih pratinjau ' + heroSlideKanan.label"
-                            :class="heroSlideKanan.gelap ? 'bg-charcoal text-ivory' : 'bg-ivory text-charcoal'"
-                            class="flex flex-col justify-between p-3 sm:p-4 text-right absolute -right-14 sm:-right-24 xl:-right-28 top-8 sm:top-11 w-28 sm:w-40 h-48 sm:h-60 rotate-6 rounded-[1.5rem] sm:rounded-3xl overflow-hidden shadow-lg ring-1 ring-champagne/40 opacity-85 hover:opacity-100 hover:-translate-y-1 transition duration-300 cursor-pointer">
-                            <img :src="heroSlideKanan.gambar" :alt="heroSlideKanan.nama_tema"
-                                class="absolute inset-0 w-full h-full object-cover"
-                                :class="heroSlideKanan.gelap ? 'opacity-65' : 'opacity-90'">
-                            <div class="absolute inset-0"
-                                :class="heroSlideKanan.gelap ?
-                                    'bg-gradient-to-b from-black/20 via-transparent to-black/80' :
-                                    'bg-gradient-to-b from-white/30 via-transparent to-ivory/95'">
-                            </div>
-                            <div class="relative z-10 mt-auto">
-                                <p class="text-[8px] sm:text-[9px] font-semibold uppercase tracking-widest"
-                                    :class="heroSlideKanan.gelap ? 'text-champagne/90' : 'text-[#8A6D33]'"
-                                    x-text="heroSlideKanan.label"></p>
-                                <p class="font-logo text-xs sm:text-sm font-bold"
-                                    :class="heroSlideKanan.gelap ? 'text-white' : 'text-charcoal'"
-                                    x-text="heroSlideKanan.pasangan"></p>
-                            </div>
-                        </button>
-
-                        {{-- Bingkai Ponsel Utama Interaktif --}}
-                        <div
-                            class="relative z-10 rounded-[2.2rem] sm:rounded-[2.5rem] bg-charcoal p-2 sm:p-2.5 shadow-[0_24px_60px_-15px_rgba(31,41,55,0.24)] ring-1 ring-champagne/45">
-                            <div
-                                class="rounded-[1.8rem] sm:rounded-[2.05rem] overflow-hidden bg-ivory relative flex flex-col">
-                                <div
-                                    class="bg-charcoal px-3.5 sm:px-4 pt-2 sm:pt-2.5 pb-1.5 sm:pb-2 flex items-center justify-between gap-2 text-[9px] sm:text-[10px] text-ivory/90">
-                                    <span class="inline-flex items-center gap-1.5 font-mono truncate">
-                                        <svg class="w-3 h-3 text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
-                                            stroke-linejoin="round" aria-hidden="true">
-                                            <rect width="18" height="11" x="3" y="11" rx="2"
-                                                ry="2" />
-                                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                                        </svg>
-                                        <span x-text="heroSlideAktif.domain"></span>
-                                    </span>
-                                    <span
-                                        class="rounded-full bg-champagne/20 px-2 py-0.5 text-[8px] sm:text-[9px] font-bold uppercase tracking-wider text-champagne shrink-0">
-                                        Live Web
-                                    </span>
+                            {{-- Pratinjau Samping Kiri --}}
+                            <button type="button" @click="heroTemaIndex = heroSlideKiriIdx; heroPreviewTerbuka = false"
+                                :aria-label="'Pilih pratinjau ' + heroSlideKiri.label"
+                                :style="'background-color: ' + heroSlideKiri.latar_bg"
+                                class="flex flex-col justify-between p-3 sm:p-4 text-left absolute -left-14 sm:-left-24 xl:-left-28 top-10 sm:top-14 w-28 sm:w-40 h-52 sm:h-68 -rotate-6 rounded-[1.5rem] sm:rounded-3xl overflow-hidden shadow-lg ring-1 ring-champagne/45 opacity-90 hover:opacity-100 hover:-translate-y-1 transition duration-300 cursor-pointer">
+                                <img :src="heroSlideKiri.gambar" :alt="heroSlideKiri.nama_tema"
+                                    class="absolute inset-0 w-full h-full object-cover object-center">
+                                <div class="absolute inset-0"
+                                    :class="heroSlideKiri.gelap ?
+                                        'bg-gradient-to-b from-black/10 via-transparent to-black/82' :
+                                        'bg-gradient-to-b from-white/10 via-transparent to-[#223029]/82'">
                                 </div>
+                                <div class="relative z-10 mt-auto">
+                                    <p class="text-[8px] sm:text-[9px] font-bold uppercase tracking-widest text-[#F3DFA2]"
+                                        x-text="heroSlideKiri.label"></p>
+                                    <p class="font-logo text-xs sm:text-sm font-bold text-white drop-shadow-xs"
+                                        x-text="heroSlideKiri.pasangan"></p>
+                                </div>
+                            </button>
 
-                                <div class="relative h-[300px] sm:h-[365px] xl:h-[385px] flex flex-col justify-between p-4 sm:p-5 text-center transition-colors duration-300"
-                                    :class="heroSlideAktif.gelap ? 'bg-[#111827] text-ivory' : 'bg-[#FDFBF7] text-charcoal'">
-                                    <img :src="heroSlideAktif.gambar" :alt="heroSlideAktif.nama_tema"
-                                        class="absolute inset-0 w-full h-full object-cover object-[center_26%] transition-all duration-500"
-                                        :class="heroSlideAktif.gelap ? 'opacity-65' : 'opacity-98'">
-                                    <div class="absolute inset-0"
-                                        :class="heroSlideAktif.gelap ?
-                                            'bg-gradient-to-b from-[#0f172a]/65 via-transparent to-[#0f172a]/90' :
-                                            'bg-gradient-to-b from-white/65 via-transparent to-ivory/90'">
+                            {{-- Pratinjau Samping Kanan --}}
+                            <button type="button" @click="heroTemaIndex = heroSlideKananIdx; heroPreviewTerbuka = false"
+                                :aria-label="'Pilih pratinjau ' + heroSlideKanan.label"
+                                :style="'background-color: ' + heroSlideKanan.latar_bg"
+                                class="flex flex-col justify-between p-3 sm:p-4 text-right absolute -right-14 sm:-right-24 xl:-right-28 top-10 sm:top-14 w-28 sm:w-40 h-52 sm:h-68 rotate-6 rounded-[1.5rem] sm:rounded-3xl overflow-hidden shadow-lg ring-1 ring-champagne/45 opacity-90 hover:opacity-100 hover:-translate-y-1 transition duration-300 cursor-pointer">
+                                <img :src="heroSlideKanan.gambar" :alt="heroSlideKanan.nama_tema"
+                                    class="absolute inset-0 w-full h-full object-cover object-center">
+                                <div class="absolute inset-0"
+                                    :class="heroSlideKanan.gelap ?
+                                        'bg-gradient-to-b from-black/10 via-transparent to-black/82' :
+                                        'bg-gradient-to-b from-white/10 via-transparent to-[#223029]/82'">
+                                </div>
+                                <div class="relative z-10 mt-auto">
+                                    <p class="text-[8px] sm:text-[9px] font-bold uppercase tracking-widest text-[#F3DFA2]"
+                                        x-text="heroSlideKanan.label"></p>
+                                    <p class="font-logo text-xs sm:text-sm font-bold text-white drop-shadow-xs"
+                                        x-text="heroSlideKanan.pasangan"></p>
+                                </div>
+                            </button>
+
+                            {{-- Bingkai Ponsel Utama Interaktif --}}
+                            <div
+                                class="relative z-10 rounded-[2.2rem] sm:rounded-[2.5rem] bg-charcoal p-2 sm:p-2.5 shadow-[0_24px_60px_-15px_rgba(31,41,55,0.28)] ring-1 ring-champagne/45">
+                                <div
+                                    class="rounded-[1.8rem] sm:rounded-[2.05rem] overflow-hidden bg-ivory relative flex flex-col">
+                                    <div
+                                        class="bg-charcoal px-3.5 sm:px-4 pt-2 sm:pt-2.5 pb-1.5 sm:pb-2 flex items-center justify-between gap-2 text-[9px] sm:text-[10px] text-ivory/90">
+                                        <span class="inline-flex items-center gap-1.5 font-mono truncate">
+                                            <svg class="w-3 h-3 text-emerald-400 shrink-0" viewBox="0 0 24 24"
+                                                fill="none" stroke="currentColor" stroke-width="2.2"
+                                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <rect width="18" height="11" x="3" y="11" rx="2"
+                                                    ry="2" />
+                                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                            </svg>
+                                            <span x-text="heroSlideAktif.domain"></span>
+                                        </span>
+                                        <span
+                                            class="rounded-full bg-champagne/20 px-2 py-0.5 text-[8px] sm:text-[9px] font-bold uppercase tracking-wider text-champagne shrink-0">
+                                            Live Web
+                                        </span>
                                     </div>
 
-                                    <div class="relative z-10 pt-1 space-y-0.5">
-                                        <p
-                                            class="text-[8px] sm:text-[10px] font-bold uppercase tracking-[0.24em] opacity-80">
-                                            The
-                                            Wedding Of</p>
-                                        <h2 class="font-logo text-xl sm:text-3xl font-bold tracking-tight"
-                                            x-text="heroSlideAktif.pasangan"></h2>
-                                        <p class="text-[10px] sm:text-xs font-medium opacity-80"
-                                            x-text="heroSlideAktif.tanggal"></p>
-                                    </div>
+                                    <div class="relative h-[350px] sm:h-[420px] xl:h-[445px] flex flex-col justify-end px-3.5 pb-3.5 sm:px-4.5 sm:pb-4.5 text-center transition-colors duration-300"
+                                        :style="'background-color: ' + heroSlideAktif.latar_bg + '; color: ' + heroSlideAktif
+                                            .warna_teks">
+                                        <img :src="heroSlideAktif.gambar" :alt="heroSlideAktif.nama_tema"
+                                            class="absolute inset-0 w-full h-full object-cover object-center transition-all duration-500">
+                                        <div class="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/10 via-transparent to-black/60">
+                                        </div>
 
-                                    <div class="relative z-10 space-y-2 pb-0.5">
-                                        <div class="rounded-xl sm:rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5 backdrop-blur-md border text-center"
-                                            :class="heroSlideAktif.gelap ?
-                                                'bg-white/10 border-champagne/35 text-ivory' :
-                                                'bg-white/92 border-champagne/40 text-charcoal shadow-sm'">
-                                            <p class="text-[8px] sm:text-[10px] opacity-75">Kepada Yth. Bapak/Ibu/Saudara/i
-                                            </p>
-                                            <p class="text-xs sm:text-sm font-bold mt-0.5">Budi Santoso &amp; Partner</p>
-
-                                            <div class="mt-1.5 sm:mt-2 grid grid-cols-3 gap-1.5 text-center border-t pt-1.5"
-                                                :class="heroSlideAktif.gelap ? 'border-white/15' : 'border-champagne/20'">
-                                                <div>
-                                                    <p class="font-sans tabular-nums text-[11px] sm:text-xs font-bold">14</p>
-                                                    <p class="text-[8px] sm:text-[9px] opacity-65">Hari</p>
-                                                </div>
-                                                <div>
-                                                    <p class="font-sans tabular-nums text-[11px] sm:text-xs font-bold">08</p>
-                                                    <p class="text-[8px] sm:text-[9px] opacity-65">Jam</p>
-                                                </div>
-                                                <div>
-                                                    <p class="font-sans tabular-nums text-[11px] sm:text-xs font-bold">25</p>
-                                                    <p class="text-[8px] sm:text-[9px] opacity-65">Menit</p>
-                                                </div>
+                                        {{-- Tipografi Mempelai Terpusat Tepat Di Dalam Bingkai Hero Asli Tema --}}
+                                        <div class="absolute z-10 flex flex-col items-center justify-center text-center px-1.5 transition-all duration-300"
+                                            :class="heroSlideAktif.posisi_teks">
+                                            <div class="w-full space-y-0.5 drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)]">
+                                                <p class="text-[7px] sm:text-[8.5px] font-bold uppercase tracking-[0.26em] leading-tight"
+                                                    :style="'color: ' + heroSlideAktif.warna_aksen"
+                                                    x-text="heroSlideAktif.tagline">
+                                                </p>
+                                                <h2 class="font-logo text-[1.15rem] sm:text-[1.45rem] font-semibold uppercase tracking-[0.08em] leading-[1.04] pt-0.5">
+                                                    <span class="block truncate" x-text="heroSlideAktif.pria"></span>
+                                                    <span class="my-0.5 flex items-center justify-center gap-1.5">
+                                                        <span aria-hidden="true" class="h-px w-4 opacity-70"
+                                                            :style="'background-color: ' + heroSlideAktif.warna_garis"></span>
+                                                        <span class="font-serif italic normal-case font-normal text-xs sm:text-sm leading-none"
+                                                            :style="'color: ' + heroSlideAktif.warna_garis">&amp;</span>
+                                                        <span aria-hidden="true" class="h-px w-4 opacity-70"
+                                                            :style="'background-color: ' + heroSlideAktif.warna_garis"></span>
+                                                    </span>
+                                                    <span class="block truncate" x-text="heroSlideAktif.wanita"></span>
+                                                </h2>
+                                                <p class="pt-1 text-[8px] sm:text-[9.5px] font-semibold tracking-[0.26em] opacity-95"
+                                                    :style="'color: ' + heroSlideAktif.warna_aksen"
+                                                    x-text="heroSlideAktif.tanggal"></p>
                                             </div>
                                         </div>
 
-                                        <button type="button"
-                                            @click="bukaModalDemo(heroSlideAktif.slug, heroSlideAktif.nama_tema, 'Live Preview')"
-                                            class="w-full inline-flex items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 sm:py-2.5 text-[11px] sm:text-xs font-bold shadow-md transition cursor-pointer"
-                                            :class="heroSlideAktif.gelap ? 'bg-champagne text-charcoal hover:bg-champagne/90' :
-                                                'bg-sage text-white hover:bg-sage/90'">
-                                            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="2.1" stroke-linecap="round"
-                                                stroke-linejoin="round" aria-hidden="true">
-                                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                                                <circle cx="12" cy="12" r="3" />
-                                            </svg>
-                                            <span>Buka Contoh Undangan</span>
-                                        </button>
+                                        {{-- Kartu Tamu + Hitung Mundur + CTA Demo --}}
+                                        <div class="relative z-10 space-y-2 pb-0.5">
+                                            <div class="rounded-xl sm:rounded-2xl px-3 py-2 sm:px-3.5 sm:py-2.5 backdrop-blur-md border text-center transition-colors duration-300"
+                                                :class="heroSlideAktif.kartu_tamu_kelas">
+                                                <p class="text-[8px] sm:text-[9.5px] opacity-80">Kepada Yth.
+                                                    Bapak/Ibu/Saudara/i</p>
+                                                <p class="text-[11px] sm:text-[13px] font-bold mt-0.5">Budi Santoso &amp;
+                                                    Partner</p>
+
+                                                <div class="mt-1.5 sm:mt-2 grid grid-cols-3 gap-1.5 text-center border-t pt-1.5"
+                                                    :class="heroSlideAktif.gelap ? 'border-white/15' : 'border-[#BFA15F]/30'">
+                                                    <div>
+                                                        <p class="font-sans tabular-nums text-[11px] sm:text-xs font-bold">
+                                                            14</p>
+                                                        <p class="text-[7.5px] sm:text-[8.5px] opacity-70">Hari</p>
+                                                    </div>
+                                                    <div>
+                                                        <p class="font-sans tabular-nums text-[11px] sm:text-xs font-bold">
+                                                            08</p>
+                                                        <p class="text-[7.5px] sm:text-[8.5px] opacity-70">Jam</p>
+                                                    </div>
+                                                    <div>
+                                                        <p class="font-sans tabular-nums text-[11px] sm:text-xs font-bold">
+                                                            25</p>
+                                                        <p class="text-[7.5px] sm:text-[8.5px] opacity-70">Menit</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="relative" data-hero-preview-menu
+                                                @click.away="heroPreviewTerbuka = false"
+                                                @keydown.escape.window="heroPreviewTerbuka = false">
+                                                {{-- Menu 2 Pilihan Muncul Tepat Di Atas Tombol (Sama Seperti Katalog Tema) --}}
+                                                <div x-show="heroPreviewTerbuka" x-cloak
+                                                    x-transition:enter="transition ease-out duration-150"
+                                                    x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                                                    x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                                    x-transition:leave="transition ease-in duration-100"
+                                                    x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                                                    x-transition:leave-end="opacity-0 translate-y-1 scale-95"
+                                                    class="absolute bottom-full inset-x-0 mb-2 z-30 rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-champagne/45 space-y-1.5 text-left">
+                                                    <a :href="heroSlideAktif.url_demo_foto"
+                                                        target="_blank" rel="noopener"
+                                                        @click="heroPreviewTerbuka = false"
+                                                        class="w-full flex items-center justify-between gap-2 rounded-xl bg-ivory/80 hover:bg-sage/10 px-3 py-2 text-xs font-semibold text-charcoal hover:text-sage transition">
+                                                        <span class="inline-flex items-center gap-2">
+                                                            <svg class="w-4 h-4 text-sage shrink-0" viewBox="0 0 24 24"
+                                                                fill="none" stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                aria-hidden="true">
+                                                                <rect width="18" height="18" x="3" y="3"
+                                                                    rx="2" ry="2" />
+                                                                <circle cx="9" cy="9" r="2" />
+                                                                <path
+                                                                    d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                                                            </svg>
+                                                            <span>Pakai Foto</span>
+                                                        </span>
+                                                        <svg class="w-3.5 h-3.5 text-charcoal/45 shrink-0"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round" aria-hidden="true">
+                                                            <path d="M7 17 17 7" />
+                                                            <path d="M7 7h10v10" />
+                                                        </svg>
+                                                    </a>
+
+                                                    <a :href="heroSlideAktif.url_demo_tanpa_foto"
+                                                        target="_blank" rel="noopener"
+                                                        @click="heroPreviewTerbuka = false"
+                                                        class="w-full flex items-center justify-between gap-2 rounded-xl bg-ivory/80 hover:bg-champagne/15 px-3 py-2 text-xs font-semibold text-charcoal hover:text-[#8A6D33] transition">
+                                                        <span class="inline-flex items-center gap-2">
+                                                            <svg class="w-4 h-4 text-[#8A6D33] shrink-0"
+                                                                viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                aria-hidden="true">
+                                                                <path
+                                                                    d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                                                                <path d="m9 12 2 2 4-4" />
+                                                            </svg>
+                                                            <span>Tanpa Foto</span>
+                                                        </span>
+                                                        <svg class="w-3.5 h-3.5 text-charcoal/45 shrink-0"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round" aria-hidden="true">
+                                                            <path d="M7 17 17 7" />
+                                                            <path d="M7 7h10v10" />
+                                                        </svg>
+                                                    </a>
+                                                </div>
+
+                                                <button type="button"
+                                                    @click.stop="heroPreviewTerbuka = !heroPreviewTerbuka"
+                                                    :aria-expanded="heroPreviewTerbuka.toString()"
+                                                    class="w-full inline-flex items-center justify-between gap-1.5 rounded-xl px-3.5 py-2 sm:py-2.5 text-[11px] sm:text-xs font-bold shadow-md transition cursor-pointer active:scale-95"
+                                                    :class="heroSlideAktif.tombol_kelas">
+                                                    <span class="inline-flex items-center gap-1.5">
+                                                        <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2.1" stroke-linecap="round"
+                                                            stroke-linejoin="round" aria-hidden="true">
+                                                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                                                            <circle cx="12" cy="12" r="3" />
+                                                        </svg>
+                                                        <span>Buka Contoh Undangan</span>
+                                                    </span>
+                                                    <svg class="w-3.5 h-3.5 shrink-0 transition-transform duration-200"
+                                                        :class="heroPreviewTerbuka ? 'rotate-180' : ''"
+                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                        stroke-width="2.3" stroke-linecap="round"
+                                                        stroke-linejoin="round" aria-hidden="true">
+                                                        <path d="m18 15-6-6-6 6" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                     </div>
                 </div>
             </div>
@@ -441,12 +609,16 @@
             class="md:hidden sticky top-14 z-30 bg-ivory/95 backdrop-blur-md border-b border-champagne/20 px-4 py-2.5">
             <div class="max-w-lg mx-auto grid grid-cols-2 rounded-2xl bg-[#F3EDE0] p-1 ring-1 ring-champagne/20">
                 <button type="button" @click="subTabPaket = 'harga'; window.scrollTo({ top: 0, behavior: 'smooth' })"
-                    :class="subTabPaket === 'harga' ? 'bg-white text-charcoal font-bold shadow-xs ring-1 ring-champagne/20' : 'text-charcoal/65 font-medium'"
+                    :class="subTabPaket === 'harga' ?
+                        'bg-white text-charcoal font-bold shadow-xs ring-1 ring-champagne/20' :
+                        'text-charcoal/65 font-medium'"
                     class="rounded-xl py-1.5 text-xs transition cursor-pointer">
                     Paket Harga
                 </button>
                 <button type="button" @click="subTabPaket = 'faq'; window.scrollTo({ top: 0, behavior: 'smooth' })"
-                    :class="subTabPaket === 'faq' ? 'bg-white text-charcoal font-bold shadow-xs ring-1 ring-champagne/20' : 'text-charcoal/65 font-medium'"
+                    :class="subTabPaket === 'faq' ?
+                        'bg-white text-charcoal font-bold shadow-xs ring-1 ring-champagne/20' :
+                        'text-charcoal/65 font-medium'"
                     class="rounded-xl py-1.5 text-xs transition cursor-pointer">
                     Tanya Jawab
                 </button>
@@ -454,13 +626,13 @@
         </div>
 
         {{-- Keunggulan SesiTemu: Editorial Ticket Highlight + Grid Fitur Bersih Tanpa Border --}}
-        <section id="keunggulan"
-            :class="tabMobile === 'beranda' ? 'block' : 'hidden md:block'"
+        <section id="keunggulan" :class="tabMobile === 'beranda' ? 'block' : 'hidden md:block'"
             class="pt-7 pb-12 sm:pt-14 sm:pb-20 bg-gradient-to-b from-white via-[#F9F5EB] to-[#F9F5EB] border-b border-champagne/20 px-4 sm:px-6 lg:px-8">
             <div class="max-w-7xl mx-auto">
                 {{-- Header Seksi --}}
                 <div class="text-center max-w-2xl mx-auto">
-                    <h2 class="font-logo text-[1.65rem] sm:text-4xl lg:text-[2.6rem] font-bold text-charcoal tracking-tight">
+                    <h2
+                        class="font-logo text-[1.65rem] sm:text-4xl lg:text-[2.6rem] font-bold text-charcoal tracking-tight">
                         Mengapa Memilih <span class="text-[#223F2E]">Sesi</span><span class="text-[#C29940]">Temu</span>?
                     </h2>
                 </div>
@@ -869,8 +1041,7 @@
         </section>
 
         {{-- Katalog Tema dengan Pencarian, Filter Kategori Gaya & Popover Preview 2 Mode --}}
-        <section id="katalog-tema"
-            :class="tabMobile === 'tema' ? 'block' : 'hidden md:block'"
+        <section id="katalog-tema" :class="tabMobile === 'tema' ? 'block' : 'hidden md:block'"
             class="pt-5 pb-10 md:py-20 bg-white px-4 sm:px-6 lg:px-8">
             <div class="max-w-7xl mx-auto">
                 <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
@@ -901,18 +1072,21 @@
                 </div>
 
                 {{-- Pilihan Kategori Gaya Tema: Semua, Adat, Islami, Floral, Elegan, Modern --}}
-                <div data-filter-kategori-beranda class="mt-6 md:mt-7 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+                <div data-filter-kategori-beranda
+                    class="mt-6 md:mt-7 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
                     <button type="button" data-filter-kategori="semua" @click="kategoriAktif = 'semua'"
                         :class="kategoriAktif === 'semua'
-                            ? 'bg-white text-charcoal ring-2 ring-sage shadow-sm'
-                            : 'bg-[#FAF7F0] text-charcoal/75 ring-1 ring-champagne/30 hover:bg-white hover:ring-champagne/65 hover:text-charcoal'"
+                            ?
+                            'bg-white text-charcoal ring-2 ring-sage shadow-sm' :
+                            'bg-[#FAF7F0] text-charcoal/75 ring-1 ring-champagne/30 hover:bg-white hover:ring-champagne/65 hover:text-charcoal'"
                         class="group flex items-center justify-between gap-2 rounded-2xl px-3.5 py-3 text-left transition-all duration-150 cursor-pointer">
                         <span class="flex items-center gap-2.5 min-w-0">
                             <span
-                                :class="kategoriAktif === 'semua' ? 'bg-sage/12 text-sage' : 'bg-white text-charcoal/50 ring-1 ring-champagne/25 group-hover:text-sage'"
+                                :class="kategoriAktif === 'semua' ? 'bg-sage/12 text-sage' :
+                                    'bg-white text-charcoal/50 ring-1 ring-champagne/25 group-hover:text-sage'"
                                 class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                     <rect width="7" height="7" x="3" y="3" rx="1.5" />
                                     <rect width="7" height="7" x="14" y="3" rx="1.5" />
                                     <rect width="7" height="7" x="14" y="14" rx="1.5" />
@@ -922,60 +1096,65 @@
                             <span class="text-xs sm:text-sm font-bold tracking-tight truncate">Semua</span>
                         </span>
                         <span
-                            :class="kategoriAktif === 'semua' ? 'bg-sage ring-4 ring-sage/20' : 'bg-charcoal/15 group-hover:bg-sage/40'"
+                            :class="kategoriAktif === 'semua' ? 'bg-sage ring-4 ring-sage/20' :
+                                'bg-charcoal/15 group-hover:bg-sage/40'"
                             class="h-2 w-2 rounded-full shrink-0 transition-all" aria-hidden="true"></span>
                     </button>
 
                     @foreach ([
-                        'adat' => [
-                            'ikon' => 'landmark',
-                            'active' => 'bg-gradient-to-r from-[#BFA15F] to-[#A68743] text-white ring-1 ring-champagne shadow-md shadow-champagne/25',
-                            'icon_active' => 'bg-white/20 text-white',
-                            'icon_idle' => 'bg-white text-[#8A6D33] ring-1 ring-champagne/25',
-                            'dot_active' => 'bg-white ring-4 ring-white/25',
-                        ],
-                        'islami' => [
-                            'ikon' => 'moon',
-                            'active' => 'bg-gradient-to-r from-[#184D47] to-[#236B62] text-white ring-1 ring-[#184D47] shadow-md shadow-[#184D47]/20',
-                            'icon_active' => 'bg-white/15 text-[#F3DFB0]',
-                            'icon_idle' => 'bg-white text-[#184D47] ring-1 ring-champagne/25',
-                            'dot_active' => 'bg-[#F3DFB0] ring-4 ring-white/20',
-                        ],
-                        'floral' => [
-                            'ikon' => 'leaf',
-                            'active' => 'bg-gradient-to-r from-[#2D4439] to-sage text-white ring-1 ring-sage shadow-md shadow-sage/20',
-                            'icon_active' => 'bg-white/15 text-ivory',
-                            'icon_idle' => 'bg-white text-sage ring-1 ring-champagne/25',
-                            'dot_active' => 'bg-[#F3DFB0] ring-4 ring-white/20',
-                        ],
-                        'elegan' => [
-                            'ikon' => 'gem',
-                            'active' => 'bg-gradient-to-r from-[#141C24] via-charcoal to-[#262E38] text-[#F3DFB0] ring-2 ring-champagne/65 shadow-lg',
-                            'icon_active' => 'bg-champagne/20 text-[#F3DFB0]',
-                            'icon_idle' => 'bg-white text-charcoal ring-1 ring-champagne/25',
-                            'dot_active' => 'bg-champagne ring-4 ring-champagne/25',
-                        ],
-                        'modern' => [
-                            'ikon' => 'sparkles',
-                            'active' => 'bg-gradient-to-r from-zinc-800 to-zinc-700 text-white ring-1 ring-zinc-700 shadow-md',
-                            'icon_active' => 'bg-white/15 text-white',
-                            'icon_idle' => 'bg-white text-zinc-700 ring-1 ring-champagne/25',
-                            'dot_active' => 'bg-white ring-4 ring-white/25',
-                        ],
-                    ] as $kodeKategori => $metaKategori)
+            'adat' => [
+                'ikon' => 'landmark',
+                'active' => 'bg-gradient-to-r from-[#BFA15F] to-[#A68743] text-white ring-1 ring-champagne shadow-md shadow-champagne/25',
+                'icon_active' => 'bg-white/20 text-white',
+                'icon_idle' => 'bg-white text-[#8A6D33] ring-1 ring-champagne/25',
+                'dot_active' => 'bg-white ring-4 ring-white/25',
+            ],
+            'islami' => [
+                'ikon' => 'moon',
+                'active' => 'bg-gradient-to-r from-[#184D47] to-[#236B62] text-white ring-1 ring-[#184D47] shadow-md shadow-[#184D47]/20',
+                'icon_active' => 'bg-white/15 text-[#F3DFB0]',
+                'icon_idle' => 'bg-white text-[#184D47] ring-1 ring-champagne/25',
+                'dot_active' => 'bg-[#F3DFB0] ring-4 ring-white/20',
+            ],
+            'floral' => [
+                'ikon' => 'leaf',
+                'active' => 'bg-gradient-to-r from-[#2D4439] to-sage text-white ring-1 ring-sage shadow-md shadow-sage/20',
+                'icon_active' => 'bg-white/15 text-ivory',
+                'icon_idle' => 'bg-white text-sage ring-1 ring-champagne/25',
+                'dot_active' => 'bg-[#F3DFB0] ring-4 ring-white/20',
+            ],
+            'elegan' => [
+                'ikon' => 'gem',
+                'active' => 'bg-gradient-to-r from-[#141C24] via-charcoal to-[#262E38] text-[#F3DFB0] ring-2 ring-champagne/65 shadow-lg',
+                'icon_active' => 'bg-champagne/20 text-[#F3DFB0]',
+                'icon_idle' => 'bg-white text-charcoal ring-1 ring-champagne/25',
+                'dot_active' => 'bg-champagne ring-4 ring-champagne/25',
+            ],
+            'modern' => [
+                'ikon' => 'sparkles',
+                'active' => 'bg-gradient-to-r from-zinc-800 to-zinc-700 text-white ring-1 ring-zinc-700 shadow-md',
+                'icon_active' => 'bg-white/15 text-white',
+                'icon_idle' => 'bg-white text-zinc-700 ring-1 ring-champagne/25',
+                'dot_active' => 'bg-white ring-4 ring-white/25',
+            ],
+        ] as $kodeKategori => $metaKategori)
                         @php $dataKategori = $ringkasanKategori[$kodeKategori]; @endphp
-                        <button type="button" data-filter-kategori="{{ $kodeKategori }}" @click="kategoriAktif = '{{ $kodeKategori }}'"
+                        <button type="button" data-filter-kategori="{{ $kodeKategori }}"
+                            @click="kategoriAktif = '{{ $kodeKategori }}'"
                             :class="kategoriAktif === '{{ $kodeKategori }}'
-                                ? '{{ $metaKategori['active'] }}'
-                                : 'bg-[#FAF7F0] text-charcoal/75 ring-1 ring-champagne/30 hover:bg-white hover:ring-champagne/65 hover:text-charcoal'"
+                                ?
+                                '{{ $metaKategori['active'] }}' :
+                                'bg-[#FAF7F0] text-charcoal/75 ring-1 ring-champagne/30 hover:bg-white hover:ring-champagne/65 hover:text-charcoal'"
                             class="group flex items-center justify-between gap-2 rounded-2xl px-3.5 py-3 text-left transition-all duration-150 cursor-pointer">
                             <span class="flex items-center gap-2.5 min-w-0">
                                 <span
-                                    :class="kategoriAktif === '{{ $kodeKategori }}' ? '{{ $metaKategori['icon_active'] }}' : '{{ $metaKategori['icon_idle'] }}'"
+                                    :class="kategoriAktif === '{{ $kodeKategori }}' ? '{{ $metaKategori['icon_active'] }}' :
+                                        '{{ $metaKategori['icon_idle'] }}'"
                                     class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors">
                                     @if ($metaKategori['ikon'] === 'landmark')
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            aria-hidden="true">
                                             <path d="M12 2 3 7h18l-9-5Z" />
                                             <path d="M5 10v8" />
                                             <path d="M9 10v8" />
@@ -984,34 +1163,42 @@
                                             <path d="M3 21h18" />
                                         </svg>
                                     @elseif ($metaKategori['ikon'] === 'moon')
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            aria-hidden="true">
                                             <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
                                         </svg>
                                     @elseif ($metaKategori['ikon'] === 'leaf')
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            aria-hidden="true">
+                                            <path
+                                                d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
                                             <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
                                         </svg>
                                     @elseif ($metaKategori['ikon'] === 'gem')
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            aria-hidden="true">
                                             <path d="M6 3h12l4 6-10 13L2 9Z" />
                                             <path d="M11 3 8 9l4 13 4-13-3-6" />
                                             <path d="M2 9h20" />
                                         </svg>
                                     @else
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                            <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            aria-hidden="true">
+                                            <path
+                                                d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
                                         </svg>
                                     @endif
                                 </span>
-                                <span class="text-xs sm:text-sm font-bold tracking-tight truncate">{{ $dataKategori['label'] }}</span>
+                                <span
+                                    class="text-xs sm:text-sm font-bold tracking-tight truncate">{{ $dataKategori['label'] }}</span>
                             </span>
                             <span
-                                :class="kategoriAktif === '{{ $kodeKategori }}' ? '{{ $metaKategori['dot_active'] }}' : 'bg-charcoal/15 group-hover:bg-champagne/60'"
+                                :class="kategoriAktif === '{{ $kodeKategori }}' ? '{{ $metaKategori['dot_active'] }}' :
+                                    'bg-charcoal/15 group-hover:bg-champagne/60'"
                                 class="h-2 w-2 rounded-full shrink-0 transition-all" aria-hidden="true"></span>
                         </button>
                     @endforeach
@@ -1023,7 +1210,7 @@
                             $infoDesain = $tema->infoDesain();
                             $infoKategori = $tema->infoKategori();
                         @endphp
-                        <div x-show="temaCocok('{{ $infoKategori['kode'] }}', '{{ e($tema->nama_tema.' '.$tema->kategoriLabel()) }}')"
+                        <div x-show="temaCocok('{{ $infoKategori['kode'] }}', '{{ e($tema->nama_tema . ' ' . $tema->kategoriLabel()) }}')"
                             x-transition
                             class="group rounded-2xl bg-white border border-champagne/30 {{ $infoKategori['card_ring'] }} flex flex-col transition duration-300 hover:shadow-xl hover:-translate-y-0.5 relative">
                             {{-- Poster Sampul Tema 3-Ponsel (Klik untuk Pratinjau Diperbesar) --}}
@@ -1064,7 +1251,8 @@
                                         @endif
                                     </div>
 
-                                    <h3 class="mt-2 font-logo text-xl sm:text-2xl font-bold text-charcoal leading-snug tracking-tight">
+                                    <h3
+                                        class="mt-2 font-logo text-xl sm:text-2xl font-bold text-charcoal leading-snug tracking-tight">
                                         {{ $tema->nama_tema }}
                                     </h3>
 
@@ -1222,9 +1410,9 @@
                 <div class="text-center max-w-2xl mx-auto">
                     <span class="text-xs font-semibold uppercase tracking-widest text-champagne">Transparan &amp;
                         Fleksibel</span>
-                    <h2 class="mt-2 font-logo text-3xl sm:text-4xl font-bold text-charcoal tracking-tight">Pilih Paket Sesuai Kebutuhan
-                        Anda</h2>
-                    <p class="mt-3 text-sm sm:text-base text-charcoal/70">Harga dasar mengikuti desain tema pilihan Anda. Susun sendiri lewat dashboard atau serahkan ke tim SesiTemu.</p>
+                    <h2 class="mt-2 font-logo text-3xl sm:text-4xl font-bold text-charcoal tracking-tight">Pilih Paket Sesuai Kebutuhan Anda</h2>
+                    <p class="mt-3 text-sm sm:text-base text-charcoal/70">Harga dasar mengikuti desain tema pilihan Anda.
+                        Susun sendiri lewat dashboard atau serahkan ke tim SesiTemu.</p>
                 </div>
 
                 <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -1288,7 +1476,9 @@
                                 Admin SesiTemu yang menginputkan semuanya hingga siap sebar.</p>
                             <div class="mt-6">
                                 <div class="flex flex-wrap items-baseline gap-2">
-                                    <span class="font-sans tabular-nums text-2xl sm:text-[2rem] font-bold tracking-tight leading-tight text-champagne">Harga Tema + {{ \App\Models\Tema::formatRupiah($biayaTerimaBeres) }}</span>
+                                    <span
+                                        class="font-sans tabular-nums text-2xl sm:text-[2rem] font-bold tracking-tight leading-tight text-champagne">Harga
+                                        Tema + {{ \App\Models\Tema::formatRupiah($biayaTerimaBeres) }}</span>
                                 </div>
                                 <p class="mt-1 text-xs text-ivory/65">
                                     Total mulai {{ \App\Models\Tema::formatRupiah($hargaTermurah + $biayaTerimaBeres) }} /
@@ -1374,7 +1564,8 @@
                                     :aria-expanded="(faqAktif === {{ $idx }}).toString()"
                                     class="w-full lg:min-h-[76px] px-5 py-4 flex items-center justify-between gap-4 text-left font-semibold text-sm sm:text-[15px] leading-snug text-charcoal cursor-pointer">
                                     <span>{{ $faq['q'] }}</span>
-                                    <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white ring-1 ring-champagne/30 text-champagne font-bold text-base shrink-0 transition"
+                                    <span
+                                        class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white ring-1 ring-champagne/30 text-champagne font-bold text-base shrink-0 transition"
                                         :class="faqAktif === {{ $idx }} ? 'bg-sage/10 text-sage ring-sage/25' : ''"
                                         x-text="faqAktif === {{ $idx }} ? '−' : '+'"></span>
                                 </button>
@@ -1398,7 +1589,8 @@
                             class="inline-block rounded-full bg-champagne/15 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-champagne">
                             Amankan Link Unik Pasangan
                         </span>
-                        <h2 class="font-logo text-2xl sm:text-3xl font-bold text-white tracking-tight">Siap Menyiapkan Undangan Hari
+                        <h2 class="font-logo text-2xl sm:text-3xl font-bold text-white tracking-tight">Siap Menyiapkan
+                            Undangan Hari
                             Bahagiamu?</h2>
                         <p class="text-xs sm:text-sm text-ivory/75 max-w-xl mx-auto">
                             Cek ketersediaan link undangan pasanganmu sekarang lalu lanjutkan membuat draft gratis di
@@ -1476,9 +1668,11 @@
 
             <div class="relative max-w-7xl mx-auto">
                 {{-- Baris Utama: Identitas Brand (Kiri) & Kanal Terhubung (Kanan) --}}
-                <div class="pb-8 border-b border-champagne/25 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+                <div
+                    class="pb-8 border-b border-champagne/25 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
                     {{-- Identitas Brand Lockup Horizontal --}}
-                    <div class="flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-6 text-center sm:text-left">
+                    <div
+                        class="flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-6 text-center sm:text-left">
                         <a href="{{ route('beranda') }}" class="inline-flex items-center shrink-0 group">
                             <img src="{{ asset('logo/logo-editorial.webp') }}" alt="Logo SesiTemu"
                                 class="h-14 sm:h-[4.25rem] w-auto object-contain transition-transform duration-200 group-hover:scale-[1.03]">
@@ -1489,13 +1683,15 @@
                         </div>
 
                         <p class="text-xs sm:text-[13px] text-charcoal/70 leading-relaxed max-w-sm">
-                            Platform undangan pernikahan digital modern. Susun draft gratis dengan galeri ringan WebP, RSVP tamu, amplop digital, dan link personal WhatsApp.
+                            Platform undangan pernikahan digital modern. Susun draft gratis dengan galeri ringan WebP, RSVP
+                            tamu, amplop digital, dan link personal WhatsApp.
                         </p>
                     </div>
 
                     {{-- Kanal Media Sosial --}}
                     <div class="flex flex-col items-center lg:items-end space-y-3">
-                        <p class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#8A6D33]">
+                        <p
+                            class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#8A6D33]">
                             <span class="h-1.5 w-1.5 rounded-full bg-champagne"></span>
                             <span>Ikuti Kami</span>
                         </p>
@@ -1510,13 +1706,15 @@
                                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                             aria-hidden="true">
-                                            <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                                            <rect width="20" height="20" x="2" y="2" rx="5"
+                                                ry="5" />
                                             <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
                                             <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
                                         </svg>
                                     </span>
                                     <div class="min-w-0 leading-tight text-left">
-                                        <span class="block text-xs font-semibold text-charcoal group-hover:text-[#C13584] transition">Instagram</span>
+                                        <span
+                                            class="block text-xs font-semibold text-charcoal group-hover:text-[#C13584] transition">Instagram</span>
                                         <span class="block text-[11px] text-charcoal/55 truncate">@sesitemu.id</span>
                                     </div>
                                 </div>
@@ -1540,7 +1738,8 @@
                                         </svg>
                                     </span>
                                     <div class="min-w-0 leading-tight text-left">
-                                        <span class="block text-xs font-semibold text-charcoal group-hover:text-black transition">TikTok</span>
+                                        <span
+                                            class="block text-xs font-semibold text-charcoal group-hover:text-black transition">TikTok</span>
                                         <span class="block text-[11px] text-charcoal/55 truncate">@sesitemu.id</span>
                                     </div>
                                 </div>
@@ -1556,16 +1755,21 @@
                 </div>
 
                 {{-- Baris Hak Cipta & Tautan Legal --}}
-                <div class="pt-5 md:pr-14 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+                <div
+                    class="pt-5 md:pr-14 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
                     <p class="text-xs text-charcoal/55">
-                        &copy; {{ now()->format('Y') }} <span class="font-semibold text-[#1D3B2C]">SesiTemu.id</span>. Seluruh hak cipta dilindungi.
+                        &copy; {{ now()->format('Y') }} <span class="font-semibold text-[#1D3B2C]">SesiTemu.id</span>.
+                        Seluruh hak cipta dilindungi.
                     </p>
-                    <nav aria-label="Tautan Legal" class="flex flex-wrap items-center justify-center sm:justify-end gap-x-4 gap-y-1 text-xs font-medium text-charcoal/70">
-                        <a href="{{ route('halaman.kebijakan-privasi') }}" class="hover:text-sage hover:underline underline-offset-4 transition">
+                    <nav aria-label="Tautan Legal"
+                        class="flex flex-wrap items-center justify-center sm:justify-end gap-x-4 gap-y-1 text-xs font-medium text-charcoal/70">
+                        <a href="{{ route('halaman.kebijakan-privasi') }}"
+                            class="hover:text-sage hover:underline underline-offset-4 transition">
                             Kebijakan Privasi
                         </a>
                         <span aria-hidden="true" class="text-champagne/60">&bull;</span>
-                        <a href="{{ route('halaman.syarat-ketentuan') }}" class="hover:text-sage hover:underline underline-offset-4 transition">
+                        <a href="{{ route('halaman.syarat-ketentuan') }}"
+                            class="hover:text-sage hover:underline underline-offset-4 transition">
                             Syarat &amp; Ketentuan
                         </a>
                     </nav>
@@ -1581,12 +1785,9 @@
             class="md:hidden fixed inset-0 z-50 flex items-end justify-center bg-charcoal/55 backdrop-blur-xs"
             @keydown.escape.window="if (!window.Swal?.isVisible()) sheetBuatTerbuka = false">
             <div @click.away="if (!window.Swal?.isVisible() && !$event.target?.closest('.swal2-container')) sheetBuatTerbuka = false"
-                x-transition:enter="transition ease-out duration-250"
-                x-transition:enter-start="translate-y-full"
-                x-transition:enter-end="translate-y-0"
-                x-transition:leave="transition ease-in duration-150"
-                x-transition:leave-start="translate-y-0"
-                x-transition:leave-end="translate-y-full"
+                x-transition:enter="transition ease-out duration-250" x-transition:enter-start="translate-y-full"
+                x-transition:enter-end="translate-y-0" x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full"
                 class="w-full rounded-t-[2rem] bg-white px-5 pt-3 pb-7 shadow-2xl ring-1 ring-champagne/30 max-h-[88dvh] overflow-y-auto">
                 <div aria-hidden="true" class="mx-auto w-10 h-1 rounded-full bg-charcoal/15 mb-4"></div>
 
@@ -1635,9 +1836,11 @@
                     <a href="{{ auth()->check() ? route('dashboard.katalog') : route('daftar') }}"
                         class="flex items-center justify-between gap-3 rounded-2xl bg-gradient-to-r from-[#2D4439] to-sage px-4 py-3 text-white shadow-sm">
                         <div class="flex items-center gap-3">
-                            <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white/15 text-champagne">
+                            <span
+                                class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white/15 text-champagne">
                                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"
+                                    aria-hidden="true">
                                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
                                     <circle cx="9" cy="7" r="4" />
                                     <line x1="19" x2="19" y1="8" y2="14" />
@@ -1645,7 +1848,8 @@
                                 </svg>
                             </span>
                             <div>
-                                <p class="text-xs font-bold">{{ auth()->check() ? 'Buka Katalog Tema Saya' : 'Buat Akun & Draft Gratis' }}</p>
+                                <p class="text-xs font-bold">
+                                    {{ auth()->check() ? 'Buka Katalog Tema Saya' : 'Buat Akun & Draft Gratis' }}</p>
                                 <p class="text-[11px] text-white/75">Edit &amp; pratinjau tanpa biaya awal</p>
                             </div>
                         </div>
@@ -1737,8 +1941,8 @@
 
         {{-- Tombol WhatsApp Mengambang (Mobile di Atas Bottom Nav & Desktop Pojok Kanan Bawah) --}}
         <a href="{{ $urlWaKonsultasi ?? \App\Support\PengaturanSesiTemu::urlWaAdmin('Halo SesiTemu, saya ingin konsultasi mengenai undangan pernikahan digital.') }}"
-            x-show="!sheetBuatTerbuka && !modalDemoTerbuka"
-            target="_blank" rel="noopener" aria-label="Konsultasi WhatsApp SesiTemu"
+            x-show="!sheetBuatTerbuka && !modalDemoTerbuka" target="_blank" rel="noopener"
+            aria-label="Konsultasi WhatsApp SesiTemu"
             class="group fixed bottom-20 right-3.5 md:bottom-5 md:right-5 z-40 inline-flex items-center rounded-full bg-sage p-3 md:p-3.5 text-white shadow-lg shadow-sage/30 ring-2 ring-white/85 hover:bg-[#3b5047] hover:pr-4 md:hover:pr-5 transition-all duration-300">
             <svg class="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path
