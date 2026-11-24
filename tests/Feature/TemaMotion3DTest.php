@@ -862,4 +862,90 @@ class TemaMotion3DTest extends TestCase
             ->assertSee('Rangkaian Acara', false)
             ->assertSee('Mempelai Wanita', false);
     }
+
+    /**
+     * Tema Velvet Garden Motion merender video motion hero Konservatori 15 detik,
+     * poster katalog triple-phone, susunan seksi seragam (Mempelai -> Slideshow -> Save The Date -> Acara -> ... -> RSVP -> Doa -> Turut -> Penutup),
+     * amplop buka-tutup, hamparan bunga penutup di atas footer, serta aman pada Mode Tanpa Foto.
+     */
+    public function test_velvet_garden_merender_video_hero_poster_dan_seksi_lengkap(): void
+    {
+        $this->assertFileExists(public_path('aset-tema/velvet-garden/velvet-garden-motion-hero.mp4'));
+        $this->assertFileExists(public_path('aset-tema/velvet-garden/hero-poster.webp'));
+        $this->assertFileExists(public_path('aset-tema/velvet-garden/bingkai-konservatori-mempelai.webp'));
+        $this->assertFileExists(public_path('aset-tema/velvet-garden/garland-velvet.webp'));
+        $this->assertFileExists(public_path('aset-tema/velvet-garden/bunga-depan-penutup.webp'));
+
+        Tema::create([
+            'nama_tema' => 'Velvet Garden Motion',
+            'slug' => 'velvet-garden',
+            'kategori' => 'floral',
+            'tier' => 'eksklusif',
+            'harga' => 119000,
+            'lokasi_view' => 'tema.velvet-garden.index',
+            'aktif' => true,
+        ]);
+
+        $respon = $this->get('/demo/velvet-garden?kanvas=1')
+            ->assertOk()
+            ->assertSee('aset-tema/velvet-garden/velvet-garden-motion-hero.mp4', false)
+            ->assertSee('aset-tema/velvet-garden/bingkai-konservatori-mempelai.webp', false)
+            ->assertSee('aset-tema/velvet-garden/garland-velvet.webp', false)
+            ->assertSee('aset-tema/velvet-garden/bunga-depan-penutup.webp', false)
+            ->assertSee('data-start-at="0"', false)
+            ->assertSee('data-playback-rate="1"', false)
+            ->assertSee('data-reveal-at="10.4"', false)
+            ->assertSee('data-settled-at="14.2"', false)
+            ->assertSee('putarUlangVideoHero()', false)
+            ->assertSee('data-slideshow-velvet', false)
+            ->assertSee('data-acara-konservatori-velvet', false)
+            ->assertSee('data-cerita-konservatori-velvet', false)
+            ->assertSee('data-galeri-kolase-velvet', false)
+            ->assertSee('M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z', false)
+            ->assertSee('aspect-[16/10]', false)
+            ->assertSee('h-48 sm:h-56', false)
+            ->assertSee('Buka Amplop Digital', false)
+            ->assertSee('RSVP &amp; Wishes', false)
+            ->assertSee('data-section-doa-pengantin="taman"', false)
+            ->assertSee('Doa Untuk Pengantin', false)
+            ->assertSee('data-section-turut-mengundang="taman"', false);
+
+        $html = $respon->getContent();
+        $posMempelai = strpos($html, 'data-layout-mempelai="taman"');
+        $posSlideshow = strpos($html, 'data-slideshow-velvet');
+        $posCountdown = strpos($html, 'data-layout-countdown="taman"');
+        $posAcara = strpos($html, 'data-layout-acara="taman"');
+        $posRsvp = strpos($html, 'id="buku-tamu"');
+        $posDoa = strpos($html, 'data-section-doa-pengantin="taman"');
+        $posTurut = strpos($html, 'data-section-turut-mengundang="taman"');
+        $posPenutup = strpos($html, 'data-layout-penutup="taman"');
+
+        $this->assertNotFalse($posMempelai);
+        $this->assertNotFalse($posSlideshow);
+        $this->assertNotFalse($posCountdown);
+        $this->assertNotFalse($posAcara);
+        $this->assertNotFalse($posRsvp);
+        $this->assertNotFalse($posDoa);
+        $this->assertNotFalse($posTurut);
+        $this->assertNotFalse($posPenutup);
+        $this->assertLessThan($posSlideshow, $posMempelai);
+        $this->assertLessThan($posCountdown, $posSlideshow);
+        $this->assertLessThan($posAcara, $posCountdown);
+        $this->assertLessThan($posDoa, $posRsvp);
+        $this->assertLessThan($posTurut, $posDoa);
+        $this->assertLessThan($posPenutup, $posTurut);
+
+        $this->get('/demo/velvet-garden?kanvas=1&tf=1')
+            ->assertOk()
+            ->assertSee('aset-tema/velvet-garden/velvet-garden-motion-hero.mp4', false)
+            ->assertSee('aset-tema/velvet-garden/bunga-depan-penutup.webp', false)
+            ->assertDontSee('data-slideshow-velvet', false)
+            ->assertDontSee('sampul-garden.webp', false);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('aset-tema/velvet-garden/hero-poster.webp', false)
+            ->assertSee('aset-tema/velvet-garden/bingkai-konservatori-mempelai.webp', false)
+            ->assertSee('aset-tema/velvet-garden/garland-velvet.webp', false);
+    }
 }
