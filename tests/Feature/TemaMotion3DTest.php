@@ -743,6 +743,11 @@ class TemaMotion3DTest extends TestCase
 
         $respon = $this->get('/demo/editorial-monokrom?kanvas=1')
             ->assertOk()
+            ->assertSee('tirai-shutter-editorial', false)
+            ->assertSee('ed-tirai-foto', false)
+            ->assertSee('ed-marquee-kanan', false)
+            ->assertSee('modeWarnaEditorial', false)
+            ->assertSee('Buka Amplop Digital', false)
             ->assertSee('data-slideshow-editorial', false)
             ->assertSee('data-section-doa-pengantin="editorial"', false)
             ->assertSee('Doa &amp; Harapan', false)
@@ -773,6 +778,13 @@ class TemaMotion3DTest extends TestCase
         $this->get('/demo/editorial-monokrom?kanvas=1&tf=1')
             ->assertOk()
             ->assertDontSee('data-slideshow-editorial', false);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('02 / CHRONOMETER', false)
+            ->assertSee('PASS 01 &middot; ADMIT ONE', false)
+            ->assertSee('01 / DOSSIER', false)
+            ->assertSee('35MM B&amp;W', false);
     }
 
     /**

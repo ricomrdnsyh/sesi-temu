@@ -22,7 +22,8 @@
     $adalahIslamicHeavenly = $tema->slug === 'islamic-heavenly';
     $adalahRusticFloral = $tema->slug === 'rustic-floral';
     $adalahVelvetGarden = $tema->slug === 'velvet-garden';
-    $adalahAdatShowcase = $adalahAdatJawa || $adalahSundaHeritage || $adalahIslamiSyari || $adalahIslamicHeavenly || $adalahRusticFloral || $adalahVelvetGarden;
+    $adalahEditorialMonokrom = $tema->slug === 'editorial-monokrom';
+    $adalahAdatShowcase = $adalahAdatJawa || $adalahSundaHeritage || $adalahIslamiSyari || $adalahIslamicHeavenly || $adalahRusticFloral || $adalahVelvetGarden || $adalahEditorialMonokrom;
 
     $relatifLatarTema = "aset-tema/{$tema->slug}/latar-utama.webp";
     $gambarLatarTemaUrl = is_file(public_path($relatifLatarTema))
@@ -74,6 +75,11 @@
         'heroPoster' => asset('aset-tema/velvet-garden/hero-poster.webp'),
     ] : [];
 
+    $asetPosterEditorial = $adalahEditorialMonokrom ? [
+        'latar' => asset('aset-tema/editorial-monokrom/latar-utama.webp'),
+        'bingkai' => asset('aset-tema/editorial-monokrom/ornamen-bingkai.webp'),
+    ] : [];
+
     $adalahEditorial = !empty($poster['editorial']);
     $adalahIslami = !empty($poster['islami']);
     $radiusArchKiri = $adalahEditorial ? '0.4cqw' : '999px 999px 1.2cqw 1.2cqw';
@@ -94,7 +100,7 @@
         <div
             aria-hidden="true"
             class="pointer-events-none absolute inset-0"
-            style="background: radial-gradient(circle at 50% 48%, rgba(243,229,171,0.16) 0%, rgba(243,229,171,0.03) 44%, transparent 72%);"
+            style="background: radial-gradient(circle at 50% 48%, {{ $adalahEditorialMonokrom ? 'rgba(255,255,255,0.14)' : 'rgba(243,229,171,0.16)' }} 0%, {{ $adalahEditorialMonokrom ? 'rgba(255,255,255,0.03)' : 'rgba(243,229,171,0.03)' }} 44%, transparent 72%);"
         ></div>
     @endif
 
@@ -138,9 +144,9 @@
         </p>
         @if ($adalahAdatShowcase)
             <div class="mx-auto flex items-center justify-center gap-[1.15cqw]" style="margin-top: 0.95cqw;" aria-hidden="true">
-                <span style="height: 0.15cqw; width: 8.5cqw; background: linear-gradient(90deg, transparent, rgba(231,200,125,0.72));"></span>
-                <span style="width: 0.65cqw; height: 0.65cqw; transform: rotate(45deg); background: #E7C87D;"></span>
-                <span style="height: 0.15cqw; width: 8.5cqw; background: linear-gradient(270deg, transparent, rgba(231,200,125,0.72));"></span>
+                <span style="height: 0.15cqw; width: 8.5cqw; background: linear-gradient(90deg, transparent, {{ $adalahEditorialMonokrom ? 'rgba(255,255,255,0.72)' : 'rgba(231,200,125,0.72)' }});"></span>
+                <span style="width: 0.65cqw; height: 0.65cqw; {{ $adalahEditorialMonokrom ? '' : 'transform: rotate(45deg);' }} background: {{ $adalahEditorialMonokrom ? '#FFFFFF' : '#E7C87D' }};"></span>
+                <span style="height: 0.15cqw; width: 8.5cqw; background: linear-gradient(270deg, transparent, {{ $adalahEditorialMonokrom ? 'rgba(255,255,255,0.72)' : 'rgba(231,200,125,0.72)' }});"></span>
             </div>
         @endif
     </div>
@@ -150,7 +156,7 @@
         <div class="absolute inset-x-0 bottom-0 z-10" style="height: 82cqw;">
             {{-- PONSEL KIRI: Save The Date + Countdown Emas + Kartu Akad Bersih --}}
             <div
-                class="absolute z-10 bg-[#151210] shadow-[0_1.6cqw_3.2cqw_rgba(0,0,0,0.36)] ring-1 ring-[#F3E5AB]/20"
+                class="absolute z-10 bg-[#151210] shadow-[0_1.6cqw_3.2cqw_rgba(0,0,0,0.36)] ring-1 {{ $adalahEditorialMonokrom ? 'ring-white/25' : 'ring-[#F3E5AB]/20' }}"
                 style="left: 6.2cqw; bottom: 9.8cqw; width: 29.2cqw; height: 63.2cqw; border-radius: 3.7cqw; padding: 0.9cqw;"
             >
                 <div
@@ -159,10 +165,103 @@
                 ></div>
 
                 <div
-                    class="relative w-full h-full overflow-hidden flex flex-col {{ ($adalahRusticFloral || $adalahVelvetGarden) ? '' : 'justify-between' }}"
-                    style="border-radius: 2.85cqw; background: {{ $adalahRusticFloral ? '#FAF5EC' : ($adalahVelvetGarden ? '#0F201D' : $poster['layar_kiri_bg']) }}; color: {{ $poster['layar_kiri_teks'] }};"
+                    class="relative w-full h-full overflow-hidden flex flex-col {{ ($adalahRusticFloral || $adalahVelvetGarden || $adalahEditorialMonokrom) ? '' : 'justify-between' }}"
+                    style="border-radius: 2.85cqw; background: {{ $adalahRusticFloral ? '#FAF5EC' : ($adalahVelvetGarden ? '#0F201D' : ($adalahEditorialMonokrom ? '#FAF9F6' : $poster['layar_kiri_bg'])) }}; color: {{ $poster['layar_kiri_teks'] }};"
                 >
-                    @if ($adalahVelvetGarden)
+                    @if ($adalahEditorialMonokrom)
+                        {{-- PONSEL KIRI EDITORIAL MONOKROM: Split-Flap Chronometer + Perforated Exhibition Pass --}}
+                        <div
+                            class="relative z-10 text-left"
+                            style="background: #18181B; color: #FAF9F6; padding: 3.1cqw 2.05cqw 1.95cqw 1.25cqw; border-bottom: 0.16cqw solid #18181B;"
+                        >
+                            <div class="flex items-center justify-between uppercase font-bold leading-none" style="font-size: 0.56cqw; letter-spacing: 0.2em; color: rgba(250,249,246,0.58); padding-bottom: 0.55cqw; border-bottom: 0.1cqw solid rgba(255,255,255,0.2);">
+                                <span>02 / CHRONOMETER</span>
+                                <span>COUNTDOWN</span>
+                            </div>
+
+                            <p class="font-serif-poster uppercase font-bold leading-tight text-white" style="margin-top: 0.7cqw; font-size: 1.95cqw; letter-spacing: 0.06em;">
+                                Save The Date
+                            </p>
+                            <p class="uppercase leading-none" style="margin-top: 0.2cqw; font-size: 0.58cqw; letter-spacing: 0.18em; color: rgba(250,249,246,0.62);">
+                                SABTU, 07 NOVEMBER 2026
+                            </p>
+
+                            {{-- 4 Kotak Split-Flap Mekanis Siku Tajam --}}
+                            <div class="grid grid-cols-4 gap-[0.48cqw] text-center" style="margin-top: 1.1cqw;">
+                                @foreach ([[$hariLagi, 'DAYS'], ['08', 'HRS'], ['25', 'MIN'], ['12', 'SEC']] as [$angka, $satuan])
+                                    <div
+                                        class="relative"
+                                        style="background-color: #0D0D10; border: 0.12cqw solid rgba(255,255,255,0.34); padding: 0.72cqw 0.1cqw 0.58cqw; box-shadow: 0.22cqw 0.22cqw 0 0 rgba(255,255,255,0.14);"
+                                    >
+                                        <span aria-hidden="true" class="pointer-events-none absolute inset-x-0" style="top: 46%; height: 0.08cqw; background: rgba(255,255,255,0.16);"></span>
+                                        <div class="font-serif-poster font-bold leading-none text-white" style="font-size: 1.55cqw;">{{ $angka }}</div>
+                                        <div class="uppercase font-bold leading-none" style="margin-top: 0.3cqw; font-size: 0.48cqw; letter-spacing: 0.16em; color: rgba(250,249,246,0.58);">{{ $satuan }}</div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <div
+                                class="flex items-center justify-between font-bold uppercase"
+                                style="margin-top: 1.15cqw; padding: 0.5cqw 0.85cqw; font-size: 0.6cqw; letter-spacing: 0.16em; background-color: #FAF9F6; color: #18181B;"
+                            >
+                                <span>Simpan ke Kalender</span>
+                                <span>&rarr;</span>
+                            </div>
+                        </div>
+
+                        {{-- Bagian Bawah: Perforated Exhibition Pass --}}
+                        <div
+                            class="relative z-10 flex-1 flex flex-col text-left overflow-hidden"
+                            style="background-color: #FAF9F6; color: #18181B; padding: 1.35cqw 2.05cqw 0 1.25cqw;"
+                        >
+                            <div class="flex items-center justify-between uppercase font-bold leading-none" style="font-size: 0.56cqw; letter-spacing: 0.2em; color: #18181B; padding-bottom: 0.5cqw; border-bottom: 0.12cqw solid #18181B;">
+                                <span>02 / ITINERARY</span>
+                                <span>PASS</span>
+                            </div>
+
+                            <div
+                                class="relative mt-auto w-full flex flex-col bg-white"
+                                style="margin-top: 0.95cqw; flex: 1; border: 0.16cqw solid #18181B; border-bottom: 0; box-shadow: 0.42cqw 0.42cqw 0 0 #18181B;"
+                            >
+                                <div class="flex items-center justify-between uppercase font-bold text-white" style="background-color: #18181B; padding: 0.62cqw 0.85cqw; font-size: 0.54cqw; letter-spacing: 0.18em;">
+                                    <span>PASS 01 &middot; ADMIT ONE</span>
+                                    <span>07.11.26</span>
+                                </div>
+
+                                <div style="padding: 0.9cqw 0.85cqw 0.7cqw;">
+                                    <p class="font-serif-poster uppercase font-bold truncate leading-tight" style="font-size: 1.45cqw; letter-spacing: 0.04em; color: #18181B;">
+                                        {{ Str::limit($namaAcaraUtama, 16, '') }}
+                                    </p>
+                                    <p class="uppercase font-bold leading-none" style="margin-top: 0.35cqw; font-size: 0.58cqw; letter-spacing: 0.12em; color: #52525B;">
+                                        SABTU &middot; 09:00 WIB
+                                    </p>
+                                </div>
+
+                                {{-- Garis Sobekan Tiket Setengah Lingkaran --}}
+                                <div class="relative flex items-center" style="padding: 0.2cqw 0;" aria-hidden="true">
+                                    <span class="absolute rounded-full bg-[#FAF9F6]" style="left: -0.52cqw; width: 0.95cqw; height: 0.95cqw; border-right: 0.16cqw solid #18181B;"></span>
+                                    <div class="w-full" style="margin: 0 0.6cqw; border-top: 0.12cqw dashed rgba(24,24,27,0.45);"></div>
+                                    <span class="absolute rounded-full bg-[#FAF9F6]" style="right: -0.52cqw; width: 0.95cqw; height: 0.95cqw; border-left: 0.16cqw solid #18181B;"></span>
+                                </div>
+
+                                <div class="flex-1 flex items-center justify-between gap-[0.6cqw]" style="padding: 0.55cqw 0.85cqw 0.75cqw;">
+                                    <div class="min-w-0">
+                                        <span class="block uppercase font-bold" style="font-size: 0.48cqw; letter-spacing: 0.18em; color: #52525B;">VENUE</span>
+                                        <p class="font-bold truncate leading-tight" style="margin-top: 0.16cqw; font-size: 0.74cqw; color: #18181B;">
+                                            {{ $tempatAcara }}
+                                        </p>
+                                    </div>
+                                    <div aria-hidden="true" class="shrink-0 flex items-end" style="gap: 0.14cqw; height: 2.1cqw; opacity: 0.75;">
+                                        <span style="width: 0.16cqw; height: 100%; background: #18181B;"></span>
+                                        <span style="width: 0.09cqw; height: 72%; background: #18181B;"></span>
+                                        <span style="width: 0.22cqw; height: 100%; background: #18181B;"></span>
+                                        <span style="width: 0.1cqw; height: 82%; background: #18181B;"></span>
+                                        <span style="width: 0.16cqw; height: 100%; background: #18181B;"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @elseif ($adalahVelvetGarden)
                         {{-- PONSEL KIRI VELVET GARDEN: Save The Date 4 Kapsul Pil Botani + Kartu Lentera Konservatori --}}
                         <div
                             class="relative z-10 text-center"
@@ -546,7 +645,7 @@
 
             {{-- PONSEL KANAN: Potret Mempelai Bersih & Editorial --}}
             <div
-                class="absolute z-10 bg-[#151210] shadow-[0_1.6cqw_3.2cqw_rgba(0,0,0,0.36)] ring-1 ring-[#F3E5AB]/20"
+                class="absolute z-10 bg-[#151210] shadow-[0_1.6cqw_3.2cqw_rgba(0,0,0,0.36)] ring-1 {{ $adalahEditorialMonokrom ? 'ring-white/25' : 'ring-[#F3E5AB]/20' }}"
                 style="right: 6.2cqw; bottom: 9.8cqw; width: 29.2cqw; height: 63.2cqw; border-radius: 3.7cqw; padding: 0.9cqw;"
             >
                 <div
@@ -554,7 +653,82 @@
                     style="top: 1.6cqw; width: 5cqw; height: 0.95cqw;"
                 ></div>
 
-                @if ($adalahAdatJawa)
+                @if ($adalahEditorialMonokrom)
+                    {{-- PONSEL KANAN EDITORIAL MONOKROM: 01 / Dossier & Kartu Obsidian Noir Mempelai Wanita --}}
+                    <div
+                        class="relative w-full h-full overflow-hidden flex flex-col justify-between text-left"
+                        style="border-radius: 2.85cqw; background-color: #FAF9F6; color: #18181B; padding: 2.9cqw 1.25cqw 1.65cqw 2.05cqw;"
+                    >
+                        <div class="relative z-10 w-full">
+                            <div class="flex items-center justify-between uppercase font-bold leading-none" style="font-size: 0.56cqw; letter-spacing: 0.22em; color: #18181B; padding-bottom: 0.55cqw; border-bottom: 0.14cqw solid #18181B;">
+                                <span>01 / DOSSIER</span>
+                                <span>THE COUPLE</span>
+                            </div>
+                            <p class="font-serif-poster uppercase font-bold leading-tight" style="margin-top: 0.65cqw; font-size: 1.68cqw; letter-spacing: 0.05em; color: #18181B;">
+                                The Bride
+                            </p>
+                        </div>
+
+                        {{-- Kartu Obsidian Noir Mempelai Wanita (Selaras Tema Asli) --}}
+                        <div
+                            class="relative z-10 w-full flex flex-col justify-between text-center"
+                            style="margin-top: 0.85cqw; flex: 1; background-color: #141417; color: #FAF9F6; border: 0.16cqw solid #18181B; box-shadow: -0.42cqw 0.42cqw 0 0 #71717A; padding: 1.15cqw 1.05cqw 1.25cqw;"
+                        >
+                            <div class="flex items-center justify-between" style="padding-bottom: 0.55cqw; border-bottom: 0.1cqw solid rgba(255,255,255,0.18);">
+                                <img
+                                    src="{{ $asetPosterEditorial['bingkai'] }}"
+                                    alt=""
+                                    aria-hidden="true"
+                                    loading="lazy"
+                                    class="invert opacity-80"
+                                    style="width: 1.9cqw;"
+                                >
+                                <span class="uppercase font-bold leading-none" style="font-size: 0.56cqw; letter-spacing: 0.2em; color: rgba(250,249,246,0.72);">
+                                    02 / THE BRIDE
+                                </span>
+                            </div>
+
+                            {{-- Bingkai Potret Siku Tajam Monokrom --}}
+                            <div
+                                class="mx-auto overflow-hidden bg-black"
+                                style="margin-top: 0.8cqw; width: 13.6cqw; height: 18.2cqw; border: 0.16cqw solid rgba(255,255,255,0.55); padding: 0.28cqw;"
+                            >
+                                <img
+                                    src="{{ $fotoWanitaUrl }}"
+                                    alt="{{ $wanitaLengkap }}"
+                                    loading="lazy"
+                                    class="w-full h-full object-cover object-top grayscale contrast-[1.08]"
+                                >
+                            </div>
+
+                            <div class="w-full" style="margin-top: 0.75cqw;">
+                                <p class="font-serif-poster uppercase font-bold leading-none text-white" style="font-size: 2.25cqw; letter-spacing: 0.08em;">
+                                    {{ $wanitaPanggilan }}
+                                </p>
+                                <p class="font-bold truncate w-full leading-tight" style="margin-top: 0.35cqw; font-size: 0.88cqw; color: rgba(250,249,246,0.92);">
+                                    {{ $wanitaLengkap }}
+                                </p>
+                                <p class="truncate w-full leading-tight" style="margin-top: 0.2cqw; font-size: 0.66cqw; color: rgba(250,249,246,0.65);">
+                                    Putri dari {{ $wanitaAyah }}
+                                </p>
+                                @if ($instagramWanita)
+                                    <div
+                                        class="inline-flex items-center justify-center uppercase font-bold"
+                                        style="margin-top: 0.6cqw; gap: 0.35cqw; padding: 0.28cqw 0.95cqw; font-size: 0.62cqw; letter-spacing: 0.12em; border: 0.12cqw solid rgba(255,255,255,0.55); color: #FAF9F6;"
+                                    >
+                                        <span>&#64;{{ $instagramWanita }}</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div
+                            aria-hidden="true"
+                            class="pointer-events-none absolute inset-y-0 left-0 z-20"
+                            style="width: 3.4cqw; background: linear-gradient(270deg, transparent, rgba(0,0,0,0.24));"
+                        ></div>
+                    </div>
+                @elseif ($adalahAdatJawa)
                     {{-- PONSEL KANAN ADAT JAWA: Kapsul Kubah Kertas Gading di Atas Latar Hutan + Gunungan + Potret Aisyah --}}
                     <div
                         class="relative w-full h-full overflow-hidden flex items-stretch justify-center"
@@ -1212,7 +1386,7 @@
 
             {{-- PONSEL TENGAH HERO (RAMPING & TINGGI ~9:19.5, MENONJOL DI DEPAN) --}}
             <div
-                class="absolute left-1/2 -translate-x-1/2 z-20 bg-[#14110F] shadow-[0_2.4cqw_4.8cqw_rgba(0,0,0,0.52)] ring-1 ring-[#F3E5AB]/32"
+                class="absolute left-1/2 -translate-x-1/2 z-20 bg-[#14110F] shadow-[0_2.4cqw_4.8cqw_rgba(0,0,0,0.52)] ring-1 {{ $adalahEditorialMonokrom ? 'ring-white/35' : 'ring-[#F3E5AB]/32' }}"
                 style="bottom: 7.4cqw; width: 33.2cqw; height: 71.5cqw; border-radius: 4.2cqw; padding: 1cqw;"
             >
                 <div
@@ -1220,7 +1394,69 @@
                     style="top: 1.85cqw; width: 6cqw; height: 1.15cqw;"
                 ></div>
 
-                @if ($adalahAdatJawa)
+                @if ($adalahEditorialMonokrom)
+                    {{-- PONSEL TENGAH EDITORIAL MONOKROM: Visual Hero Exhibition Spread (Viewfinder, Arsitektur Monokrom & Masthead Bertingkat) --}}
+                    <div
+                        class="relative w-full h-full overflow-hidden flex flex-col justify-between text-left"
+                        style="border-radius: 3.25cqw; background: #0E0E11; color: #FAF9F6; padding: 2.85cqw 2.2cqw 2.15cqw;"
+                    >
+                        <img
+                            src="{{ $asetPosterEditorial['latar'] }}"
+                            alt="{{ $tema->nama_tema }}"
+                            loading="lazy"
+                            class="absolute inset-0 w-full h-full object-cover object-center grayscale contrast-[1.12]"
+                        >
+                        <div
+                            aria-hidden="true"
+                            class="pointer-events-none absolute inset-0"
+                            style="background: linear-gradient(180deg, rgba(12,12,15,0.84) 0%, rgba(12,12,15,0.32) 38%, rgba(12,12,15,0.48) 66%, rgba(10,10,13,0.94) 100%);"
+                        ></div>
+
+                        {{-- Bingkai Viewfinder Siku Tajam --}}
+                        <div aria-hidden="true" class="pointer-events-none absolute z-10" style="inset: 1.15cqw; border: 0.11cqw solid rgba(255,255,255,0.22);">
+                            <span class="absolute -top-px -left-px" style="width: 1.1cqw; height: 1.1cqw; border-top: 0.2cqw solid #FFFFFF; border-left: 0.2cqw solid #FFFFFF;"></span>
+                            <span class="absolute -top-px -right-px" style="width: 1.1cqw; height: 1.1cqw; border-top: 0.2cqw solid #FFFFFF; border-right: 0.2cqw solid #FFFFFF;"></span>
+                            <span class="absolute -bottom-px -left-px" style="width: 1.1cqw; height: 1.1cqw; border-bottom: 0.2cqw solid #FFFFFF; border-left: 0.2cqw solid #FFFFFF;"></span>
+                            <span class="absolute -bottom-px -right-px" style="width: 1.1cqw; height: 1.1cqw; border-bottom: 0.2cqw solid #FFFFFF; border-right: 0.2cqw solid #FFFFFF;"></span>
+                        </div>
+
+                        {{-- Baris Telemetri Atas --}}
+                        <div class="relative z-20 space-y-[0.55cqw]" style="padding: 0 0.4cqw;">
+                            <div class="flex items-center justify-between uppercase font-bold leading-none" style="font-size: 0.62cqw; letter-spacing: 0.18em; color: rgba(255,255,255,0.82); padding-bottom: 0.6cqw; border-bottom: 0.11cqw solid rgba(255,255,255,0.26);">
+                                <span>NO. 01 &middot; {{ $poster['tanggal_pendek'] }}</span>
+                                <span style="border: 0.1cqw solid rgba(255,255,255,0.48); padding: 0.2cqw 0.45cqw; background: rgba(0,0,0,0.45);">35MM B&amp;W</span>
+                            </div>
+                            <p class="uppercase font-semibold leading-none" style="padding-top: 0.25cqw; font-size: 0.66cqw; letter-spacing: 0.24em; color: rgba(255,255,255,0.75);">
+                                We Are Getting Married!
+                            </p>
+                        </div>
+
+                        {{-- Masthead Nama Mempelai Bertingkat Asimetris --}}
+                        <div class="relative z-20 my-auto" style="padding: 0 0.4cqw;">
+                            <p class="font-serif-poster uppercase font-bold leading-[0.96] text-white drop-shadow" style="font-size: 3.75cqw; letter-spacing: 0.05em;">
+                                {{ $priaPanggilan }}
+                            </p>
+                            <div class="flex items-center" style="margin: 0.55cqw 0; gap: 0.65cqw;">
+                                <span style="height: 0.12cqw; width: 2.8cqw; background: rgba(255,255,255,0.62);"></span>
+                                <span class="uppercase font-bold leading-none" style="font-size: 0.66cqw; letter-spacing: 0.22em; color: rgba(255,255,255,0.82);">&amp; / COLLECTOR EDITION</span>
+                            </div>
+                            <p class="font-serif-poster uppercase font-bold leading-[0.96] text-white drop-shadow" style="padding-left: 1.8cqw; font-size: 3.75cqw; letter-spacing: 0.05em;">
+                                {{ $wanitaPanggilan }}
+                            </p>
+                        </div>
+
+                        {{-- Footer Colophon & Segel Monogram --}}
+                        <div class="relative z-20 flex items-end justify-between" style="padding: 0.65cqw 0.4cqw 0; border-top: 0.11cqw solid rgba(255,255,255,0.26);">
+                            <div>
+                                <p class="uppercase font-bold leading-none" style="font-size: 0.54cqw; letter-spacing: 0.22em; color: rgba(255,255,255,0.58);">EXHIBITION DATE</p>
+                                <p class="uppercase font-bold leading-none text-white" style="margin-top: 0.3cqw; font-size: 0.72cqw; letter-spacing: 0.18em;">{{ $poster['tanggal_pendek'] }}</p>
+                            </div>
+                            <span class="font-serif-poster font-bold uppercase leading-none text-white" style="font-size: 1.05cqw; letter-spacing: 0.12em; border: 0.12cqw solid rgba(255,255,255,0.52); background: rgba(0,0,0,0.55); padding: 0.42cqw 0.6cqw;">
+                                {{ mb_substr($priaPanggilan, 0, 1) }}{{ mb_substr($wanitaPanggilan, 0, 1) }}
+                            </span>
+                        </div>
+                    </div>
+                @elseif ($adalahAdatJawa)
                     {{-- PONSEL TENGAH ADAT JAWA: Visual Hero Video Motion Keraton Asli (Bingkai Ukiran, Janur, Joglo & Mawar) --}}
                     <div
                         class="relative w-full h-full overflow-hidden text-center"

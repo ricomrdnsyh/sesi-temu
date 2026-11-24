@@ -1476,9 +1476,7 @@
                                 Admin SesiTemu yang menginputkan semuanya hingga siap sebar.</p>
                             <div class="mt-6">
                                 <div class="flex flex-wrap items-baseline gap-2">
-                                    <span
-                                        class="font-sans tabular-nums text-2xl sm:text-[2rem] font-bold tracking-tight leading-tight text-champagne">Harga
-                                        Tema + {{ \App\Models\Tema::formatRupiah($biayaTerimaBeres) }}</span>
+                                    <span class="font-sans tabular-nums text-2xl sm:text-[2rem] font-bold tracking-tight leading-tight text-champagne">Harga Tema + {{ \App\Models\Tema::formatRupiah($biayaTerimaBeres) }}</span>
                                 </div>
                                 <p class="mt-1 text-xs text-ivory/65">
                                     Total mulai {{ \App\Models\Tema::formatRupiah($hargaTermurah + $biayaTerimaBeres) }} /
