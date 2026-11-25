@@ -23,7 +23,9 @@
     $adalahRusticFloral = $tema->slug === 'rustic-floral';
     $adalahVelvetGarden = $tema->slug === 'velvet-garden';
     $adalahEditorialMonokrom = $tema->slug === 'editorial-monokrom';
-    $adalahAdatShowcase = $adalahAdatJawa || $adalahSundaHeritage || $adalahIslamiSyari || $adalahIslamicHeavenly || $adalahRusticFloral || $adalahVelvetGarden || $adalahEditorialMonokrom;
+    $adalahLuxuryNoir = $tema->slug === 'luxury-noir';
+    $adalahRoyalIvory = $tema->slug === 'royal-ivory';
+    $adalahAdatShowcase = $adalahAdatJawa || $adalahSundaHeritage || $adalahIslamiSyari || $adalahIslamicHeavenly || $adalahRusticFloral || $adalahVelvetGarden || $adalahEditorialMonokrom || $adalahLuxuryNoir || $adalahRoyalIvory;
 
     $relatifLatarTema = "aset-tema/{$tema->slug}/latar-utama.webp";
     $gambarLatarTemaUrl = is_file(public_path($relatifLatarTema))
@@ -78,6 +80,17 @@
     $asetPosterEditorial = $adalahEditorialMonokrom ? [
         'latar' => asset('aset-tema/editorial-monokrom/latar-utama.webp'),
         'bingkai' => asset('aset-tema/editorial-monokrom/ornamen-bingkai.webp'),
+    ] : [];
+
+    $asetPosterNoir = $adalahLuxuryNoir ? [
+        'latar' => asset('aset-tema/luxury-noir/latar-utama.webp'),
+        'bingkai' => asset('aset-tema/luxury-noir/bingkai-artdeco.webp'),
+        'emas' => asset('aset-tema/luxury-noir/ornamen-emas.webp'),
+    ] : [];
+
+    $asetPosterRoyal = $adalahRoyalIvory ? [
+        'latar' => asset('aset-tema/royal-ivory/latar-utama.webp'),
+        'katedral' => asset('aset-tema/royal-ivory/ornamen-katedral.webp'),
     ] : [];
 
     $adalahEditorial = !empty($poster['editorial']);
@@ -165,10 +178,158 @@
                 ></div>
 
                 <div
-                    class="relative w-full h-full overflow-hidden flex flex-col {{ ($adalahRusticFloral || $adalahVelvetGarden || $adalahEditorialMonokrom) ? '' : 'justify-between' }}"
-                    style="border-radius: 2.85cqw; background: {{ $adalahRusticFloral ? '#FAF5EC' : ($adalahVelvetGarden ? '#0F201D' : ($adalahEditorialMonokrom ? '#FAF9F6' : $poster['layar_kiri_bg'])) }}; color: {{ $poster['layar_kiri_teks'] }};"
+                    class="relative w-full h-full overflow-hidden flex flex-col {{ ($adalahRusticFloral || $adalahVelvetGarden || $adalahEditorialMonokrom || $adalahLuxuryNoir || $adalahRoyalIvory) ? '' : 'justify-between' }}"
+                    style="border-radius: 2.85cqw; background: {{ $adalahRusticFloral ? '#FAF5EC' : ($adalahVelvetGarden ? '#0F201D' : ($adalahEditorialMonokrom ? '#FAF9F6' : ($adalahLuxuryNoir ? '#0B0B0F' : ($adalahRoyalIvory ? '#FBF8F3' : $poster['layar_kiri_bg'])))) }}; color: {{ $poster['layar_kiri_teks'] }};"
                 >
-                    @if ($adalahEditorialMonokrom)
+                    @if ($adalahLuxuryNoir)
+                        {{-- PONSEL KIRI LUXURY NOIR: Beveled Gold-Plate Chronograph + Grand Ballroom Programme --}}
+                        <div
+                            class="relative z-10 text-center"
+                            style="background: linear-gradient(180deg, #16151E 0%, #0E0D14 100%); color: #F5EFE6; padding: 3.1cqw 2.05cqw 1.95cqw 1.25cqw; border-bottom: 0.14cqw solid rgba(212,175,55,0.45);"
+                        >
+                            <img
+                                src="{{ $asetPosterNoir['emas'] }}"
+                                alt=""
+                                aria-hidden="true"
+                                loading="lazy"
+                                class="mx-auto"
+                                style="width: 2.6cqw;"
+                            >
+                            <p class="uppercase font-bold leading-none" style="margin-top: 0.35cqw; font-size: 0.56cqw; letter-spacing: 0.22em; color: #D4AF37;">
+                                Menuju Malam Bahagia
+                            </p>
+                            <p class="font-serif-poster uppercase font-bold leading-tight" style="margin-top: 0.25cqw; font-size: 1.95cqw; letter-spacing: 0.06em; color: #F3E5AB;">
+                                Save The Date
+                            </p>
+
+                            <div class="grid grid-cols-4 gap-[0.48cqw]" style="margin-top: 1.05cqw;">
+                                @foreach ([[$hariLagi, 'Hari'], ['08', 'Jam'], ['25', 'Mnt'], ['12', 'Dtk']] as [$angka, $satuan])
+                                    <div
+                                        style="border-radius: 0.55cqw; background-color: #17161E; border: 0.13cqw solid rgba(212,175,55,0.65); padding: 0.68cqw 0.1cqw 0.55cqw;"
+                                    >
+                                        <div class="font-serif-poster font-bold leading-none" style="font-size: 1.55cqw; color: #F3E5AB;">{{ $angka }}</div>
+                                        <div class="uppercase font-bold leading-none" style="margin-top: 0.28cqw; font-size: 0.48cqw; letter-spacing: 0.14em; color: #D4AF37;">{{ $satuan }}</div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <div
+                                class="inline-flex items-center justify-center font-bold uppercase"
+                                style="margin-top: 1.15cqw; padding: 0.48cqw 1.35cqw; font-size: 0.62cqw; letter-spacing: 0.12em; border-radius: 9999px; background: linear-gradient(135deg, #C59B38 0%, #F3E5AB 50%, #C59B38 100%); color: #0B0B0F;"
+                            >
+                                <span>Simpan ke Kalender</span>
+                            </div>
+                        </div>
+
+                        <div
+                            class="relative z-10 flex-1 flex flex-col text-center overflow-hidden"
+                            style="background-color: #0B0B0F; color: #F5EFE6; padding: 1.45cqw 2.05cqw 1.5cqw 1.25cqw;"
+                        >
+                            <p class="uppercase font-bold leading-none" style="font-size: 0.56cqw; letter-spacing: 0.22em; color: #D4AF37;">
+                                Waktu &amp; Tempat
+                            </p>
+                            <p class="font-serif-poster uppercase font-bold leading-tight text-white" style="margin-top: 0.24cqw; font-size: 1.55cqw; letter-spacing: 0.05em;">
+                                Rangkaian Acara
+                            </p>
+
+                            <div
+                                class="relative mt-auto w-full flex flex-col justify-between overflow-hidden"
+                                style="margin-top: 0.9cqw; flex: 1; border-radius: 0.95cqw; background-color: #15141B; border: 0.16cqw solid rgba(212,175,55,0.62);"
+                            >
+                                <div style="background: linear-gradient(180deg, #1E1C26 0%, #121118 100%); border-bottom: 0.12cqw solid rgba(212,175,55,0.45); padding: 0.75cqw 0.7cqw;">
+                                    <p class="uppercase font-bold leading-none" style="font-size: 0.52cqw; letter-spacing: 0.18em; color: #D4AF37;">
+                                        PROSESI 01 &bull; MINGGU
+                                    </p>
+                                    <p class="font-serif-poster uppercase font-bold truncate leading-tight" style="margin-top: 0.28cqw; font-size: 1.28cqw; color: #F3E5AB;">
+                                        {{ Str::limit($namaAcaraUtama, 18, '') }}
+                                    </p>
+                                </div>
+
+                                <div class="flex-1 flex flex-col items-center justify-center" style="padding: 0.7cqw 0.75cqw;">
+                                    <p class="font-serif-poster font-bold uppercase leading-none text-white" style="font-size: 1.05cqw; letter-spacing: 0.08em;">
+                                        08 NOV 2026 &middot; 15:00 WIB
+                                    </p>
+                                    <p class="truncate w-full leading-tight" style="margin-top: 0.42cqw; font-size: 0.76cqw; color: rgba(245,239,230,0.78);">
+                                        {{ $tempatAcara }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    @elseif ($adalahRoyalIvory)
+                        {{-- PONSEL KIRI ROYAL IVORY: Hitung Mundur Perunggu + Piagam Letterpress Katedral --}}
+                        <div
+                            class="relative z-10 text-center"
+                            style="background: linear-gradient(180deg, #7B603F 0%, #58432B 100%); color: #FAF6EE; padding: 3.1cqw 2.05cqw 1.95cqw 1.25cqw; border-bottom: 0.14cqw solid rgba(229,201,155,0.5);"
+                        >
+                            <img
+                                src="{{ $asetPosterRoyal['katedral'] }}"
+                                alt=""
+                                aria-hidden="true"
+                                loading="lazy"
+                                class="mx-auto"
+                                style="width: 2.8cqw;"
+                            >
+                            <p class="uppercase font-bold leading-none" style="margin-top: 0.35cqw; font-size: 0.56cqw; letter-spacing: 0.22em; color: #E5C99B;">
+                                Menuju Hari Bahagia
+                            </p>
+                            <p class="font-serif-poster font-bold leading-tight text-white" style="margin-top: 0.22cqw; font-size: 2.05cqw;">
+                                Save The Date
+                            </p>
+
+                            <div class="grid grid-cols-4 gap-[0.48cqw]" style="margin-top: 1.05cqw;">
+                                @foreach ([[$hariLagi, 'Hari'], ['08', 'Jam'], ['25', 'Mnt'], ['12', 'Dtk']] as [$angka, $satuan])
+                                    <div
+                                        style="border-radius: 0.65cqw; background-color: #FBF8F3; border: 0.13cqw solid #E5C99B; padding: 0.68cqw 0.1cqw 0.55cqw; color: #3B2E25;"
+                                    >
+                                        <div class="font-serif-poster font-bold leading-none" style="font-size: 1.55cqw; color: #58432B;">{{ $angka }}</div>
+                                        <div class="uppercase font-bold leading-none" style="margin-top: 0.28cqw; font-size: 0.48cqw; letter-spacing: 0.12em; color: #9E7B4F;">{{ $satuan }}</div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <div
+                                class="inline-flex items-center justify-center font-bold uppercase"
+                                style="margin-top: 1.15cqw; padding: 0.48cqw 1.35cqw; font-size: 0.62cqw; letter-spacing: 0.1em; border-radius: 9999px; background-color: #FAF6EE; color: #58432B;"
+                            >
+                                <span>Simpan ke Kalender</span>
+                            </div>
+                        </div>
+
+                        <div
+                            class="relative z-10 flex-1 flex flex-col text-center overflow-hidden"
+                            style="background-color: #FBF8F3; color: #3B2E25; padding: 1.45cqw 2.05cqw 1.5cqw 1.25cqw;"
+                        >
+                            <p class="uppercase font-bold leading-none" style="font-size: 0.56cqw; letter-spacing: 0.22em; color: #9E7B4F;">
+                                Waktu &amp; Tempat
+                            </p>
+                            <p class="font-serif-poster font-bold leading-tight" style="margin-top: 0.22cqw; font-size: 1.7cqw; color: #3B2E25;">
+                                Rangkaian Acara
+                            </p>
+
+                            <div
+                                class="relative mt-auto w-full flex flex-col justify-between overflow-hidden shadow-xs"
+                                style="margin-top: 0.85cqw; flex: 1; border-radius: 1.1cqw; background-color: #FFFFFF; border: 0.16cqw solid rgba(158,123,79,0.58);"
+                            >
+                                <div style="background: linear-gradient(180deg, #6E5436 0%, #58432B 100%); padding: 0.75cqw 0.7cqw; color: #FAF6EE;">
+                                    <p class="uppercase font-bold leading-none" style="font-size: 0.52cqw; letter-spacing: 0.18em; color: #E5C99B;">
+                                        PROSESI 01 &bull; MINGGU
+                                    </p>
+                                    <p class="font-serif-poster font-bold truncate leading-tight text-white" style="margin-top: 0.24cqw; font-size: 1.42cqw;">
+                                        {{ Str::limit($namaAcaraUtama, 18, '') }}
+                                    </p>
+                                </div>
+
+                                <div class="flex-1 flex flex-col items-center justify-center" style="padding: 0.7cqw 0.75cqw;">
+                                    <p class="font-serif-poster font-bold uppercase leading-none" style="font-size: 1.05cqw; letter-spacing: 0.08em; color: #58432B;">
+                                        15 NOV 2026 &middot; 09:00 WIB
+                                    </p>
+                                    <p class="truncate w-full leading-tight" style="margin-top: 0.42cqw; font-size: 0.76cqw; color: rgba(59,46,37,0.75);">
+                                        {{ $tempatAcara }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    @elseif ($adalahEditorialMonokrom)
                         {{-- PONSEL KIRI EDITORIAL MONOKROM: Split-Flap Chronometer + Perforated Exhibition Pass --}}
                         <div
                             class="relative z-10 text-left"
@@ -653,7 +814,140 @@
                     style="top: 1.6cqw; width: 5cqw; height: 0.95cqw;"
                 ></div>
 
-                @if ($adalahEditorialMonokrom)
+                @if ($adalahLuxuryNoir)
+                    {{-- PONSEL KANAN LUXURY NOIR: Kartu Mempelai Wanita Art Deco Obsidian-Emas --}}
+                    <div
+                        class="relative w-full h-full overflow-hidden flex flex-col justify-between text-center"
+                        style="border-radius: 2.85cqw; background-color: #0B0B0F; color: #F5EFE6; padding: 2.9cqw 1.2cqw 1.65cqw 1.85cqw;"
+                    >
+                        <div class="relative z-10 w-full">
+                            <img
+                                src="{{ $asetPosterNoir['emas'] }}"
+                                alt=""
+                                aria-hidden="true"
+                                loading="lazy"
+                                class="mx-auto"
+                                style="width: 2.7cqw;"
+                            >
+                            <p class="uppercase font-bold leading-none" style="margin-top: 0.4cqw; font-size: 0.62cqw; letter-spacing: 0.22em; color: #D4AF37;">
+                                The Couple
+                            </p>
+                            <p class="font-serif-poster uppercase font-bold leading-tight text-white" style="margin-top: 0.28cqw; font-size: 1.65cqw; letter-spacing: 0.05em;">
+                                Mempelai Wanita
+                            </p>
+                        </div>
+
+                        <div
+                            class="relative z-10 w-full flex flex-col justify-between overflow-hidden"
+                            style="margin-top: 0.9cqw; flex: 1; border-radius: 1.15cqw; background-color: #15141B; border: 0.16cqw solid rgba(212,175,55,0.62); padding: 0.95cqw 0.95cqw 1.2cqw;"
+                        >
+                            <div
+                                class="mx-auto overflow-hidden bg-black"
+                                style="width: 14.5cqw; height: 19.6cqw; border-radius: 0.75cqw; border: 0.16cqw solid rgba(212,175,55,0.72);"
+                            >
+                                <img
+                                    src="{{ $fotoWanitaUrl }}"
+                                    alt="{{ $wanitaLengkap }}"
+                                    loading="lazy"
+                                    class="w-full h-full object-cover object-top"
+                                >
+                            </div>
+
+                            <div class="w-full" style="margin-top: 0.75cqw;">
+                                <p class="font-serif-poster uppercase font-bold leading-none" style="font-size: 2.05cqw; letter-spacing: 0.06em; color: #F3E5AB;">
+                                    {{ $wanitaPanggilan }}
+                                </p>
+                                <p class="font-bold truncate w-full leading-tight text-white" style="margin-top: 0.35cqw; font-size: 0.92cqw;">
+                                    {{ $wanitaLengkap }}
+                                </p>
+                                <p class="truncate w-full leading-tight" style="margin-top: 0.2cqw; font-size: 0.7cqw; color: rgba(245,239,230,0.72);">
+                                    Putri dari {{ $wanitaAyah }}
+                                </p>
+                                @if ($instagramWanita)
+                                    <div
+                                        class="inline-flex items-center justify-center font-semibold"
+                                        style="margin-top: 0.58cqw; padding: 0.28cqw 1.1cqw; font-size: 0.72cqw; border-radius: 9999px; background-color: #09090D; border: 0.12cqw solid rgba(212,175,55,0.6); color: #F3E5AB;"
+                                    >
+                                        <span>&#64;{{ $instagramWanita }}</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div
+                            aria-hidden="true"
+                            class="pointer-events-none absolute inset-y-0 left-0 z-20"
+                            style="width: 3.4cqw; background: linear-gradient(270deg, transparent, rgba(0,0,0,0.34));"
+                        ></div>
+                    </div>
+                @elseif ($adalahRoyalIvory)
+                    {{-- PONSEL KANAN ROYAL IVORY: Kartu Letterpress Katedral Gading & Potret Lengkung Mempelai Wanita --}}
+                    <div
+                        class="relative w-full h-full overflow-hidden flex flex-col justify-between text-center"
+                        style="border-radius: 2.85cqw; background-color: #FBF8F3; color: #3B2E25; padding: 2.9cqw 1.2cqw 1.65cqw 1.85cqw;"
+                    >
+                        <div class="relative z-10 w-full">
+                            <img
+                                src="{{ $asetPosterRoyal['katedral'] }}"
+                                alt=""
+                                aria-hidden="true"
+                                loading="lazy"
+                                class="mx-auto"
+                                style="width: 2.8cqw;"
+                            >
+                            <p class="uppercase font-bold leading-none" style="margin-top: 0.4cqw; font-size: 0.62cqw; letter-spacing: 0.22em; color: #9E7B4F;">
+                                Royal Couple
+                            </p>
+                            <p class="font-serif-poster font-bold leading-tight" style="margin-top: 0.26cqw; font-size: 1.85cqw; color: #3B2E25;">
+                                Mempelai Berbahagia
+                            </p>
+                        </div>
+
+                        <div
+                            class="relative z-10 w-full flex flex-col justify-between overflow-hidden shadow-xs"
+                            style="margin-top: 0.85cqw; flex: 1; border-radius: 1.35cqw; background-color: #FFFFFF; border: 0.16cqw solid rgba(158,123,79,0.58); padding: 1.05cqw 0.95cqw 1.2cqw;"
+                        >
+                            <div
+                                class="mx-auto overflow-hidden"
+                                style="width: 14cqw; height: 18.8cqw; border-radius: 999px 999px 0.8cqw 0.8cqw; border: 0.2cqw solid rgba(158,123,79,0.72); background-color: #FBF8F3; padding: 0.24cqw;"
+                            >
+                                <img
+                                    src="{{ $fotoWanitaUrl }}"
+                                    alt="{{ $wanitaLengkap }}"
+                                    loading="lazy"
+                                    class="w-full h-full object-cover object-top"
+                                    style="border-radius: 999px 999px 0.6cqw 0.6cqw;"
+                                >
+                            </div>
+
+                            <div class="w-full" style="margin-top: 0.65cqw;">
+                                <p class="font-script leading-none" style="font-size: 2.7cqw; color: #3B2E25;">
+                                    {{ $wanitaPanggilan }}
+                                </p>
+                                <p class="font-serif-poster font-bold truncate w-full leading-tight" style="margin-top: 0.3cqw; font-size: 1.05cqw; color: #3B2E25;">
+                                    {{ $wanitaLengkap }}
+                                </p>
+                                <p class="truncate w-full leading-tight" style="margin-top: 0.2cqw; font-size: 0.74cqw; color: rgba(59,46,37,0.72);">
+                                    Putri dari {{ $wanitaAyah }}
+                                </p>
+                                @if ($instagramWanita)
+                                    <div
+                                        class="inline-flex items-center justify-center font-semibold"
+                                        style="margin-top: 0.55cqw; padding: 0.28cqw 1.1cqw; font-size: 0.74cqw; border-radius: 9999px; background-color: #FBF8F3; border: 0.12cqw solid rgba(158,123,79,0.58); color: #58432B;"
+                                    >
+                                        <span>&#64;{{ $instagramWanita }}</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div
+                            aria-hidden="true"
+                            class="pointer-events-none absolute inset-y-0 left-0 z-20"
+                            style="width: 3.4cqw; background: linear-gradient(270deg, transparent, rgba(0,0,0,0.22));"
+                        ></div>
+                    </div>
+                @elseif ($adalahEditorialMonokrom)
                     {{-- PONSEL KANAN EDITORIAL MONOKROM: 01 / Dossier & Kartu Obsidian Noir Mempelai Wanita --}}
                     <div
                         class="relative w-full h-full overflow-hidden flex flex-col justify-between text-left"
@@ -1394,7 +1688,133 @@
                     style="top: 1.85cqw; width: 6cqw; height: 1.15cqw;"
                 ></div>
 
-                @if ($adalahEditorialMonokrom)
+                @if ($adalahLuxuryNoir)
+                    {{-- PONSEL TENGAH LUXURY NOIR: Panggung Ballroom Art Deco, Lampu Kristal & Monogram Emas --}}
+                    <div
+                        class="relative w-full h-full overflow-hidden flex flex-col justify-between text-center"
+                        style="border-radius: 3.25cqw; background: #09090D; color: #F5EFE6; padding: 3.6cqw 2.4cqw 2.4cqw;"
+                    >
+                        <img
+                            src="{{ $asetPosterNoir['latar'] }}"
+                            alt="{{ $tema->nama_tema }}"
+                            loading="lazy"
+                            class="absolute inset-0 w-full h-full object-cover object-center"
+                        >
+                        <div
+                            aria-hidden="true"
+                            class="pointer-events-none absolute inset-0"
+                            style="background: linear-gradient(180deg, rgba(9,9,13,0.82) 0%, rgba(9,9,13,0.44) 48%, rgba(6,6,9,0.92) 100%);"
+                        ></div>
+
+                        <img
+                            src="{{ $asetPosterNoir['bingkai'] }}"
+                            alt=""
+                            aria-hidden="true"
+                            loading="lazy"
+                            class="pointer-events-none absolute inset-0 w-full h-full object-contain opacity-92 z-10"
+                            style="padding: 0.55cqw;"
+                        >
+
+                        <div class="relative z-20 my-auto" style="padding: 3.2cqw 1.2cqw 0;">
+                            <img
+                                src="{{ $asetPosterNoir['emas'] }}"
+                                alt=""
+                                aria-hidden="true"
+                                loading="lazy"
+                                class="mx-auto"
+                                style="width: 3.2cqw;"
+                            >
+                            <p class="uppercase font-bold leading-none" style="margin-top: 0.7cqw; font-size: 0.74cqw; letter-spacing: 0.24em; color: #D4AF37;">
+                                The Grand Celebration
+                            </p>
+                            <p class="font-serif-poster uppercase font-bold leading-[1.06] text-white drop-shadow" style="margin-top: 0.9cqw; font-size: 3.05cqw; letter-spacing: 0.08em;">
+                                {{ $priaPanggilan }}
+                            </p>
+                            <div class="flex items-center justify-center gap-[0.65cqw]" style="margin: 0.25cqw 0;">
+                                <span style="height: 0.12cqw; width: 2.2cqw; background: rgba(212,175,55,0.75);"></span>
+                                <span class="font-script leading-none" style="font-size: 2.4cqw; color: #F3E5AB;">&amp;</span>
+                                <span style="height: 0.12cqw; width: 2.2cqw; background: rgba(212,175,55,0.75);"></span>
+                            </div>
+                            <p class="font-serif-poster uppercase font-bold leading-[1.06] text-white drop-shadow" style="font-size: 3.05cqw; letter-spacing: 0.08em;">
+                                {{ $wanitaPanggilan }}
+                            </p>
+                            <p class="uppercase font-semibold leading-none" style="margin-top: 1.15cqw; font-size: 0.92cqw; letter-spacing: 0.22em; color: #F3E5AB;">
+                                {{ $poster['tanggal_pendek'] }}
+                            </p>
+                        </div>
+
+                        <div class="relative z-20 flex justify-center" style="padding-bottom: 0.6cqw;">
+                            <span
+                                class="font-serif-poster font-bold uppercase flex items-center justify-center"
+                                style="width: 3.6cqw; height: 3.6cqw; border-radius: 9999px; border: 0.13cqw dashed rgba(212,175,55,0.8); background: rgba(9,9,13,0.75); font-size: 0.88cqw; letter-spacing: 0.08em; color: #F3E5AB;"
+                            >
+                                {{ mb_substr($priaPanggilan, 0, 1) }}&amp;{{ mb_substr($wanitaPanggilan, 0, 1) }}
+                            </span>
+                        </div>
+                    </div>
+                @elseif ($adalahRoyalIvory)
+                    {{-- PONSEL TENGAH ROYAL IVORY: Lengkungan Katedral Mutiara Gading & Segel Lilin Perunggu --}}
+                    <div
+                        class="relative w-full h-full overflow-hidden flex flex-col justify-between text-center"
+                        style="border-radius: 3.25cqw; background: #3B2E25; color: #3B2E25; padding: 3.4cqw 2.2cqw 2.4cqw;"
+                    >
+                        <img
+                            src="{{ $asetPosterRoyal['latar'] }}"
+                            alt="{{ $tema->nama_tema }}"
+                            loading="lazy"
+                            class="absolute inset-0 w-full h-full object-cover object-center"
+                        >
+                        <div
+                            aria-hidden="true"
+                            class="pointer-events-none absolute inset-0"
+                            style="background: linear-gradient(180deg, rgba(250,246,238,0.88) 0%, rgba(250,246,238,0.52) 55%, rgba(59,46,37,0.84) 100%);"
+                        ></div>
+
+                        {{-- Lengkungan Rose-Window Katedral --}}
+                        <div
+                            aria-hidden="true"
+                            class="pointer-events-none absolute z-10"
+                            style="inset: 1.05cqw; border-radius: 999px 999px 1.8cqw 1.8cqw; border: 0.16cqw solid rgba(158,123,79,0.72);"
+                        ></div>
+
+                        <div class="relative z-20 my-auto" style="padding: 1.8cqw 1cqw 0;">
+                            <img
+                                src="{{ $asetPosterRoyal['katedral'] }}"
+                                alt=""
+                                aria-hidden="true"
+                                loading="lazy"
+                                class="mx-auto"
+                                style="width: 3.3cqw;"
+                            >
+                            <p class="uppercase font-bold leading-none" style="margin-top: 0.65cqw; font-size: 0.76cqw; letter-spacing: 0.24em; color: #7B603F;">
+                                The Royal Wedding
+                            </p>
+                            <p class="font-serif-poster font-bold leading-[1.06]" style="margin-top: 0.85cqw; font-size: 3.35cqw; color: #3B2E25;">
+                                {{ $priaPanggilan }}
+                            </p>
+                            <div class="flex items-center justify-center gap-[0.65cqw]" style="margin: 0.2cqw 0;">
+                                <span style="height: 0.13cqw; width: 2.2cqw; background: rgba(158,123,79,0.75);"></span>
+                                <span class="font-script leading-none" style="font-size: 2.55cqw; color: #9E7B4F;">&amp;</span>
+                                <span style="height: 0.13cqw; width: 2.2cqw; background: rgba(158,123,79,0.75);"></span>
+                            </div>
+                            <p class="font-serif-poster font-bold leading-[1.06]" style="font-size: 3.35cqw; color: #3B2E25;">
+                                {{ $wanitaPanggilan }}
+                            </p>
+                            <p class="uppercase font-bold leading-none" style="margin-top: 1.1cqw; font-size: 0.94cqw; letter-spacing: 0.22em; color: #58432B;">
+                                {{ $poster['tanggal_pendek'] }}
+                            </p>
+                        </div>
+
+                        <div class="relative z-20 flex justify-center" style="padding-bottom: 0.5cqw;">
+                            <span
+                                class="font-serif-poster font-bold uppercase flex items-center justify-center shadow-md"
+                                style="width: 3.6cqw; height: 3.6cqw; border-radius: 9999px; background-color: #9E7B4F; border: 0.16cqw solid #E5C99B; font-size: 0.88cqw; letter-spacing: 0.08em; color: #FAF6EE;"
+                            >
+                                {{ mb_substr($priaPanggilan, 0, 1) }}&amp;{{ mb_substr($wanitaPanggilan, 0, 1) }}
+                            </span>
+                        </div>
+                    </div>
+                @elseif ($adalahEditorialMonokrom)
                     {{-- PONSEL TENGAH EDITORIAL MONOKROM: Visual Hero Exhibition Spread (Viewfinder, Arsitektur Monokrom & Masthead Bertingkat) --}}
                     <div
                         class="relative w-full h-full overflow-hidden flex flex-col justify-between text-left"

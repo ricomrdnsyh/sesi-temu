@@ -1,6 +1,10 @@
 @if ($undangan->musik_latar)
     @php
         $slugTemaAudio = $undangan->tema?->slug ?? '';
+        $adalahEleganAudio = in_array($slugTemaAudio, ['luxury-noir', 'royal-ivory'], true);
+        $posisiTombolMusik = $adalahEleganAudio
+            ? 'bottom-[4.65rem] right-3.5 sm:right-5 w-10 h-10 sm:w-11 sm:h-11'
+            : 'bottom-5 right-5 w-11 h-11 sm:w-12 sm:h-12';
         $srcAudio = str_starts_with($undangan->musik_latar, 'http')
             ? $undangan->musik_latar
             : asset($undangan->musik_latar);
@@ -35,7 +39,7 @@
         x-show="undanganTerbuka"
         x-cloak
         x-transition
-        class="fixed bottom-5 right-5 z-40 w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center backdrop-blur-md cursor-pointer transition active:scale-95 {{ $kelasTombolMusik }}"
+        class="fixed z-40 flex items-center justify-center backdrop-blur-md cursor-pointer transition active:scale-95 {{ $posisiTombolMusik }} {{ $kelasTombolMusik }}"
         :class="musikBerputar ? '{{ $slugTemaAudio === 'editorial-monokrom' ? '' : 'animasi-putar-kaset' }}' : '{{ $slugTemaAudio === 'editorial-monokrom' ? 'opacity-75' : 'animasi-putar-kaset animasi-putar-jeda opacity-80' }}'"
     >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">

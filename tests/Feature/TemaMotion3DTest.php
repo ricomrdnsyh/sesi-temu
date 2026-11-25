@@ -198,7 +198,7 @@ class TemaMotion3DTest extends TestCase
                     ->assertSee('data-lenis-prevent', false);
             } elseif ($item['tier'] === 'eksklusif' || $item['tier'] === 'premium') {
                 $respon->assertSee('diorama-kamera-3d', false);
-                if ($item['slug'] !== 'editorial-monokrom') {
+                if (! in_array($item['slug'], ['editorial-monokrom', 'luxury-noir'], true)) {
                     $respon->assertSee('rounded-t-[10.5rem]', false);
                 }
             } else {
@@ -750,11 +750,28 @@ class TemaMotion3DTest extends TestCase
             ->assertSee('modeWarnaEditorial', false)
             ->assertSee('Buka Amplop Digital', false)
             ->assertSee('data-slideshow-editorial', false)
+            ->assertSee('data-indeks-editorial', false)
+            ->assertSee('data-masthead-lengket', false)
+            ->assertSee('data-horizontal-editorial', false)
+            ->assertSee('data-lookbook-cerita="editorial"', false)
+            ->assertSee('data-lookbook-galeri="editorial"', false)
             ->assertSee('data-section-doa-pengantin="editorial"', false)
             ->assertSee('Doa &amp; Harapan', false)
             ->assertSee('data-section-turut-mengundang="editorial"', false);
 
         $html = $respon->getContent();
+
+        // Pastikan Contact Sheet galeri (x-show="modeContactSheet") tidak menjebak foto dengan data-gsap saat tersembunyi
+        // serta tirai foto langsung terbuka (ed-terbuka) agar tidak tampil hitam kosong saat diklik
+        $this->assertMatchesRegularExpression(
+            '/x-show="modeContactSheet"[\s\S]*?ed-tirai-foto\s+ed-terbuka/',
+            $html
+        );
+        if (preg_match('/<div[^>]+x-show="modeContactSheet"[^>]*>([\s\S]*?)<\/section>/', $html, $blokContactSheet)) {
+            $this->assertStringNotContainsString('data-gsap="potret"', $blokContactSheet[1]);
+        }
+        $respon->assertSee('modeContactSheet = !modeContactSheet; window.SesiTemuSinema?.refresh', false);
+
         $posMempelai = strpos($html, 'data-layout-mempelai="editorial"');
         $posSlideshow = strpos($html, 'data-slideshow-editorial');
         $posCountdown = strpos($html, 'data-layout-countdown="editorial"');
@@ -1003,5 +1020,129 @@ class TemaMotion3DTest extends TestCase
             ->assertSee('aset-tema/velvet-garden/hero-poster.webp', false)
             ->assertSee('aset-tema/velvet-garden/bingkai-konservatori-mempelai.webp', false)
             ->assertSee('aset-tema/velvet-garden/garland-velvet.webp', false);
+    }
+
+    /**
+     * Memastikan kedua tema kategori Elegan (luxury-noir & royal-ivory) memiliki urutan seksi,
+     * slideshow transisi, laci Amplop Digital interaktif, Doa Untuk Pengantin, dan showcase poster
+     * yang seragam dengan tema kategori lainnya.
+     */
+    public function test_kategori_elegan_luxury_noir_dan_royal_ivory_memiliki_urutan_seksi_dan_fitur_seragam(): void
+    {
+        $this->seed(\Database\Seeders\DatabaseSeeder::class);
+
+        $kasusElegan = [
+            'luxury-noir' => [
+                'gaya' => 'artdeco',
+                'nav' => 'noir',
+                'slideshow' => 'data-slideshow-noir',
+                'sampul' => 'sampul-luxury.webp',
+            ],
+            'royal-ivory' => [
+                'gaya' => 'katedral',
+                'nav' => 'ivory',
+                'slideshow' => 'data-slideshow-royal',
+                'sampul' => 'sampul-royal.webp',
+            ],
+        ];
+
+        $semuaHashFotoElegan = [];
+
+        foreach ($kasusElegan as $slug => $meta) {
+            $gaya = $meta['gaya'];
+            $nav = $meta['nav'];
+            $respon = $this->get("/demo/{$slug}?kanvas=1");
+            $respon->assertOk()
+                ->assertSee('tirai-gulir-atas', false)
+                ->assertSee("data-selendang-transisi=\"{$nav}\"", false)
+                ->assertSee('data-kartu-tumpuk', false)
+                ->assertSee("data-nav-elegan=\"{$nav}\"", false)
+                ->assertSee('max-w-[388px]', false)
+                ->assertSee('grid-cols-6', false)
+                ->assertSee('bottom-[4.65rem]', false)
+                ->assertDontSee('right-[4.35rem]', false)
+                ->assertSee("data-galeri-reel-elegan=\"{$nav}\"", false)
+                ->assertSee("data-penutup-sinematik-elegan=\"{$nav}\"", false)
+                ->assertSee('Mode Geser', false)
+                ->assertSee('Lihat Semua', false)
+                ->assertDontSee('rounded-t-[4rem]', false)
+                ->assertDontSee('rounded-t-[6rem]', false)
+                ->assertSee($meta['slideshow'], false)
+                ->assertSee('Buka Amplop Digital', false)
+                ->assertSee('Doa Untuk Pengantin', false)
+                ->assertSee('Turut Mengundang', false)
+                ->assertSee("data-section-dress-code=\"{$gaya}\"", false)
+                ->assertSee("data-section-doa-pengantin=\"{$gaya}\"", false)
+                ->assertSee("data-section-turut-mengundang=\"{$gaya}\"", false);
+
+            // Pastikan seluruh aset foto mempelai & 10 foto galeri tema Elegan ada, berukuran memadai, dan bebas duplikat
+            $daftarFileFoto = [
+                "aset-demo/{$meta['sampul']}",
+                "aset-demo/tema-{$slug}.webp",
+                "aset-demo/galeri/{$slug}/pria.webp",
+                "aset-demo/galeri/{$slug}/wanita.webp",
+            ];
+            for ($no = 1; $no <= 10; $no++) {
+                $daftarFileFoto[] = sprintf('aset-demo/galeri/%s/galeri-%02d.webp', $slug, $no);
+            }
+            foreach ($daftarFileFoto as $relPath) {
+                $fullPath = public_path($relPath);
+                $this->assertFileExists($fullPath, "Aset {$relPath} wajib tersedia.");
+                $this->assertGreaterThan(12000, filesize($fullPath), "Aset {$relPath} terlalu kecil.");
+                $hash = md5_file($fullPath);
+                $this->assertNotFalse($hash);
+                $this->assertArrayNotHasKey($hash, $semuaHashFotoElegan, "Duplikasi file foto terdeteksi antara {$relPath} dan ".($semuaHashFotoElegan[$hash] ?? ''));
+                $semuaHashFotoElegan[$hash] = $relPath;
+            }
+
+            $html = $respon->getContent();
+            $posMempelai = strpos($html, "data-layout-mempelai=\"{$gaya}\"");
+            $posSlideshow = strpos($html, $meta['slideshow']);
+            $posCountdown = strpos($html, "data-layout-countdown=\"{$gaya}\"");
+            $posAcara = strpos($html, "data-layout-acara=\"{$gaya}\"");
+            $posDressCode = strpos($html, "data-section-dress-code=\"{$gaya}\"");
+            $posCerita = strpos($html, "data-layout-cerita=\"{$gaya}\"");
+            $posGaleri = strpos($html, "data-layout-galeri=\"{$gaya}\"");
+            $posAmplop = strpos($html, 'Buka Amplop Digital');
+            $posRsvp = strpos($html, 'id="buku-tamu"');
+            $posDoa = strpos($html, "data-section-doa-pengantin=\"{$gaya}\"");
+            $posTurut = strpos($html, "data-section-turut-mengundang=\"{$gaya}\"");
+            $posPenutup = strpos($html, "data-layout-penutup=\"{$gaya}\"");
+
+            $this->assertNotFalse($posMempelai);
+            $this->assertNotFalse($posSlideshow);
+            $this->assertNotFalse($posCountdown);
+            $this->assertNotFalse($posAcara);
+            $this->assertNotFalse($posDressCode);
+            $this->assertNotFalse($posCerita);
+            $this->assertNotFalse($posGaleri);
+            $this->assertNotFalse($posAmplop);
+            $this->assertNotFalse($posRsvp);
+            $this->assertNotFalse($posDoa);
+            $this->assertNotFalse($posTurut);
+            $this->assertNotFalse($posPenutup);
+
+            $this->assertLessThan($posSlideshow, $posMempelai);
+            $this->assertLessThan($posCountdown, $posSlideshow);
+            $this->assertLessThan($posAcara, $posCountdown);
+            $this->assertLessThan($posDressCode, $posAcara);
+            $this->assertLessThan($posCerita, $posDressCode);
+            $this->assertLessThan($posGaleri, $posCerita);
+            $this->assertLessThan($posAmplop, $posGaleri);
+            $this->assertLessThan($posRsvp, $posAmplop);
+            $this->assertLessThan($posDoa, $posRsvp);
+            $this->assertLessThan($posTurut, $posDoa);
+            $this->assertLessThan($posPenutup, $posTurut);
+
+            $this->get("/demo/{$slug}?kanvas=1&tf=1")
+                ->assertOk()
+                ->assertDontSee($meta['slideshow'], false)
+                ->assertDontSee($meta['sampul'], false);
+        }
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('aset-tema/luxury-noir/bingkai-artdeco.webp', false)
+            ->assertSee('aset-tema/royal-ivory/ornamen-katedral.webp', false);
     }
 }

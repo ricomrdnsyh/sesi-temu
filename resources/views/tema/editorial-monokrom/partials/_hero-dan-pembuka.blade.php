@@ -1,8 +1,9 @@
 {{-- SEKSI 1: HERO EDITORIAL EXHIBITION SPREAD (DARKROOM FOCUS + MASKED KINETIC TYPOGRAPHY) --}}
 <section
+    id="ed-bab-01"
     data-diorama-3d="{{ $tierAktif }}"
     data-autoscroll-delay="4800"
-    class="relative min-h-[95dvh] p-3 sm:p-3.5 flex items-stretch overflow-hidden bg-[#FAF9F6]"
+    class="relative min-h-[95dvh] p-3 sm:p-3.5 flex items-stretch overflow-x-clip bg-[#FAF9F6]"
 >
     <div class="relative w-full min-h-[calc(95dvh-1.75rem)] rounded-none border border-[#18181B] overflow-hidden bg-[#0E0E11] shadow-[6px_6px_0_0_#18181B]">
         <div class="relative w-full h-full flex flex-col justify-between diorama-kamera-3d">
@@ -174,12 +175,15 @@
 {{-- SEKSI 2: 00 / PRELUDE SPREAD (SWISS GRID MONOGRAM + INK CURTAIN PHOTO WIPE) --}}
 <section
     data-section-pembuka="editorial"
-    class="relative bg-[#111113] text-[#FAF9F6] px-5 py-14 overflow-hidden"
+    class="relative bg-[#111113] text-[#FAF9F6] px-5 pb-14 pt-4 overflow-x-clip"
 >
     <div aria-hidden="true" class="pointer-events-none absolute inset-0 ed-film-grain opacity-30"></div>
 
     <div class="relative z-10 max-w-md mx-auto space-y-7">
-        <div data-gsap="turun" class="ed-mono flex items-center justify-between text-[9.5px] uppercase tracking-[0.3em] text-white/60 border-b border-white/20 pb-3">
+        <div
+            data-masthead-lengket
+            class="sticky {{ $tampilBarDemo ? 'top-14' : 'top-0' }} z-30 -mx-5 px-5 py-3 bg-[#111113]/95 backdrop-blur-md ed-mono flex items-center justify-between text-[9.5px] uppercase tracking-[0.3em] text-white/70 border-b border-white/20"
+        >
             <span>00 / PRELUDE</span>
             <span>ARCHIVE &middot; {{ $tanggalTitik }}</span>
         </div>

@@ -25,9 +25,59 @@
             0% { opacity: 0; transform: translate3d(0, 20px, 0) scale(0.96); }
             100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
         }
+        @keyframes royalFadeTurun {
+            0% { opacity: 0; transform: translate3d(0, -14px, 0); }
+            100% { opacity: 1; transform: translate3d(0, 0, 0); }
+        }
+        @keyframes royalFadeNaik {
+            0% { opacity: 0; transform: translate3d(0, 18px, 0); }
+            100% { opacity: 1; transform: translate3d(0, 0, 0); }
+        }
+        @keyframes royalKameoMekar {
+            0% { opacity: 0; transform: translate3d(0, 22px, 0) scale(0.92); filter: blur(4px); }
+            100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0); }
+        }
+        @keyframes royalSegelCap {
+            0% { opacity: 0; transform: scale(1.25) rotate(-10deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        @keyframes royalHeroLensaMasuk {
+            0% { transform: scale(1.09); filter: brightness(1.08) blur(3px); }
+            100% { transform: scale(1.01); filter: brightness(1) blur(0); }
+        }
+        @keyframes royalSelendangNaik {
+            0% { opacity: 0; transform: translate3d(0, 110%, 0); }
+            22% { opacity: 0.96; }
+            78% { opacity: 0.88; }
+            100% { opacity: 0; transform: translate3d(0, -135%, 0); }
+        }
         .royal-arch-masuk {
-            animation: royalArchMasuk 1.15s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+            animation: royalArchMasuk 1.25s cubic-bezier(0.16, 1, 0.3, 1) 0.28s both;
             will-change: transform, opacity;
+        }
+        .royal-hero-lensa-masuk {
+            animation: royalHeroLensaMasuk 1.55s cubic-bezier(0.16, 1, 0.3, 1) 0.14s both;
+            will-change: transform, filter;
+        }
+        .royal-selendang-aktif {
+            animation: royalSelendangNaik 1.24s cubic-bezier(0.76, 0, 0.24, 1) 0.04s both;
+            will-change: transform, opacity;
+        }
+        .royal-hero-baris-1 {
+            animation: royalFadeTurun 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.36s both;
+        }
+        .royal-hero-baris-2 {
+            animation: royalFadeNaik 1.05s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+        }
+        .royal-hero-kameo {
+            animation: royalKameoMekar 1.05s cubic-bezier(0.16, 1, 0.3, 1) 0.64s both;
+            will-change: transform, opacity, filter;
+        }
+        .royal-hero-segel {
+            animation: royalSegelCap 0.82s cubic-bezier(0.22, 1, 0.36, 1) 0.8s both;
+        }
+        .royal-hero-bawah {
+            animation: royalFadeNaik 1s cubic-bezier(0.16, 1, 0.3, 1) 0.76s both;
         }
         .royal-tombol {
             background: linear-gradient(135deg, #9E7B4F 0%, #7B603F 60%, #58432B 100%);
@@ -35,8 +85,82 @@
             box-shadow: 0 10px 22px -10px rgba(88, 67, 43, 0.6);
         }
         .royal-tombol:hover { filter: brightness(1.07); }
+        .royal-tombol-gading {
+            background: linear-gradient(135deg, #FAF6EE 0%, #F1E3CB 55%, #E5C99B 100%);
+            color: #3B2E25;
+            border: 1px solid rgba(158, 123, 79, 0.55);
+            box-shadow: 0 10px 22px -10px rgba(59, 46, 37, 0.35);
+        }
+        .royal-tombol-gading:hover { filter: brightness(1.04); }
+        main[data-sinema-gsap="royal-ivory"] {
+            transform: none !important;
+            perspective: none !important;
+            transform-style: flat !important;
+            overflow: visible !important;
+        }
+        .royal-kartu-tumpuk {
+            border-top-left-radius: 1.85rem;
+            border-top-right-radius: 1.85rem;
+            border-top: 1px solid rgba(158, 123, 79, 0.45);
+            box-shadow: 0 -20px 44px -12px rgba(59, 46, 37, 0.24);
+            will-change: transform;
+        }
+        /* Transisi Selendang Sutra Gading Melengkung + Cahaya Mutiara Sampanye 60fps */
+        .tirai-fade-halus.tirai-gulir-atas {
+            opacity: 1;
+            clip-path: inset(0% 0% 0% 0% round 0 0 0% 0%);
+            transform: translate3d(0, 0, 0) scale(1);
+            filter: brightness(1);
+            visibility: visible;
+            transition:
+                clip-path 1.18s cubic-bezier(0.76, 0, 0.24, 1),
+                transform 1.24s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.72s ease,
+                opacity 0.3s ease 0.94s,
+                visibility 0s linear 0s;
+            will-change: clip-path, transform, opacity;
+            backface-visibility: hidden;
+        }
+        .tirai-fade-halus.tirai-gulir-atas.tirai-terbuka {
+            opacity: 0;
+            clip-path: inset(0% 0% 100% 0% round 0 0 48% 48%);
+            transform: translate3d(0, -3.5%, 0) scale(1.04);
+            filter: brightness(1.16);
+            visibility: hidden;
+            transition:
+                clip-path 1.18s cubic-bezier(0.76, 0, 0.24, 1),
+                transform 1.24s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.72s ease,
+                opacity 0.3s ease 0.94s,
+                visibility 0s linear 1.24s;
+        }
+        .royal-isi-sampul {
+            transition:
+                opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .tirai-terbuka .royal-isi-sampul {
+            opacity: 0;
+            transform: translate3d(0, -18px, 0) scale(0.97);
+        }
         @media (prefers-reduced-motion: reduce) {
-            .royal-arch-masuk { animation: none !important; opacity: 1 !important; transform: none !important; }
+            .royal-arch-masuk,
+            .royal-hero-lensa-masuk,
+            .royal-selendang-aktif,
+            .royal-hero-baris-1,
+            .royal-hero-baris-2,
+            .royal-hero-kameo,
+            .royal-hero-segel,
+            .royal-hero-bawah { animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; }
+            .royal-selendang-aktif { display: none !important; }
+            .tirai-fade-halus.tirai-gulir-atas,
+            .tirai-fade-halus.tirai-gulir-atas.tirai-terbuka {
+                transition: none !important;
+                clip-path: none !important;
+                transform: none !important;
+                filter: none !important;
+            }
+            .tirai-fade-halus.tirai-gulir-atas.tirai-terbuka { opacity: 0; }
         }
     </style>
 </head>
@@ -82,6 +206,7 @@
         @include('tema.royal-ivory.partials._panggung-desktop-kanan')
     </div>
 
+    @include('komponen-undangan.navigasi-elegan', ['varian' => 'ivory', 'tanpaFoto' => $tanpaFoto])
     @include('komponen-undangan.kontrol-sinema')
     @include('komponen-undangan.pemutar-musik')
     @include('komponen-undangan.modal-galeri')

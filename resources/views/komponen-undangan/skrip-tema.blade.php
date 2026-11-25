@@ -91,6 +91,7 @@
                 window.addEventListener('touchstart', jedaKarenaInteraksi, {
                     passive: true
                 });
+                window.addEventListener('sesitemu:lompat-seksi', jedaKarenaInteraksi);
 
                 // Jeda audio & auto-scroll otomatis saat pindah tab
                 document.addEventListener('visibilitychange', () => {

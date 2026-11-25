@@ -259,6 +259,23 @@
             box-shadow: 6px 6px 0 0 rgba(250, 249, 246, 0.22);
         }
 
+        /* Nonaktifkan transform/perspective di panggung utama agar masthead sticky menempel presisi */
+        main[data-sinema-gsap="editorial-monokrom"] {
+            transform: none !important;
+            perspective: none !important;
+            transform-style: flat !important;
+            overflow: visible !important;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
         @media (prefers-reduced-motion: reduce) {
             .tirai-fade-halus.tirai-shutter-editorial,
             .ed-foto-darkroom-aktif,
@@ -310,7 +327,7 @@
             data-kolom-undangan
             class="w-full lg:w-[460px] xl:w-[490px] shrink-0 min-h-screen relative overflow-x-clip shadow-[0_0_80px_rgba(0,0,0,0.78)] lg:border-x border-white/25 bg-[#FAF9F6]"
         >
-            {{-- Progres Baca Vernier Arsitektural + Indikator Persentase Live --}}
+            {{-- Progres Baca Vernier Arsitektural --}}
             <div
                 data-progres-undangan
                 aria-hidden="true"
@@ -320,11 +337,6 @@
             >
                 <div class="h-[3px] bg-black/15 w-full overflow-hidden">
                     <div class="h-full transition-all duration-150 bg-[#18181B]" :style="'width: ' + scrollPersen + '%'"></div>
-                </div>
-                <div class="flex justify-end pr-3 pt-1.5">
-                    <span class="ed-mono bg-[#18181B]/90 text-[#FAF9F6] px-2 py-0.5 text-[8.5px] tracking-[0.2em] uppercase border border-white/20">
-                        IDX <span x-text="String(scrollPersen).padStart(2, '0') + '%'">00%</span>
-                    </span>
                 </div>
             </div>
 
@@ -346,6 +358,7 @@
         @include('tema.editorial-monokrom.partials._panggung-desktop-kanan')
     </div>
 
+    @include('komponen-undangan.indeks-editorial', ['tanpaFoto' => $tanpaFoto])
     @include('komponen-undangan.kontrol-sinema')
     @include('komponen-undangan.pemutar-musik')
     @include('komponen-undangan.modal-galeri')
@@ -366,11 +379,9 @@
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('ed-terbuka');
-                    } else if (entry.boundingClientRect.top > window.innerHeight * 0.98) {
-                        entry.target.classList.remove('ed-terbuka');
                     }
                 });
-            }, { threshold: 0.14, rootMargin: '0px 0px -30px 0px' });
+            }, { threshold: 0.01, rootMargin: '40px 80px 40px 80px' });
             daftarFoto.forEach((el) => io.observe(el));
         })();
     </script>

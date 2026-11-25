@@ -1,7 +1,20 @@
-{{-- SAMPUL PEMBUKA ROYAL IVORY (FADE HALUS + SEGEL LILIN) --}}
+{{-- SELENDANG CAHAYA MUTIARA-SAMPANYE PENYINGKAP TIRAI GADING (SAAT BUKA UNDANGAN) --}}
+<div
+    aria-hidden="true"
+    data-selendang-transisi="ivory"
+    :class="undanganTerbuka ? 'royal-selendang-aktif' : 'opacity-0'"
+    class="pointer-events-none fixed inset-0 mx-auto h-dvh w-full lg:w-[460px] xl:w-[490px] z-[45] overflow-hidden"
+>
+    <div
+        class="w-full h-full"
+        style="background: linear-gradient(180deg, transparent 0%, rgba(229,201,155,0.14) 30%, rgba(251,248,243,0.72) 48%, rgba(255,252,245,0.92) 51%, rgba(229,201,155,0.38) 56%, rgba(158,123,79,0.22) 68%, transparent 100%);"
+    ></div>
+</div>
+
+{{-- SAMPUL PEMBUKA ROYAL IVORY (TIRAI SUTRA GADING MELENGKUNG + SEGEL LILIN) --}}
 <section
     data-transisi-sampul="fade-halus"
-    class="tirai-fade-halus fixed inset-0 mx-auto h-dvh w-full lg:w-[460px] xl:w-[490px] z-40 {{ $tampilBarDemo ? 'pt-28 sm:pt-20 lg:pt-14' : '' }}"
+    class="tirai-fade-halus tirai-gulir-atas fixed inset-0 mx-auto h-dvh w-full lg:w-[460px] xl:w-[490px] z-40 {{ $tampilBarDemo ? 'pt-28 sm:pt-20 lg:pt-14' : '' }}"
     style="height: 100dvh;"
     :class="undanganTerbuka ? 'tirai-terbuka pointer-events-none' : ''"
 >
@@ -31,7 +44,7 @@
         @include('komponen-undangan.lapisan-motion', ['efekMotion' => 'katedral-cahaya', 'konteks' => 'sampul'])
 
         @if ($pakaiFotoSampul)
-            <div class="relative z-20 px-8 pt-7 sm:pt-9 text-center text-white space-y-1.5">
+            <div class="royal-isi-sampul relative z-20 px-8 pt-7 sm:pt-9 text-center text-white space-y-1.5">
                 <img src="{{ $asetRoyal['katedral'] }}" alt="" class="w-11 mx-auto opacity-95 animasi-ayun-3d">
                 <p class="text-[10px] font-bold uppercase tracking-[0.38em] text-[#E5C99B] drop-shadow">
                     The Royal Wedding
@@ -48,7 +61,7 @@
 
             <div class="flex-1"></div>
 
-            <div class="relative z-20 px-7 pb-9 sm:pb-11 text-center text-[#FAF6EE] space-y-2.5">
+            <div class="royal-isi-sampul relative z-20 px-7 pb-9 sm:pb-11 text-center text-[#FAF6EE] space-y-2.5">
                 <div class="flex items-center justify-center gap-3 px-10 pb-0.5" aria-hidden="true">
                     <span class="h-px flex-1 bg-[#E5C99B]/40"></span>
                     <span class="w-1.5 h-1.5 rotate-45 bg-[#E5C99B]"></span>
@@ -80,7 +93,7 @@
             </div>
         @else
             {{-- Mode Tanpa Foto: Tipografi & Tombol Melayang Halus di Dalam Fade Lengkungan Katedral --}}
-            <div class="relative z-20 w-full max-w-[330px] px-4 py-6 text-center text-[#3B2E25] space-y-5">
+            <div class="royal-isi-sampul relative z-20 w-full max-w-[330px] px-4 py-6 text-center text-[#3B2E25] space-y-5">
                 <div class="space-y-1.5">
                     <img src="{{ $asetRoyal['katedral'] }}" alt="" class="w-11 mx-auto opacity-95 animasi-ayun-3d">
                     <p class="text-[10px] font-bold uppercase tracking-[0.38em] text-[#7B603F]">

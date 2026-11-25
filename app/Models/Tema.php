@@ -623,8 +623,8 @@ class Tema extends Model
                 'islami' => false,
             ],
             'luxury-noir' => [
-                'latar_css' => 'radial-gradient(circle at 50% 20%, #2C2C34 0%, #16161B 56%, #0B0B0F 100%)',
-                'lantai_hex' => '#EFECE5',
+                'latar_css' => 'radial-gradient(circle at 50% 42%, #322E3D 0%, #16151E 54%, #09090D 100%)',
+                'lantai_hex' => '#F3EEE6',
                 'layar_kiri_bg' => 'linear-gradient(180deg, #16151B 0%, #0B0B0F 100%)',
                 'layar_kiri_teks' => '#F5EFE6',
                 'kotak_countdown_bg' => '#222029',
@@ -645,8 +645,8 @@ class Tema extends Model
                 'islami' => false,
             ],
             'royal-ivory' => [
-                'latar_css' => 'radial-gradient(circle at 50% 22%, #8C7151 0%, #6A5339 58%, #4A3824 100%)',
-                'lantai_hex' => '#EFECE5',
+                'latar_css' => 'radial-gradient(circle at 50% 42%, #8C7151 0%, #634D34 54%, #3B2E25 100%)',
+                'lantai_hex' => '#F3EEE6',
                 'layar_kiri_bg' => 'linear-gradient(180deg, #7B603F 0%, #58432B 100%)',
                 'layar_kiri_teks' => '#FAF6EE',
                 'kotak_countdown_bg' => '#FFFFFF',

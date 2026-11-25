@@ -37,7 +37,7 @@
         @keyframes noirChandelierTurun {
             0% {
                 opacity: 0;
-                transform: translate3d(0, -26px, 0);
+                transform: translate3d(0, -28px, 0);
             }
 
             100% {
@@ -46,13 +46,83 @@
             }
         }
 
+        @keyframes noirHeroLensaMasuk {
+            0% {
+                transform: scale(1.1);
+                filter: brightness(0.75) blur(4px);
+            }
+
+            100% {
+                transform: scale(1);
+                filter: brightness(1) blur(0);
+            }
+        }
+
+        @keyframes noirFadeNaik {
+            0% {
+                opacity: 0;
+                transform: translate3d(0, 20px, 0);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+
+        @keyframes noirPitaEmasNaik {
+            0% {
+                opacity: 0;
+                transform: translate3d(0, 110%, 0);
+            }
+
+            22% {
+                opacity: 0.95;
+            }
+
+            78% {
+                opacity: 0.85;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate3d(0, -135%, 0);
+            }
+        }
+
         .noir-deco-masuk {
-            animation: noirDecoMasuk 1.15s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+            animation: noirDecoMasuk 1.25s cubic-bezier(0.16, 1, 0.3, 1) 0.28s both;
             will-change: transform, opacity;
         }
 
         .noir-chandelier-turun {
-            animation: noirChandelierTurun 1.25s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+            animation: noirChandelierTurun 1.3s cubic-bezier(0.16, 1, 0.3, 1) 0.36s both;
+            will-change: transform, opacity;
+        }
+
+        .noir-hero-lensa-masuk {
+            animation: noirHeroLensaMasuk 1.55s cubic-bezier(0.16, 1, 0.3, 1) 0.14s both;
+            will-change: transform, filter;
+        }
+
+        .noir-hero-baris-1 {
+            animation: noirFadeNaik 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.42s both;
+        }
+
+        .noir-hero-baris-2 {
+            animation: noirFadeNaik 1.05s cubic-bezier(0.16, 1, 0.3, 1) 0.56s both;
+        }
+
+        .noir-hero-baris-3 {
+            animation: noirFadeNaik 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.72s both;
+        }
+
+        .noir-hero-bawah {
+            animation: noirFadeNaik 1s cubic-bezier(0.16, 1, 0.3, 1) 0.84s both;
+        }
+
+        .noir-pita-cahaya-aktif {
+            animation: noirPitaEmasNaik 1.22s cubic-bezier(0.76, 0, 0.24, 1) 0.04s both;
             will-change: transform, opacity;
         }
 
@@ -70,13 +140,105 @@
             filter: brightness(1.08);
         }
 
+        .noir-tombol-obsidian {
+            background: linear-gradient(135deg, #211F29 0%, #14131A 55%, #0B0B0F 100%);
+            color: #F3E5AB;
+            border: 1px solid rgba(212, 175, 55, 0.58);
+            box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.78);
+        }
+
+        .noir-tombol-obsidian:hover {
+            filter: brightness(1.12);
+        }
+
+        /* Pastikan kontainer <main> bebas transform/overflow agar position: sticky kartu bertumpuk mengunci mulus */
+        main[data-sinema-gsap="luxury-noir"] {
+            transform: none !important;
+            perspective: none !important;
+            transform-style: flat !important;
+            overflow: visible !important;
+        }
+
+        .noir-kartu-tumpuk {
+            border-top-left-radius: 1.85rem;
+            border-top-right-radius: 1.85rem;
+            border-top: 1px solid rgba(212, 175, 55, 0.48);
+            box-shadow: 0 -24px 52px -12px rgba(0, 0, 0, 0.88);
+            will-change: transform;
+        }
+
+        /* Transisi Tirai Beludru Malam Melengkung + Sapuan Cahaya Emas Sampanye 60fps */
+        .tirai-fade-halus.tirai-gulir-atas {
+            opacity: 1;
+            clip-path: inset(0% 0% 0% 0% round 0 0 0% 0%);
+            transform: translate3d(0, 0, 0) scale(1);
+            filter: brightness(1);
+            visibility: visible;
+            transition:
+                clip-path 1.16s cubic-bezier(0.76, 0, 0.24, 1),
+                transform 1.22s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.72s ease,
+                opacity 0.3s ease 0.92s,
+                visibility 0s linear 0s;
+            will-change: clip-path, transform, opacity;
+            backface-visibility: hidden;
+        }
+
+        .tirai-fade-halus.tirai-gulir-atas.tirai-terbuka {
+            opacity: 0;
+            clip-path: inset(0% 0% 100% 0% round 0 0 46% 46%);
+            transform: translate3d(0, -3.5%, 0) scale(1.04);
+            filter: brightness(1.16);
+            visibility: hidden;
+            transition:
+                clip-path 1.16s cubic-bezier(0.76, 0, 0.24, 1),
+                transform 1.22s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.72s ease,
+                opacity 0.3s ease 0.92s,
+                visibility 0s linear 1.22s;
+        }
+
+        .noir-isi-sampul {
+            transition:
+                opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .tirai-terbuka .noir-isi-sampul {
+            opacity: 0;
+            transform: translate3d(0, -18px, 0) scale(0.97);
+        }
+
         @media (prefers-reduced-motion: reduce) {
 
             .noir-deco-masuk,
-            .noir-chandelier-turun {
+            .noir-chandelier-turun,
+            .noir-hero-lensa-masuk,
+            .noir-hero-baris-1,
+            .noir-hero-baris-2,
+            .noir-hero-baris-3,
+            .noir-hero-bawah,
+            .noir-pita-cahaya-aktif {
                 animation: none !important;
                 opacity: 1 !important;
                 transform: none !important;
+                filter: none !important;
+            }
+
+            .noir-pita-cahaya-aktif {
+                display: none !important;
+            }
+
+            .tirai-fade-halus.tirai-gulir-atas,
+            .tirai-fade-halus.tirai-gulir-atas.tirai-terbuka {
+                transition: none !important;
+                clip-path: none !important;
+                transform: none !important;
+                filter: none !important;
+            }
+
+            .tirai-fade-halus.tirai-gulir-atas.tirai-terbuka {
+                opacity: 0;
             }
         }
     </style>
@@ -127,6 +289,7 @@
         @include('tema.luxury-noir.partials._panggung-desktop-kanan')
     </div>
 
+    @include('komponen-undangan.navigasi-elegan', ['varian' => 'noir', 'tanpaFoto' => $tanpaFoto])
     @include('komponen-undangan.kontrol-sinema')
     @include('komponen-undangan.pemutar-musik')
     @include('komponen-undangan.modal-galeri')

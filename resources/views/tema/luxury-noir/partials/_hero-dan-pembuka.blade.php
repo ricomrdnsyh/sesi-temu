@@ -1,13 +1,19 @@
 {{-- SEKSI 1: HERO DIORAMA ART DECO BALLROOM & CRYSTAL CHANDELIER --}}
+<div data-kartu-tumpuk class="bg-[#09090D]">
 <section
     data-diorama-3d="{{ $tierAktif }}"
     class="relative min-h-[96dvh] px-3.5 py-4 flex items-stretch overflow-hidden bg-[#09090D]"
 >
     <div class="relative w-full min-h-[calc(96dvh-2rem)] rounded-2xl border border-[#D4AF37]/60 overflow-hidden shadow-2xl bg-[#0B0B0F]">
         <div class="relative w-full h-full flex flex-col justify-between diorama-kamera-3d">
-            {{-- Z-0: Latar Ballroom --}}
-            <div class="absolute inset-0 pointer-events-none">
-                <img src="{{ $urlFotoLatar }}" alt="Luxury Noir Ballroom" class="w-full h-full object-cover object-center">
+            {{-- Z-0: Latar Ballroom dengan Gerak Lensa Halus Saat Tirai Terbuka --}}
+            <div class="absolute inset-0 pointer-events-none overflow-hidden">
+                <img
+                    src="{{ $urlFotoLatar }}"
+                    alt="Luxury Noir Ballroom"
+                    :class="undanganTerbuka ? 'noir-hero-lensa-masuk' : 'scale-110'"
+                    class="w-full h-full object-cover object-center"
+                >
                 <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/45 to-black/92"></div>
             </div>
 
@@ -45,31 +51,38 @@
             {{-- Debu Emas Naik --}}
             @include('komponen-undangan.lapisan-motion', ['efekMotion' => 'debu-emas', 'konteks' => 'utama'])
 
-            {{-- Z-3: Tipografi Tengah Art Deco (Tepat di Ruang Hitam Tengah di Bawah Kipas Sunburst Atas) --}}
-            <div class="relative z-20 flex-1 flex flex-col justify-between px-11 pt-36 pb-10 text-center text-[#F5EFE6]">
+            {{-- Z-3: Tipografi Tengah Art Deco Bertahap (Tepat di Ruang Hitam Tengah di Bawah Kipas Sunburst Atas) --}}
+            <div class="relative z-20 flex-1 flex flex-col justify-between px-11 pt-36 pb-20 text-center text-[#F5EFE6]">
                 <div class="my-auto space-y-2.5">
-                    <img src="{{ $asetNoir['emas'] }}" alt="" class="w-11 mx-auto opacity-95 animasi-ayun-3d">
-                    <p class="text-[10px] font-semibold uppercase tracking-[0.36em] text-[#D4AF37]">
-                        With Joy &amp; Honor
-                    </p>
-                    <p class="text-[10px] uppercase tracking-[0.26em] text-white/80">
-                        We Are Getting Married!
-                    </p>
-                    <h2 class="pt-1 noir-font-judul text-3xl sm:text-[2.45rem] font-bold tracking-wider leading-[1.12] text-white">
+                    <div :class="undanganTerbuka ? 'noir-hero-baris-1' : 'opacity-0'" class="space-y-1.5">
+                        <img src="{{ $asetNoir['emas'] }}" alt="" class="w-11 mx-auto opacity-95 animasi-ayun-3d">
+                        <p class="text-[10px] font-semibold uppercase tracking-[0.36em] text-[#D4AF37]">
+                            With Joy &amp; Honor
+                        </p>
+                        <p class="text-[10px] uppercase tracking-[0.26em] text-white/80">
+                            We Are Getting Married!
+                        </p>
+                    </div>
+                    <h2
+                        :class="undanganTerbuka ? 'noir-hero-baris-2' : 'opacity-0'"
+                        class="pt-1 noir-font-judul text-3xl sm:text-[2.45rem] font-bold tracking-wider leading-[1.12] text-white"
+                    >
                         {{ $undangan->nama_panggilan_pria }}
                         <span class="block font-kaligrafi text-3xl font-normal text-[#D4AF37] my-0.5">&amp;</span>
                         {{ $undangan->nama_panggilan_wanita }}
                     </h2>
-                    <p class="pt-1 text-xs font-semibold uppercase tracking-[0.32em] text-[#F3E5AB]">
-                        {{ $tanggalTitik }}
-                    </p>
-                    <p class="text-[10px] tracking-[0.18em] text-[#D4AF37]">
-                        {{ $hashtagPasangan }}
-                    </p>
+                    <div :class="undanganTerbuka ? 'noir-hero-baris-3' : 'opacity-0'" class="pt-1 space-y-1">
+                        <p class="text-xs font-semibold uppercase tracking-[0.32em] text-[#F3E5AB]">
+                            {{ $tanggalTitik }}
+                        </p>
+                        <p class="text-[10px] tracking-[0.18em] text-[#D4AF37]">
+                            {{ $hashtagPasangan }}
+                        </p>
+                    </div>
                 </div>
 
                 {{-- Medallion Monogram Orbit + Indikator Gulir --}}
-                <div class="pt-6 space-y-3">
+                <div :class="undanganTerbuka ? 'noir-hero-bawah' : 'opacity-0'" class="pt-6 space-y-3">
                     <div aria-hidden="true" class="mx-auto w-5 h-8 rounded-full border border-[#D4AF37]/70 flex justify-center pt-1.5">
                         <span class="w-1 h-1.5 rounded-full bg-[#F3E5AB] animasi-gulir-roda"></span>
                     </div>
@@ -99,11 +112,13 @@
         @endfor
     </div>
 </div>
+</div>
 
 {{-- SEKSI 2: PRELUDE GALA & LANDSCAPE SPOTLIGHT FOTO PEMBUKA --}}
 <section
+    data-kartu-tumpuk
     data-section-pembuka="artdeco"
-    class="relative bg-[#0B0B0F] px-4 py-12 overflow-hidden"
+    class="noir-kartu-tumpuk relative bg-[#0B0B0F] px-4 py-12 overflow-hidden"
 >
     <div class="relative max-w-md mx-auto rounded-xl bg-[#16151B] border border-[#D4AF37]/55 p-6 text-center shadow-2xl space-y-6 efek-shimmer-kartu">
         <span aria-hidden="true" class="pointer-events-none absolute top-2 left-2 h-4 w-4 border-t border-l border-[#D4AF37]"></span>

@@ -1,11 +1,19 @@
 {{-- SEKSI 9: 05 / TANDA KASIH — FOLD-OUT PRIVATE BLACK-CARD VAULT (BUKA AMPLOP DIGITAL) --}}
 @if ($undangan->fiturAktif('amplop_digital') && ($undangan->daftarAmplop->isNotEmpty() || $alamatKado !== ''))
-<section class="relative bg-[#FAF9F6] px-5 pt-14 pb-7 overflow-hidden">
-    <div class="max-w-md mx-auto bg-white border border-[#18181B] p-6 text-left space-y-5 ed-bayangan-tajam kartu-3d">
-        <div class="border-b border-[#18181B]/20 pb-3.5 space-y-1">
-            <p data-gsap="turun" class="ed-mono text-[9.5px] font-bold uppercase tracking-[0.3em] text-[#52525B]">05 / TANDA KASIH</p>
-            <h2 data-gsap="naik" data-gsap-delay="0.05" class="ed-serif text-3xl uppercase tracking-wide text-[#18181B]">Amplop Digital</h2>
+<section class="relative bg-[#FAF9F6] px-5 pt-4 pb-7 overflow-x-clip">
+    <div class="max-w-md mx-auto space-y-5">
+        <div
+            data-masthead-lengket
+            class="sticky {{ $tampilBarDemo ? 'top-14' : 'top-0' }} z-30 -mx-5 px-5 py-3 bg-[#FAF9F6]/95 backdrop-blur-md ed-mono flex items-center justify-between border-b border-[#18181B] text-[9.5px] font-bold uppercase tracking-[0.3em] text-[#18181B]"
+        >
+            <span>05 / TANDA KASIH</span>
+            <span>DIGITAL VAULT</span>
         </div>
+
+        <div class="bg-white border border-[#18181B] p-6 text-left space-y-5 ed-bayangan-tajam kartu-3d">
+            <div class="border-b border-[#18181B]/20 pb-3.5 space-y-1">
+                <h2 data-gsap="naik" data-gsap-delay="0.05" class="ed-serif text-3xl uppercase tracking-wide text-[#18181B]">Amplop Digital</h2>
+            </div>
 
         <p data-gsap="teks" data-gsap-delay="0.08" class="text-xs text-[#52525B] leading-relaxed">
             Doa restu Bapak/Ibu/Saudara/i merupakan karunia terindah bagi kami. Namun apabila bermaksud memberikan tanda kasih secara digital, dapat melalui akses di bawah ini:
@@ -14,7 +22,7 @@
         <div>
             <button
                 type="button"
-                @click="amplopTerbuka = !amplopTerbuka"
+                @click="amplopTerbuka = !amplopTerbuka; window.SesiTemuSinema?.refresh(80)"
                 :aria-expanded="amplopTerbuka.toString()"
                 class="ed-btn-invert w-full inline-flex items-center justify-between gap-2 bg-[#18181B] text-[#FAF9F6] px-4 py-3 text-[11px] font-bold uppercase tracking-[0.24em] hover:bg-black transition cursor-pointer"
             >
@@ -86,18 +94,27 @@
                 </div>
             @endif
         </div>
+        </div>
     </div>
 </section>
 @endif
 
 {{-- SEKSI 10: 06 / ATTENDANCE — ARCHITECTURAL EDITORIAL RSVP --}}
 @if ($undangan->fiturAktif('buku_tamu'))
-<section id="buku-tamu" class="relative bg-[#FAF9F6] px-5 py-7 overflow-hidden">
-    <div class="max-w-md mx-auto bg-white border border-[#18181B] p-6 text-left space-y-5 ed-bayangan-tajam">
-        <div class="border-b border-[#18181B]/20 pb-3.5 space-y-1">
-            <p data-gsap="turun" class="ed-mono text-[9.5px] font-bold uppercase tracking-[0.3em] text-[#52525B]">06 / ATTENDANCE</p>
-            <h2 data-gsap="mekar" data-gsap-delay="0.06" class="ed-serif text-3xl uppercase tracking-wide text-[#18181B]">RSVP &amp; Notes</h2>
+<section id="buku-tamu" class="relative bg-[#FAF9F6] px-5 pt-4 pb-7 overflow-x-clip">
+    <div class="max-w-md mx-auto space-y-5">
+        <div
+            data-masthead-lengket
+            class="sticky {{ $tampilBarDemo ? 'top-14' : 'top-0' }} z-30 -mx-5 px-5 py-3 bg-[#FAF9F6]/95 backdrop-blur-md ed-mono flex items-center justify-between border-b border-[#18181B] text-[9.5px] font-bold uppercase tracking-[0.3em] text-[#18181B]"
+        >
+            <span>06 / ATTENDANCE</span>
+            <span>GUESTBOOK</span>
         </div>
+
+        <div class="bg-white border border-[#18181B] p-6 text-left space-y-5 ed-bayangan-tajam">
+            <div class="border-b border-[#18181B]/20 pb-3.5 space-y-1">
+                <h2 data-gsap="mekar" data-gsap-delay="0.06" class="ed-serif text-3xl uppercase tracking-wide text-[#18181B]">RSVP &amp; Notes</h2>
+            </div>
 
         @if (! empty($modeDemo))
             <div x-data="bukuTamuDemo(@js($daftarUcapanAwal), @js($namaTamu))" class="space-y-5">
@@ -210,6 +227,7 @@
                 </div>
             </div>
         @endif
+        </div>
     </div>
 </section>
 @endif

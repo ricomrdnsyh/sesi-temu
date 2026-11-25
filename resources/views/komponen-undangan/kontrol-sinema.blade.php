@@ -1,5 +1,11 @@
 @php
     $adaMusik = ! empty($undangan->musik_latar);
+    $adalahEleganSinema = in_array($undangan->tema?->slug ?? '', ['luxury-noir', 'royal-ivory'], true);
+    $posisiToastSinema = $adalahEleganSinema ? 'bottom-[4.75rem]' : 'bottom-5';
+    $posisiDockSinema = $adalahEleganSinema
+        ? ($adaMusik ? 'bottom-[7.65rem] right-3.5 sm:right-5' : 'bottom-[4.65rem] right-3.5 sm:right-5')
+        : ($adaMusik ? 'bottom-[4.75rem] right-5' : 'bottom-5 right-5');
+    $ukuranPemicuSinema = $adalahEleganSinema ? 'h-9 w-9 sm:h-10 sm:w-10' : 'h-10 w-10';
 @endphp
 
 {{-- Toast Ringkas Status Auto-Scroll Cinema (Tengah Bawah) --}}
@@ -12,7 +18,7 @@
     x-transition:leave="transition ease-in duration-200"
     x-transition:leave-start="opacity-100 translate-y-0"
     x-transition:leave-end="opacity-0 translate-y-2"
-    class="fixed bottom-5 left-1/2 -translate-x-1/2 z-40"
+    class="fixed {{ $posisiToastSinema }} left-1/2 -translate-x-1/2 z-40"
 >
     <button
         type="button"
@@ -32,7 +38,7 @@
     x-cloak
     x-transition
     data-autoscroll-dock
-    class="fixed {{ $adaMusik ? 'bottom-[4.75rem]' : 'bottom-5' }} right-5 z-40 flex flex-col items-center gap-2"
+    class="fixed {{ $posisiDockSinema }} z-40 flex flex-col items-center gap-2"
 >
     {{-- Panel Kontrol Vertikal Saat Dibuka --}}
     <div
@@ -105,7 +111,7 @@
         @click="autoScrollPanelTerbuka = !autoScrollPanelTerbuka"
         :title="autoScrollPanelTerbuka ? 'Tutup kontrol auto-scroll' : 'Buka kontrol auto-scroll sinema'"
         aria-label="Kontrol Auto-Scroll Sinema"
-        class="relative inline-flex h-10 w-10 items-center justify-center rounded-full shadow-lg border-2 border-[#D4AF37]/70 bg-[#151817]/90 text-[#F3E5AB] hover:bg-[#151817] active:scale-95 transition cursor-pointer backdrop-blur-md"
+        class="relative inline-flex {{ $ukuranPemicuSinema }} items-center justify-center rounded-full shadow-lg border-2 border-[#D4AF37]/70 bg-[#151817]/90 text-[#F3E5AB] hover:bg-[#151817] active:scale-95 transition cursor-pointer backdrop-blur-md"
     >
         <span
             x-show="autoScrollAktif"

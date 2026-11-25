@@ -1,10 +1,14 @@
 {{-- SEKSI 3: ASYMMETRIC MAGAZINE DOSSIER SPREADS (01 / WHITE SHEET GROOM & 02 / OBSIDIAN NOIR BRIDE) --}}
 <section
+    id="ed-bab-02"
     data-layout-mempelai="editorial"
-    class="relative bg-[#FAF9F6] px-5 py-14 overflow-hidden"
+    class="relative bg-[#FAF9F6] px-5 pb-14 pt-4 overflow-x-clip"
 >
     <div class="max-w-md mx-auto space-y-9">
-        <div data-gsap="turun" class="ed-mono flex items-center justify-between border-b border-[#18181B] pb-3 text-[9.5px] font-bold uppercase tracking-[0.3em] text-[#18181B]">
+        <div
+            data-masthead-lengket
+            class="sticky {{ $tampilBarDemo ? 'top-14' : 'top-0' }} z-30 -mx-5 px-5 py-3 bg-[#FAF9F6]/95 backdrop-blur-md ed-mono flex items-center justify-between border-b border-[#18181B] text-[9.5px] font-bold uppercase tracking-[0.3em] text-[#18181B]"
+        >
             <span>01 / DOSSIER</span>
             <span>THE COUPLE</span>
         </div>
@@ -203,6 +207,7 @@
 {{-- SEKSI 4B: MECHANICAL SPLIT-FLAP ARCHITECTURAL COUNTDOWN --}}
 @if ($undangan->fiturAktif('hitung_mundur') && $isoTarget)
 <section
+    id="ed-bab-03"
     data-layout-countdown="editorial"
     x-data="{
         targetMs: new Date(@js($isoTarget)).getTime(),
@@ -216,12 +221,15 @@
         },
         init() { this.perbarui(); setInterval(() => this.perbarui(), 1000); }
     }"
-    class="relative bg-[#18181B] shadow-[0_-2px_0_0_#18181B] text-[#FAF9F6] px-5 {{ $fotoGaleriSlideshow->isNotEmpty() ? 'pt-9 pb-14' : 'py-14' }} overflow-hidden"
+    class="relative bg-[#18181B] shadow-[0_-2px_0_0_#18181B] text-[#FAF9F6] px-5 pt-4 pb-14 overflow-x-clip"
 >
     <div aria-hidden="true" class="pointer-events-none absolute inset-0 ed-film-grain opacity-30"></div>
 
     <div class="relative z-10 max-w-md mx-auto space-y-6">
-        <div data-gsap="turun" class="ed-mono flex items-center justify-between text-[9.5px] uppercase tracking-[0.3em] text-white/60 border-b border-white/20 pb-3">
+        <div
+            data-masthead-lengket
+            class="sticky {{ $tampilBarDemo ? 'top-14' : 'top-0' }} z-30 -mx-5 px-5 py-3 bg-[#18181B]/95 backdrop-blur-md ed-mono flex items-center justify-between text-[9.5px] uppercase tracking-[0.3em] text-white/70 border-b border-white/20"
+        >
             <span>02 / CHRONOMETER</span>
             <span>COUNTDOWN</span>
         </div>
@@ -269,11 +277,15 @@
 {{-- SEKSI 5: DIE-CUT PERFORATED EXHIBITION / BOARDING-PASS EVENT TICKETS --}}
 @if ($undangan->daftarAcara->isNotEmpty())
 <section
+    id="ed-bab-04"
     data-layout-acara="editorial"
-    class="relative bg-[#FAF9F6] px-5 py-14 overflow-hidden"
+    class="relative bg-[#FAF9F6] px-5 pt-4 pb-14 overflow-x-clip"
 >
     <div class="max-w-md mx-auto space-y-7">
-        <div data-gsap="turun" class="ed-mono flex items-center justify-between border-b border-[#18181B] pb-3 text-[9.5px] font-bold uppercase tracking-[0.3em] text-[#18181B]">
+        <div
+            data-masthead-lengket
+            class="sticky {{ $tampilBarDemo ? 'top-14' : 'top-0' }} z-30 -mx-5 px-5 py-3 bg-[#FAF9F6]/95 backdrop-blur-md ed-mono flex items-center justify-between border-b border-[#18181B] text-[9.5px] font-bold uppercase tracking-[0.3em] text-[#18181B]"
+        >
             <span>02 / ITINERARY</span>
             <span>EXHIBITION PASS</span>
         </div>
@@ -408,64 +420,169 @@
 </section>
 @endif
 
-{{-- SEKSI 7: 03 / STORYLINE — INTERACTIVE EDITORIAL CHAPTER TABS & MAGAZINE ISSUE SPREAD --}}
+{{-- SEKSI 7: 03 / STORYLINE — HORIZONTAL DRAG & SWIPE MAGAZINE LOOKBOOK SPREAD --}}
 @if ($undangan->fiturAktif('cerita_cinta') && ! empty($ceritaList))
 <section
+    id="ed-bab-05"
     data-layout-cerita="editorial"
-    class="relative bg-[#FAF9F6] px-5 py-14 border-t border-[#18181B]/15 overflow-hidden"
+    x-data="{
+        babAktifLokal: 0,
+        progresCerita: {{ count($ceritaList) > 1 ? number_format(100 / count($ceritaList), 2, '.', '') : '100' }},
+        totalBab: {{ count($ceritaList) }},
+        sinkronScrollCerita() {
+            const el = this.$refs.jalurCerita;
+            if (!el) return;
+            const maks = Math.max(1, el.scrollWidth - el.clientWidth);
+            const rasio = Math.min(1, Math.max(0, el.scrollLeft / maks));
+            this.babAktifLokal = Math.min(this.totalBab - 1, Math.round(rasio * (this.totalBab - 1)));
+            this.progresCerita = ((this.babAktifLokal + 1) / this.totalBab) * 100;
+        },
+        keBab(idx) {
+            const target = (idx + this.totalBab) % this.totalBab;
+            this.babAktifLokal = target;
+            const el = this.$refs.jalurCerita;
+            if (!el) return;
+            const kartu = el.children[target];
+            if (kartu) {
+                el.scrollTo({ left: kartu.offsetLeft - 4, behavior: 'smooth' });
+            }
+        }
+    }"
+    class="relative bg-[#FAF9F6] px-5 pt-4 pb-14 border-t border-[#18181B]/15 overflow-x-clip"
 >
-    <div data-scroll-scrub class="max-w-md mx-auto mb-6 overflow-hidden">
-        <div data-gsap="kiri" class="flex items-center justify-between">
-            <p class="scroll-scrub-kiri ed-mono text-[9.5px] font-bold uppercase tracking-[0.3em] text-[#52525B]">03 / CHRONICLE</p>
+    <div class="max-w-md mx-auto space-y-5">
+        <div
+            data-masthead-lengket
+            class="sticky {{ $tampilBarDemo ? 'top-14' : 'top-0' }} z-30 -mx-5 px-5 py-3 bg-[#FAF9F6]/95 backdrop-blur-md ed-mono flex items-center justify-between border-b border-[#18181B] text-[9.5px] font-bold uppercase tracking-[0.3em] text-[#18181B]"
+        >
+            <span>03 / CHRONICLE</span>
             @if (count($ceritaList) > 1)
                 <button
                     type="button"
-                    @click="semuaBabCerita = !semuaBabCerita"
+                    @click="semuaBabCerita = !semuaBabCerita; window.SesiTemuSinema?.refresh(80)"
                     class="ed-mono border border-[#18181B] px-2.5 py-0.5 text-[8.5px] font-bold uppercase tracking-[0.18em] transition cursor-pointer"
                     :class="semuaBabCerita ? 'bg-[#18181B] text-white' : 'bg-white text-[#18181B] hover:bg-[#18181B] hover:text-white'"
-                    x-text="semuaBabCerita ? 'MODE TAB' : 'LIHAT SEMUA'"
+                    x-text="semuaBabCerita ? 'MODE GESER' : 'LIHAT SEMUA'"
                 >LIHAT SEMUA</button>
+            @else
+                <span>STORY ISSUE</span>
             @endif
         </div>
-        <div data-gsap="kanan" data-gsap-delay="0.06">
-            <h2 class="scroll-scrub-kanan mt-1.5 ed-serif text-3xl sm:text-4xl uppercase tracking-wide text-[#18181B]">Kisah Kami</h2>
-        </div>
-    </div>
 
-    <div class="max-w-md mx-auto">
-        {{-- Baris Tab Bab Interaktif --}}
-        @if (count($ceritaList) > 1)
-            <div x-show="!semuaBabCerita" class="flex items-stretch border-x border-t border-[#18181B] bg-[#18181B] overflow-x-auto no-scrollbar">
+        <div data-scroll-scrub class="overflow-hidden">
+            <div data-gsap="kanan" class="flex items-end justify-between gap-3">
+                <h2 class="scroll-scrub-kanan ed-serif text-3xl sm:text-4xl uppercase tracking-wide text-[#18181B]">Kisah Kami</h2>
+                @if (count($ceritaList) > 1)
+                    <span x-show="!semuaBabCerita" class="ed-mono text-[8.5px] uppercase tracking-[0.22em] text-[#52525B] pb-1">
+                        SWIPE &harr;
+                    </span>
+                @endif
+            </div>
+        </div>
+
+        {{-- Baris Indeks Bab + Jalur Horizontal Lookbook (Default) --}}
+        <div x-show="!semuaBabCerita" class="space-y-3.5">
+            @if (count($ceritaList) > 1)
+                <div class="flex items-stretch border border-[#18181B] bg-[#18181B] overflow-x-auto no-scrollbar">
+                    @foreach ($ceritaList as $idx => $cerita)
+                        <button
+                            type="button"
+                            @click="keBab({{ $idx }})"
+                            :class="babAktifLokal === {{ $idx }} ? 'bg-white text-[#18181B]' : 'bg-[#18181B] text-white/70 hover:text-white'"
+                            class="ed-mono flex-1 min-w-[76px] py-2 px-3 text-[9px] font-bold uppercase tracking-[0.2em] border-r border-white/15 last:border-r-0 transition cursor-pointer"
+                        >
+                            CH. {{ sprintf('%02d', $idx + 1) }}
+                        </button>
+                    @endforeach
+                </div>
+            @endif
+
+            <div
+                x-ref="jalurCerita"
+                data-horizontal-editorial
+                data-lookbook-cerita="editorial"
+                @scroll.passive="sinkronScrollCerita()"
+                class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-3 pr-4 no-scrollbar cursor-grab select-none"
+            >
                 @foreach ($ceritaList as $idx => $cerita)
-                    <button
-                        type="button"
-                        @click="babCeritaAktif = {{ $idx }}"
-                        :class="babCeritaAktif === {{ $idx }} ? 'bg-white text-[#18181B]' : 'bg-[#18181B] text-white/70 hover:text-white'"
-                        class="ed-mono flex-1 min-w-[76px] py-2.5 px-3 text-[9.5px] font-bold uppercase tracking-[0.2em] border-r border-white/15 last:border-r-0 transition cursor-pointer"
-                    >
-                        CH. {{ sprintf('%02d', $idx + 1) }}
-                    </button>
+                    @php
+                        $urlFotoBab = (! $tanpaFoto && ! empty($cerita['foto']))
+                            ? \App\Support\MediaPublik::url((string) $cerita['foto'])
+                            : null;
+                    @endphp
+                    <article class="{{ count($ceritaList) > 1 ? 'w-[86%] sm:w-[84%]' : 'w-full' }} shrink-0 snap-start bg-white border border-[#18181B] p-5 ed-bayangan-tajam space-y-4 text-left">
+                        <div class="flex items-baseline justify-between gap-3 border-b border-[#18181B]/15 pb-3">
+                            <span class="ed-serif ed-angka-outline text-4xl leading-none">
+                                {{ sprintf('%02d', $idx + 1) }}
+                            </span>
+                            @if (! empty($cerita['tanggal']))
+                                <span class="ed-mono border border-[#18181B] px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.2em] text-[#18181B]">
+                                    {{ $cerita['tanggal'] }}
+                                </span>
+                            @endif
+                        </div>
+
+                        @if ($urlFotoBab)
+                            <div class="ed-tirai-foto border border-[#18181B] p-1 bg-[#FAF9F6]">
+                                <img
+                                    src="{{ $urlFotoBab }}"
+                                    alt="{{ $cerita['judul'] ?? 'Kisah Kami' }}"
+                                    draggable="false"
+                                    :class="modeWarnaEditorial ? 'grayscale-0' : 'grayscale hover:grayscale-0'"
+                                    class="w-full aspect-[16/10] object-cover object-center contrast-[1.06] transition duration-500"
+                                >
+                            </div>
+                        @endif
+
+                        <div class="space-y-2">
+                            <h3 class="ed-serif text-xl sm:text-2xl uppercase tracking-wide text-[#18181B]">
+                                {{ $cerita['judul'] ?? '' }}
+                            </h3>
+                            <p class="text-xs sm:text-[13px] text-[#52525B] leading-relaxed">
+                                {{ $cerita['cerita'] ?? '' }}
+                            </p>
+                        </div>
+                    </article>
                 @endforeach
             </div>
-        @endif
 
-        {{-- Lembar Artikel Cerita --}}
-        <div class="bg-white border border-[#18181B] ed-bayangan-tajam divide-y divide-[#18181B]/20">
+            @if (count($ceritaList) > 1)
+                <div class="flex items-center gap-3 pt-0.5 ed-mono text-[9px] font-bold uppercase tracking-[0.2em]">
+                    <button
+                        type="button"
+                        @click="keBab(babAktifLokal - 1)"
+                        class="border border-[#18181B] bg-white px-2.5 py-1 text-[#18181B] hover:bg-[#18181B] hover:text-white transition cursor-pointer"
+                    >
+                        &larr; PREV
+                    </button>
+                    <div class="h-[3px] flex-1 bg-[#18181B]/15 overflow-hidden">
+                        <div class="h-full bg-[#18181B] transition-all duration-300" :style="'width: ' + progresCerita + '%'"></div>
+                    </div>
+                    <span class="text-[#52525B] tabular-nums">
+                        <span x-text="String(babAktifLokal + 1).padStart(2, '0')">01</span>/{{ sprintf('%02d', count($ceritaList)) }}
+                    </span>
+                    <button
+                        type="button"
+                        @click="keBab(babAktifLokal + 1)"
+                        class="border border-[#18181B] bg-white px-2.5 py-1 text-[#18181B] hover:bg-[#18181B] hover:text-white transition cursor-pointer"
+                    >
+                        NEXT &rarr;
+                    </button>
+                </div>
+            @endif
+        </div>
+
+        {{-- Mode Lihat Semua (Vertikal Penuh) --}}
+        <div x-show="semuaBabCerita" x-cloak x-transition.opacity.duration.250ms class="bg-white border border-[#18181B] ed-bayangan-tajam divide-y divide-[#18181B]/20">
             @foreach ($ceritaList as $idx => $cerita)
                 @php
                     $urlFotoBab = (! $tanpaFoto && ! empty($cerita['foto']))
                         ? \App\Support\MediaPublik::url((string) $cerita['foto'])
                         : null;
                 @endphp
-                <article
-                    x-show="semuaBabCerita || babCeritaAktif === {{ $idx }}"
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-2"
-                    x-transition:enter-end="opacity-100 translate-y-0"
-                    class="p-5 sm:p-6 space-y-4 text-left"
-                >
+                <article class="p-5 sm:p-6 space-y-4 text-left">
                     <div class="flex items-baseline justify-between gap-3 border-b border-[#18181B]/15 pb-3">
-                        <span class="ed-serif ed-angka-outline text-4xl sm:text-5xl leading-none">
+                        <span class="ed-serif ed-angka-outline text-4xl leading-none">
                             {{ sprintf('%02d', $idx + 1) }}
                         </span>
                         @if (! empty($cerita['tanggal']))
@@ -476,7 +593,7 @@
                     </div>
 
                     @if ($urlFotoBab)
-                        <div class="ed-tirai-foto border border-[#18181B] p-1 bg-[#FAF9F6]">
+                        <div class="ed-tirai-foto ed-terbuka border border-[#18181B] p-1 bg-[#FAF9F6]">
                             <img
                                 src="{{ $urlFotoBab }}"
                                 alt="{{ $cerita['judul'] ?? 'Kisah Kami' }}"
@@ -496,86 +613,167 @@
                     </div>
                 </article>
             @endforeach
-
-            @if (count($ceritaList) > 1)
-                <div x-show="!semuaBabCerita" class="px-5 py-3 bg-[#FAF9F6] flex items-center justify-between ed-mono text-[9.5px] font-bold uppercase tracking-[0.2em]">
-                    <button
-                        type="button"
-                        @click="babCeritaAktif = (babCeritaAktif - 1 + {{ count($ceritaList) }}) % {{ count($ceritaList) }}"
-                        class="text-[#18181B] hover:underline cursor-pointer"
-                    >
-                        &larr; PREV
-                    </button>
-                    <span class="text-[#52525B]">
-                        CHAPTER <span x-text="String(babCeritaAktif + 1).padStart(2, '0')">01</span> / {{ sprintf('%02d', count($ceritaList)) }}
-                    </span>
-                    <button
-                        type="button"
-                        @click="babCeritaAktif = (babCeritaAktif + 1) % {{ count($ceritaList) }}"
-                        class="text-[#18181B] hover:underline cursor-pointer"
-                    >
-                        NEXT &rarr;
-                    </button>
-                </div>
-            @endif
         </div>
     </div>
 </section>
 @endif
 
-{{-- SEKSI 8: 04 / PORTRAITS — CURATED EXHIBITION CONTACT SHEET --}}
+{{-- SEKSI 8: 04 / PORTRAITS — HORIZONTAL EXHIBITION LOOKBOOK + CONTACT SHEET TOGGLE --}}
 @if (! $tanpaFoto && $undangan->fiturAktif('galeri') && $undangan->daftarGaleri->isNotEmpty())
 <section
+    id="ed-bab-06"
     data-layout-galeri="editorial"
-    class="relative bg-[#111113] text-[#FAF9F6] px-5 py-14 overflow-hidden"
+    x-data="{
+        modeContactSheet: false,
+        plateAktif: 0,
+        totalPlate: {{ $undangan->daftarGaleri->count() }},
+        progresPlate: {{ $undangan->daftarGaleri->count() > 1 ? number_format(100 / $undangan->daftarGaleri->count(), 2, '.', '') : '100' }},
+        sinkronLookbook() {
+            const el = this.$refs.jalurGaleriEditorial;
+            if (!el) return;
+            const maks = Math.max(1, el.scrollWidth - el.clientWidth);
+            const rasio = Math.min(1, Math.max(0, el.scrollLeft / maks));
+            this.plateAktif = Math.min(this.totalPlate - 1, Math.round(rasio * (this.totalPlate - 1)));
+            this.progresPlate = ((this.plateAktif + 1) / this.totalPlate) * 100;
+        },
+        geserPlate(arah) {
+            const el = this.$refs.jalurGaleriEditorial;
+            if (!el) return;
+            el.scrollBy({ left: arah * Math.round(el.clientWidth * 0.78), behavior: 'smooth' });
+        }
+    }"
+    class="relative bg-[#111113] text-[#FAF9F6] px-5 pt-4 pb-14 overflow-x-clip"
 >
     <div aria-hidden="true" class="pointer-events-none absolute inset-0 ed-film-grain opacity-30"></div>
 
-    <div data-scroll-scrub class="relative z-10 max-w-md mx-auto mb-6 overflow-hidden">
-        <div data-gsap="kanan" class="flex items-center justify-between">
-            <p class="scroll-scrub-kanan ed-mono text-[9.5px] font-bold uppercase tracking-[0.3em] text-white/60">04 / EXHIBITION</p>
-            <span class="ed-mono text-[8.5px] uppercase tracking-[0.22em] text-white/45">TAP TO ENLARGE</span>
+    <div class="relative z-10 max-w-md mx-auto space-y-5">
+        <div
+            data-masthead-lengket
+            class="sticky {{ $tampilBarDemo ? 'top-14' : 'top-0' }} z-30 -mx-5 px-5 py-3 bg-[#111113]/95 backdrop-blur-md ed-mono flex items-center justify-between border-b border-white/20 text-[9.5px] font-bold uppercase tracking-[0.3em] text-white/75"
+        >
+            <span>04 / EXHIBITION</span>
+            @if ($undangan->daftarGaleri->count() > 1)
+                <button
+                    type="button"
+                    @click="modeContactSheet = !modeContactSheet; window.SesiTemuSinema?.refresh(80)"
+                    class="ed-mono border border-white/40 px-2.5 py-0.5 text-[8.5px] font-bold uppercase tracking-[0.18em] transition cursor-pointer"
+                    :class="modeContactSheet ? 'bg-white text-[#111113]' : 'bg-black/60 text-white hover:bg-white hover:text-[#111113]'"
+                    x-text="modeContactSheet ? 'MODE LOOKBOOK' : 'CONTACT SHEET'"
+                >CONTACT SHEET</button>
+            @else
+                <span class="text-white/45">TAP TO ENLARGE</span>
+            @endif
         </div>
-        <div data-gsap="kiri" data-gsap-delay="0.06">
-            <h2 class="scroll-scrub-kiri mt-1.5 ed-serif text-3xl sm:text-4xl uppercase tracking-wide text-white">Editorial Galeri</h2>
-        </div>
-    </div>
 
-    <div class="relative z-10 max-w-md mx-auto grid grid-cols-12 items-stretch gap-3">
-        @foreach ($undangan->daftarGaleri as $galeri)
-            @php
-                $kelasTile = \App\Support\DataTemaUndangan::kelasGridGaleri($loop->index, $loop->count, 'editorial');
-            @endphp
-            <button
-                type="button"
-                data-gsap="potret"
-                data-gsap-delay="{{ number_format(($loop->index % 2) * 0.07, 2, '.', '') }}"
-                @click="bukaGaleri(@js($galeri->urlFoto()), @js($galeri->keterangan))"
-                class="ed-tirai-foto group relative overflow-hidden rounded-none border border-white/30 bg-black cursor-pointer kartu-3d {{ $kelasTile }}"
+        <div data-scroll-scrub class="overflow-hidden">
+            <div data-gsap="kiri" class="flex items-end justify-between gap-3">
+                <h2 class="scroll-scrub-kiri ed-serif text-3xl sm:text-4xl uppercase tracking-wide text-white">Editorial Galeri</h2>
+                <span class="ed-mono text-[8.5px] uppercase tracking-[0.22em] text-white/50 pb-1" x-text="modeContactSheet ? 'TAP TO ENLARGE' : 'DRAG / SWIPE'">DRAG / SWIPE</span>
+            </div>
+        </div>
+
+        {{-- Mode Default: Horizontal Exhibition Lookbook Strip --}}
+        <div x-show="!modeContactSheet" class="space-y-4">
+            <div
+                x-ref="jalurGaleriEditorial"
+                data-horizontal-editorial
+                data-lookbook-galeri="editorial"
+                @scroll.passive="sinkronLookbook()"
+                class="flex gap-3.5 overflow-x-auto snap-x snap-mandatory pb-2 pr-4 no-scrollbar cursor-grab select-none"
             >
-                <img
-                    src="{{ $galeri->urlFoto() }}"
-                    alt="{{ $galeri->keterangan ?? 'Editorial Portrait' }}"
-                    :class="modeWarnaEditorial ? 'grayscale-0' : 'grayscale group-hover:grayscale-0'"
-                    class="w-full h-full object-cover object-top contrast-[1.06] group-hover:scale-105 transition duration-700"
-                >
+                @foreach ($undangan->daftarGaleri as $galeri)
+                    <button
+                        type="button"
+                        @click="bukaGaleri(@js($galeri->urlFoto()), @js($galeri->keterangan))"
+                        class="ed-tirai-foto group relative w-[78%] sm:w-[75%] shrink-0 snap-center aspect-[4/5] overflow-hidden rounded-none border border-white/35 bg-black p-1.5 cursor-pointer shadow-[5px_5px_0_0_rgba(250,249,246,0.18)]"
+                    >
+                        <div class="relative w-full h-full overflow-hidden bg-[#0A0A0D]">
+                            <img
+                                src="{{ $galeri->urlFoto() }}"
+                                alt="{{ $galeri->keterangan ?? 'Editorial Portrait' }}"
+                                draggable="false"
+                                :class="modeWarnaEditorial ? 'grayscale-0' : 'grayscale group-hover:grayscale-0'"
+                                class="w-full h-full object-cover object-top contrast-[1.06] group-hover:scale-105 transition duration-700"
+                            >
 
-                {{-- Stempel Nomor Plate Pameran --}}
-                <span class="pointer-events-none absolute top-2 left-2 z-10 ed-mono bg-black/75 backdrop-blur-xs border border-white/25 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-[0.2em] text-white/90">
-                    PL. {{ sprintf('%02d', $loop->iteration) }}
-                </span>
+                            <span class="pointer-events-none absolute top-2.5 left-2.5 z-10 ed-mono bg-black/80 backdrop-blur-xs border border-white/30 px-2 py-0.5 text-[8.5px] font-bold uppercase tracking-[0.2em] text-white">
+                                PL. {{ sprintf('%02d', $loop->iteration) }}
+                            </span>
 
-                {{-- Siku Fokus Muncul Saat Hover --}}
-                <span aria-hidden="true" class="pointer-events-none absolute top-2 right-2 z-10 h-2.5 w-2.5 border-t border-r border-white opacity-0 group-hover:opacity-100 transition"></span>
-                <span aria-hidden="true" class="pointer-events-none absolute bottom-2 left-2 z-10 h-2.5 w-2.5 border-b border-l border-white opacity-0 group-hover:opacity-100 transition"></span>
+                            <span aria-hidden="true" class="pointer-events-none absolute top-2.5 right-2.5 z-10 h-3 w-3 border-t border-r border-white/85"></span>
+                            <span aria-hidden="true" class="pointer-events-none absolute bottom-9 left-2.5 z-10 h-3 w-3 border-b border-l border-white/85"></span>
 
-                @if ($galeri->keterangan)
-                    <span class="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-black/80 px-3 py-2 text-left ed-mono text-[9px] uppercase tracking-wider text-white/90 truncate">
-                        {{ $galeri->keterangan }}
+                            @if ($galeri->keterangan)
+                                <span class="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-black/85 border-t border-white/15 px-3 py-2 text-left ed-mono text-[9px] uppercase tracking-wider text-white/90 truncate">
+                                    {{ $galeri->keterangan }}
+                                </span>
+                            @endif
+                        </div>
+                    </button>
+                @endforeach
+            </div>
+
+            @if ($undangan->daftarGaleri->count() > 1)
+                <div class="flex items-center gap-3 ed-mono text-[9px] font-bold uppercase tracking-[0.2em] text-white/80">
+                    <button
+                        type="button"
+                        @click="geserPlate(-1)"
+                        aria-label="Plate sebelumnya"
+                        class="border border-white/35 bg-white/[0.04] px-2.5 py-1 hover:bg-white hover:text-[#111113] transition cursor-pointer"
+                    >
+                        &larr;
+                    </button>
+                    <div class="h-[2px] flex-1 bg-white/15 overflow-hidden">
+                        <div class="h-full bg-white transition-all duration-300" :style="'width: ' + progresPlate + '%'"></div>
+                    </div>
+                    <span class="tabular-nums text-white/65">
+                        PL <span x-text="String(plateAktif + 1).padStart(2, '0')">01</span>/{{ sprintf('%02d', $undangan->daftarGaleri->count()) }}
                     </span>
-                @endif
-            </button>
-        @endforeach
+                    <button
+                        type="button"
+                        @click="geserPlate(1)"
+                        aria-label="Plate berikutnya"
+                        class="border border-white/35 bg-white/[0.04] px-2.5 py-1 hover:bg-white hover:text-[#111113] transition cursor-pointer"
+                    >
+                        &rarr;
+                    </button>
+                </div>
+            @endif
+        </div>
+
+        {{-- Mode Contact Sheet 12-Kolom (Bebas data-gsap tersembunyi & tirai langsung terbuka agar tampil instan) --}}
+        <div x-show="modeContactSheet" x-cloak x-transition.opacity.duration.250ms class="grid grid-cols-12 items-stretch gap-3">
+            @foreach ($undangan->daftarGaleri as $galeri)
+                @php
+                    $kelasTile = \App\Support\DataTemaUndangan::kelasGridGaleri($loop->index, $loop->count, 'editorial');
+                @endphp
+                <button
+                    type="button"
+                    @click="bukaGaleri(@js($galeri->urlFoto()), @js($galeri->keterangan))"
+                    class="ed-tirai-foto ed-terbuka group relative overflow-hidden rounded-none border border-white/30 bg-black cursor-pointer kartu-3d {{ $kelasTile }}"
+                >
+                    <img
+                        src="{{ $galeri->urlFoto() }}"
+                        alt="{{ $galeri->keterangan ?? 'Editorial Portrait' }}"
+                        :class="modeWarnaEditorial ? 'grayscale-0' : 'grayscale group-hover:grayscale-0'"
+                        class="w-full h-full object-cover object-top contrast-[1.06] group-hover:scale-105 transition duration-700"
+                    >
+
+                    <span class="pointer-events-none absolute top-2 left-2 z-10 ed-mono bg-black/75 backdrop-blur-xs border border-white/25 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-[0.2em] text-white/90">
+                        PL. {{ sprintf('%02d', $loop->iteration) }}
+                    </span>
+
+                    <span aria-hidden="true" class="pointer-events-none absolute top-2 right-2 z-10 h-2.5 w-2.5 border-t border-r border-white opacity-0 group-hover:opacity-100 transition"></span>
+                    <span aria-hidden="true" class="pointer-events-none absolute bottom-2 left-2 z-10 h-2.5 w-2.5 border-b border-l border-white opacity-0 group-hover:opacity-100 transition"></span>
+
+                    @if ($galeri->keterangan)
+                        <span class="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-black/80 px-3 py-2 text-left ed-mono text-[9px] uppercase tracking-wider text-white/90 truncate">
+                            {{ $galeri->keterangan }}
+                        </span>
+                    @endif
+                </button>
+            @endforeach
+        </div>
     </div>
 </section>
 @endif
