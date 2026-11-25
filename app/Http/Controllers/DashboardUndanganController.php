@@ -14,16 +14,20 @@ use App\Models\Transaksi;
 use App\Models\Undangan;
 use App\Services\LayananTransaksiService;
 use App\Services\PengolahGambarService;
+use App\Support\MediaPublik;
 use App\Support\PengaturanSesiTemu;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class DashboardUndanganController extends Controller
@@ -256,14 +260,35 @@ class DashboardUndanganController extends Controller
                 'judul_buku_tamu', 'doa_judul', 'doa_arab', 'doa_latin', 'doa_isi',
                 'judul_turut_mengundang', 'judul_penutup', 'ucapan_penutup', 'label_penutup',
             ];
+            $teksBawaanTema = $pratinjau->teksBawaanTema();
             $teksTersimpan = (array) ($pengaturan['teks'] ?? []);
             foreach ($kunciTeksDiizinkan as $kunciTeks) {
                 if (array_key_exists($kunciTeks, $request->input('teks', []))) {
-                    $teksTersimpan[$kunciTeks] = Str::limit(trim((string) $request->input("teks.{$kunciTeks}", '')), 1000, '');
+                    $nilaiBaru = Str::limit(trim((string) $request->input("teks.{$kunciTeks}", '')), 1000, '');
+                    $bawaanKunci = $teksBawaanTema[$kunciTeks] ?? null;
+                    $teksTersimpan[$kunciTeks] = ($bawaanKunci !== null && $nilaiBaru === $bawaanKunci)
+                        ? ''
+                        : $nilaiBaru;
                 }
             }
             if ($request->boolean('doa_disertakan')) {
-                $teksTersimpan['doa_kustom'] = true;
+                $doaBawaan = [
+                    'doa_judul' => 'Doa Untuk Pengantin',
+                    'doa_arab' => 'بَارَكَ اللّٰهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ',
+                    'doa_latin' => 'Baarakallahu laka wa baaraka ‘alaika wa jama‘a bainakuma fii khair.',
+                    'doa_isi' => 'Semoga Allah memberkahimu di waktu bahagia dan memberkahimu di waktu susah, serta semoga Allah mempersatukan kalian berdua dalam kebaikan. (HR. Abu Daud)',
+                ];
+                $doaBerubah = false;
+                foreach ($doaBawaan as $kunciDoa => $nilaiBawaanDoa) {
+                    if (array_key_exists($kunciDoa, $request->input('teks', []))
+                        && trim((string) ($teksTersimpan[$kunciDoa] ?? '')) !== $nilaiBawaanDoa) {
+                        $doaBerubah = true;
+                        break;
+                    }
+                }
+                if ($doaBerubah || ! empty($teksTersimpan['doa_kustom'])) {
+                    $teksTersimpan['doa_kustom'] = true;
+                }
             }
             $pengaturan['teks'] = $teksTersimpan;
         }
@@ -365,7 +390,6 @@ class DashboardUndanganController extends Controller
             'foto_sampul' => 'hapus_foto_sampul',
             'foto_pembuka' => 'hapus_foto_pembuka',
             'foto_penutup' => 'hapus_foto_penutup',
-            'foto_latar_tema' => 'hapus_foto_latar_tema',
         ] as $kunciFoto => $kunciHapus) {
             $blob = trim((string) ($fotoLive[$kunciFoto] ?? ''));
             if (preg_match('/^blob:https?:\/\/[^\s"\'<>]+$/', $blob) === 1) {
@@ -375,7 +399,76 @@ class DashboardUndanganController extends Controller
             }
         }
 
+        if ($request->boolean('foto_hitung_mundur_disertakan') || is_array($request->input('foto_hitung_mundur_live'))) {
+            $fotoHitungMundurLama = $undangan->daftarPathFotoHitungMundur();
+            $hasilLiveHitungMundur = [];
+            foreach (array_slice((array) $request->input('foto_hitung_mundur_live', []), 0, Undangan::MAKS_FOTO_HITUNG_MUNDUR) as $itemLive) {
+                if (! is_array($itemLive)) {
+                    continue;
+                }
+                $urlLive = trim((string) ($itemLive['url'] ?? ''));
+                $pathLive = trim((string) ($itemLive['path'] ?? ''));
+                if (preg_match('/^blob:https?:\/\/[^\s"\'<>]+$/', $urlLive) === 1) {
+                    $hasilLiveHitungMundur[] = $urlLive;
+                } elseif ($pathLive !== '' && in_array($pathLive, $fotoHitungMundurLama, true)) {
+                    $hasilLiveHitungMundur[] = $pathLive;
+                }
+            }
+            $pengaturan['foto_hitung_mundur'] = $hasilLiveHitungMundur;
+        } elseif ($request->boolean('hapus_foto_hitung_mundur')) {
+            $pengaturan['foto_hitung_mundur'] = [];
+        } else {
+            $blobHitungMundur = trim((string) ($fotoLive['foto_hitung_mundur'] ?? ''));
+            if (preg_match('/^blob:https?:\/\/[^\s"\'<>]+$/', $blobHitungMundur) === 1) {
+                $pengaturan['foto_hitung_mundur'] = [$blobHitungMundur];
+            }
+        }
+
         $pratinjau->pengaturan = $pengaturan;
+
+        if ($request->boolean('galeri_disertakan') || is_array($request->input('galeri_live'))) {
+            $galeriLamaById = $undangan->daftarGaleri->keyBy('id');
+            $galeriLamaPaths = $undangan->daftarGaleri->pluck('lokasi_foto')->filter()->all();
+            $koleksiGaleriLive = [];
+            $urutanLive = 1;
+
+            foreach (array_slice((array) $request->input('galeri_live', []), 0, 10) as $itemGaleri) {
+                if (! is_array($itemGaleri)) {
+                    continue;
+                }
+                $idItem = (int) ($itemGaleri['id'] ?? 0);
+                $urlItem = trim((string) ($itemGaleri['url'] ?? ''));
+                $pathItem = trim((string) ($itemGaleri['path'] ?? ''));
+                $keteranganItem = Str::limit(trim((string) ($itemGaleri['keterangan'] ?? '')), 255, '');
+
+                $lokasiFinal = '';
+                if (preg_match('/^blob:https?:\/\/[^\s"\'<>]+$/', $urlItem) === 1) {
+                    $lokasiFinal = $urlItem;
+                } elseif ($idItem > 0 && $galeriLamaById->has($idItem)) {
+                    $lokasiFinal = (string) $galeriLamaById->get($idItem)->lokasi_foto;
+                } elseif ($pathItem !== '' && in_array($pathItem, $galeriLamaPaths, true)) {
+                    $lokasiFinal = $pathItem;
+                }
+
+                if ($lokasiFinal === '') {
+                    continue;
+                }
+
+                $modelGaleri = new GaleriUndangan([
+                    'undangan_id' => $undangan->id,
+                    'lokasi_foto' => $lokasiFinal,
+                    'keterangan' => $keteranganItem !== '' ? $keteranganItem : null,
+                    'urutan' => $urutanLive++,
+                ]);
+                if ($idItem > 0) {
+                    $modelGaleri->id = $idItem;
+                }
+                $koleksiGaleriLive[] = $modelGaleri;
+            }
+
+            $pratinjau->setRelation('daftarGaleri', new EloquentCollection($koleksiGaleriLive));
+        }
+
         $fokusBagian = (string) $request->input('fokus_bagian', '');
         if (! in_array($fokusBagian, ['tema', 'mempelai', 'acara', 'cerita', 'galeri', 'amplop', 'penutup'], true)) {
             $fokusBagian = '';
@@ -574,8 +667,10 @@ class DashboardUndanganController extends Controller
         $fotoWanita = $undangan->foto_wanita;
         $fotoSampul = data_get($undangan->pengaturan, 'foto_sampul');
         $fotoPembuka = data_get($undangan->pengaturan, 'foto_pembuka');
+        $fotoHitungMundurList = $undangan->daftarPathFotoHitungMundur();
         $fotoPenutup = data_get($undangan->pengaturan, 'foto_penutup');
         $fotoLatar = data_get($undangan->pengaturan, 'foto_latar_tema');
+        $musikKustom = data_get($undangan->pengaturan, 'musik_kustom.path');
         $fotoCerita = collect((array) data_get($undangan->pengaturan, 'cerita_cinta', []))
             ->pluck('foto')
             ->filter(static fn ($path): bool => is_string($path) && $path !== '')
@@ -587,7 +682,7 @@ class DashboardUndanganController extends Controller
 
         $pengolahGambar->hapusBerkasJikaAda($fotoPria);
         $pengolahGambar->hapusBerkasJikaAda($fotoWanita);
-        foreach ([$fotoSampul, $fotoPembuka, $fotoPenutup, $fotoLatar, ...$fotoCerita] as $jalurTambahan) {
+        foreach ([$fotoSampul, $fotoPembuka, $fotoPenutup, $fotoLatar, ...$fotoHitungMundurList, ...$fotoCerita] as $jalurTambahan) {
             if (is_string($jalurTambahan)) {
                 $pengolahGambar->hapusBerkasJikaAda($jalurTambahan);
             }
@@ -600,6 +695,13 @@ class DashboardUndanganController extends Controller
         foreach ($jalurBuktiTransaksi as $jalurBukti) {
             if (Storage::disk('public')->exists($jalurBukti)) {
                 Storage::disk('public')->delete($jalurBukti);
+            }
+        }
+
+        if (is_string($musikKustom) && str_starts_with($musikKustom, 'storage/')) {
+            $relatifMusik = substr($musikKustom, 8);
+            if ($relatifMusik !== '' && Storage::disk('public')->exists($relatifMusik)) {
+                Storage::disk('public')->delete($relatifMusik);
             }
         }
 
@@ -721,14 +823,36 @@ class DashboardUndanganController extends Controller
                 'ucapan_penutup',
                 'label_penutup',
             ];
+            $undangan->loadMissing('tema');
+            $teksBawaanTema = $undangan->teksBawaanTema();
             $teksTersimpan = (array) ($pengaturan['teks'] ?? []);
             foreach ($kunciTeksDiizinkan as $kunciTeks) {
                 if (array_key_exists($kunciTeks, $request->input('teks', []))) {
-                    $teksTersimpan[$kunciTeks] = trim((string) $request->input("teks.{$kunciTeks}", ''));
+                    $nilaiBaru = trim((string) $request->input("teks.{$kunciTeks}", ''));
+                    $bawaanKunci = $teksBawaanTema[$kunciTeks] ?? null;
+                    $teksTersimpan[$kunciTeks] = ($bawaanKunci !== null && $nilaiBaru === $bawaanKunci)
+                        ? ''
+                        : $nilaiBaru;
                 }
             }
             if ($request->boolean('doa_disertakan')) {
-                $teksTersimpan['doa_kustom'] = true;
+                $doaBawaan = [
+                    'doa_judul' => 'Doa Untuk Pengantin',
+                    'doa_arab' => 'بَارَكَ اللّٰهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ',
+                    'doa_latin' => 'Baarakallahu laka wa baaraka ‘alaika wa jama‘a bainakuma fii khair.',
+                    'doa_isi' => 'Semoga Allah memberkahimu di waktu bahagia dan memberkahimu di waktu susah, serta semoga Allah mempersatukan kalian berdua dalam kebaikan. (HR. Abu Daud)',
+                ];
+                $doaBerubah = false;
+                foreach ($doaBawaan as $kunciDoa => $nilaiBawaanDoa) {
+                    if (array_key_exists($kunciDoa, $request->input('teks', []))
+                        && trim((string) ($teksTersimpan[$kunciDoa] ?? '')) !== $nilaiBawaanDoa) {
+                        $doaBerubah = true;
+                        break;
+                    }
+                }
+                if ($doaBerubah || ! empty($teksTersimpan['doa_kustom'])) {
+                    $teksTersimpan['doa_kustom'] = true;
+                }
             }
             $pengaturan['teks'] = $teksTersimpan;
         }
@@ -738,7 +862,14 @@ class DashboardUndanganController extends Controller
                 'tema_id' => ['nullable', 'integer', 'exists:tema,id'],
                 'slug' => ['nullable', 'string', 'max:100'],
                 'musik_latar' => ['nullable', 'string', 'max:255'],
+                'sumber_musik' => ['nullable', Rule::in(['katalog', 'kustom'])],
+                'file_musik_kustom' => ['nullable', 'file', 'mimes:mp3,wav,ogg,m4a', 'max:15360'],
+                'hapus_musik_kustom' => ['nullable', 'boolean'],
                 'gaya_font' => ['nullable', Rule::in(array_keys(Undangan::GAYA_FONT_TERSEDIA))],
+            ], [
+                'file_musik_kustom.file' => 'Berkas musik kustom tidak valid.',
+                'file_musik_kustom.mimes' => 'Format musik harus MP3, WAV, OGG, atau M4A.',
+                'file_musik_kustom.max' => 'Ukuran file musik maksimal 15 MB.',
             ]);
 
             if ($request->filled('slug')) {
@@ -746,12 +877,24 @@ class DashboardUndanganController extends Controller
 
                 if ($slugBaru !== $undangan->slug) {
                     if ($undangan->status_publikasi && ! $request->user()->adalahAdmin()) {
+                        if ($request->expectsJson()) {
+                            throw ValidationException::withMessages([
+                                'slug' => 'Slug undangan yang sudah aktif tidak dapat diubah oleh client.',
+                            ]);
+                        }
+
                         return back()
                             ->withErrors(['slug' => 'Slug undangan yang sudah aktif tidak dapat diubah oleh client.'])
                             ->with('tab_aktif', 'tema');
                     }
 
                     if ($slugBaru === '' || in_array($slugBaru, self::SLUG_TERCADANG, true)) {
+                        if ($request->expectsJson()) {
+                            throw ValidationException::withMessages([
+                                'slug' => 'Format slug tidak valid atau dicadangkan oleh sistem.',
+                            ]);
+                        }
+
                         return back()
                             ->withErrors(['slug' => 'Format slug tidak valid atau dicadangkan oleh sistem.'])
                             ->with('tab_aktif', 'tema')
@@ -774,14 +917,21 @@ class DashboardUndanganController extends Controller
 
                 if ($temaBaruId !== (int) $undangan->tema_id) {
                     if (! $undangan->bolehGantiTemaOleh($request->user())) {
+                        $pesanKunciTema = $undangan->alasanTemaTerkunci() ?? 'Tema undangan yang sudah aktif tidak dapat diubah oleh client.';
+                        if ($request->expectsJson()) {
+                            throw ValidationException::withMessages(['tema_id' => $pesanKunciTema]);
+                        }
+
                         return back()
-                            ->withErrors([
-                                'tema_id' => $undangan->alasanTemaTerkunci() ?? 'Tema undangan yang sudah aktif tidak dapat diubah oleh client.',
-                            ])
+                            ->withErrors(['tema_id' => $pesanKunciTema])
                             ->with('tab_aktif', 'tema');
                     }
 
                     if (! Tema::where('id', $temaBaruId)->where('aktif', true)->exists()) {
+                        if ($request->expectsJson()) {
+                            throw ValidationException::withMessages(['tema_id' => 'Tema yang dipilih sedang tidak aktif.']);
+                        }
+
                         return back()
                             ->withErrors(['tema_id' => 'Tema yang dipilih sedang tidak aktif.'])
                             ->with('tab_aktif', 'tema');
@@ -790,14 +940,56 @@ class DashboardUndanganController extends Controller
                     $undangan->tema_id = $temaBaruId;
                 }
             }
-            if ($request->has('musik_latar')) {
+            $musikKustomLama = is_array($pengaturan['musik_kustom'] ?? null)
+                ? $pengaturan['musik_kustom']
+                : null;
+            $pathKustomLama = is_string($musikKustomLama['path'] ?? null)
+                ? trim($musikKustomLama['path'])
+                : '';
+
+            if ($request->boolean('hapus_musik_kustom')) {
+                if ($pathKustomLama !== '' && str_starts_with($pathKustomLama, 'storage/')) {
+                    Storage::disk('public')->delete(substr($pathKustomLama, 8));
+                }
+                $pengaturan['musik_kustom'] = null;
+                if ($undangan->musik_latar === $pathKustomLama) {
+                    $undangan->musik_latar = null;
+                }
+                $pathKustomLama = '';
+            }
+
+            if ($request->hasFile('file_musik_kustom')) {
+                if ($pathKustomLama !== '' && str_starts_with($pathKustomLama, 'storage/')) {
+                    Storage::disk('public')->delete(substr($pathKustomLama, 8));
+                }
+
+                $fileMusik = $request->file('file_musik_kustom');
+                $pathRelatif = $fileMusik->store("undangan/{$undangan->id}/musik", 'public');
+                $pathPublik = 'storage/'.$pathRelatif;
+                $namaAsli = Str::limit(trim((string) $fileMusik->getClientOriginalName()), 120, '');
+
+                $pengaturan['musik_kustom'] = [
+                    'path' => $pathPublik,
+                    'nama' => $namaAsli !== '' ? $namaAsli : 'Musik Kustom',
+                ];
+                $undangan->musik_latar = $pathPublik;
+            } elseif ($request->input('sumber_musik') === 'kustom') {
+                $pathKustomAktif = is_string(data_get($pengaturan, 'musik_kustom.path'))
+                    ? trim((string) data_get($pengaturan, 'musik_kustom.path'))
+                    : '';
+                $undangan->musik_latar = $pathKustomAktif !== '' ? $pathKustomAktif : null;
+            } elseif ($request->has('musik_latar')) {
                 $undangan->musik_latar = ($tervalidasi['musik_latar'] ?? null) ?: null;
             }
 
-            if ($bagian === 'tema') {
-                $pengaturan['gaya_font'] = $tervalidasi['gaya_font'] ?? 'bawaan';
-                $pengaturan['tanpa_foto'] = $request->boolean('tanpa_foto');
-                // Pertahankan sakelar fitur bila form tema tidak mengirim input fitur_*
+            if ($bagian === 'tema' || $bagian === 'semua') {
+                if ($bagian === 'tema' || $request->has('gaya_font')) {
+                    $pengaturan['gaya_font'] = $tervalidasi['gaya_font'] ?? ($pengaturan['gaya_font'] ?? 'bawaan');
+                }
+                if ($bagian === 'tema' || $request->has('tanpa_foto')) {
+                    $pengaturan['tanpa_foto'] = $request->boolean('tanpa_foto');
+                }
+                // Pertahankan sakelar fitur bila form tidak mengirim input fitur_*
                 foreach (['hitung_mundur', 'cerita_cinta', 'galeri', 'amplop_digital', 'buku_tamu', 'doa_pengantin'] as $kunciFitur) {
                     if ($request->has("fitur_{$kunciFitur}")) {
                         $pengaturan['fitur_aktif'][$kunciFitur] = $request->boolean("fitur_{$kunciFitur}");
@@ -861,24 +1053,37 @@ class DashboardUndanganController extends Controller
             }
         }
 
-        if (in_array($bagian, ['tema', 'mempelai', 'penutup', 'semua'], true)) {
-            $request->validate([
+        if (in_array($bagian, ['tema', 'mempelai', 'acara_teks', 'acara_tambahan', 'penutup', 'semua'], true)) {
+            $aturanFotoTambahan = [
                 'foto_sampul' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
                 'hapus_foto_sampul' => ['nullable', 'boolean'],
                 'foto_pembuka' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
                 'hapus_foto_pembuka' => ['nullable', 'boolean'],
+                'foto_hitung_mundur_disertakan' => ['nullable', 'boolean'],
+                'foto_hitung_mundur_items' => ['nullable', 'array', 'max:'.Undangan::MAKS_FOTO_HITUNG_MUNDUR],
+                'foto_hitung_mundur_items.*.path' => ['nullable', 'string', 'max:255'],
+                'foto_hitung_mundur_items.*.file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'hapus_foto_hitung_mundur' => ['nullable', 'boolean'],
                 'foto_penutup' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
                 'hapus_foto_penutup' => ['nullable', 'boolean'],
-                'foto_latar_tema' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
-                'hapus_foto_latar_tema' => ['nullable', 'boolean'],
                 'hashtag' => ['nullable', 'string', 'max:80'],
-            ]);
+            ];
+
+            if ($request->hasFile('foto_hitung_mundur')) {
+                if (is_array($request->file('foto_hitung_mundur'))) {
+                    $aturanFotoTambahan['foto_hitung_mundur'] = ['array', 'max:'.Undangan::MAKS_FOTO_HITUNG_MUNDUR];
+                    $aturanFotoTambahan['foto_hitung_mundur.*'] = ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'];
+                } else {
+                    $aturanFotoTambahan['foto_hitung_mundur'] = ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'];
+                }
+            }
+
+            $request->validate($aturanFotoTambahan);
 
             foreach ([
                 'foto_sampul' => ['hapus' => 'hapus_foto_sampul', 'awalan' => 'foto-sampul'],
                 'foto_pembuka' => ['hapus' => 'hapus_foto_pembuka', 'awalan' => 'foto-pembuka'],
                 'foto_penutup' => ['hapus' => 'hapus_foto_penutup', 'awalan' => 'foto-penutup'],
-                'foto_latar_tema' => ['hapus' => 'hapus_foto_latar_tema', 'awalan' => 'foto-latar'],
             ] as $kunciFoto => $metaFoto) {
                 $fotoLama = data_get($pengaturan, $kunciFoto);
                 if ($request->boolean($metaFoto['hapus']) && is_string($fotoLama) && $fotoLama !== '') {
@@ -896,9 +1101,80 @@ class DashboardUndanganController extends Controller
                 }
             }
 
+            // Slideshow Foto Hitung Mundur (hingga 4 foto)
+            $fotoHitungMundurLama = $undangan->daftarPathFotoHitungMundur();
+            if ($request->boolean('foto_hitung_mundur_disertakan') || $request->has('foto_hitung_mundur_items') || $request->hasFile('foto_hitung_mundur_items')) {
+                $inputItems = (array) $request->input('foto_hitung_mundur_items', []);
+                $fileItems = (array) $request->file('foto_hitung_mundur_items', []);
+                $daftarIndeks = array_values(array_unique(array_merge(array_keys($inputItems), array_keys($fileItems))));
+                usort($daftarIndeks, static fn ($a, $b): int => (int) $a <=> (int) $b);
+
+                $daftarFinal = [];
+                foreach ($daftarIndeks as $idx) {
+                    if (count($daftarFinal) >= Undangan::MAKS_FOTO_HITUNG_MUNDUR) {
+                        break;
+                    }
+
+                    if ($request->hasFile("foto_hitung_mundur_items.{$idx}.file")) {
+                        $daftarFinal[] = $pengolahGambar->simpanGambarUndangan(
+                            $request->file("foto_hitung_mundur_items.{$idx}.file"),
+                            $undangan->id,
+                            'foto-hitung-mundur-'.(count($daftarFinal) + 1)
+                        );
+                        continue;
+                    }
+
+                    $jalurPertahankan = trim((string) data_get($inputItems, "{$idx}.path", ''));
+                    if (
+                        $jalurPertahankan !== ''
+                        && in_array($jalurPertahankan, $fotoHitungMundurLama, true)
+                        && ! in_array($jalurPertahankan, $daftarFinal, true)
+                    ) {
+                        $daftarFinal[] = $jalurPertahankan;
+                    }
+                }
+
+                foreach ($fotoHitungMundurLama as $jalurLama) {
+                    if (! in_array($jalurLama, $daftarFinal, true)) {
+                        $pengolahGambar->hapusBerkasJikaAda($jalurLama);
+                    }
+                }
+
+                $pengaturan['foto_hitung_mundur'] = $daftarFinal;
+            } else {
+                if ($request->boolean('hapus_foto_hitung_mundur') && ! empty($fotoHitungMundurLama)) {
+                    foreach ($fotoHitungMundurLama as $jalurLama) {
+                        $pengolahGambar->hapusBerkasJikaAda($jalurLama);
+                    }
+                    $fotoHitungMundurLama = [];
+                    $pengaturan['foto_hitung_mundur'] = [];
+                }
+
+                if ($request->hasFile('foto_hitung_mundur')) {
+                    $berkasMasuk = $request->file('foto_hitung_mundur');
+                    $daftarBerkas = is_array($berkasMasuk) ? array_values($berkasMasuk) : [$berkasMasuk];
+                    $daftarBerkas = array_slice($daftarBerkas, 0, Undangan::MAKS_FOTO_HITUNG_MUNDUR);
+
+                    foreach ($fotoHitungMundurLama as $jalurLama) {
+                        $pengolahGambar->hapusBerkasJikaAda($jalurLama);
+                    }
+
+                    $daftarFinal = [];
+                    foreach ($daftarBerkas as $idx => $berkas) {
+                        $daftarFinal[] = $pengolahGambar->simpanGambarUndangan(
+                            $berkas,
+                            $undangan->id,
+                            'foto-hitung-mundur-'.($idx + 1)
+                        );
+                    }
+                    $pengaturan['foto_hitung_mundur'] = $daftarFinal;
+                }
+            }
+
             if ($request->has('hashtag')) {
                 $hashtagBersih = ltrim(trim((string) $request->input('hashtag', '')), '# ');
-                $pengaturan['hashtag'] = $hashtagBersih !== '' ? '#'.$hashtagBersih : '';
+                $hashtagFinal = $hashtagBersih !== '' ? '#'.$hashtagBersih : '';
+                $pengaturan['hashtag'] = $hashtagFinal === $undangan->hashtagBawaan() ? '' : $hashtagFinal;
             }
         }
 
@@ -1019,8 +1295,145 @@ class DashboardUndanganController extends Controller
             }
         }
 
+        if (in_array($bagian, ['galeri', 'semua'], true) && (
+            $request->boolean('galeri_disertakan')
+            || $request->has('galeri_items')
+            || $request->hasFile('galeri_items')
+        )) {
+            $request->validate([
+                'galeri_disertakan' => ['nullable', 'boolean'],
+                'galeri_items' => ['nullable', 'array', 'max:10'],
+                'galeri_items.*.id' => ['nullable', 'integer'],
+                'galeri_items.*.keterangan' => ['nullable', 'string', 'max:255'],
+                'galeri_items.*.file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            ]);
+
+            $galeriLama = $undangan->daftarGaleri()->get()->keyBy('id');
+            $inputGaleri = (array) $request->input('galeri_items', []);
+            $fileGaleri = (array) $request->file('galeri_items', []);
+            $daftarIndeksGaleri = array_values(array_unique(array_merge(array_keys($inputGaleri), array_keys($fileGaleri))));
+            usort($daftarIndeksGaleri, static fn ($a, $b): int => (int) $a <=> (int) $b);
+
+            $idDipertahankan = [];
+            $urutanGaleri = 1;
+
+            foreach ($daftarIndeksGaleri as $idx) {
+                if ($urutanGaleri > 10) {
+                    break;
+                }
+
+                $idLama = (int) data_get($inputGaleri, "{$idx}.id", 0);
+                $ketBersih = trim((string) data_get($inputGaleri, "{$idx}.keterangan", ''));
+                $ketFinal = $ketBersih !== '' ? Str::limit($ketBersih, 255, '') : null;
+                $adaBerkasBaru = $request->hasFile("galeri_items.{$idx}.file");
+
+                if ($idLama > 0 && $galeriLama->has($idLama) && ! in_array($idLama, $idDipertahankan, true)) {
+                    $baris = $galeriLama->get($idLama);
+                    if ($adaBerkasBaru) {
+                        $pathBaru = $pengolahGambar->simpanGambarUndangan(
+                            $request->file("galeri_items.{$idx}.file"),
+                            $undangan->id,
+                            'galeri'
+                        );
+                        $pengolahGambar->hapusBerkasJikaAda($baris->lokasi_foto);
+                        $baris->lokasi_foto = $pathBaru;
+                    }
+                    $baris->keterangan = $ketFinal;
+                    $baris->urutan = $urutanGaleri++;
+                    $baris->save();
+                    $idDipertahankan[] = $baris->id;
+                } elseif ($adaBerkasBaru) {
+                    $pathBaru = $pengolahGambar->simpanGambarUndangan(
+                        $request->file("galeri_items.{$idx}.file"),
+                        $undangan->id,
+                        'galeri'
+                    );
+                    $barisBaru = GaleriUndangan::create([
+                        'undangan_id' => $undangan->id,
+                        'lokasi_foto' => $pathBaru,
+                        'keterangan' => $ketFinal,
+                        'urutan' => $urutanGaleri++,
+                    ]);
+                    $idDipertahankan[] = $barisBaru->id;
+                }
+            }
+
+            foreach ($galeriLama as $barisLama) {
+                if (! in_array($barisLama->id, $idDipertahankan, true)) {
+                    $barisLama->delete();
+                }
+            }
+        }
+
         $undangan->pengaturan = $pengaturan;
         $undangan->save();
+
+        if ($request->expectsJson()) {
+            $undangan->refresh();
+            $undangan->load('daftarGaleri');
+            $musikKustom = $undangan->musikKustom();
+            $galeriTersimpan = $undangan->daftarGaleri
+                ->map(static fn (GaleriUndangan $item): array => [
+                    'id' => (int) $item->id,
+                    'path' => (string) $item->lokasi_foto,
+                    'url' => $item->urlFoto(),
+                    'keterangan' => (string) ($item->keterangan ?? ''),
+                    'urutan' => (int) $item->urutan,
+                ])
+                ->values()
+                ->all();
+            $ceritaTersimpan = collect((array) data_get($undangan->pengaturan, 'cerita_cinta', []))
+                ->map(static function (array $item): array {
+                    $jalurFoto = is_string($item['foto'] ?? null) ? trim($item['foto']) : '';
+
+                    return [
+                        'judul' => (string) ($item['judul'] ?? ''),
+                        'tanggal' => (string) ($item['tanggal'] ?? ''),
+                        'cerita' => (string) ($item['cerita'] ?? ''),
+                        'foto' => $jalurFoto,
+                        'foto_url' => $jalurFoto !== '' ? (MediaPublik::url($jalurFoto) ?? '') : '',
+                        'hapus_foto' => false,
+                    ];
+                })
+                ->values()
+                ->all();
+
+            return response()->json([
+                'ok' => true,
+                'pesan' => 'Semua perubahan undangan berhasil disimpan.',
+                'slug' => $undangan->slug,
+                'url_publik' => Route::has('undangan.tampil')
+                    ? route('undangan.tampil', $undangan->slug)
+                    : url('/'.$undangan->slug),
+                'url_publik_relatif' => Route::has('undangan.tampil')
+                    ? route('undangan.tampil', $undangan->slug, false)
+                    : '/'.$undangan->slug,
+                'fitur_aktif' => [
+                    'hitung_mundur' => $undangan->fiturAktif('hitung_mundur'),
+                    'cerita_cinta' => $undangan->fiturAktif('cerita_cinta'),
+                    'galeri' => $undangan->fiturAktif('galeri'),
+                    'amplop_digital' => $undangan->fiturAktif('amplop_digital'),
+                    'buku_tamu' => $undangan->fiturAktif('buku_tamu'),
+                    'doa_pengantin' => $undangan->fiturAktif('doa_pengantin'),
+                ],
+                'foto' => [
+                    'foto_sampul' => $undangan->urlFotoSampulKhususDashboard(),
+                    'foto_pembuka' => $undangan->urlFotoPembukaKhususDashboard(),
+                    'foto_hitung_mundur' => $undangan->urlFotoHitungMundurKhususDashboard(),
+                    'foto_pria' => $undangan->urlFotoPria(),
+                    'foto_wanita' => $undangan->urlFotoWanita(),
+                    'foto_penutup' => $undangan->urlFotoPenutupKhususDashboard(),
+                ],
+                'foto_hitung_mundur' => $undangan->daftarFotoHitungMundurKhususDashboard(),
+                'galeri' => $galeriTersimpan,
+                'musik_kustom' => [
+                    'url' => $undangan->urlMusikKustom() ?? '',
+                    'nama' => (string) ($musikKustom['nama'] ?? ''),
+                    'aktif' => $undangan->pakaiMusikKustom(),
+                ],
+                'cerita_cinta' => $ceritaTersimpan,
+            ]);
+        }
 
         $tabTujuan = match ($bagian) {
             'tema' => 'mempelai',

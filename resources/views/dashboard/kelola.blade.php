@@ -111,20 +111,46 @@
             'doa_pengantin' => $undangan->fiturAktif('doa_pengantin'),
         ];
         $teksKustom = (array) data_get($pengaturan, 'teks', []);
+        $teksBawaanTema = $undangan->teksBawaanTema();
+        $nilaiTeksEditor = static fn (string $kunci): string => (string) old(
+            "teks.{$kunci}",
+            $undangan->teksKustom($kunci, $teksBawaanTema[$kunci] ?? '')
+        );
         $doaPengantinAwal = $undangan->doaPengantin();
+        $musikKustomAktif = $undangan->musikKustom();
+        $pakaiMusikKustom = $undangan->pakaiMusikKustom();
+        $rasioFotoTema = $undangan->rasioFotoTema();
+
+        $galeriAwal = $undangan->daftarGaleri
+            ->map(static fn (\App\Models\GaleriUndangan $item): array => [
+                'id' => (int) $item->id,
+                'path' => (string) $item->lokasi_foto,
+                'url' => $item->urlFoto(),
+                'keterangan' => (string) ($item->keterangan ?? ''),
+                'urutan' => (int) $item->urutan,
+            ])
+            ->values()
+            ->all();
 
         $configEditor = [
             'tab' => $tabAktif,
             'urlPublikPreview' => $urlPublikRelatif,
+            'urlPublikSalin' => $urlPublik,
             'urlSimpanFitur' => route('dashboard.undangan.perbarui', $undangan, false),
             'urlPratinjauLangsung' => route('dashboard.undangan.pratinjau-langsung', $undangan, false),
             'csrfToken' => csrf_token(),
+            'rasioFotoTema' => $rasioFotoTema,
             'namaPriaLive' => old('nama_panggilan_pria', $undangan->nama_panggilan_pria),
             'namaWanitaLive' => old('nama_panggilan_wanita', $undangan->nama_panggilan_wanita),
             'tanpaFotoAktif' => $undangan->modeTanpaFoto(),
             'sakelarFitur' => $sakelarFiturAwal,
-            'musikDipilih' => (string) ($undangan->musik_latar ?? ''),
+            'musikDipilih' => $pakaiMusikKustom ? '' : (string) ($undangan->musik_latar ?? ''),
+            'modeMusik' => old('sumber_musik', $pakaiMusikKustom ? 'kustom' : 'katalog'),
+            'musikKustomUrlAwal' => $undangan->urlMusikKustom() ?? '',
+            'musikKustomNamaAwal' => (string) ($musikKustomAktif['nama'] ?? ''),
             'daftarUrlMusik' => $daftarUrlMusik,
+            'daftarFotoHitungMundur' => $undangan->daftarFotoHitungMundurKhususDashboard(),
+            'daftarGaleri' => $galeriAwal,
             'daftarCerita' => $ceritaAwal,
             'liveAktifLive' => (bool) ($pengaturan['live_streaming']['aktif'] ?? false),
             'katalogBank' => \App\Support\GayaKartuBank::katalogFrontend(),
@@ -134,7 +160,8 @@
         ];
     @endphp
 
-    <div x-data="editorKelolaUndangan(@js($configEditor))" class="relative min-h-screen lg:h-screen lg:overflow-hidden flex bg-[#F2F1EC]">
+    <script id="editor-kelola-config" type="application/json">{!! json_encode($configEditor, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>
+    <div x-data="editorKelolaUndangan()" x-on:buka-cropper-foto="bukaCropperFoto($event.detail)" class="relative min-h-screen lg:h-screen lg:overflow-hidden flex bg-[#F2F1EC]">
         {{-- 1. Sidebar Vertikal Ramping Desktop + Bottom Bar Mobile --}}
         @include('dashboard._workspace-sidebar', ['undangan' => $undangan, 'menuAktif' => 'undangan'])
 
@@ -152,12 +179,12 @@
                         <a href="{{ auth()->user()->adalahAdmin() ? route('admin.undangan.index') : route('dashboard.index') }}"
                             class="hover:text-sage transition">Dashboard</a>
                         <span aria-hidden="true">&rsaquo;</span>
-                        <span class="font-medium text-charcoal/80 truncate">{{ $undangan->nama_panggilan_pria }} &amp;
+                        <span class="font-medium text-charcoal/80 truncate" x-text="(namaPriaLive || @js($undangan->nama_panggilan_pria)) + ' & ' + (namaWanitaLive || @js($undangan->nama_panggilan_wanita))">{{ $undangan->nama_panggilan_pria }} &amp;
                             {{ $undangan->nama_panggilan_wanita }}</span>
                     </div>
                 </div>
 
-                <a href="{{ $urlPublik }}" target="_blank"
+                <a :href="urlPublikSalin || @js($urlPublik)" href="{{ $urlPublik }}" target="_blank"
                     class="lg:hidden inline-flex items-center gap-1.5 rounded-xl bg-ivory px-3 py-2 text-xs font-semibold text-charcoal ring-1 ring-champagne/35 hover:bg-champagne/15 active:scale-95 transition shrink-0">
                     <svg class="h-3.5 w-3.5 text-sage shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -171,7 +198,7 @@
             {{-- Body Scrollable Panel Kiri --}}
             <div x-ref="panelKiri" data-select2-parent x-on:input="saatInputLive($event)"
                 x-on:change="saatInputLive($event)" x-on:foto-live-berubah="perbaruiFotoLive($event.detail)"
-                class="relative flex-1 min-h-0 lg:overflow-y-auto px-4 sm:px-5 py-4 pb-28 lg:pb-8 space-y-3.5">
+                class="relative flex-1 min-h-0 lg:overflow-y-auto px-4 sm:px-5 py-4 pb-44 lg:pb-6 space-y-3.5">
                 {{-- Kartu Status / Aktivasi Ringkas --}}
                 @if ($statusKodeEditor === 'aktif')
                     <div
@@ -341,9 +368,50 @@
                     @endif
                 </div>
             </div>
+
+            {{-- Footer Sticky Panel Kiri: Satu Tombol Simpan Semua (Tanpa Refresh Halaman) --}}
+            <div class="fixed bottom-16 inset-x-0 z-30 lg:static lg:inset-auto border-t border-champagne/25 bg-white/95 backdrop-blur-md px-4 sm:px-5 py-3 flex items-center justify-between gap-3 shrink-0 shadow-[0_-6px_20px_-12px_rgba(0,0,0,0.12)] lg:shadow-none">
+                <div class="min-w-0 flex items-center gap-2">
+                    <span
+                        :class="sedangMenyimpanSemua
+                            ? 'bg-amber-400 animate-pulse'
+                            : (adaPerubahanBelumDisimpan ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500')"
+                        class="h-2 w-2 rounded-full shrink-0"
+                    ></span>
+                    <span
+                        class="text-xs font-medium truncate"
+                        :class="adaPerubahanBelumDisimpan ? 'text-amber-800' : 'text-charcoal/60'"
+                        x-text="sedangMenyimpanSemua
+                            ? 'Menyimpan semua perubahan...'
+                            : (adaPerubahanBelumDisimpan ? 'Ada perubahan belum disimpan' : (statusSimpanTeks || 'Semua perubahan tersimpan'))"
+                    ></span>
+                </div>
+
+                <button
+                    type="button"
+                    data-simpan-semua
+                    :disabled="sedangMenyimpanSemua"
+                    @click="simpanSemuaPerubahan()"
+                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-sage px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-[#3b5047] active:scale-[0.98] disabled:opacity-60 transition cursor-pointer shrink-0"
+                >
+                    <svg x-show="sedangMenyimpanSemua" x-cloak class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" />
+                        <path class="opacity-85" d="M12 2a10 10 0 0 1 10 10" />
+                    </svg>
+                    <svg x-show="!sedangMenyimpanSemua" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+                        <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/>
+                        <path d="M7 3v4a1 1 0 0 0 1 1h7"/>
+                    </svg>
+                    <span x-text="sedangMenyimpanSemua ? 'Menyimpan...' : 'Simpan Semua'"></span>
+                </button>
+            </div>
         </div>
 
         {{-- 3. Panel Kanan: Kanvas Live Preview Interaktif + Drawer Tema + Lightbox --}}
         @include('dashboard._kelola-panel-kanan')
+
+        {{-- 4. Modal Crop Foto Interaktif Sesuai Rasio Template --}}
+        @include('dashboard._modal-crop-foto')
     </div>
 @endsection

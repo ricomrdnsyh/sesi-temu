@@ -3,10 +3,7 @@
         || filled($teksKustom['sampul_tombol'] ?? '')
         || filled($teksKustom['sampul_sapaan'] ?? '')
         || filled($teksKustom['sampul_catatan'] ?? '');
-    $jumlahFotoSampulLatar = collect([
-        $undangan->urlFotoSampulKhususDashboard(),
-        $undangan->urlFotoLatarCustomKhususDashboard(),
-    ])->filter()->count();
+    $adaFotoSampul = filled($undangan->urlFotoSampulKhususDashboard());
     $adaFotoPembuka = filled($undangan->urlFotoPembukaKhususDashboard());
     $teksMempelaiDikustom = filled($teksKustom['judul_mempelai'] ?? '')
         || filled($teksKustom['pengantar_mempelai'] ?? '')
@@ -45,18 +42,7 @@
             <p class="mt-0.5 text-xs text-charcoal/60">Layar pertama undangan: pilih tema, link, musik, foto sampul, dan teks gerbang pembuka.</p>
         </div>
 
-        <form
-            action="{{ route('dashboard.undangan.perbarui', $undangan) }}"
-            method="POST"
-            enctype="multipart/form-data"
-            class="space-y-4"
-            data-swal-loading
-            data-swal-loading-title="Menyimpan Pengaturan Tema..."
-            data-swal-loading-text="Memperbarui tema, tipografi, musik latar, foto sampul, dan link undangan..."
-        >
-            @csrf
-            @method('PUT')
-            <input type="hidden" name="bagian" value="tema">
+        <div data-bagian-utama="tema" class="space-y-4">
             <audio x-ref="audioPreview" @ended="audioSedangPutar = false" class="hidden" preload="none"></audio>
 
             {{-- Tema & Link --}}
@@ -145,7 +131,7 @@
                         >
                         <button
                             type="button"
-                            @click="navigator.clipboard?.writeText(@js($urlPublik)); slugTersalin = true; setTimeout(() => slugTersalin = false, 2000)"
+                            @click="navigator.clipboard?.writeText(urlPublikSalin || @js($urlPublik)); slugTersalin = true; setTimeout(() => slugTersalin = false, 2000)"
                             :class="slugTersalin ? 'bg-sage text-white ring-sage' : 'bg-ivory text-charcoal/75 ring-champagne/30 hover:text-sage'"
                             class="ml-2 rounded-lg px-2.5 py-1 text-[11px] font-semibold ring-1 transition shrink-0 cursor-pointer"
                             x-text="slugTersalin ? 'Tersalin!' : 'Salin'"
@@ -167,32 +153,157 @@
                     </select>
                 </div>
 
-                <div>
-                    <label for="musik_latar" class="block text-xs font-semibold text-charcoal/80 mb-1">Musik Latar</label>
-                    <select
-                        id="musik_latar"
-                        name="musik_latar"
-                        @change="musikDipilih = $event.target.value; hentikanAudioPreview()"
-                        class="w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm focus:border-sage focus:outline-none"
-                    >
-                        <option value="">-- Tanpa Musik Latar --</option>
-                        @foreach ($daftarMusik as $musik)
-                            <option value="{{ $musik['path'] }}" @selected($undangan->musik_latar === $musik['path'])>
-                                {{ $musik['label'] }}
-                            </option>
-                        @endforeach
-                    </select>
+                <div class="space-y-2.5">
+                    <div class="flex items-center justify-between gap-2">
+                        <label for="musik_latar" class="block text-xs font-semibold text-charcoal/80">Musik Latar</label>
+                        <div class="inline-flex items-center rounded-lg bg-white p-0.5 ring-1 ring-champagne/30">
+                            <button
+                                type="button"
+                                @click="ubahModeMusik('katalog')"
+                                :class="modeMusik === 'katalog' ? 'bg-sage text-white shadow-2xs' : 'text-charcoal/65 hover:text-charcoal'"
+                                class="rounded-md px-2.5 py-1 text-[11px] font-semibold transition cursor-pointer"
+                            >
+                                Katalog
+                            </button>
+                            <button
+                                type="button"
+                                @click="ubahModeMusik('kustom')"
+                                :class="modeMusik === 'kustom' ? 'bg-sage text-white shadow-2xs' : 'text-charcoal/65 hover:text-charcoal'"
+                                class="rounded-md px-2.5 py-1 text-[11px] font-semibold transition cursor-pointer"
+                            >
+                                Musik Sendiri
+                            </button>
+                        </div>
+                    </div>
 
-                    <div x-show="urlMusikAktif()" x-cloak class="mt-2 flex items-center justify-between gap-2 rounded-xl bg-white px-3 py-1.5 ring-1 ring-champagne/25">
-                        <span class="text-[11px] font-medium text-charcoal/70 truncate" x-text="audioSedangPutar ? 'Memutar contoh lagu...' : 'Coba dengarkan musik pilihan'"></span>
-                        <button
-                            type="button"
-                            @click="toggleAudioPreview()"
-                            :class="audioSedangPutar ? 'bg-charcoal text-white' : 'bg-sage/12 text-sage hover:bg-sage hover:text-white'"
-                            class="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition shrink-0 cursor-pointer"
+                    <input type="hidden" name="sumber_musik" :value="modeMusik">
+                    <input type="hidden" name="hapus_musik_kustom" :value="hapusMusikKustom ? '1' : '0'">
+                    <input
+                        id="file_musik_kustom"
+                        x-ref="inputMusikKustom"
+                        type="file"
+                        name="file_musik_kustom"
+                        accept=".mp3,.wav,.ogg,.m4a,audio/mpeg,audio/wav,audio/ogg,audio/mp4,audio/x-m4a"
+                        @change="saatPilihMusikKustom($event)"
+                        class="sr-only"
+                    >
+
+                    {{-- Mode 1: Pilih dari Katalog Musik --}}
+                    <div x-show="modeMusik === 'katalog'" class="space-y-2">
+                        <select
+                            id="musik_latar"
+                            name="musik_latar"
+                            x-model="musikDipilih"
+                            @change="hentikanAudioPreview()"
+                            class="w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm focus:border-sage focus:outline-none"
                         >
-                            <span x-text="audioSedangPutar ? 'Berhenti' : 'Putar'"></span>
-                        </button>
+                            <option value="">-- Tanpa Musik Latar --</option>
+                            @foreach ($daftarMusik as $musik)
+                                <option value="{{ $musik['path'] }}" @selected(! $pakaiMusikKustom && $undangan->musik_latar === $musik['path'])>
+                                    {{ $musik['label'] }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <div x-show="urlMusikAktif()" x-cloak class="flex items-center justify-between gap-2 rounded-xl bg-white px-3 py-1.5 ring-1 ring-champagne/25">
+                            <span class="text-[11px] font-medium text-charcoal/70 truncate" x-text="audioSedangPutar ? 'Memutar contoh lagu...' : 'Coba dengarkan musik pilihan'"></span>
+                            <button
+                                type="button"
+                                @click="toggleAudioPreview()"
+                                :class="audioSedangPutar ? 'bg-charcoal text-white' : 'bg-sage/12 text-sage hover:bg-sage hover:text-white'"
+                                class="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition shrink-0 cursor-pointer"
+                            >
+                                <span x-text="audioSedangPutar ? 'Berhenti' : 'Putar'"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {{-- Mode 2: Unggah & Gunakan Musik Sendiri --}}
+                    <div x-show="modeMusik === 'kustom'" x-cloak class="space-y-2">
+                        <div x-show="namaMusikKustomTampil()" class="rounded-xl bg-white p-3 ring-1 ring-champagne/30 space-y-2.5">
+                            <div class="flex items-center justify-between gap-2.5">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sage/12 text-sage">
+                                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M9 18V5l12-2v13"/>
+                                            <circle cx="6" cy="18" r="3"/>
+                                            <circle cx="18" cy="16" r="3"/>
+                                        </svg>
+                                    </span>
+                                    <div class="min-w-0">
+                                        <p class="text-xs font-semibold text-charcoal truncate" x-text="namaMusikKustomTampil()"></p>
+                                        <p class="text-[11px] text-charcoal/55 truncate" x-text="musikKustomUkuranBaru ? (musikKustomUkuranBaru + ' • Klik Simpan untuk menerapkan') : 'Musik sendiri terpasang'"></p>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    x-show="urlMusikAktif()"
+                                    @click="toggleAudioPreview()"
+                                    :class="audioSedangPutar ? 'bg-charcoal text-white' : 'bg-sage/12 text-sage hover:bg-sage hover:text-white'"
+                                    class="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition shrink-0 cursor-pointer"
+                                >
+                                    <span x-text="audioSedangPutar ? 'Berhenti' : 'Putar'"></span>
+                                </button>
+                            </div>
+
+                            <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-champagne/20">
+                                <label
+                                    for="file_musik_kustom"
+                                    class="inline-flex items-center gap-1.5 rounded-lg bg-ivory px-2.5 py-1 text-[11px] font-semibold text-charcoal/80 ring-1 ring-champagne/35 hover:text-sage transition cursor-pointer"
+                                >
+                                    <span>Ganti File Audio</span>
+                                </label>
+                                <button
+                                    type="button"
+                                    x-show="musikKustomPreviewUrl"
+                                    @click="batalkanMusikKustomBaru()"
+                                    class="rounded-lg bg-rose-50 px-2.5 py-1 text-[11px] font-semibold text-rose-700 hover:bg-rose-100 transition cursor-pointer"
+                                >
+                                    Batalkan
+                                </button>
+                                <button
+                                    type="button"
+                                    x-show="!musikKustomPreviewUrl && musikKustomUrlAwal"
+                                    @click="tandaiHapusMusikKustom()"
+                                    class="rounded-lg bg-rose-50 px-2.5 py-1 text-[11px] font-semibold text-rose-700 hover:bg-rose-100 transition cursor-pointer"
+                                >
+                                    Hapus Musik
+                                </button>
+                            </div>
+                        </div>
+
+                        <label
+                            for="file_musik_kustom"
+                            x-show="!namaMusikKustomTampil()"
+                            class="block rounded-xl border-2 border-dashed border-champagne/50 bg-white/85 hover:border-sage/60 hover:bg-white p-4 text-center cursor-pointer transition"
+                        >
+                            <div class="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-sage/10 text-sage">
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M9 18V5l12-2v13"/>
+                                    <circle cx="6" cy="18" r="3"/>
+                                    <circle cx="18" cy="16" r="3"/>
+                                </svg>
+                            </div>
+                            <p class="text-xs font-semibold text-charcoal">Unggah Musik Sendiri</p>
+                            <p class="mt-0.5 text-[11px] text-charcoal/55">Format MP3, M4A, WAV, atau OGG • Maks. 15 MB</p>
+                            <span class="mt-2.5 inline-flex items-center rounded-lg bg-sage/10 px-3 py-1 text-[11px] font-semibold text-sage">
+                                Pilih File Audio
+                            </span>
+                        </label>
+
+                        <div
+                            x-show="hapusMusikKustom && !musikKustomPreviewUrl && musikKustomUrlAwal"
+                            x-cloak
+                            class="flex items-center justify-between gap-2 rounded-xl border border-rose-200 bg-rose-50/80 px-3 py-2 text-xs text-rose-700"
+                        >
+                            <span class="font-medium">Musik sendiri akan dihapus saat disimpan.</span>
+                            <button type="button" @click="batalHapusMusikKustom()" class="font-bold text-rose-800 hover:underline shrink-0 cursor-pointer">Urungkan</button>
+                        </div>
+
+                        <p x-show="pesanGalatMusik" x-cloak x-text="pesanGalatMusik" class="text-xs font-medium text-rose-600"></p>
+                        @error('file_musik_kustom')
+                            <p class="text-xs font-medium text-rose-600">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
             </div>
@@ -230,7 +341,7 @@
                 <input type="hidden" name="tanpa_foto" :value="tanpaFotoAktif ? '1' : '0'">
             </div>
 
-            {{-- Drawer Lipat 1: Foto Sampul & Latar Tema --}}
+            {{-- Drawer Lipat 1: Foto Sampul Depan --}}
             <div x-data="{ buka: false }" class="rounded-2xl border border-champagne/30 bg-ivory/50 overflow-hidden">
                 <button
                     type="button"
@@ -243,36 +354,26 @@
                             <circle cx="9" cy="9" r="2"/>
                             <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
                         </svg>
-                        <span class="text-xs font-semibold text-charcoal truncate">Foto Sampul &amp; Latar Tema</span>
+                        <span class="text-xs font-semibold text-charcoal truncate">Foto Sampul Depan</span>
                     </span>
                     <span class="flex items-center gap-1.5 shrink-0">
-                        <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $jumlahFotoSampulLatar > 0 ? 'bg-sage/12 text-sage' : 'bg-white text-charcoal/50 ring-1 ring-champagne/30' }}">
-                            {{ $jumlahFotoSampulLatar > 0 ? $jumlahFotoSampulLatar.' Foto' : 'Bawaan' }}
+                        <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $adaFotoSampul ? 'bg-sage/12 text-sage' : 'bg-white text-charcoal/50 ring-1 ring-champagne/30' }}">
+                            {{ $adaFotoSampul ? 'Terisi' : 'Bawaan' }}
                         </span>
                         <svg :class="buka ? 'rotate-180 text-sage' : 'text-charcoal/45'" class="h-3.5 w-3.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="m6 9 6 6 6-6"/>
                         </svg>
                     </span>
                 </button>
-                <div x-show="buka" x-cloak class="px-3.5 pb-4 pt-3 border-t border-champagne/20 bg-white/80 space-y-3.5">
+                <div x-show="buka" x-cloak class="px-3.5 pb-4 pt-3 border-t border-champagne/20 bg-white/80">
                     @include('dashboard._input-foto-pratinjau', [
                         'name' => 'foto_sampul',
                         'varian' => 'sampul',
-                        'label' => 'Foto Sampul Gerbang',
-                        'petunjuk' => 'Layar pertama sebelum tamu klik Buka Undangan (3:4 / 9:16)',
+                        'label' => 'Foto Sampul Depan',
+                        'petunjuk' => 'Rasio template: '.$rasioFotoTema['foto_sampul']['label'].' • Bisa dipotong saat unggah',
                         'urlAwal' => $undangan->urlFotoSampulKhususDashboard(),
                         'hapusNama' => 'hapus_foto_sampul',
                         'hapusLabel' => 'Hapus foto sampul khusus',
-                    ])
-
-                    @include('dashboard._input-foto-pratinjau', [
-                        'name' => 'foto_latar_tema',
-                        'varian' => 'sampul',
-                        'label' => 'Foto Latar Belakang Custom (Opsional)',
-                        'petunjuk' => 'Timpa ilustrasi latar bawaan tema dengan foto Anda sendiri',
-                        'urlAwal' => $undangan->urlFotoLatarCustomKhususDashboard(),
-                        'hapusNama' => 'hapus_foto_latar_tema',
-                        'hapusLabel' => 'Kembalikan ke ilustrasi bawaan tema',
                     ])
                 </div>
             </div>
@@ -300,7 +401,7 @@
                     </span>
                 </button>
                 <div x-show="buka" x-cloak class="px-3.5 pb-3.5 pt-2.5 border-t border-champagne/20 bg-white/80 space-y-3">
-                    <p class="text-[11px] text-charcoal/55">Kosongkan kolom mana saja bila ingin memakai teks bawaan tema.</p>
+                    <p class="text-[11px] text-charcoal/55">Sudah terisi teks bawaan tema — ubah seperlunya atau kosongkan untuk kembali ke bawaan.</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label for="teks_sampul_judul" class="block text-xs font-semibold text-charcoal/80">Label Atas Sampul</label>
@@ -308,8 +409,8 @@
                                 id="teks_sampul_judul"
                                 type="text"
                                 name="teks[sampul_judul]"
-                                value="{{ old('teks.sampul_judul', $teksKustom['sampul_judul'] ?? '') }}"
-                                placeholder="The Wedding of / Walimatul Ursy"
+                                value="{{ $nilaiTeksEditor('sampul_judul') }}"
+                                placeholder="{{ $teksBawaanTema['sampul_judul'] ?: 'The Wedding of / Walimatul Ursy' }}"
                                 class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none"
                             >
                         </div>
@@ -319,8 +420,8 @@
                                 id="teks_sampul_tombol"
                                 type="text"
                                 name="teks[sampul_tombol]"
-                                value="{{ old('teks.sampul_tombol', $teksKustom['sampul_tombol'] ?? '') }}"
-                                placeholder="Buka Undangan"
+                                value="{{ $nilaiTeksEditor('sampul_tombol') }}"
+                                placeholder="{{ $teksBawaanTema['sampul_tombol'] ?: 'Buka Undangan' }}"
                                 class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none"
                             >
                         </div>
@@ -331,8 +432,8 @@
                             id="teks_sampul_sapaan"
                             type="text"
                             name="teks[sampul_sapaan]"
-                            value="{{ old('teks.sampul_sapaan', $teksKustom['sampul_sapaan'] ?? '') }}"
-                            placeholder="Kepada Yth. Bapak/Ibu/Saudara/i"
+                            value="{{ $nilaiTeksEditor('sampul_sapaan') }}"
+                            placeholder="{{ $teksBawaanTema['sampul_sapaan'] ?: 'Kepada Yth. Bapak/Ibu/Saudara/i' }}"
                             class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none"
                         >
                     </div>
@@ -342,19 +443,14 @@
                             id="teks_sampul_catatan"
                             type="text"
                             name="teks[sampul_catatan]"
-                            value="{{ old('teks.sampul_catatan', $teksKustom['sampul_catatan'] ?? '') }}"
-                            placeholder="Mohon maaf apabila ada kesalahan penulisan nama/gelar"
+                            value="{{ $nilaiTeksEditor('sampul_catatan') }}"
+                            placeholder="{{ $teksBawaanTema['sampul_catatan'] ?: 'Mohon maaf apabila ada kesalahan penulisan nama/gelar' }}"
                             class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none"
                         >
                     </div>
                 </div>
             </div>
-
-            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-sage px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#3b5047] active:scale-[0.98] transition cursor-pointer">
-                <span>Simpan Sampul &amp; Lanjut ke Ayat &amp; Mempelai</span>
-                <span aria-hidden="true">&rarr;</span>
-            </button>
-        </form>
+        </div>
     </section>
 </div>
 
@@ -401,19 +497,7 @@
             </button>
         @endif
 
-        <form
-            action="{{ route('dashboard.undangan.perbarui', $undangan) }}"
-            method="POST"
-            enctype="multipart/form-data"
-            class="space-y-4"
-            data-swal-loading
-            data-swal-loading-title="Menyimpan &amp; Mengompresi Foto..."
-            data-swal-loading-text="Mengonversi foto ke .webp hemat kuota dan menyimpan data mempelai..."
-        >
-            @csrf
-            @method('PUT')
-            <input type="hidden" name="bagian" value="mempelai">
-
+        <div data-bagian-utama="mempelai" class="space-y-4">
             {{-- Bagian 2A (Tampil Pertama di Undangan): Kutipan Ayat & Foto Pembuka --}}
             <div class="rounded-2xl bg-ivory/75 p-4 ring-1 ring-champagne/25 space-y-3">
                 <div>
@@ -429,7 +513,7 @@
                     ] as $judulTemplate => $isiTemplate)
                         <button
                             type="button"
-                            @click="$refs.kutipanInput.value = @js($isiTemplate); jadwalkanLivePreview(true)"
+                            @click="$refs.kutipanInput.value = @js($isiTemplate); tandaiPerubahan(); jadwalkanLivePreview(true)"
                             class="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-sage ring-1 ring-sage/25 hover:bg-sage hover:text-white transition cursor-pointer"
                         >
                             + {{ $judulTemplate }}
@@ -467,7 +551,7 @@
                             'name' => 'foto_pembuka',
                             'varian' => 'sampul',
                             'label' => 'Foto Pembuka / Seksi Ayat',
-                            'petunjuk' => 'Tampil di kartu kutipan ayat (kosong = pakai Foto Sampul)',
+                            'petunjuk' => 'Rasio template: '.$rasioFotoTema['foto_pembuka']['label'].' • Kosong = pakai Foto Sampul',
                             'urlAwal' => $undangan->urlFotoPembukaKhususDashboard(),
                             'hapusNama' => 'hapus_foto_pembuka',
                             'hapusLabel' => 'Hapus foto pembuka',
@@ -499,15 +583,15 @@
                     </span>
                 </button>
                 <div x-show="buka" x-cloak class="px-3.5 pb-3.5 pt-2.5 border-t border-champagne/20 bg-white/80 space-y-3">
-                    <p class="text-[11px] text-charcoal/55">Kosongkan bila ingin memakai teks bawaan tema.</p>
+                    <p class="text-[11px] text-charcoal/55">Sudah terisi teks bawaan tema — ubah seperlunya atau kosongkan untuk kembali ke bawaan.</p>
                     <div>
                         <label for="teks_judul_mempelai" class="block text-xs font-semibold text-charcoal/80">Judul Bagian Mempelai</label>
                         <input
                             id="teks_judul_mempelai"
                             type="text"
                             name="teks[judul_mempelai]"
-                            value="{{ old('teks.judul_mempelai', $teksKustom['judul_mempelai'] ?? '') }}"
-                            placeholder="Mempelai Berbahagia / We Are Getting Married!"
+                            value="{{ $nilaiTeksEditor('judul_mempelai') }}"
+                            placeholder="{{ $teksBawaanTema['judul_mempelai'] ?: 'Mempelai Berbahagia / We Are Getting Married!' }}"
                             class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none"
                         >
                     </div>
@@ -517,9 +601,9 @@
                             id="teks_pengantar_mempelai"
                             name="teks[pengantar_mempelai]"
                             rows="2"
-                            placeholder="Dengan memohon rahmat dan ridho Tuhan Yang Maha Esa..."
+                            placeholder="{{ $teksBawaanTema['pengantar_mempelai'] ?: 'Dengan memohon rahmat dan ridho Tuhan Yang Maha Esa...' }}"
                             class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm leading-relaxed focus:border-sage focus:outline-none"
-                        >{{ old('teks.pengantar_mempelai', $teksKustom['pengantar_mempelai'] ?? '') }}</textarea>
+                        >{{ $nilaiTeksEditor('pengantar_mempelai') }}</textarea>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
@@ -527,8 +611,8 @@
                             <input
                                 type="text"
                                 name="teks[label_pria]"
-                                value="{{ old('teks.label_pria', $teksKustom['label_pria'] ?? '') }}"
-                                placeholder="Putra Pertama dari (bawaan: Putra dari)"
+                                value="{{ $nilaiTeksEditor('label_pria') }}"
+                                placeholder="{{ $teksBawaanTema['label_pria'] ?: 'Putra dari' }}"
                                 class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none"
                             >
                         </div>
@@ -537,8 +621,8 @@
                             <input
                                 type="text"
                                 name="teks[label_wanita]"
-                                value="{{ old('teks.label_wanita', $teksKustom['label_wanita'] ?? '') }}"
-                                placeholder="Putri Kedua dari (bawaan: Putri dari)"
+                                value="{{ $nilaiTeksEditor('label_wanita') }}"
+                                placeholder="{{ $teksBawaanTema['label_wanita'] ?: 'Putri dari' }}"
                                 class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none"
                             >
                         </div>
@@ -560,7 +644,7 @@
                     'name' => 'foto_pria',
                     'varian' => 'lingkaran',
                     'label' => 'Foto Mempelai Pria',
-                    'petunjuk' => 'Rasio 1:1 • Otomatis WebP (maks. 5 MB)',
+                    'petunjuk' => 'Rasio template: '.$rasioFotoTema['foto_pria']['label'].' • Otomatis WebP',
                     'urlAwal' => $undangan->urlFotoPria(),
                     'inisial' => $undangan->inisialPria(),
                 ])
@@ -612,7 +696,7 @@
                     'name' => 'foto_wanita',
                     'varian' => 'lingkaran',
                     'label' => 'Foto Mempelai Wanita',
-                    'petunjuk' => 'Rasio 1:1 • Otomatis WebP (maks. 5 MB)',
+                    'petunjuk' => 'Rasio template: '.$rasioFotoTema['foto_wanita']['label'].' • Otomatis WebP',
                     'urlAwal' => $undangan->urlFotoWanita(),
                     'inisial' => $undangan->inisialWanita(),
                 ])
@@ -649,10 +733,6 @@
                     </div>
                 </div>
             </div>
-
-            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-sage px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#3b5047] active:scale-[0.98] transition cursor-pointer">
-                <span>Simpan Ayat &amp; Mempelai &rarr; Hitung Mundur &amp; Acara</span>
-            </button>
-        </form>
+        </div>
     </section>
 </div>

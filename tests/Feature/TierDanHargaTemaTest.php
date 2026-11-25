@@ -434,7 +434,8 @@ class TierDanHargaTemaTest extends TestCase
             ->assertSee('+ QS. Ar-Rum: 21')
             ->assertSee('Pilih atau Seret Foto Prewedding')
             ->assertSee('<textarea', false)
-            ->assertSee('name="keterangan"', false);
+            ->assertSee('name="galeri_foto[]"', false)
+            ->assertSee('Keterangan (opsional)...');
     }
 
     public function test_url_foto_galeri_mengikuti_host_permintaan_bukan_terkunci_app_url(): void
@@ -522,10 +523,10 @@ class TierDanHargaTemaTest extends TestCase
             ->assertSee('1234 5678 90')
             ->assertSee('#0057B8', false)
             ->assertSee('#00AED6', false)
-            ->assertSee('Menyimpan Pengaturan Tema...')
-            ->assertSee('Menyimpan &amp; Mengompresi Foto...', false)
-            ->assertSee('Mengunggah &amp; Mengompresi Foto...', false)
-            ->assertSee('Menyimpan Cerita Cinta...')
+            ->assertSee('data-simpan-semua', false)
+            ->assertSee('Menyimpan semua perubahan...')
+            ->assertSee('name="galeri_foto[]"', false)
+            ->assertSee('Pilih atau Seret Foto Prewedding')
             ->assertSee('Menambahkan Kartu Rekening...')
             ->assertSee('Menghapus Rekening...')
             ->assertDontSee('onsubmit="return confirm', false);
@@ -637,12 +638,14 @@ class TierDanHargaTemaTest extends TestCase
             'name="foto_pembuka"',
             'name="nama_panggilan_pria"',
             'data-toggle-fitur="hitung_mundur"',
+            'name="foto_hitung_mundur[]"',
             'name="teks[judul_hitung_mundur]"',
             'name="nama_acara"',
             'name="dress_code_catatan"',
             'name="live_platform"',
             'name="teks[judul_cerita]"',
             'name="teks[judul_galeri]"',
+            'name="galeri_foto[]"',
             'name="teks[judul_amplop]"',
             'name="nama_bank"',
             'name="alamat_kado_fisik"',
@@ -904,5 +907,362 @@ class TierDanHargaTemaTest extends TestCase
                 'nama_panggilan_pria' => 'Hacker',
             ])
             ->assertForbidden();
+    }
+
+    public function test_input_teks_terisi_value_bawaan_tema_dan_customer_bisa_unggah_musik_sendiri(): void
+    {
+        Storage::fake('public');
+        $this->seed(DatabaseSeeder::class);
+
+        $client = Pengguna::factory()->create(['peran' => 'client']);
+        $temaJawa = Tema::where('slug', 'adat-jawa')->firstOrFail();
+
+        $undangan = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $temaJawa->id,
+            'slug' => 'uji-bawaan-dan-musik',
+            'nama_panggilan_pria' => 'Dodi',
+            'nama_lengkap_pria' => 'Dodi Pratama',
+            'nama_panggilan_wanita' => 'Windy',
+            'nama_lengkap_wanita' => 'Windy Sari',
+            'musik_latar' => 'musik/gamelan-lembut.mp3',
+            'pengaturan' => Undangan::pengaturanBawaan(),
+            'status_publikasi' => true,
+            'berlaku_sampai' => now()->addMonths(3),
+        ]);
+
+        // 1. Halaman editor mengisi value input sesuai bawaan tema aktif & menyediakan unggah musik sendiri
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/kelola")
+            ->assertOk()
+            ->assertSee('value="The Wedding of"', false)
+            ->assertSee('value="Buka Undangan"', false)
+            ->assertSee('value="Kepada Yth. Bapak/Ibu/Saudara/i"', false)
+            ->assertSee('value="Mohon maaf apabila ada kesalahan penulisan nama/gelar"', false)
+            ->assertSee('value="We Are Getting Married!"', false)
+            ->assertSee('value="Our Love Story"', false)
+            ->assertSee('value="Our Gallery"', false)
+            ->assertSee('value="#DodiWindyTogether"', false)
+            ->assertSee('name="file_musik_kustom"', false)
+            ->assertSee('Musik Sendiri')
+            ->assertSee('Atur Potongan Foto')
+            ->assertSee('Terapkan Potongan')
+            ->assertSee('Potret Kapsul (11:18)')
+            ->assertSee('9:16 Sampul Penuh')
+            ->assertSee('4:3 Cerita');
+
+        // Verifikasi rasio crop menyesuaikan tema aktif saat berganti tema (mis. Editorial Monokrom)
+        $temaEditorial = Tema::where('slug', 'editorial-monokrom')->firstOrFail();
+        $undangan->update(['tema_id' => $temaEditorial->id]);
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/kelola")
+            ->assertOk()
+            ->assertSee('3:4 Editorial')
+            ->assertSee('16:10 Cerita');
+        $undangan->update(['tema_id' => $temaJawa->id]);
+
+        // 2. Menyimpan nilai bawaan tanpa diubah tetap menyimpan string kosong (tidak mengunci ke tema lama)
+        $this->actingAs($client)
+            ->put("/dashboard/undangan/{$undangan->id}", [
+                'bagian' => 'tema',
+                'tema_id' => $temaJawa->id,
+                'slug' => 'uji-bawaan-dan-musik',
+                'sumber_musik' => 'katalog',
+                'musik_latar' => 'musik/gamelan-lembut.mp3',
+                'gaya_font' => 'bawaan',
+                'teks' => [
+                    'sampul_judul' => 'The Wedding of',
+                    'sampul_tombol' => 'Buka Undangan',
+                    'sampul_sapaan' => 'Kepada Yth. Bapak/Ibu/Saudara/i',
+                    'sampul_catatan' => 'Mohon maaf apabila ada kesalahan penulisan nama/gelar',
+                ],
+            ])
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola")
+            ->assertSessionHasNoErrors();
+
+        $undangan->refresh();
+        $this->assertSame('', (string) data_get($undangan->pengaturan, 'teks.sampul_judul', ''));
+        $this->assertSame('', (string) data_get($undangan->pengaturan, 'teks.sampul_tombol', ''));
+
+        // 3. Format audio tidak valid ditolak
+        $this->actingAs($client)
+            ->put("/dashboard/undangan/{$undangan->id}", [
+                'bagian' => 'tema',
+                'sumber_musik' => 'kustom',
+                'file_musik_kustom' => UploadedFile::fake()->create('bukan-lagu.txt', 10, 'text/plain'),
+            ])
+            ->assertSessionHasErrors('file_musik_kustom');
+
+        // 4. Customer mengunggah musik sendiri -> tersimpan, aktif di undangan publik, dan bisa diputar
+        $audioKustom = UploadedFile::fake()->create('lagu-favorit-kami.mp3', 512, 'audio/mpeg');
+
+        $this->actingAs($client)
+            ->put("/dashboard/undangan/{$undangan->id}", [
+                'bagian' => 'tema',
+                'tema_id' => $temaJawa->id,
+                'slug' => 'uji-bawaan-dan-musik',
+                'sumber_musik' => 'kustom',
+                'gaya_font' => 'bawaan',
+                'file_musik_kustom' => $audioKustom,
+            ])
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola")
+            ->assertSessionHasNoErrors();
+
+        $undangan->refresh();
+        $pathMusikKustom = $undangan->musik_latar;
+        $this->assertNotNull($pathMusikKustom);
+        $this->assertStringStartsWith("storage/undangan/{$undangan->id}/musik/", $pathMusikKustom);
+        $this->assertTrue($undangan->pakaiMusikKustom());
+        $this->assertSame('lagu-favorit-kami.mp3', $undangan->musikKustom()['nama'] ?? null);
+        Storage::disk('public')->assertExists(substr($pathMusikKustom, 8));
+
+        // Halaman undangan publik menggunakan audio kustom tersebut
+        $this->get('/uji-bawaan-dan-musik')
+            ->assertOk()
+            ->assertSee($pathMusikKustom, false);
+
+        // Simpan ulang tab tema tanpa unggah ulang file saat sumber_musik=kustom tetap mempertahankan musik sendiri
+        $this->actingAs($client)
+            ->put("/dashboard/undangan/{$undangan->id}", [
+                'bagian' => 'tema',
+                'sumber_musik' => 'kustom',
+                'musik_latar' => '',
+                'gaya_font' => 'bawaan',
+            ])
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame($pathMusikKustom, $undangan->fresh()->musik_latar);
+
+        // 5. Hapus musik kustom -> file terhapus bersih dari storage dan kembali ke pilihan katalog
+        $this->actingAs($client)
+            ->put("/dashboard/undangan/{$undangan->id}", [
+                'bagian' => 'tema',
+                'sumber_musik' => 'katalog',
+                'musik_latar' => 'musik/gamelan-lembut.mp3',
+                'hapus_musik_kustom' => '1',
+                'gaya_font' => 'bawaan',
+            ])
+            ->assertSessionHasNoErrors();
+
+        $undangan->refresh();
+        $this->assertNull($undangan->musikKustom());
+        $this->assertFalse($undangan->pakaiMusikKustom());
+        $this->assertSame('musik/gamelan-lembut.mp3', $undangan->musik_latar);
+        Storage::disk('public')->assertMissing(substr($pathMusikKustom, 8));
+    }
+
+    public function test_toggle_fitur_put_json_dan_tombol_simpan_semua_tanpa_refresh(): void
+    {
+        Storage::fake('public');
+        $this->seed(DatabaseSeeder::class);
+
+        $client = Pengguna::factory()->create(['peran' => 'client']);
+        $temaJawa = Tema::where('slug', 'adat-jawa')->firstOrFail();
+
+        $undangan = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $temaJawa->id,
+            'slug' => 'uji-simpan-semua',
+            'nama_panggilan_pria' => 'Dodi',
+            'nama_lengkap_pria' => 'Dodi Pratama',
+            'nama_panggilan_wanita' => 'Windy',
+            'nama_lengkap_wanita' => 'Windy Sari',
+            'pengaturan' => Undangan::pengaturanBawaan(),
+            'status_publikasi' => false,
+        ]);
+
+        // 1. Editor hanya menampilkan satu tombol Simpan Semua (bukan tombol simpan per bagian)
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/kelola")
+            ->assertOk()
+            ->assertSee('data-simpan-semua', false)
+            ->assertSee('Simpan Semua')
+            ->assertDontSee('Simpan Sampul &amp; Lanjut', false)
+            ->assertDontSee('Simpan Ayat &amp; Mempelai', false)
+            ->assertDontSee('Simpan Cerita &amp; Lanjut', false)
+            ->assertDontSee('Simpan Penutup &amp; Lanjut', false);
+
+        // 2. Toggle ON/OFF seluruh 6 fitur melalui PUT JSON (persis seperti fetch() di browser)
+        foreach (['hitung_mundur', 'cerita_cinta', 'galeri', 'amplop_digital', 'buku_tamu', 'doa_pengantin'] as $kunciFitur) {
+            $this->actingAs($client)
+                ->putJson("/dashboard/undangan/{$undangan->id}", [
+                    'bagian' => 'fitur',
+                    'kunci' => $kunciFitur,
+                    'aktif' => false,
+                ])
+                ->assertOk()
+                ->assertJson([
+                    'ok' => true,
+                    'kunci' => $kunciFitur,
+                    'aktif' => false,
+                ]);
+        }
+
+        $undangan->refresh();
+        foreach (['hitung_mundur', 'cerita_cinta', 'galeri', 'amplop_digital', 'buku_tamu', 'doa_pengantin'] as $kunciFitur) {
+            $this->assertFalse($undangan->fiturAktif($kunciFitur), "Fitur {$kunciFitur} harus tersimpan nonaktif.");
+        }
+
+        // Aktifkan kembali cerita_cinta & buku_tamu via PUT JSON
+        $this->actingAs($client)
+            ->putJson("/dashboard/undangan/{$undangan->id}", [
+                'bagian' => 'fitur',
+                'kunci' => 'cerita_cinta',
+                'aktif' => true,
+            ])
+            ->assertOk()
+            ->assertJson(['ok' => true, 'kunci' => 'cerita_cinta', 'aktif' => true]);
+
+        $this->assertTrue($undangan->fresh()->fiturAktif('cerita_cinta'));
+
+        // 3. Simpan Semua (bagian=semua) dengan Accept: application/json menyimpan seluruh seksi sekaligus tanpa redirect
+        $respon = $this->actingAs($client)
+            ->withHeaders(['Accept' => 'application/json'])
+            ->post("/dashboard/undangan/{$undangan->id}", [
+                '_method' => 'PUT',
+                'bagian' => 'semua',
+                'tema_id' => $temaJawa->id,
+                'slug' => 'uji-simpan-semua-baru',
+                'gaya_font' => 'editorial_gilda',
+                'tanpa_foto' => '0',
+                'sumber_musik' => 'katalog',
+                'musik_latar' => 'musik/gamelan-lembut.mp3',
+                'fitur_hitung_mundur' => '1',
+                'fitur_cerita_cinta' => '1',
+                'fitur_galeri' => '0',
+                'fitur_amplop_digital' => '1',
+                'fitur_buku_tamu' => '1',
+                'fitur_doa_pengantin' => '0',
+                'nama_panggilan_pria' => 'Dodi',
+                'nama_lengkap_pria' => 'Dodi Pratama, S.T.',
+                'nama_panggilan_wanita' => 'Windy',
+                'nama_lengkap_wanita' => 'Windy Sari, S.E.',
+                'kutipan_ayat' => 'Kutipan pembuka baru.',
+                'foto_sampul' => UploadedFile::fake()->image('sampul-baru.jpg', 900, 1600),
+                'dress_code_disertakan' => '1',
+                'dress_code_catatan' => 'Batik Klasik',
+                'dress_code_warna' => ['#472A1C', '#D7BB83'],
+                'live_aktif' => '1',
+                'live_platform' => 'YouTube Live',
+                'live_link' => 'https://youtube.com/live/uji',
+                'cerita_cinta' => [
+                    ['judul' => 'Awal Jumpa', 'tanggal' => '2023', 'cerita' => 'Di Yogyakarta.'],
+                ],
+                'alamat_kado_fisik' => 'Jl. Malioboro No. 1',
+                'turut_mengundang_pria' => 'Keluarga Besar Pratama',
+                'hashtag' => 'DodiWindy2026',
+                'doa_disertakan' => '1',
+                'teks' => [
+                    'sampul_judul' => 'Pernikahan Bahagia',
+                    'judul_galeri' => 'Album Kami',
+                ],
+            ]);
+
+        $respon->assertOk()
+            ->assertJson([
+                'ok' => true,
+                'slug' => 'uji-simpan-semua-baru',
+                'fitur_aktif' => [
+                    'hitung_mundur' => true,
+                    'cerita_cinta' => true,
+                    'galeri' => false,
+                    'amplop_digital' => true,
+                    'buku_tamu' => true,
+                    'doa_pengantin' => false,
+                ],
+            ]);
+
+        $undangan->refresh();
+        $this->assertSame('uji-simpan-semua-baru', $undangan->slug);
+        $this->assertSame('editorial_gilda', $undangan->kodeGayaFontTerpilih());
+        $this->assertSame('Dodi Pratama, S.T.', $undangan->nama_lengkap_pria);
+        $this->assertSame('Batik Klasik', $undangan->dressCodeCatatan());
+        $this->assertSame('Jl. Malioboro No. 1', data_get($undangan->pengaturan, 'alamat_kado_fisik'));
+        $this->assertSame('#DodiWindy2026', $undangan->hashtagPasangan());
+        $this->assertSame('Pernikahan Bahagia', $undangan->teksKustom('sampul_judul'));
+        $this->assertSame('Album Kami', $undangan->teksKustom('judul_galeri'));
+        $this->assertFalse($undangan->fiturAktif('galeri'));
+        $this->assertFalse($undangan->fiturAktif('doa_pengantin'));
+        $this->assertTrue($undangan->fiturAktif('hitung_mundur'));
+        $this->assertNotEmpty($undangan->urlFotoSampulKhususDashboard());
+
+        // Uji sinkronisasi multi-foto Galeri lewat Simpan Semua (tanpa refresh) + urutan + potong ulang + hapus + live preview
+        $responGaleri1 = $this->actingAs($client)
+            ->withHeaders(['Accept' => 'application/json'])
+            ->post("/dashboard/undangan/{$undangan->id}", [
+                '_method' => 'PUT',
+                'bagian' => 'semua',
+                'nama_panggilan_pria' => 'Dodi',
+                'nama_lengkap_pria' => 'Dodi Pratama, S.T.',
+                'nama_panggilan_wanita' => 'Windy',
+                'nama_lengkap_wanita' => 'Windy Sari, S.E.',
+                'fitur_galeri' => '1',
+                'galeri_disertakan' => '1',
+                'galeri_items' => [
+                    [
+                        'keterangan' => 'Momen Lamaran',
+                        'file' => UploadedFile::fake()->image('galeri-a.jpg', 900, 1200),
+                    ],
+                    [
+                        'keterangan' => 'Prewedding Senja',
+                        'file' => UploadedFile::fake()->image('galeri-b.jpg', 900, 1200),
+                    ],
+                ],
+            ]);
+
+        $responGaleri1->assertOk()->assertJsonCount(2, 'galeri');
+        $galeriJson1 = $responGaleri1->json('galeri');
+        $idGaleri1 = $galeriJson1[0]['id'];
+        $idGaleri2 = $galeriJson1[1]['id'];
+        $pathGaleri1 = $galeriJson1[0]['path'];
+        $pathGaleri2 = $galeriJson1[1]['path'];
+
+        Storage::disk('public')->assertExists($pathGaleri1);
+        Storage::disk('public')->assertExists($pathGaleri2);
+        $this->assertSame('Momen Lamaran', $galeriJson1[0]['keterangan']);
+        $this->assertSame('Prewedding Senja', $galeriJson1[1]['keterangan']);
+
+        // Live preview menampilkan galeri blob & urutan live secara langsung
+        $this->actingAs($client)
+            ->postJson("/dashboard/undangan/{$undangan->id}/pratinjau-langsung", [
+                'galeri_disertakan' => true,
+                'galeri_live' => [
+                    ['id' => $idGaleri2, 'path' => $pathGaleri2, 'url' => $galeriJson1[1]['url'], 'keterangan' => 'Senja Indah'],
+                    ['id' => null, 'path' => '', 'url' => 'blob:http://127.0.0.1:8000/galeri-live-baru', 'keterangan' => 'Pratinjau Baru'],
+                ],
+            ])
+            ->assertOk()
+            ->assertSee('blob:http://127.0.0.1:8000/galeri-live-baru', false);
+
+        // Simpan Semua berikutnya: hapus foto pertama, simpan foto kedua dengan keterangan baru & hasil potong ulang
+        $responGaleri2 = $this->actingAs($client)
+            ->withHeaders(['Accept' => 'application/json'])
+            ->post("/dashboard/undangan/{$undangan->id}", [
+                '_method' => 'PUT',
+                'bagian' => 'semua',
+                'nama_panggilan_pria' => 'Dodi',
+                'nama_lengkap_pria' => 'Dodi Pratama, S.T.',
+                'nama_panggilan_wanita' => 'Windy',
+                'nama_lengkap_wanita' => 'Windy Sari, S.E.',
+                'galeri_disertakan' => '1',
+                'galeri_items' => [
+                    [
+                        'id' => $idGaleri2,
+                        'keterangan' => 'Prewedding Senja (Potong Ulang)',
+                        'file' => UploadedFile::fake()->image('galeri-b-recrop.jpg', 900, 1200),
+                    ],
+                ],
+            ]);
+
+        $responGaleri2->assertOk()->assertJsonCount(1, 'galeri');
+        $galeriJson2 = $responGaleri2->json('galeri');
+        $pathGaleri2Baru = $galeriJson2[0]['path'];
+
+        $this->assertSame($idGaleri2, $galeriJson2[0]['id']);
+        $this->assertSame('Prewedding Senja (Potong Ulang)', $galeriJson2[0]['keterangan']);
+        $this->assertNotSame($pathGaleri2, $pathGaleri2Baru);
+        Storage::disk('public')->assertMissing($pathGaleri1);
+        Storage::disk('public')->assertMissing($pathGaleri2);
+        Storage::disk('public')->assertExists($pathGaleri2Baru);
     }
 }

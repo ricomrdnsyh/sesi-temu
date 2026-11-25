@@ -32,6 +32,8 @@ class DataTemaUndangan
         $urlFotoSampul = $tanpaFoto ? null : $undangan->urlFotoSampul();
         $pakaiFotoSampul = ! $tanpaFoto && ! empty($urlFotoSampul);
         $urlFotoPembuka = $tanpaFoto ? null : $undangan->urlFotoPembuka();
+        $daftarUrlFotoHitungMundur = $tanpaFoto ? [] : $undangan->daftarUrlFotoHitungMundur();
+        $urlFotoHitungMundur = $daftarUrlFotoHitungMundur[0] ?? null;
         $urlFotoPenutup = $tanpaFoto ? null : $undangan->urlFotoPenutup();
         $urlFotoLatarCustom = $tanpaFoto ? null : $undangan->urlFotoLatarCustom();
         $urlFotoLatar = $urlFotoLatarCustom ?? $latarDefaultUrl;
@@ -66,11 +68,25 @@ class DataTemaUndangan
                 ->filter(static fn($item) => ! empty($item['url']))
                 ->values();
 
-            $fotoGaleriSlideshow = $undangan->daftarGaleri
-                ->take(4)
-                ->map(static fn($item) => $item->urlFoto())
-                ->filter()
-                ->values();
+            if ($undangan->fiturAktif('hitung_mundur')) {
+                if (! empty($daftarUrlFotoHitungMundur)) {
+                    $fotoGaleriSlideshow = collect($daftarUrlFotoHitungMundur)->values();
+                } elseif ($modeDemo) {
+                    $fotoGaleriSlideshow = $undangan->daftarGaleri
+                        ->take(4)
+                        ->map(static fn($item) => $item->urlFoto())
+                        ->filter()
+                        ->values();
+
+                    if ($fotoGaleriSlideshow->isEmpty()) {
+                        foreach ([$urlFotoPembuka, $urlFotoPenutup] as $fotoAlternatif) {
+                            if (! empty($fotoAlternatif)) {
+                                $fotoGaleriSlideshow->push($fotoAlternatif);
+                            }
+                        }
+                    }
+                }
+            }
 
             if ($galeriPanggungKanan->isEmpty()) {
                 foreach ([$urlFotoPembuka, $urlFotoPenutup] as $fotoAlternatif) {
@@ -79,14 +95,6 @@ class DataTemaUndangan
                             'url' => $fotoAlternatif,
                             'keterangan' => "{$undangan->nama_panggilan_pria} & {$undangan->nama_panggilan_wanita}",
                         ]);
-                    }
-                }
-            }
-
-            if ($fotoGaleriSlideshow->isEmpty()) {
-                foreach ([$urlFotoPembuka, $urlFotoPenutup] as $fotoAlternatif) {
-                    if (! empty($fotoAlternatif)) {
-                        $fotoGaleriSlideshow->push($fotoAlternatif);
                     }
                 }
             }
@@ -147,6 +155,7 @@ class DataTemaUndangan
             'urlFotoSampul' => $urlFotoSampul,
             'pakaiFotoSampul' => $pakaiFotoSampul,
             'urlFotoPembuka' => $urlFotoPembuka,
+            'urlFotoHitungMundur' => $urlFotoHitungMundur,
             'urlFotoPenutup' => $urlFotoPenutup,
             'urlFotoLatarCustom' => $urlFotoLatarCustom,
             'urlFotoLatar' => $urlFotoLatar,

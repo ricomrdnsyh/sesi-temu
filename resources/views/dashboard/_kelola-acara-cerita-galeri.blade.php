@@ -1,4 +1,5 @@
 @php
+    $jumlahFotoHitungMundur = count($undangan->daftarFotoHitungMundurKhususDashboard());
     $teksAcaraDikustom = filled($teksKustom['judul_hitung_mundur'] ?? '')
         || filled($teksKustom['pengantar_hitung_mundur'] ?? '')
         || filled($teksKustom['judul_acara'] ?? '');
@@ -64,6 +65,158 @@
             </button>
         </div>
 
+        {{-- Drawer Lipat: Foto Slideshow Hitung Mundur (1-4 Foto di atas Save The Date) --}}
+        <div
+            x-show="sakelarFitur.hitung_mundur"
+            x-cloak
+            x-data="{ buka: false }"
+            class="rounded-2xl border border-champagne/30 bg-ivory/50 overflow-hidden"
+        >
+            <button
+                type="button"
+                @click="buka = !buka"
+                class="w-full px-3.5 py-2.5 flex items-center justify-between gap-2 text-left hover:bg-ivory transition cursor-pointer"
+            >
+                <span class="flex items-center gap-2 min-w-0">
+                    <svg class="h-3.5 w-3.5 text-sage shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                        <circle cx="9" cy="9" r="2"/>
+                        <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                    </svg>
+                    <span class="text-xs font-semibold text-charcoal truncate">Foto Slideshow Hitung Mundur</span>
+                </span>
+                <span class="flex items-center gap-1.5 shrink-0">
+                    <span
+                        :class="daftarFotoHitungMundur.length > 0 ? 'bg-sage/12 text-sage' : 'bg-white text-charcoal/50 ring-1 ring-champagne/30'"
+                        class="rounded-full px-2 py-0.5 text-[10px] font-semibold tabular-nums"
+                        x-text="daftarFotoHitungMundur.length > 0 ? daftarFotoHitungMundur.length + '/' + maksFotoHitungMundur + ' Foto' : 'Opsional'"
+                    >{{ $jumlahFotoHitungMundur > 0 ? $jumlahFotoHitungMundur.'/'.\App\Models\Undangan::MAKS_FOTO_HITUNG_MUNDUR.' Foto' : 'Opsional' }}</span>
+                    <svg :class="buka ? 'rotate-180 text-sage' : 'text-charcoal/45'" class="h-3.5 w-3.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="m6 9 6 6 6-6"/>
+                    </svg>
+                </span>
+            </button>
+            <div x-show="buka" x-cloak class="px-3.5 pb-4 pt-3 border-t border-champagne/20 bg-white/80 space-y-3">
+                <input
+                    id="input-foto-hitung-mundur"
+                    type="file"
+                    name="foto_hitung_mundur[]"
+                    accept="image/jpeg,image/png,image/webp,image/*"
+                    multiple
+                    @change="pilihFotoHitungMundur($event)"
+                    class="sr-only"
+                >
+
+                <div class="flex items-start justify-between gap-2">
+                    <p class="text-[11px] leading-relaxed text-charcoal/60">
+                        Unggah 1&ndash;{{ \App\Models\Undangan::MAKS_FOTO_HITUNG_MUNDUR }} foto agar berganti otomatis di atas <strong>Save The Date</strong>. Rasio template: <span class="font-semibold text-charcoal/80">{{ $rasioFotoTema['foto_hitung_mundur']['label'] }}</span>.
+                    </p>
+                </div>
+
+                {{-- Keadaan Kosong: Area Unggah Penuh --}}
+                <label
+                    x-show="daftarFotoHitungMundur.length === 0"
+                    for="input-foto-hitung-mundur"
+                    @dragover.prevent="sedangTarikHitungMundur = true"
+                    @dragleave.prevent="sedangTarikHitungMundur = false"
+                    @drop.prevent="jatuhFotoHitungMundur($event)"
+                    :class="sedangTarikHitungMundur ? 'border-sage bg-sage/[0.06] ring-4 ring-sage/10' : 'border-champagne/60 bg-ivory/50 hover:border-sage/60 hover:bg-ivory'"
+                    class="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-4 py-6 text-center cursor-pointer transition select-none"
+                >
+                    <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-sage/10 text-sage">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" x2="12" y1="3" y2="15"/>
+                        </svg>
+                    </span>
+                    <div>
+                        <p class="text-xs font-semibold text-charcoal">Pilih atau Seret Foto Slideshow</p>
+                        <p class="mt-0.5 text-[11px] text-charcoal/55">Bisa pilih sekaligus hingga {{ \App\Models\Undangan::MAKS_FOTO_HITUNG_MUNDUR }} foto • JPG, PNG, WebP</p>
+                    </div>
+                    <span class="rounded-lg bg-sage/10 px-3 py-1.5 text-[11px] font-semibold text-sage">Pilih Foto</span>
+                </label>
+
+                {{-- Grid Foto Slideshow + Tombol Tambah Foto --}}
+                <div
+                    x-show="daftarFotoHitungMundur.length > 0"
+                    x-cloak
+                    class="grid grid-cols-2 gap-2.5"
+                >
+                    <template x-for="(item, idx) in daftarFotoHitungMundur" :key="item.uid">
+                        <div
+                            class="relative overflow-hidden rounded-xl border border-champagne/40 bg-charcoal shadow-2xs group"
+                            style="aspect-ratio: {{ $rasioFotoTema['foto_hitung_mundur']['rasio'] }};"
+                        >
+                            <img
+                                :src="item.url"
+                                :alt="'Foto Hitung Mundur #' + (idx + 1)"
+                                class="block h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                            >
+                            <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/70"></div>
+
+                            {{-- Nomor Slide & Urutan --}}
+                            <div class="absolute top-2 left-2 z-10 flex items-center gap-1">
+                                <span class="rounded-full bg-black/60 backdrop-blur-xs px-2 py-0.5 text-[10px] font-bold text-white ring-1 ring-white/15 tabular-nums" x-text="'#' + (idx + 1)"></span>
+                                <button
+                                    type="button"
+                                    x-show="idx > 0"
+                                    @click="pindahFotoHitungMundur(idx, -1)"
+                                    title="Geser ke kiri"
+                                    aria-label="Geser foto ke kiri"
+                                    class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-black/55 hover:bg-sage text-[10px] font-bold text-white ring-1 ring-white/15 transition cursor-pointer"
+                                >&larr;</button>
+                                <button
+                                    type="button"
+                                    x-show="idx < daftarFotoHitungMundur.length - 1"
+                                    @click="pindahFotoHitungMundur(idx, 1)"
+                                    title="Geser ke kanan"
+                                    aria-label="Geser foto ke kanan"
+                                    class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-black/55 hover:bg-sage text-[10px] font-bold text-white ring-1 ring-white/15 transition cursor-pointer"
+                                >&rarr;</button>
+                            </div>
+
+                            {{-- Aksi Potong & Hapus --}}
+                            <div class="absolute bottom-2 inset-x-2 z-10 flex items-center justify-end gap-1.5">
+                                <button
+                                    type="button"
+                                    @click="potongFotoHitungMundur(idx)"
+                                    class="rounded-full bg-black/60 hover:bg-sage backdrop-blur-xs px-2.5 py-1 text-[10px] font-semibold text-white ring-1 ring-white/15 transition cursor-pointer"
+                                >Potong</button>
+                                <button
+                                    type="button"
+                                    @click="hapusFotoHitungMundur(idx)"
+                                    class="rounded-full bg-black/60 hover:bg-rose-600 backdrop-blur-xs px-2.5 py-1 text-[10px] font-semibold text-white ring-1 ring-white/15 transition cursor-pointer"
+                                >Hapus</button>
+                            </div>
+                        </div>
+                    </template>
+
+                    {{-- Kartu Tambah Foto Baru (selama belum mencapai 4 foto) --}}
+                    <label
+                        x-show="daftarFotoHitungMundur.length < maksFotoHitungMundur"
+                        for="input-foto-hitung-mundur"
+                        @dragover.prevent="sedangTarikHitungMundur = true"
+                        @dragleave.prevent="sedangTarikHitungMundur = false"
+                        @drop.prevent="jatuhFotoHitungMundur($event)"
+                        :class="sedangTarikHitungMundur ? 'border-sage bg-sage/[0.08] ring-2 ring-sage/20' : 'border-champagne/60 bg-ivory/60 hover:border-sage/60 hover:bg-ivory'"
+                        class="flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed p-3 text-center cursor-pointer transition select-none"
+                        style="aspect-ratio: {{ $rasioFotoTema['foto_hitung_mundur']['rasio'] }};"
+                    >
+                        <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-sage/10 text-sage text-base font-bold">+</span>
+                        <span class="text-[11px] font-semibold text-charcoal">Tambah Foto</span>
+                        <span class="text-[10px] text-charcoal/55 tabular-nums" x-text="'Sisa ' + (maksFotoHitungMundur - daftarFotoHitungMundur.length) + ' slot'"></span>
+                    </label>
+                </div>
+
+                <p x-show="daftarFotoHitungMundur.length >= maksFotoHitungMundur" x-cloak class="text-[11px] text-charcoal/55">
+                    Batas {{ \App\Models\Undangan::MAKS_FOTO_HITUNG_MUNDUR }} foto slideshow tercapai. Hapus salah satu foto jika ingin mengganti.
+                </p>
+
+                <p x-show="pesanGalatHitungMundur" x-cloak x-text="pesanGalatHitungMundur" class="text-xs font-medium text-rose-600"></p>
+            </div>
+        </div>
+
         {{-- Drawer Lipat: Ubah Judul Hitung Mundur, Pengantar & Judul Acara --}}
         <div x-data="{ buka: false }" class="rounded-2xl border border-champagne/30 bg-ivory/50 overflow-hidden">
             <button
@@ -87,17 +240,7 @@
                 </span>
             </button>
             <div x-show="buka" x-cloak class="px-3.5 pb-3.5 pt-2.5 border-t border-champagne/20 bg-white/80">
-                <form
-                    action="{{ route('dashboard.undangan.perbarui', $undangan) }}"
-                    method="POST"
-                    class="space-y-3"
-                    data-swal-loading
-                    data-swal-loading-title="Menyimpan Teks Acara..."
-                    data-swal-loading-text="Memperbarui judul hitung mundur dan judul bagian acara..."
-                >
-                    @csrf
-                    @method('PUT')
-                    <input type="hidden" name="bagian" value="acara_teks">
+                <div data-bagian-utama="acara_teks" class="space-y-3">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label for="teks_judul_hitung_mundur" class="block text-xs font-semibold text-charcoal/80">Judul Hitung Mundur</label>
@@ -105,8 +248,8 @@
                                 id="teks_judul_hitung_mundur"
                                 type="text"
                                 name="teks[judul_hitung_mundur]"
-                                value="{{ old('teks.judul_hitung_mundur', $teksKustom['judul_hitung_mundur'] ?? '') }}"
-                                placeholder="Save The Date"
+                                value="{{ $nilaiTeksEditor('judul_hitung_mundur') }}"
+                                placeholder="{{ $teksBawaanTema['judul_hitung_mundur'] ?: 'Save The Date' }}"
                                 class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none"
                             >
                         </div>
@@ -116,8 +259,8 @@
                                 id="teks_judul_acara"
                                 type="text"
                                 name="teks[judul_acara]"
-                                value="{{ old('teks.judul_acara', $teksKustom['judul_acara'] ?? '') }}"
-                                placeholder="Rangkaian Acara"
+                                value="{{ $nilaiTeksEditor('judul_acara') }}"
+                                placeholder="{{ $teksBawaanTema['judul_acara'] ?: 'Rangkaian Acara' }}"
                                 class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none"
                             >
                         </div>
@@ -128,14 +271,11 @@
                             id="teks_pengantar_hitung_mundur"
                             name="teks[pengantar_hitung_mundur]"
                             rows="2"
-                            placeholder="Merupakan kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir..."
+                            placeholder="{{ $teksBawaanTema['pengantar_hitung_mundur'] ?: 'Merupakan kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir...' }}"
                             class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm leading-relaxed focus:border-sage focus:outline-none"
-                        >{{ old('teks.pengantar_hitung_mundur', $teksKustom['pengantar_hitung_mundur'] ?? '') }}</textarea>
+                        >{{ $nilaiTeksEditor('pengantar_hitung_mundur') }}</textarea>
                     </div>
-                    <button type="submit" class="w-full rounded-xl bg-sage px-4 py-2 text-xs font-semibold text-white hover:bg-[#3b5047] transition cursor-pointer">
-                        Simpan Teks Hitung Mundur &amp; Acara
-                    </button>
-                </form>
+                </div>
             </div>
         </div>
 
@@ -331,18 +471,7 @@
         </div>
 
         {{-- 3C. Dress Code & Live Streaming (Tampil Setelah Rangkaian Acara di Semua Tema) --}}
-        <form
-            action="{{ route('dashboard.undangan.perbarui', $undangan) }}"
-            method="POST"
-            class="space-y-3 pt-1"
-            data-swal-loading
-            data-swal-loading-title="Menyimpan Dress Code &amp; Live..."
-            data-swal-loading-text="Memperbarui panduan busana dan siaran langsung..."
-        >
-            @csrf
-            @method('PUT')
-            <input type="hidden" name="bagian" value="acara_tambahan">
-            <input type="hidden" name="dress_code_disertakan" value="1">
+        <div data-bagian-utama="acara_tambahan" class="space-y-3 pt-1">
             <input type="hidden" name="live_aktif" :value="liveAktifLive ? '1' : '0'">
 
             <div x-data="{ buka: false }" class="rounded-2xl border border-champagne/30 bg-ivory/50 overflow-hidden">
@@ -381,8 +510,8 @@
                         <div class="flex flex-wrap items-center justify-between gap-2">
                             <h3 class="font-sans text-xs font-bold text-charcoal">Dress Code &amp; Palet Warna</h3>
                             <div class="flex flex-wrap gap-1">
-                                <button type="button" @click="pakaiPreset(['#472A1C', '#D7BB83', '#F5E9D6']); $nextTick(() => jadwalkanLivePreview(true))" class="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-sage ring-1 ring-sage/25 hover:bg-sage hover:text-white transition cursor-pointer">Jawa Sogan</button>
-                                <button type="button" @click="pakaiPreset(['#2F4F4F', '#C8A464', '#FDFBF7']); $nextTick(() => jadwalkanLivePreview(true))" class="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-sage ring-1 ring-sage/25 hover:bg-sage hover:text-white transition cursor-pointer">Sage Ivory</button>
+                                <button type="button" @click="pakaiPreset(['#472A1C', '#D7BB83', '#F5E9D6']); tandaiPerubahan(); $nextTick(() => jadwalkanLivePreview(true))" class="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-sage ring-1 ring-sage/25 hover:bg-sage hover:text-white transition cursor-pointer">Jawa Sogan</button>
+                                <button type="button" @click="pakaiPreset(['#2F4F4F', '#C8A464', '#FDFBF7']); tandaiPerubahan(); $nextTick(() => jadwalkanLivePreview(true))" class="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-sage ring-1 ring-sage/25 hover:bg-sage hover:text-white transition cursor-pointer">Sage Ivory</button>
                             </div>
                         </div>
 
@@ -397,14 +526,14 @@
                         <div class="space-y-2">
                             <div class="flex items-center justify-between">
                                 <span class="text-[11px] font-semibold text-charcoal/70">Warna Pilihan (Maks. 5)</span>
-                                <button type="button" @click="tambahWarna(); $nextTick(() => jadwalkanLivePreview(true))" x-show="warnaList.length < 5" class="rounded-full bg-sage/10 px-2.5 py-0.5 text-[11px] font-semibold text-sage hover:bg-sage hover:text-white transition cursor-pointer">+ Warna</button>
+                                <button type="button" @click="tambahWarna(); tandaiPerubahan(); $nextTick(() => jadwalkanLivePreview(true))" x-show="warnaList.length < 5" class="rounded-full bg-sage/10 px-2.5 py-0.5 text-[11px] font-semibold text-sage hover:bg-sage hover:text-white transition cursor-pointer">+ Warna</button>
                             </div>
                             <div class="flex flex-wrap items-center gap-2">
                                 <template x-for="(hex, idx) in warnaList" :key="idx">
                                     <div class="inline-flex items-center gap-1.5 rounded-full bg-white pl-1.5 pr-2 py-1 ring-1 ring-charcoal/15">
                                         <input type="color" :name="'dress_code_warna[' + idx + ']'" x-model="warnaList[idx]" class="h-5 w-5 rounded-full border-0 bg-transparent cursor-pointer p-0">
                                         <span class="font-mono text-[10px] font-semibold uppercase text-charcoal/75" x-text="hex"></span>
-                                        <button type="button" @click="hapusWarna(idx); $nextTick(() => jadwalkanLivePreview(true))" class="text-charcoal/45 hover:text-rose-600 text-xs font-bold leading-none cursor-pointer" title="Hapus warna">&times;</button>
+                                        <button type="button" @click="hapusWarna(idx); tandaiPerubahan(); $nextTick(() => jadwalkanLivePreview(true))" class="text-charcoal/45 hover:text-rose-600 text-xs font-bold leading-none cursor-pointer" title="Hapus warna">&times;</button>
                                     </div>
                                 </template>
                                 <p x-show="warnaList.length === 0" class="text-[11px] italic text-charcoal/50">Belum ada warna ditambahkan.</p>
@@ -449,7 +578,7 @@
                                     @foreach (['YouTube Live', 'Instagram Live', 'Zoom'] as $presetLive)
                                         <button
                                             type="button"
-                                            @click="$refs.livePlatformInput.value = @js($presetLive); jadwalkanLivePreview(true)"
+                                            @click="$refs.livePlatformInput.value = @js($presetLive); tandaiPerubahan(); jadwalkanLivePreview(true)"
                                             class="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-sage ring-1 ring-sage/25 hover:bg-sage hover:text-white transition cursor-pointer"
                                         >
                                             {{ $presetLive }}
@@ -476,13 +605,9 @@
                             </div>
                         </div>
                     </div>
-
-                    <button type="submit" class="w-full rounded-xl bg-sage px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#3b5047] transition cursor-pointer">
-                        Simpan Dress Code &amp; Live Streaming &rarr; Cerita Cinta
-                    </button>
                 </div>
             </div>
-        </form>
+        </div>
     </section>
 </div>
 
@@ -545,19 +670,7 @@
             </button>
         </div>
 
-        <form
-            action="{{ route('dashboard.undangan.perbarui', $undangan) }}"
-            method="POST"
-            enctype="multipart/form-data"
-            class="space-y-4"
-            data-swal-loading
-            data-swal-loading-title="Menyimpan Cerita Cinta..."
-            data-swal-loading-text="Menyimpan linimasa cerita dan foto bab..."
-        >
-            @csrf
-            @method('PUT')
-            <input type="hidden" name="bagian" value="cerita">
-
+        <div data-bagian-utama="cerita" class="space-y-4">
             {{-- Judul Bagian Cerita (Di Atas Daftar Bab) --}}
             <div x-data="{ buka: false }" class="rounded-2xl border border-champagne/30 bg-ivory/50 overflow-hidden">
                 <button
@@ -586,8 +699,8 @@
                         id="teks_judul_cerita"
                         type="text"
                         name="teks[judul_cerita]"
-                        value="{{ old('teks.judul_cerita', $teksKustom['judul_cerita'] ?? '') }}"
-                        placeholder="Cerita Cinta / Our Love Story"
+                        value="{{ $nilaiTeksEditor('judul_cerita') }}"
+                        placeholder="{{ $teksBawaanTema['judul_cerita'] ?: 'Cerita Cinta / Our Love Story' }}"
                         class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none"
                     >
                 </div>
@@ -625,17 +738,66 @@
                             <div class="sm:col-span-12">
                                 <input type="hidden" :name="`cerita_cinta[${idx}][foto]`" :value="item.foto || ''">
                                 <input type="hidden" :name="`cerita_cinta[${idx}][hapus_foto]`" :value="item.hapus_foto ? '1' : '0'">
-                                <div class="flex flex-wrap items-center gap-2.5">
-                                    <template x-if="item.foto_url">
-                                        <div class="h-11 w-11 rounded-lg overflow-hidden ring-1 ring-champagne/45 shrink-0 bg-white">
-                                            <img :src="item.foto_url" alt="Pratinjau foto bab" class="h-full w-full object-cover">
-                                        </div>
-                                    </template>
-                                    <label class="inline-flex items-center gap-1.5 rounded-xl border border-charcoal/15 bg-white px-3 py-1.5 text-xs font-semibold text-charcoal/80 hover:border-sage hover:text-sage cursor-pointer transition">
-                                        <span x-text="item.foto_url ? 'Ganti Foto Bab' : '+ Foto Bab (Opsional)'"></span>
-                                        <input type="file" accept="image/jpeg,image/png,image/webp" :name="`cerita_cinta[${idx}][foto_file]`" @change="pilihFotoCerita(idx, $event)" class="sr-only">
+                                <input
+                                    :id="`cerita-foto-${idx}`"
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp,image/*"
+                                    :name="`cerita_cinta[${idx}][foto_file]`"
+                                    @change="pilihFotoCerita(idx, $event)"
+                                    class="sr-only"
+                                >
+
+                                <div
+                                    :class="item.foto_url ? 'border-solid border-champagne/40 bg-charcoal shadow-2xs' : 'border-dashed border-champagne/50 bg-white/80 hover:border-sage/60 hover:bg-white'"
+                                    class="relative overflow-hidden rounded-xl border-2 transition-all group"
+                                >
+                                    <label :for="`cerita-foto-${idx}`" class="block w-full cursor-pointer select-none">
+                                        <template x-if="item.foto_url">
+                                            <div class="relative w-full min-h-[140px] flex items-center justify-center bg-charcoal">
+                                                <img :src="item.foto_url" alt="Pratinjau foto bab" class="block w-full h-auto max-h-[240px] object-contain transition duration-500 group-hover:scale-[1.02]">
+                                                <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/75"></div>
+                                                <div class="absolute bottom-2.5 inset-x-2.5 flex items-center justify-between gap-2 text-white">
+                                                    <span class="text-[11px] font-medium text-white/90 truncate">Klik foto untuk ganti</span>
+                                                    <span class="rounded-lg bg-white/95 group-hover:bg-white px-2.5 py-1 text-[11px] font-semibold text-charcoal shrink-0 transition">Ganti</span>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <template x-if="!item.foto_url">
+                                            <div class="px-3.5 py-3 flex items-center justify-between gap-2">
+                                                <div class="flex items-center gap-2.5 min-w-0">
+                                                    <span class="inline-flex h-8 w-8 rounded-lg bg-sage/10 text-sage items-center justify-center shrink-0">
+                                                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                            <rect x="3" y="3" width="18" height="18" rx="3"/>
+                                                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                                                            <path d="m21 15-5-5L5 21"/>
+                                                        </svg>
+                                                    </span>
+                                                    <div class="min-w-0">
+                                                        <p class="text-xs font-semibold text-charcoal truncate">+ Foto Bab (Opsional)</p>
+                                                        <p class="text-[11px] text-charcoal/55 truncate">Rasio template: {{ $rasioFotoTema['foto_cerita']['label'] }}</p>
+                                                    </div>
+                                                </div>
+                                                <span class="rounded-lg bg-sage/10 px-2.5 py-1 text-[11px] font-semibold text-sage shrink-0">Pilih</span>
+                                            </div>
+                                        </template>
                                     </label>
-                                    <button type="button" x-show="item.foto_url" @click="hapusFotoCerita(idx)" class="text-xs font-semibold text-rose-600 hover:underline cursor-pointer">Hapus Foto</button>
+
+                                    <div x-show="item.foto_url" x-cloak class="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5">
+                                        <button
+                                            type="button"
+                                            @click="potongFotoCerita(idx)"
+                                            class="inline-flex items-center gap-1 rounded-full bg-black/55 hover:bg-sage backdrop-blur-xs px-2.5 py-1 text-[11px] font-semibold text-white ring-1 ring-white/15 transition cursor-pointer"
+                                        >
+                                            Potong
+                                        </button>
+                                        <button
+                                            type="button"
+                                            @click="hapusFotoCerita(idx)"
+                                            class="rounded-full bg-black/55 hover:bg-rose-600 backdrop-blur-xs px-2.5 py-1 text-[11px] font-semibold text-white ring-1 ring-white/15 transition cursor-pointer"
+                                        >
+                                            Hapus
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -688,12 +850,7 @@
                     </div>
                 </div>
             </div>
-
-            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-sage px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#3b5047] active:scale-[0.98] transition cursor-pointer">
-                <span>Simpan Cerita &amp; Lanjut ke Galeri</span>
-                <span aria-hidden="true">&rarr;</span>
-            </button>
-        </form>
+        </div>
     </section>
 </div>
 
@@ -724,7 +881,10 @@
                 <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-sage/12 text-[11px] font-bold text-sage shrink-0">5</span>
                 <span class="font-sans text-sm font-semibold text-charcoal truncate" :class="!sakelarFitur.galeri ? 'opacity-55' : ''">Galeri Foto</span>
             </span>
-            <span class="rounded-full bg-ivory px-2 py-0.5 font-sans tabular-nums text-[11px] font-semibold text-sage ring-1 ring-champagne/25 shrink-0">
+            <span
+                class="rounded-full bg-ivory px-2 py-0.5 font-sans tabular-nums text-[11px] font-semibold text-sage ring-1 ring-champagne/25 shrink-0"
+                x-text="daftarGaleri.length + '/' + maksGaleri + ' Foto'"
+            >
                 {{ $jumlahGaleri }}/10 Foto
             </span>
         </button>
@@ -775,133 +935,171 @@
                 </span>
             </button>
             <div x-show="buka" x-cloak class="px-3.5 pb-3.5 pt-2.5 border-t border-champagne/20 bg-white/80">
-                <form
-                    action="{{ route('dashboard.undangan.perbarui', $undangan) }}"
-                    method="POST"
-                    class="flex items-end gap-2"
-                    data-swal-loading
-                    data-swal-loading-title="Menyimpan Judul Galeri..."
-                    data-swal-loading-text="Memperbarui judul bagian galeri foto..."
-                >
-                    @csrf
-                    @method('PUT')
-                    <input type="hidden" name="bagian" value="galeri">
-                    <div class="flex-1 min-w-0">
-                        <label for="teks_judul_galeri" class="block text-xs font-semibold text-charcoal/80">Judul Bagian Galeri</label>
-                        <input
-                            id="teks_judul_galeri"
-                            type="text"
-                            name="teks[judul_galeri]"
-                            value="{{ old('teks.judul_galeri', $teksKustom['judul_galeri'] ?? '') }}"
-                            placeholder="Our Gallery / Potret Kebahagiaan"
-                            class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none"
-                        >
-                    </div>
-                    <button type="submit" class="rounded-xl bg-sage px-4 py-2 text-xs font-semibold text-white hover:bg-[#3b5047] transition cursor-pointer shrink-0">Simpan</button>
-                </form>
+                <div data-bagian-utama="galeri">
+                    <label for="teks_judul_galeri" class="block text-xs font-semibold text-charcoal/80">Judul Bagian Galeri</label>
+                    <input
+                        id="teks_judul_galeri"
+                        type="text"
+                        name="teks[judul_galeri]"
+                        value="{{ $nilaiTeksEditor('judul_galeri') }}"
+                        placeholder="{{ $teksBawaanTema['judul_galeri'] ?: 'Our Gallery / Potret Kebahagiaan' }}"
+                        class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none"
+                    >
+                </div>
             </div>
         </div>
 
-        {{-- Kuota Ringkas --}}
+        {{-- Kuota Ringkas (Live) --}}
         <div class="rounded-xl bg-ivory p-3 ring-1 ring-champagne/25">
             <div class="flex items-center justify-between text-xs font-semibold text-charcoal">
                 <span>Kuota Galeri Prewedding</span>
-                <span class="text-sage font-bold">{{ $jumlahGaleri }}/10 Foto</span>
+                <span class="text-sage font-bold tabular-nums" x-text="daftarGaleri.length + '/' + maksGaleri + ' Foto'">{{ $jumlahGaleri }}/10 Foto</span>
             </div>
             <div class="mt-2 h-1.5 w-full rounded-full bg-champagne/20 overflow-hidden">
-                <div class="h-full rounded-full bg-gradient-to-r from-sage to-champagne transition-all duration-500" style="width: {{ $persenGaleri }}%"></div>
+                <div
+                    class="h-full rounded-full bg-gradient-to-r from-sage to-champagne transition-all duration-300"
+                    :style="'width: ' + Math.min(100, Math.round((daftarGaleri.length / maksGaleri) * 100)) + '%'"
+                    style="width: {{ $persenGaleri }}%"
+                ></div>
             </div>
         </div>
 
-        {{-- Upload Galeri --}}
-        <form
-            action="{{ route('dashboard.galeri.unggah', $undangan) }}"
-            method="POST"
-            enctype="multipart/form-data"
-            @submit="if (!$el.querySelector('input[type=file]')?.files?.length) { $event.preventDefault(); window.Swal?.fire({ icon: 'warning', title: 'Pilih Foto Dulu', text: 'Silakan pilih file foto prewedding yang ingin diunggah.', confirmButtonColor: '#4B6358' }); }"
-            class="grid grid-cols-1 gap-3.5"
-            data-swal-loading
-            data-swal-loading-title="Mengunggah &amp; Mengompresi Foto..."
-            data-swal-loading-text="Mengonversi foto galeri ke .webp dan menyimpannya..."
-        >
-            @csrf
-            <div class="flex">
-                @include('dashboard._input-foto-pratinjau', [
-                    'name' => 'foto',
-                    'varian' => 'galeri',
-                    'label' => 'Pilih atau Seret Foto Prewedding',
-                    'petunjuk' => 'JPG/PNG/WebP • Maks. 5 MB • Otomatis WebP',
-                ])
+        {{-- Multi-Unggah Galeri Tanpa Refresh (Tersimpan Bersama Simpan Semua) --}}
+        <div class="space-y-3">
+            <input
+                id="input-galeri-foto"
+                type="file"
+                name="galeri_foto[]"
+                accept="image/jpeg,image/png,image/webp,image/*"
+                multiple
+                @change="pilihFotoGaleri($event)"
+                class="sr-only"
+            >
+
+            <div class="flex items-center justify-between gap-2">
+                <p class="text-[11px] leading-relaxed text-charcoal/60">
+                    Pilih 1&ndash;10 foto sekaligus (rasio template: <span class="font-semibold text-charcoal/80">{{ $rasioFotoTema['foto_galeri']['label'] }}</span>). Perubahan langsung tampil di pratinjau dan tersimpan lewat <strong>Simpan Semua</strong>.
+                </p>
             </div>
 
-            <div class="rounded-2xl bg-ivory/75 ring-1 ring-champagne/25 p-3.5 space-y-2.5">
-                <label for="keterangan_galeri" class="block text-xs font-semibold text-charcoal/80">
-                    Keterangan Foto <span class="font-normal text-charcoal/45">(Opsional)</span>
-                </label>
-                <div class="flex flex-wrap gap-1">
-                    @foreach (['Prewedding Outdoor', 'Momen Lamaran', 'Persiapan Akad', 'Senja Bersama'] as $saranKet)
-                        <button
-                            type="button"
-                            @click="$refs.ketGaleriInput.value = @js($saranKet)"
-                            class="rounded-full bg-white px-2.5 py-0.5 text-[11px] font-semibold text-sage ring-1 ring-sage/25 hover:bg-sage hover:text-white transition cursor-pointer"
-                        >
-                            + {{ $saranKet }}
-                        </button>
-                    @endforeach
+            {{-- Keadaan Kosong: Area Unggah Penuh --}}
+            <label
+                x-show="daftarGaleri.length === 0"
+                for="input-galeri-foto"
+                @dragover.prevent="sedangTarikGaleri = true"
+                @dragleave.prevent="sedangTarikGaleri = false"
+                @drop.prevent="jatuhFotoGaleri($event)"
+                :class="sedangTarikGaleri ? 'border-sage bg-sage/[0.06] ring-4 ring-sage/10' : 'border-champagne/60 bg-ivory/50 hover:border-sage/60 hover:bg-ivory'"
+                class="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-4 py-7 text-center cursor-pointer transition select-none"
+            >
+                <span class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-sage/10 text-sage">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" x2="12" y1="3" y2="15"/>
+                    </svg>
+                </span>
+                <div>
+                    <p class="text-xs font-semibold text-charcoal">Pilih atau Seret Foto Prewedding</p>
+                    <p class="mt-0.5 text-[11px] text-charcoal/55">Bisa pilih sekaligus hingga 10 foto • Otomatis dipotong &amp; WebP</p>
                 </div>
-                <input
-                    id="keterangan_galeri"
-                    x-ref="ketGaleriInput"
-                    type="text"
-                    name="keterangan"
-                    placeholder="Contoh: Sesi prewedding di Bandung"
-                    class="w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm focus:border-sage focus:outline-none"
-                >
-                <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-sage px-5 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 transition cursor-pointer shadow-xs">
-                    <span>Unggah Foto (#{{ $jumlahGaleri + 1 }})</span>
-                </button>
-            </div>
-        </form>
+                <span class="rounded-lg bg-sage/10 px-3 py-1.5 text-[11px] font-semibold text-sage">Pilih Foto</span>
+            </label>
 
-        @if ($undangan->daftarGaleri->isNotEmpty())
-            <div class="pt-3 border-t border-champagne/20 space-y-3">
+            {{-- Grid Foto Galeri + Kartu Tambah Foto --}}
+            <div x-show="daftarGaleri.length > 0" x-cloak class="space-y-2.5">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-charcoal/65">Foto Terunggah</h3>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-charcoal/65">Koleksi Foto Galeri</h3>
                     <span class="text-[11px] text-charcoal/50">Klik foto untuk perbesar</span>
                 </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                    @foreach ($undangan->daftarGaleri as $galeri)
-                        <div class="group rounded-xl overflow-hidden bg-white ring-1 ring-champagne/25 shadow-xs flex flex-col">
+                <div class="grid grid-cols-2 gap-2.5">
+                    <template x-for="(item, idx) in daftarGaleri" :key="item.uid">
+                        <div class="group rounded-xl overflow-hidden bg-white ring-1 ring-champagne/30 shadow-2xs flex flex-col">
                             <div
-                                @click="galeriLightbox = { url: @js($galeri->urlFoto()), caption: @js($galeri->keterangan ?: 'Foto #'.$galeri->urutan) }"
-                                class="relative aspect-[4/5] overflow-hidden bg-ivory cursor-zoom-in"
+                                @click="galeriLightbox = { url: item.url, caption: item.keterangan || ('Foto #' + (idx + 1)) }"
+                                class="relative overflow-hidden bg-charcoal cursor-zoom-in"
+                                style="aspect-ratio: {{ $rasioFotoTema['foto_galeri']['rasio'] }};"
                             >
-                                <img src="{{ $galeri->urlFoto() }}" alt="{{ $galeri->keterangan ?? 'Foto Galeri' }}" class="w-full h-full object-cover object-top transition duration-500 group-hover:scale-105">
-                                <span class="absolute top-2 left-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-bold text-white">#{{ $galeri->urutan }}</span>
-                            </div>
-                            <div class="p-2 flex items-center justify-between gap-1.5 text-[11px] bg-white">
-                                <span class="truncate font-medium text-charcoal/80">{{ $galeri->keterangan ?: 'Foto #'.$galeri->urutan }}</span>
-                                <form
-                                    action="{{ route('dashboard.galeri.hapus', [$undangan, $galeri]) }}"
-                                    method="POST"
-                                    data-swal-title="Hapus Foto Galeri?"
-                                    data-swal-confirm="Yakin ingin menghapus foto ini dari galeri?"
-                                    data-swal-icon="warning"
-                                    data-swal-confirm-button="Ya, Hapus"
-                                    data-swal-confirm-color="#DC2626"
-                                    data-swal-loading-title="Menghapus Foto Galeri..."
-                                    data-swal-loading-text="Menghapus foto dari galeri..."
+                                <img
+                                    :src="item.url"
+                                    :alt="item.keterangan || ('Foto Galeri #' + (idx + 1))"
+                                    class="block h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                                 >
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="rounded-md bg-rose-50 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700 hover:bg-rose-100 cursor-pointer shrink-0">Hapus</button>
-                                </form>
+                                <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/55 via-transparent to-black/70"></div>
+
+                                {{-- Nomor & Urutan --}}
+                                <div class="absolute top-2 left-2 z-10 flex items-center gap-1">
+                                    <span class="rounded-full bg-black/60 backdrop-blur-xs px-2 py-0.5 text-[10px] font-bold text-white ring-1 ring-white/15 tabular-nums" x-text="'#' + (idx + 1)"></span>
+                                    <button
+                                        type="button"
+                                        x-show="idx > 0"
+                                        @click.stop="pindahFotoGaleri(idx, -1)"
+                                        title="Geser ke kiri"
+                                        aria-label="Geser foto galeri ke kiri"
+                                        class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-black/55 hover:bg-sage text-[10px] font-bold text-white ring-1 ring-white/15 transition cursor-pointer"
+                                    >&larr;</button>
+                                    <button
+                                        type="button"
+                                        x-show="idx < daftarGaleri.length - 1"
+                                        @click.stop="pindahFotoGaleri(idx, 1)"
+                                        title="Geser ke kanan"
+                                        aria-label="Geser foto galeri ke kanan"
+                                        class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-black/55 hover:bg-sage text-[10px] font-bold text-white ring-1 ring-white/15 transition cursor-pointer"
+                                    >&rarr;</button>
+                                </div>
+
+                                {{-- Aksi Potong & Hapus --}}
+                                <div class="absolute bottom-2 inset-x-2 z-10 flex items-center justify-end gap-1.5">
+                                    <button
+                                        type="button"
+                                        @click.stop="potongFotoGaleri(idx)"
+                                        class="rounded-full bg-black/60 hover:bg-sage backdrop-blur-xs px-2.5 py-1 text-[10px] font-semibold text-white ring-1 ring-white/15 transition cursor-pointer"
+                                    >Potong</button>
+                                    <button
+                                        type="button"
+                                        @click.stop="hapusFotoGaleri(idx)"
+                                        class="rounded-full bg-black/60 hover:bg-rose-600 backdrop-blur-xs px-2.5 py-1 text-[10px] font-semibold text-white ring-1 ring-white/15 transition cursor-pointer"
+                                    >Hapus</button>
+                                </div>
+                            </div>
+
+                            {{-- Keterangan Opsional Langsung di Kartu --}}
+                            <div class="p-2 bg-white border-t border-champagne/20">
+                                <input
+                                    type="text"
+                                    x-model="item.keterangan"
+                                    @input="saatUbahKeteranganGaleri()"
+                                    maxlength="255"
+                                    placeholder="Keterangan (opsional)..."
+                                    class="w-full rounded-lg border border-charcoal/10 bg-ivory/50 px-2 py-1 text-[11px] text-charcoal placeholder:text-charcoal/40 focus:border-sage focus:bg-white focus:outline-none"
+                                >
                             </div>
                         </div>
-                    @endforeach
+                    </template>
+
+                    {{-- Kartu Tambah Foto Baru (selama < 10 foto) --}}
+                    <label
+                        x-show="daftarGaleri.length < maksGaleri"
+                        for="input-galeri-foto"
+                        @dragover.prevent="sedangTarikGaleri = true"
+                        @dragleave.prevent="sedangTarikGaleri = false"
+                        @drop.prevent="jatuhFotoGaleri($event)"
+                        :class="sedangTarikGaleri ? 'border-sage bg-sage/[0.08] ring-2 ring-sage/20' : 'border-champagne/60 bg-ivory/60 hover:border-sage/60 hover:bg-ivory'"
+                        class="flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed p-3 text-center cursor-pointer transition select-none min-h-[160px]"
+                    >
+                        <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-sage/10 text-sage text-lg font-bold">+</span>
+                        <span class="text-xs font-semibold text-charcoal">Tambah Foto</span>
+                        <span class="text-[10px] text-charcoal/55 tabular-nums" x-text="'Sisa ' + (maksGaleri - daftarGaleri.length) + ' slot'"></span>
+                    </label>
                 </div>
+
+                <p x-show="daftarGaleri.length >= maksGaleri" x-cloak class="text-[11px] text-charcoal/55">
+                    Kuota maksimal 10 foto galeri sudah tercapai. Hapus salah satu foto jika ingin mengganti.
+                </p>
             </div>
-        @endif
+
+            <p x-show="pesanGalatGaleri" x-cloak x-text="pesanGalatGaleri" class="text-xs font-medium text-rose-600"></p>
+        </div>
     </section>
 </div>

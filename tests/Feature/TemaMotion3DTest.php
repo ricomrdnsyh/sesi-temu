@@ -3,9 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\AcaraUndangan;
+use App\Models\GaleriUndangan;
 use App\Models\Pengguna;
 use App\Models\Tema;
 use App\Models\Undangan;
+use App\Support\DataTemaUndangan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -365,9 +367,10 @@ class TemaMotion3DTest extends TestCase
     }
 
     /**
-     * Memastikan user dapat mengustomisasi seluruh foto tema (sampul, pembuka, penutup,
-     * latar tema, dan foto per-bab cerita cinta) + hashtag dari dashboard, tampil pada
-     * undangan publik, disembunyikan saat Mode Tanpa Foto, serta bisa dihapus bersih.
+     * Memastikan user dapat mengustomisasi foto sampul depan, pembuka, penutup,
+     * dan foto per-bab cerita cinta + hashtag dari dashboard, latar undangan selalu
+     * memakai bawaan tema, seluruh foto kustom disembunyikan saat Mode Tanpa Foto,
+     * serta bisa dihapus bersih.
      */
     public function test_dashboard_kustomisasi_foto_lengkap_dan_foto_bab_cerita_serta_aman_mode_tanpa_foto(): void
     {
@@ -416,10 +419,36 @@ class TemaMotion3DTest extends TestCase
             'alamat_lengkap' => 'Surakarta',
         ]);
 
-        // 1. Upload foto sampul, pembuka, penutup, latar tema + hashtag dari tab Mempelai
+        // 0. Halaman kelola hanya menampilkan unggahan Foto Sampul Depan (tanpa sampul latar custom)
+        //    dan menyediakan unggahan khusus multi-foto Slideshow Hitung Mundur
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=tema")
+            ->assertOk()
+            ->assertSee('Foto Sampul Depan')
+            ->assertSee('name="foto_sampul"', false)
+            ->assertDontSee('name="foto_latar_tema"', false)
+            ->assertSee('Foto Slideshow Hitung Mundur')
+            ->assertSee('name="foto_hitung_mundur[]"', false)
+            ->assertSee('4:3 Hitung Mundur');
+
+        // 0b. Jika hanya ada foto di Galeri (tanpa Foto Hitung Mundur), banner Hitung Mundur tidak mencuri dari Galeri
+        GaleriUndangan::create([
+            'undangan_id' => $undangan->id,
+            'lokasi_foto' => 'undangan/galeri-uji-khusus.webp',
+            'keterangan' => 'Foto Galeri Uji',
+            'urutan' => 1,
+        ]);
+        $undangan->load('daftarGaleri');
+        $this->assertTrue(DataTemaUndangan::siapkan($undangan)['fotoGaleriSlideshow']->isEmpty());
+        $this->get('/kustom-foto-lengkap')
+            ->assertOk()
+            ->assertDontSee('alt="Momen Bahagia Dimas & Laras"', false);
+
+        // 1. Upload foto sampul depan, pembuka, 3 foto slideshow hitung mundur, penutup + hashtag
+        //    (foto_latar_tema diabaikan karena latar selalu bawaan)
         $this->actingAs($client)
             ->put("/dashboard/undangan/{$undangan->id}", [
-                'bagian' => 'mempelai',
+                'bagian' => 'semua',
                 'nama_panggilan_pria' => 'Dimas',
                 'nama_lengkap_pria' => 'Dimas Prasetya',
                 'nama_panggilan_wanita' => 'Laras',
@@ -427,6 +456,12 @@ class TemaMotion3DTest extends TestCase
                 'hashtag' => 'DimasLarasSelamanya',
                 'foto_sampul' => UploadedFile::fake()->image('sampul.jpg', 900, 1200),
                 'foto_pembuka' => UploadedFile::fake()->image('pembuka.jpg', 900, 1200),
+                'foto_hitung_mundur_disertakan' => '1',
+                'foto_hitung_mundur_items' => [
+                    ['path' => '', 'file' => UploadedFile::fake()->image('hitung-mundur-1.jpg', 1200, 900)],
+                    ['path' => '', 'file' => UploadedFile::fake()->image('hitung-mundur-2.jpg', 1200, 900)],
+                    ['path' => '', 'file' => UploadedFile::fake()->image('hitung-mundur-3.jpg', 1200, 900)],
+                ],
                 'foto_penutup' => UploadedFile::fake()->image('penutup.jpg', 900, 1200),
                 'foto_latar_tema' => UploadedFile::fake()->image('latar.jpg', 1000, 1400),
             ])
@@ -453,46 +488,67 @@ class TemaMotion3DTest extends TestCase
 
         $pathSampul = $undangan->pengaturan['foto_sampul'] ?? null;
         $pathPembuka = $undangan->pengaturan['foto_pembuka'] ?? null;
+        $daftarPathHitungMundur = $undangan->daftarPathFotoHitungMundur();
         $pathPenutup = $undangan->pengaturan['foto_penutup'] ?? null;
-        $pathLatar = $undangan->pengaturan['foto_latar_tema'] ?? null;
         $pathBab = $undangan->pengaturan['cerita_cinta'][0]['foto'] ?? null;
 
         $this->assertNotEmpty($pathSampul);
         $this->assertNotEmpty($pathPembuka);
+        $this->assertCount(3, $daftarPathHitungMundur);
         $this->assertNotEmpty($pathPenutup);
-        $this->assertNotEmpty($pathLatar);
+        $this->assertNull($undangan->pengaturan['foto_latar_tema'] ?? null);
+        $this->assertNull($undangan->urlFotoLatarCustom());
         $this->assertNotEmpty($pathBab);
         $this->assertSame('#DimasLarasSelamanya', $undangan->hashtagPasangan());
 
         Storage::disk('public')->assertExists($pathSampul);
         Storage::disk('public')->assertExists($pathPembuka);
+        foreach ($daftarPathHitungMundur as $pathHm) {
+            Storage::disk('public')->assertExists($pathHm);
+        }
         Storage::disk('public')->assertExists($pathPenutup);
-        Storage::disk('public')->assertExists($pathLatar);
         Storage::disk('public')->assertExists($pathBab);
 
-        // 3. Verifikasi seluruh foto custom & hashtag muncul di tema flagship Adat Jawa
+        // 3. Verifikasi seluruh foto custom & slideshow 3 foto muncul di tema flagship Adat Jawa
         $this->get('/kustom-foto-lengkap')
             ->assertOk()
             ->assertSee($pathSampul, false)
             ->assertSee($pathPembuka, false)
+            ->assertSee($daftarPathHitungMundur[0], false)
+            ->assertSee($daftarPathHitungMundur[1], false)
+            ->assertSee($daftarPathHitungMundur[2], false)
+            ->assertSee('jumlah: 3', false)
             ->assertSee($pathPenutup, false)
-            ->assertSee($pathLatar, false)
             ->assertSee($pathBab, false)
             ->assertSee('#DimasLarasSelamanya', false);
 
-        // 4. Verifikasi juga tampil pada tema lain (Sunda Heritage)
+        // 4. Verifikasi juga tampil bergantian pada tema lain (Sunda Heritage)
         $undangan->update(['tema_id' => $temaSunda->id]);
         $this->get('/kustom-foto-lengkap')
             ->assertOk()
             ->assertSee($pathSampul, false)
             ->assertSee($pathPembuka, false)
+            ->assertSee($daftarPathHitungMundur[0], false)
+            ->assertSee($daftarPathHitungMundur[1], false)
+            ->assertSee($daftarPathHitungMundur[2], false)
+            ->assertSee('jumlah: 3', false)
             ->assertSee($pathPenutup, false)
-            ->assertSee($pathLatar, false)
             ->assertSee($pathBab, false)
             ->assertSee('#DimasLarasSelamanya', false);
 
+        // 4b. Jika fitur Hitung Mundur dimatikan, seluruh foto slideshow hitung mundur ikut disembunyikan
+        $pengaturanNonaktif = $undangan->pengaturan;
+        $pengaturanNonaktif['fitur_aktif']['hitung_mundur'] = false;
+        $undangan->update(['tema_id' => $temaJawa->id, 'pengaturan' => $pengaturanNonaktif]);
+        $this->get('/kustom-foto-lengkap')
+            ->assertOk()
+            ->assertDontSee($daftarPathHitungMundur[0], false)
+            ->assertDontSee($daftarPathHitungMundur[1], false)
+            ->assertDontSee($daftarPathHitungMundur[2], false);
+
         // 5. Mode Tanpa Foto aktif -> seluruh foto kustom disembunyikan dengan aman
         $pengaturanTf = $undangan->pengaturan;
+        $pengaturanTf['fitur_aktif']['hitung_mundur'] = true;
         $pengaturanTf['tanpa_foto'] = true;
         $undangan->update(['tema_id' => $temaJawa->id, 'pengaturan' => $pengaturanTf]);
 
@@ -500,21 +556,49 @@ class TemaMotion3DTest extends TestCase
             ->assertOk()
             ->assertDontSee($pathSampul, false)
             ->assertDontSee($pathPembuka, false)
+            ->assertDontSee($daftarPathHitungMundur[0], false)
+            ->assertDontSee($daftarPathHitungMundur[1], false)
+            ->assertDontSee($daftarPathHitungMundur[2], false)
             ->assertDontSee($pathPenutup, false)
-            ->assertDontSee($pathLatar, false)
             ->assertDontSee($pathBab, false);
 
-        // 6. Hapus foto pembuka, penutup, latar tema, dan foto bab cerita dari dashboard
+        // 5b. Urutkan ulang & hapus 1 foto slideshow -> foto terhapus hilang dari storage, 2 foto tersisa tetap terurut
         $this->actingAs($client)
             ->put("/dashboard/undangan/{$undangan->id}", [
-                'bagian' => 'mempelai',
+                'bagian' => 'semua',
+                'nama_panggilan_pria' => 'Dimas',
+                'nama_lengkap_pria' => 'Dimas Prasetya',
+                'nama_panggilan_wanita' => 'Laras',
+                'nama_lengkap_wanita' => 'Larasati Ningrum',
+                'foto_hitung_mundur_disertakan' => '1',
+                'foto_hitung_mundur_items' => [
+                    ['path' => $daftarPathHitungMundur[2]],
+                    ['path' => $daftarPathHitungMundur[0]],
+                ],
+            ])
+            ->assertSessionHasNoErrors();
+
+        $undangan->refresh();
+        $this->assertSame(
+            [$daftarPathHitungMundur[2], $daftarPathHitungMundur[0]],
+            $undangan->daftarPathFotoHitungMundur()
+        );
+        Storage::disk('public')->assertMissing($daftarPathHitungMundur[1]);
+        Storage::disk('public')->assertExists($daftarPathHitungMundur[0]);
+        Storage::disk('public')->assertExists($daftarPathHitungMundur[2]);
+
+        // 6. Hapus foto pembuka, seluruh slideshow hitung mundur, penutup, dan foto bab cerita dari dashboard
+        $this->actingAs($client)
+            ->put("/dashboard/undangan/{$undangan->id}", [
+                'bagian' => 'semua',
                 'nama_panggilan_pria' => 'Dimas',
                 'nama_lengkap_pria' => 'Dimas Prasetya',
                 'nama_panggilan_wanita' => 'Laras',
                 'nama_lengkap_wanita' => 'Larasati Ningrum',
                 'hapus_foto_pembuka' => '1',
+                'foto_hitung_mundur_disertakan' => '1',
+                'foto_hitung_mundur_items' => [],
                 'hapus_foto_penutup' => '1',
-                'hapus_foto_latar_tema' => '1',
             ])
             ->assertSessionHasNoErrors();
 
@@ -535,13 +619,15 @@ class TemaMotion3DTest extends TestCase
 
         $undangan->refresh();
         $this->assertNull($undangan->pengaturan['foto_pembuka'] ?? null);
+        $this->assertSame([], $undangan->daftarPathFotoHitungMundur());
         $this->assertNull($undangan->pengaturan['foto_penutup'] ?? null);
-        $this->assertNull($undangan->pengaturan['foto_latar_tema'] ?? null);
         $this->assertNull($undangan->pengaturan['cerita_cinta'][0]['foto'] ?? null);
 
         Storage::disk('public')->assertMissing($pathPembuka);
+        foreach ($daftarPathHitungMundur as $pathHm) {
+            Storage::disk('public')->assertMissing($pathHm);
+        }
         Storage::disk('public')->assertMissing($pathPenutup);
-        Storage::disk('public')->assertMissing($pathLatar);
         Storage::disk('public')->assertMissing($pathBab);
     }
 

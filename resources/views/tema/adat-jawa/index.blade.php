@@ -25,6 +25,8 @@
     $urlFotoSampul = $tanpaFoto ? null : $undangan->urlFotoSampul();
     $pakaiFotoSampul = !$tanpaFoto && !empty($urlFotoSampul);
     $urlFotoPembuka = $tanpaFoto ? null : $undangan->urlFotoPembuka();
+    $daftarUrlFotoHitungMundur = $tanpaFoto ? [] : $undangan->daftarUrlFotoHitungMundur();
+    $urlFotoHitungMundur = $daftarUrlFotoHitungMundur[0] ?? null;
     $urlFotoPenutup = $tanpaFoto ? null : $undangan->urlFotoPenutup();
     $urlFotoLatarCustom = $tanpaFoto ? null : $undangan->urlFotoLatarCustom();
     $urlFotoLatar = $urlFotoLatarCustom ?? $asetJawa['latarHutan'];
@@ -46,9 +48,18 @@
     $turutPria = $undangan->turutMengundangPria();
     $adaTurutMengundang = !empty($turutWanita) || !empty($turutPria);
 
-    $fotoGaleriSlideshow = $tanpaFoto
-        ? collect()
-        : $undangan->daftarGaleri->take(3)->map(static fn($item) => $item->urlFoto())->filter()->values();
+    $fotoGaleriSlideshow = collect();
+    if (!$tanpaFoto && $undangan->fiturAktif('hitung_mundur')) {
+        if (!empty($daftarUrlFotoHitungMundur)) {
+            $fotoGaleriSlideshow = collect($daftarUrlFotoHitungMundur)->values();
+        } elseif ($modeDemo) {
+            $fotoGaleriSlideshow = $undangan->daftarGaleri
+                ->take(3)
+                ->map(static fn($item) => $item->urlFoto())
+                ->filter()
+                ->values();
+        }
+    }
 
     $galeriPanggungKanan = collect();
     if (!$tanpaFoto) {

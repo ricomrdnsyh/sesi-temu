@@ -12,6 +12,8 @@ class Undangan extends Model
 {
     protected $table = 'undangan';
 
+    public const MAKS_FOTO_HITUNG_MUNDUR = 4;
+
     /**
      * Daftar pilihan kombinasi desain font untuk halaman undangan.
      *
@@ -165,8 +167,9 @@ class Undangan extends Model
             'tanpa_foto' => false,
             'foto_sampul' => null,
             'foto_pembuka' => null,
+            'foto_hitung_mundur' => [],
             'foto_penutup' => null,
-            'foto_latar_tema' => null,
+            'musik_kustom' => null,
             'hashtag' => '',
             'sosial_media' => [
                 'instagram_pria' => '',
@@ -423,6 +426,202 @@ class Undangan extends Model
     }
 
     /**
+     * Daftar teks bawaan sesuai tema aktif undangan untuk mengisi nilai awal kolom editor
+     * sekaligus menjaga agar nilai bawaan tidak menimpa tema lain saat berganti tema.
+     *
+     * @return array<string, string>
+     */
+    public function teksBawaanTema(): array
+    {
+        $slugTema = $this->tema?->slug ?? 'rustic-floral';
+        $tanpaFoto = $this->modeTanpaFoto();
+
+        $umum = [
+            'sampul_judul' => 'The Wedding Of',
+            'sampul_tombol' => 'Buka Undangan',
+            'sampul_sapaan' => 'Kepada Yth. Bapak/Ibu/Saudara/i',
+            'sampul_catatan' => 'Mohon maaf apabila ada kesalahan penulisan nama/gelar',
+            'judul_mempelai' => 'Mempelai Berbahagia',
+            'pengantar_mempelai' => 'Dengan memohon rahmat dan ridho Tuhan Yang Maha Esa, kami bermaksud menyelenggarakan pernikahan putra-putri kami:',
+            'label_pria' => 'Putra dari',
+            'label_wanita' => 'Putri dari',
+            'judul_hitung_mundur' => 'Save The Date',
+            'pengantar_hitung_mundur' => 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu.',
+            'judul_acara' => 'Rangkaian Acara',
+            'judul_cerita' => 'Cerita Cinta',
+            'judul_galeri' => 'Potret Kebahagiaan',
+            'judul_amplop' => 'Amplop Digital',
+            'pengantar_amplop' => 'Doa restu Bapak/Ibu/Saudara/i merupakan kado terindah bagi kami. Namun apabila ingin memberikan tanda kasih, dapat disalurkan melalui:',
+            'judul_buku_tamu' => 'RSVP & Wishes',
+            'judul_turut_mengundang' => 'Turut Mengundang',
+            'judul_penutup' => 'Terima Kasih',
+            'ucapan_penutup' => 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu.',
+            'label_penutup' => 'Kami Yang Berbahagia',
+        ];
+
+        $khususTema = match ($slugTema) {
+            'adat-jawa' => [
+                'sampul_judul' => 'The Wedding of',
+                'judul_mempelai' => 'We Are Getting Married!',
+                'pengantar_mempelai' => 'Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud menyelenggarakan upacara pernikahan putra-putri kami:',
+                'pengantar_hitung_mundur' => 'Merupakan kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu.',
+                'judul_acara' => '',
+                'judul_cerita' => 'Our Love Story',
+                'judul_galeri' => 'Our Gallery',
+                'pengantar_amplop' => 'Tanpa mengurangi rasa hormat, bagi Bapak/Ibu/Saudara/i yang ingin memberikan tanda kasih untuk kami, dapat melalui:',
+                'judul_penutup' => '',
+                'ucapan_penutup' => 'Atas kehadiran dan doa restu yang Bapak/Ibu/Saudara/i berikan, kami ucapkan terima kasih. Semoga Allah SWT senantiasa melimpahkan rahmat dan berkah-Nya kepada kita semua.',
+                'label_penutup' => 'Kami Yang Berbahagia,',
+            ],
+            'sunda-heritage' => [
+                'sampul_judul' => $tanpaFoto ? 'The Wedding Of' : 'Sampurasun • Walimatul Ursy',
+                'pengantar_mempelai' => 'Kalayan nyuhunkeun rido sareng rahmat Gusti Nu Maha Suci, sim kuring nyanggakeun pangulem nikah:',
+                'label_pria' => 'Putra ti',
+                'label_wanita' => 'Putri ti',
+                'pengantar_hitung_mundur' => 'Merupakan kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu.',
+                'judul_galeri' => 'Our Gallery',
+                'pengantar_amplop' => 'Doa restu Bapa/Ibu/Saderek mangrupikeun kado pangsaena. Bilih kersa ngintun tanda kasih, mangga tiasa liwat:',
+                'judul_penutup' => 'Hatur Nuhun',
+                'ucapan_penutup' => 'Mugia kahadiran sareng doa restu Bapa/Ibu/Saderek ngajantenkeun amal soleh sareng kabagjaan kangge rumah tangga sim kuring.',
+            ],
+            'islami-syari' => [
+                'sampul_judul' => 'Walimatul Ursy',
+                'judul_mempelai' => 'Mempelai Pengantin',
+                'pengantar_mempelai' => 'Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud menyelenggarakan akad nikah & walimatul ursy putra-putri kami:',
+                'pengantar_hitung_mundur' => 'Merupakan kehormatan dan keberkahan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu.',
+                'judul_acara' => 'Jadwal Akad & Walimah',
+                'judul_cerita' => 'Kisah Pertemuan',
+                'judul_galeri' => 'Momen Terindah',
+                'judul_amplop' => 'Hadiah Pernikahan',
+                'pengantar_amplop' => 'Doa restu Bapak/Ibu/Saudara/i merupakan karunia terindah. Apabila berkenan memberikan tanda kasih, dapat melalui:',
+                'judul_penutup' => 'Jazakumullahu Khairan',
+                'ucapan_penutup' => 'Atas kehadiran dan doa restu Bapak/Ibu/Saudara/i, kami ucapkan terima kasih. Wassalamu’alaikum Warahmatullahi Wabarakatuh.',
+            ],
+            'islamic-heavenly' => [
+                'sampul_judul' => 'Walimatul Ursy',
+                'judul_mempelai' => 'Mempelai Pengantin',
+                'pengantar_mempelai' => 'Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud menyelenggarakan akad nikah & walimatul ursy putra-putri kami:',
+                'pengantar_hitung_mundur' => 'Merupakan kehormatan dan keberkahan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu.',
+                'judul_acara' => 'Jadwal Akad & Walimah',
+                'judul_cerita' => 'Kisah Pertemuan',
+                'judul_galeri' => 'Momen Terindah',
+                'judul_amplop' => 'Hadiah Pernikahan',
+                'pengantar_amplop' => 'Doa restu Bapak/Ibu/Saudara/i adalah karunia terindah. Apabila berkenan memberikan tanda kasih, dapat melalui:',
+                'judul_penutup' => 'Jazakumullahu Khairan',
+                'ucapan_penutup' => 'Atas kehadiran dan doa restu Bapak/Ibu/Saudara/i, kami ucapkan terima kasih. Wassalamu’alaikum Warahmatullahi Wabarakatuh.',
+            ],
+            'editorial-monokrom' => [
+                'sampul_judul' => 'The Editorial Invitation',
+                'judul_mempelai' => 'THE COUPLE',
+                'pengantar_mempelai' => '',
+                'pengantar_hitung_mundur' => '',
+                'judul_acara' => 'EXHIBITION PASS',
+                'judul_cerita' => 'Kisah Kami',
+                'judul_galeri' => 'Editorial Galeri',
+                'pengantar_amplop' => 'Doa restu Bapak/Ibu/Saudara/i merupakan karunia terindah bagi kami. Namun apabila bermaksud memberikan tanda kasih secara digital, dapat melalui akses di bawah ini:',
+                'judul_buku_tamu' => 'RSVP & Notes',
+                'judul_penutup' => '',
+                'ucapan_penutup' => 'Merupakan kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu pada hari bahagia kami.',
+            ],
+            'luxury-noir' => [
+                'sampul_judul' => 'The Grand Celebration',
+                'judul_galeri' => 'Galeri Kebahagiaan',
+                'pengantar_amplop' => 'Doa restu dan kehadiran Bapak/Ibu/Saudara/i adalah kado terindah. Apabila berkenan memberikan tanda kasih, dapat melalui:',
+                'ucapan_penutup' => 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu pada malam bahagia kami.',
+            ],
+            'royal-ivory' => [
+                'sampul_judul' => 'The Royal Wedding',
+                'judul_galeri' => 'Galeri Kebahagiaan',
+                'pengantar_amplop' => 'Doa restu dan kehadiran Bapak/Ibu/Saudara/i adalah kado terindah. Apabila berkenan memberikan tanda kasih, dapat melalui:',
+                'ucapan_penutup' => 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu pada hari bahagia kami.',
+            ],
+            'velvet-garden' => [
+                'sampul_judul' => 'Velvet Garden Motion',
+                'pengantar_hitung_mundur' => 'Merupakan kehormatan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir pada rangkaian acara berikut:',
+                'pengantar_amplop' => 'Doa restu Bapak/Ibu/Saudara/i merupakan hadiah terindah bagi kami. Namun apabila ingin memberikan tanda kasih, dapat disalurkan melalui:',
+                'ucapan_penutup' => 'Atas kehadiran dan doa restu Bapak/Ibu/Saudara/i, kami menghaturkan terima kasih yang sebesar-besarnya.',
+            ],
+            default => [
+                'pengantar_hitung_mundur' => 'Dengan penuh suka cita, kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri momen bahagia kami:',
+            ],
+        };
+
+        return array_merge($umum, $khususTema);
+    }
+
+    /**
+     * Rasio aspek & bentuk bingkai foto sesuai template tema aktif untuk
+     * cropper interaktif dan petunjuk unggah foto di editor dashboard.
+     *
+     * @return array<string, array{rasio: float, label: string, bentuk: string}>
+     */
+    public function rasioFotoTema(): array
+    {
+        $slugTema = $this->tema?->slug ?? 'rustic-floral';
+
+        $mempelai = match ($slugTema) {
+            'adat-jawa' => ['rasio' => round(176 / 288, 4), 'label' => 'Potret Kapsul (11:18)', 'bentuk' => 'pill'],
+            'editorial-monokrom' => ['rasio' => 0.75, 'label' => '3:4 Editorial', 'bentuk' => 'rect'],
+            'islami-syari' => ['rasio' => 0.8, 'label' => '4:5 Mihrab', 'bentuk' => 'arch'],
+            'islamic-heavenly' => ['rasio' => round(4 / 4.35, 4), 'label' => 'Potret (~11:12)', 'bentuk' => 'rect'],
+            'luxury-noir' => ['rasio' => round(4 / 4.3, 4), 'label' => 'Potret (~11:12)', 'bentuk' => 'rect'],
+            'royal-ivory' => ['rasio' => round(4 / 4.8, 4), 'label' => '5:6 Lengkung', 'bentuk' => 'arch'],
+            'sunda-heritage' => ['rasio' => round(780 / 1043, 4), 'label' => '3:4 Lengkung', 'bentuk' => 'arch'],
+            default => ['rasio' => round(780 / 960, 4), 'label' => '4:5 Lengkung', 'bentuk' => 'arch'],
+        };
+
+        $pembuka = match ($slugTema) {
+            'adat-jawa' => ['rasio' => round(4 / 4.2, 4), 'label' => 'Hampir Kotak (~1:1)', 'bentuk' => 'rect'],
+            'editorial-monokrom' => ['rasio' => round(4 / 3, 4), 'label' => '4:3 Editorial', 'bentuk' => 'rect'],
+            'luxury-noir' => ['rasio' => 1.6, 'label' => '16:10 Sinema', 'bentuk' => 'rect'],
+            'islamic-heavenly' => ['rasio' => round(4 / 4.6, 4), 'label' => 'Potret (~7:8)', 'bentuk' => 'rect'],
+            'sunda-heritage' => ['rasio' => 0.8, 'label' => '4:5 Kapsul', 'bentuk' => 'pill'],
+            'rustic-floral' => ['rasio' => 0.8, 'label' => '4:5 Polaroid', 'bentuk' => 'rect'],
+            default => ['rasio' => 0.8, 'label' => '4:5 Lengkung', 'bentuk' => 'arch'],
+        };
+
+        $cerita = match ($slugTema) {
+            'adat-jawa', 'islami-syari' => ['rasio' => round(4 / 3, 4), 'label' => '4:3 Cerita', 'bentuk' => 'rect'],
+            default => ['rasio' => 1.6, 'label' => '16:10 Cerita', 'bentuk' => 'rect'],
+        };
+
+        $penutup = match ($slugTema) {
+            'adat-jawa' => ['rasio' => round(4 / 4.5, 4), 'label' => 'Potret Lengkung', 'bentuk' => 'arch'],
+            'editorial-monokrom' => ['rasio' => 0.8, 'label' => '4:5 Editorial', 'bentuk' => 'rect'],
+            'luxury-noir', 'royal-ivory' => ['rasio' => 0.75, 'label' => '3:4 Penutup', 'bentuk' => 'rect'],
+            'rustic-floral', 'velvet-garden' => ['rasio' => round(780 / 960, 4), 'label' => '4:5 Lengkung', 'bentuk' => 'arch'],
+            default => ['rasio' => 0.8, 'label' => '4:5 Lengkung', 'bentuk' => 'arch'],
+        };
+
+        $urutanGaleri = $this->relationLoaded('daftarGaleri')
+            ? $this->daftarGaleri->count()
+            : $this->daftarGaleri()->count();
+        $slotGaleri = $urutanGaleri % 10;
+        $galeri = match ($slotGaleri) {
+            0, 6 => ['rasio' => 1.6, 'label' => '16:10 Galeri Utama', 'bentuk' => 'rect'],
+            3 => ['rasio' => round(4 / 3, 4), 'label' => '4:3 Galeri', 'bentuk' => 'rect'],
+            7, 8 => ['rasio' => 1.0, 'label' => '1:1 Galeri', 'bentuk' => 'rect'],
+            default => ['rasio' => 0.8, 'label' => '4:5 Galeri', 'bentuk' => 'rect'],
+        };
+
+        $hitungMundur = match ($slugTema) {
+            'islami-syari', 'islamic-heavenly' => ['rasio' => 1.5, 'label' => '3:2 Hitung Mundur', 'bentuk' => 'rect'],
+            default => ['rasio' => round(4 / 3, 4), 'label' => '4:3 Hitung Mundur', 'bentuk' => 'rect'],
+        };
+
+        return [
+            'foto_sampul' => ['rasio' => round(9 / 16, 4), 'label' => '9:16 Sampul Penuh', 'bentuk' => 'rect'],
+            'foto_pembuka' => $pembuka,
+            'foto_hitung_mundur' => $hitungMundur,
+            'foto_pria' => $mempelai,
+            'foto_wanita' => $mempelai,
+            'foto_cerita' => $cerita,
+            'foto_galeri' => $galeri,
+            'foto_penutup' => $penutup,
+        ];
+    }
+
+    /**
      * @param  array{judul?: string, arab?: string, latin?: string, isi?: string}  $bawaan
      * @return array{judul: string, arab: string, latin: string, isi: string}
      */
@@ -574,6 +773,89 @@ class Undangan extends Model
             : null;
     }
 
+    /**
+     * @return list<string>
+     */
+    public function daftarPathFotoHitungMundur(): array
+    {
+        $mentah = data_get($this->pengaturan, 'foto_hitung_mundur');
+
+        if (is_string($mentah)) {
+            $jalur = trim($mentah);
+
+            return $jalur !== '' ? [$jalur] : [];
+        }
+
+        if (! is_array($mentah)) {
+            return [];
+        }
+
+        $hasil = [];
+        foreach ($mentah as $item) {
+            if (! is_string($item)) {
+                continue;
+            }
+            $jalur = trim($item);
+            if ($jalur !== '' && ! in_array($jalur, $hasil, true)) {
+                $hasil[] = $jalur;
+            }
+            if (count($hasil) >= self::MAKS_FOTO_HITUNG_MUNDUR) {
+                break;
+            }
+        }
+
+        return $hasil;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function daftarUrlFotoHitungMundur(): array
+    {
+        if ($this->modeTanpaFoto()) {
+            return [];
+        }
+
+        $urls = [];
+        foreach ($this->daftarPathFotoHitungMundur() as $jalur) {
+            $url = $this->resolveUrlMedia($jalur);
+            if (is_string($url) && $url !== '') {
+                $urls[] = $url;
+            }
+        }
+
+        return $urls;
+    }
+
+    /**
+     * @return list<array{path: string, url: string}>
+     */
+    public function daftarFotoHitungMundurKhususDashboard(): array
+    {
+        $daftar = [];
+        foreach ($this->daftarPathFotoHitungMundur() as $jalur) {
+            $url = $this->resolveUrlMedia($jalur);
+            if (is_string($url) && $url !== '') {
+                $daftar[] = [
+                    'path' => $jalur,
+                    'url' => $url,
+                ];
+            }
+        }
+
+        return $daftar;
+    }
+
+    public function urlFotoHitungMundur(): ?string
+    {
+        return $this->daftarUrlFotoHitungMundur()[0] ?? null;
+    }
+
+    public function urlFotoHitungMundurKhususDashboard(): ?string
+    {
+        return $this->daftarFotoHitungMundurKhususDashboard()[0]['url'] ?? null;
+    }
+
     public function urlFotoPenutup(): ?string
     {
         if ($this->modeTanpaFoto()) {
@@ -597,26 +879,61 @@ class Undangan extends Model
             : null;
     }
 
+    /**
+     * Latar belakang saat undangan dibuka selalu menggunakan bawaan tema.
+     */
     public function urlFotoLatarCustom(): ?string
     {
-        if ($this->modeTanpaFoto()) {
-            return null;
-        }
-
-        $fotoLatar = data_get($this->pengaturan, 'foto_latar_tema');
-
-        return (is_string($fotoLatar) && $fotoLatar !== '')
-            ? $this->resolveUrlMedia($fotoLatar)
-            : null;
+        return null;
     }
 
     public function urlFotoLatarCustomKhususDashboard(): ?string
     {
-        $fotoLatar = data_get($this->pengaturan, 'foto_latar_tema');
+        return null;
+    }
 
-        return (is_string($fotoLatar) && $fotoLatar !== '')
-            ? $this->resolveUrlMedia($fotoLatar)
-            : null;
+    /**
+     * @return array{path: string, nama: string}|null
+     */
+    public function musikKustom(): ?array
+    {
+        $data = data_get($this->pengaturan, 'musik_kustom');
+        if (! is_array($data)) {
+            return null;
+        }
+
+        $path = is_string($data['path'] ?? null) ? trim($data['path']) : '';
+        if ($path === '') {
+            return null;
+        }
+
+        $nama = is_string($data['nama'] ?? null) && trim($data['nama']) !== ''
+            ? trim($data['nama'])
+            : basename($path);
+
+        return [
+            'path' => $path,
+            'nama' => $nama,
+        ];
+    }
+
+    public function urlMusikKustom(): ?string
+    {
+        $musik = $this->musikKustom();
+
+        return $musik ? $this->resolveUrlMedia($musik['path']) : null;
+    }
+
+    public function pakaiMusikKustom(): bool
+    {
+        $musik = $this->musikKustom();
+
+        return $musik !== null && $this->musik_latar === $musik['path'];
+    }
+
+    public function hashtagBawaan(): string
+    {
+        return '#'.Str::studly($this->nama_panggilan_pria.$this->nama_panggilan_wanita).'Together';
     }
 
     public function hashtagPasangan(): string
@@ -629,7 +946,7 @@ class Undangan extends Model
             }
         }
 
-        return '#'.Str::studly($this->nama_panggilan_pria.$this->nama_panggilan_wanita).'Together';
+        return $this->hashtagBawaan();
     }
 
     public static function bersihkanUsernameInstagram(?string $nilai): string

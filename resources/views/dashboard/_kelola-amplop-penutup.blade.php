@@ -88,37 +88,23 @@
                 </span>
             </button>
             <div x-show="buka" x-cloak class="px-3.5 pb-4 pt-3 border-t border-champagne/20 bg-white/80">
-                <form
-                    action="{{ route('dashboard.undangan.perbarui', $undangan) }}"
-                    method="POST"
-                    class="space-y-3"
-                    data-swal-loading
-                    data-swal-loading-title="Menyimpan Teks Amplop..."
-                    data-swal-loading-text="Memperbarui judul dan kalimat pengantar amplop digital..."
-                >
-                    @csrf
-                    @method('PUT')
-                    <input type="hidden" name="bagian" value="amplop_teks">
-
+                <div data-bagian-utama="amplop_teks" class="space-y-3">
                     <div>
                         <label for="teks_judul_amplop" class="block text-xs font-semibold text-charcoal/80">Judul Bagian Amplop</label>
                         <input
                             id="teks_judul_amplop"
                             type="text"
                             name="teks[judul_amplop]"
-                            value="{{ old('teks.judul_amplop', $teksKustom['judul_amplop'] ?? '') }}"
-                            placeholder="Amplop Digital / Hadiah Pernikahan"
+                            value="{{ $nilaiTeksEditor('judul_amplop') }}"
+                            placeholder="{{ $teksBawaanTema['judul_amplop'] ?: 'Amplop Digital / Hadiah Pernikahan' }}"
                             class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none"
                         >
                     </div>
                     <div>
                         <label for="teks_pengantar_amplop" class="block text-xs font-semibold text-charcoal/80">Kalimat Pengantar</label>
-                        <textarea id="teks_pengantar_amplop" name="teks[pengantar_amplop]" rows="2" placeholder="Doa restu Anda merupakan karunia terindah bagi kami..." class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none">{{ old('teks.pengantar_amplop', $teksKustom['pengantar_amplop'] ?? '') }}</textarea>
+                        <textarea id="teks_pengantar_amplop" name="teks[pengantar_amplop]" rows="2" placeholder="{{ $teksBawaanTema['pengantar_amplop'] ?: 'Doa restu Anda merupakan karunia terindah bagi kami...' }}" class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none">{{ $nilaiTeksEditor('pengantar_amplop') }}</textarea>
                     </div>
-                    <button type="submit" class="w-full rounded-xl bg-sage px-4 py-2 text-xs font-semibold text-white hover:bg-[#3b5047] transition cursor-pointer">
-                        Simpan Teks Amplop
-                    </button>
-                </form>
+                </div>
             </div>
         </div>
 
@@ -227,26 +213,12 @@
                 </span>
             </button>
             <div x-show="buka" x-cloak class="px-3.5 pb-4 pt-3 border-t border-champagne/20 bg-white/80">
-                <form
-                    action="{{ route('dashboard.undangan.perbarui', $undangan) }}"
-                    method="POST"
-                    class="space-y-3"
-                    data-swal-loading
-                    data-swal-loading-title="Menyimpan Alamat Kado..."
-                    data-swal-loading-text="Memperbarui alamat pengiriman kado fisik..."
-                >
-                    @csrf
-                    @method('PUT')
-                    <input type="hidden" name="bagian" value="kado_fisik">
-
+                <div data-bagian-utama="kado_fisik" class="space-y-3">
                     <div>
                         <label for="alamat_kado_fisik" class="block text-xs font-semibold text-charcoal/80">Alamat Lengkap Penerima Kado</label>
                         <textarea id="alamat_kado_fisik" name="alamat_kado_fisik" rows="2" placeholder="Jl. Contoh No. 12, Jakarta Selatan..." class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none">{{ old('alamat_kado_fisik', $pengaturan['alamat_kado_fisik'] ?? '') }}</textarea>
                     </div>
-                    <button type="submit" class="w-full rounded-xl bg-sage px-4 py-2 text-xs font-semibold text-white hover:bg-[#3b5047] transition cursor-pointer">
-                        Simpan Alamat Kado &rarr; Buku Tamu &amp; Penutup
-                    </button>
-                </form>
+                </div>
             </div>
         </div>
     </section>
@@ -318,20 +290,8 @@
             </a>
         </div>
 
-        {{-- 1 Form Tunggal Mengikuti Urutan Persis Seksi 10 -> 11 -> 12 Undangan --}}
-        <form
-            action="{{ route('dashboard.undangan.perbarui', $undangan) }}"
-            method="POST"
-            enctype="multipart/form-data"
-            class="space-y-3"
-            data-swal-loading
-            data-swal-loading-title="Menyimpan Bagian Penutup..."
-            data-swal-loading-text="Memperbarui buku tamu, doa pengantin, turut mengundang, dan penutup..."
-        >
-            @csrf
-            @method('PUT')
-            <input type="hidden" name="bagian" value="penutup">
-            <input type="hidden" name="doa_disertakan" value="1">
+        {{-- Seksi 10 -> 11 -> 12 Undangan (disimpan lewat tombol Simpan Semua) --}}
+        <div data-bagian-utama="penutup" class="space-y-3">
 
             {{-- 7A (lanjutan): Ubah Judul Buku Tamu --}}
             <div x-data="{ buka: false }" class="rounded-2xl border border-champagne/30 bg-ivory/50 overflow-hidden">
@@ -348,8 +308,8 @@
                         id="teks_judul_buku_tamu"
                         type="text"
                         name="teks[judul_buku_tamu]"
-                        value="{{ old('teks.judul_buku_tamu', $teksKustom['judul_buku_tamu'] ?? '') }}"
-                        placeholder="RSVP &amp; Wishes / Buku Tamu"
+                        value="{{ $nilaiTeksEditor('judul_buku_tamu') }}"
+                        placeholder="{{ $teksBawaanTema['judul_buku_tamu'] ?: 'RSVP & Wishes / Buku Tamu' }}"
                         class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none"
                     >
                 </div>
@@ -421,7 +381,7 @@
                 <div x-show="buka" x-cloak class="px-3.5 pb-3.5 pt-2.5 border-t border-champagne/20 bg-white/80 space-y-3">
                     <div>
                         <label class="block text-xs font-semibold text-charcoal/80">Judul Turut Mengundang</label>
-                        <input type="text" name="teks[judul_turut_mengundang]" value="{{ old('teks.judul_turut_mengundang', $teksKustom['judul_turut_mengundang'] ?? '') }}" placeholder="Turut Mengundang" class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none">
+                        <input type="text" name="teks[judul_turut_mengundang]" value="{{ $nilaiTeksEditor('judul_turut_mengundang') }}" placeholder="{{ $teksBawaanTema['judul_turut_mengundang'] ?: 'Turut Mengundang' }}" class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none">
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
@@ -450,7 +410,7 @@
                         'name' => 'foto_penutup',
                         'varian' => 'sampul',
                         'label' => 'Foto Penutup Undangan (Opsional)',
-                        'petunjuk' => 'Tampil di kartu ucapan terima kasih akhir (kosong = pakai Foto Sampul)',
+                        'petunjuk' => 'Rasio template: '.$rasioFotoTema['foto_penutup']['label'].' • Kosong = pakai Foto Sampul',
                         'urlAwal' => $undangan->urlFotoPenutupKhususDashboard(),
                         'hapusNama' => 'hapus_foto_penutup',
                         'hapusLabel' => 'Hapus foto penutup',
@@ -458,15 +418,15 @@
 
                     <div>
                         <label class="block text-xs font-semibold text-charcoal/80">Judul Penutup</label>
-                        <input type="text" name="teks[judul_penutup]" value="{{ old('teks.judul_penutup', $teksKustom['judul_penutup'] ?? '') }}" placeholder="Terima Kasih / Hatur Nuhun / Jazakumullahu Khairan" class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none">
+                        <input type="text" name="teks[judul_penutup]" value="{{ $nilaiTeksEditor('judul_penutup') }}" placeholder="{{ $teksBawaanTema['judul_penutup'] ?: 'Terima Kasih / Hatur Nuhun / Jazakumullahu Khairan' }}" class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-charcoal/80">Kalimat Ucapan Terima Kasih</label>
-                        <textarea name="teks[ucapan_penutup]" rows="3" placeholder="Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir..." class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm leading-relaxed focus:border-sage focus:outline-none">{{ old('teks.ucapan_penutup', $teksKustom['ucapan_penutup'] ?? '') }}</textarea>
+                        <textarea name="teks[ucapan_penutup]" rows="3" placeholder="{{ $teksBawaanTema['ucapan_penutup'] ?: 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir...' }}" class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm leading-relaxed focus:border-sage focus:outline-none">{{ $nilaiTeksEditor('ucapan_penutup') }}</textarea>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-charcoal/80">Label Penutup</label>
-                        <input type="text" name="teks[label_penutup]" value="{{ old('teks.label_penutup', $teksKustom['label_penutup'] ?? '') }}" placeholder="Kami Yang Berbahagia" class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none">
+                        <input type="text" name="teks[label_penutup]" value="{{ $nilaiTeksEditor('label_penutup') }}" placeholder="{{ $teksBawaanTema['label_penutup'] ?: 'Kami Yang Berbahagia' }}" class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none">
                     </div>
                     <div>
                         <label for="hashtag" class="block text-xs font-semibold text-charcoal/80">Hashtag Pernikahan <span class="font-normal text-charcoal/45">(Opsional)</span></label>
@@ -474,20 +434,13 @@
                             id="hashtag"
                             type="text"
                             name="hashtag"
-                            value="{{ old('hashtag', data_get($pengaturan, 'hashtag', '')) }}"
-                            placeholder="Contoh: #{{ \Illuminate\Support\Str::studly($undangan->nama_panggilan_pria.$undangan->nama_panggilan_wanita) }}Forever"
+                            value="{{ old('hashtag', $undangan->hashtagPasangan()) }}"
+                            placeholder="Contoh: {{ $undangan->hashtagBawaan() }}"
                             class="mt-1 w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-sage focus:outline-none"
                         >
                     </div>
                 </div>
             </div>
-
-            <div class="pt-1">
-                <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-sage px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#3b5047] active:scale-[0.98] transition cursor-pointer">
-                    <span>Simpan Penutup &amp; Lanjut ke Pembayaran</span>
-                    <span aria-hidden="true">&rarr;</span>
-                </button>
-            </div>
-        </form>
+        </div>
     </section>
 </div>

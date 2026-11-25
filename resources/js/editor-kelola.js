@@ -1,11 +1,74 @@
-export function editorKelolaUndangan(cfg) {
+export function editorKelolaUndangan(cfgMasuk = null) {
+    let cfg = cfgMasuk;
+    if (!cfg && typeof document !== 'undefined') {
+        try {
+            const elCfg = document.getElementById('editor-kelola-config');
+            cfg = elCfg ? JSON.parse(elCfg.textContent || '{}') : {};
+        } catch (_) {
+            cfg = {};
+        }
+    }
+    cfg = cfg || {};
+
+    let cropImg = null;
+    let cropSourceFile = null;
+    let cropTempUrl = '';
+    let cropCallbacks = {};
+    const cropPointers = new Map();
+    let cropLastPos = null;
+    let cropPinchDist = 0;
+    const ceritaAsliMap = new WeakMap();
+    const ceritaHasilMap = new WeakMap();
+    const hitungMundurAsliMap = new Map();
+    const hitungMundurHasilMap = new Map();
+    let hitungMundurUidCounter = 0;
+    const buatItemFotoHitungMundur = (path = '', url = '') => ({
+        uid: `hm-${++hitungMundurUidCounter}`,
+        path: path || '',
+        url: url || '',
+    });
+    const galeriAsliMap = new Map();
+    const galeriHasilMap = new Map();
+    let galeriUidCounter = 0;
+    const buatItemGaleri = (item = {}) => ({
+        uid: `gal-${++galeriUidCounter}`,
+        id: Number(item?.id) > 0 ? Number(item.id) : null,
+        path: item?.path || '',
+        url: item?.url || '',
+        keterangan: item?.keterangan || '',
+    });
+
     return {
         tab: cfg.tab,
         urutanTab: ['tema', 'mempelai', 'acara', 'cerita', 'galeri', 'amplop', 'penutup', 'aktivasi'],
         urlPublikPreview: cfg.urlPublikPreview,
+        urlPublikSalin: cfg.urlPublikSalin || '',
         urlSimpanFitur: cfg.urlSimpanFitur,
         urlPratinjauLangsung: cfg.urlPratinjauLangsung,
         csrfToken: cfg.csrfToken,
+        adaPerubahanBelumDisimpan: false,
+        sedangMenyimpanSemua: false,
+        statusSimpanTeks: '',
+        rasioFotoTema: cfg.rasioFotoTema || {},
+        cropTerbuka: false,
+        cropMemuat: false,
+        cropMenyimpan: false,
+        cropGalat: '',
+        cropJudul: 'Atur Potongan Foto',
+        cropNamaAsli: 'foto.jpg',
+        cropRasioTemplate: 0.75,
+        cropLabelTemplate: 'Sesuai Template',
+        cropBentukTemplate: 'rect',
+        cropRasio: 0.75,
+        cropBentuk: 'rect',
+        cropZoom: 1,
+        cropRotasi: 0,
+        cropOffsetX: 0,
+        cropOffsetY: 0,
+        cropStageW: 360,
+        cropStageH: 360,
+        cropBoxW: 240,
+        cropBoxH: 320,
         modePreview: 'mobile',
         previewKey: 1,
         previewMemuat: true,
@@ -24,9 +87,29 @@ export function editorKelolaUndangan(cfg) {
         sakelarFitur: cfg.sakelarFitur,
         fiturMenyimpan: {},
         musikDipilih: cfg.musikDipilih,
+        modeMusik: cfg.modeMusik || 'katalog',
+        musikKustomUrlAwal: cfg.musikKustomUrlAwal || '',
+        musikKustomNamaAwal: cfg.musikKustomNamaAwal || '',
+        musikKustomPreviewUrl: '',
+        musikKustomNamaBaru: '',
+        musikKustomUkuranBaru: '',
+        hapusMusikKustom: false,
+        pesanGalatMusik: '',
         daftarUrlMusik: cfg.daftarUrlMusik,
         audioSedangPutar: false,
         slugTersalin: false,
+        maksFotoHitungMundur: 4,
+        daftarFotoHitungMundur: (Array.isArray(cfg.daftarFotoHitungMundur) ? cfg.daftarFotoHitungMundur : [])
+            .slice(0, 4)
+            .map((item) => buatItemFotoHitungMundur(item?.path, item?.url)),
+        sedangTarikHitungMundur: false,
+        pesanGalatHitungMundur: '',
+        maksGaleri: 10,
+        daftarGaleri: (Array.isArray(cfg.daftarGaleri) ? cfg.daftarGaleri : [])
+            .slice(0, 10)
+            .map((item) => buatItemGaleri(item)),
+        sedangTarikGaleri: false,
+        pesanGalatGaleri: '',
         daftarCerita: cfg.daftarCerita,
         liveAktifLive: cfg.liveAktifLive,
         katalogBank: cfg.katalogBank,
@@ -71,12 +154,31 @@ export function editorKelolaUndangan(cfg) {
             window.addEventListener('resize', () => {
                 this.hitungSkalaPreview();
                 this.hitungSkalaPreviewStudio();
+                if (this.cropTerbuka) {
+                    this.ukurDanGambarCrop();
+                }
             });
-            this.$watch('tanpaFotoAktif', () => this.jadwalkanLivePreview(true));
-            this.$watch('liveAktifLive', () => this.jadwalkanLivePreview(true));
+            this.$watch('tanpaFotoAktif', () => {
+                this.tandaiPerubahan();
+                this.jadwalkanLivePreview(true);
+            });
+            this.$watch('liveAktifLive', () => {
+                this.tandaiPerubahan();
+                this.jadwalkanLivePreview(true);
+            });
+            window.addEventListener('keydown', (event) => {
+                if ((event.ctrlKey || event.metaKey) && event.key?.toLowerCase() === 's') {
+                    event.preventDefault();
+                    this.simpanSemuaPerubahan();
+                }
+            });
             setTimeout(() => {
                 this.previewMemuat = false;
             }, 2500);
+        },
+        tandaiPerubahan() {
+            this.adaPerubahanBelumDisimpan = true;
+            this.statusSimpanTeks = '';
         },
         previewVirtualW() {
             return this.modePreview === 'mobile' ? 390 : 1280;
@@ -124,18 +226,22 @@ export function editorKelolaUndangan(cfg) {
         },
         perbaruiFotoLive(detail) {
             if (!detail?.nama) return;
-            if (['foto_pria', 'foto_wanita', 'foto_sampul', 'foto_pembuka', 'foto_penutup', 'foto_latar_tema'].includes(detail.nama)) {
+            if (['foto_pria', 'foto_wanita', 'foto_sampul', 'foto_pembuka', 'foto_hitung_mundur', 'foto_penutup'].includes(detail.nama)) {
                 this.fotoLiveMap = { ...this.fotoLiveMap, [detail.nama]: detail.url || '' };
+                this.tandaiPerubahan();
                 this.jadwalkanLivePreview(true);
             }
         },
         saatInputLive(event) {
             const el = event?.target;
-            if (!el || !el.name) return;
+            if (!el || !el.name || el.type === 'file') return;
+            if (!el.closest('form')) {
+                this.tandaiPerubahan();
+            }
             const namaDiabaikan = [
-                'slug', 'musik_latar', 'tema_id', 'acara_id',
+                'slug', 'musik_latar', 'sumber_musik', 'file_musik_kustom', 'hapus_musik_kustom', 'tema_id', 'acara_id',
                 'nama_acara', 'tanggal_acara', 'waktu_mulai', 'waktu_selesai', 'zona_waktu', 'nama_tempat', 'alamat_lengkap', 'link_maps',
-                'foto', 'keterangan', 'nama_bank', 'nomor_rekening', 'atas_nama',
+                'foto', 'foto_hitung_mundur[]', 'galeri_foto[]', 'keterangan', 'nama_bank', 'nomor_rekening', 'atas_nama',
                 'paket', 'kode_promo', 'bukti_pembayaran',
             ];
             if (namaDiabaikan.includes(el.name)) return;
@@ -225,10 +331,21 @@ export function editorKelolaUndangan(cfg) {
                 hashtag: nilai('hashtag'),
                 cerita_cinta: this.daftarCerita,
                 foto_live: this.fotoLiveMap,
+                foto_hitung_mundur_disertakan: true,
+                foto_hitung_mundur_live: this.daftarFotoHitungMundur.map((item) => ({
+                    path: item.path || '',
+                    url: item.url || '',
+                })),
+                galeri_disertakan: true,
+                galeri_live: this.daftarGaleri.map((item) => ({
+                    id: item.id || null,
+                    path: item.path || '',
+                    url: item.url || '',
+                    keterangan: item.keterangan || '',
+                })),
                 hapus_foto_sampul: tercentang('hapus_foto_sampul'),
                 hapus_foto_pembuka: tercentang('hapus_foto_pembuka'),
                 hapus_foto_penutup: tercentang('hapus_foto_penutup'),
-                hapus_foto_latar_tema: tercentang('hapus_foto_latar_tema'),
                 buka_sampul: bukaSampul,
                 scroll_y: fokusBagian ? 0 : scrollY,
                 fokus_bagian: fokusBagian || '',
@@ -281,11 +398,22 @@ export function editorKelolaUndangan(cfg) {
             const nilaiBaru = !nilaiLama;
             this.sakelarFitur[kunci] = nilaiBaru;
             this.fiturMenyimpan[kunci] = true;
-            this.jadwalkanLivePreview(true);
+
+            const petaFokus = {
+                hitung_mundur: 'acara',
+                cerita_cinta: 'cerita',
+                galeri: 'galeri',
+                amplop_digital: 'amplop',
+                buku_tamu: 'penutup',
+                doa_pengantin: 'penutup',
+            };
+            const fokus = nilaiBaru ? (petaFokus[kunci] || '') : '';
+            this.jadwalkanLivePreview(true, fokus);
+
             try {
                 const token = document.querySelector('meta[name=csrf-token]')?.content || this.csrfToken;
                 const respon = await fetch(this.urlSimpanFitur, {
-                    method: 'POST',
+                    method: 'PUT',
                     credentials: 'same-origin',
                     headers: {
                         'Content-Type': 'application/json',
@@ -293,9 +421,10 @@ export function editorKelolaUndangan(cfg) {
                         'X-Requested-With': 'XMLHttpRequest',
                         'X-CSRF-TOKEN': token,
                     },
-                    body: JSON.stringify({ _method: 'PUT', bagian: 'fitur', kunci, aktif: nilaiBaru }),
+                    body: JSON.stringify({ bagian: 'fitur', kunci, aktif: nilaiBaru }),
                 });
                 if (!respon.ok) throw new Error('Gagal');
+                this.statusSimpanTeks = nilaiBaru ? 'Bagian diaktifkan' : 'Bagian disembunyikan';
             } catch (_) {
                 this.sakelarFitur[kunci] = nilaiLama;
                 this.jadwalkanLivePreview(true);
@@ -307,6 +436,176 @@ export function editorKelolaUndangan(cfg) {
                 });
             } finally {
                 this.fiturMenyimpan[kunci] = false;
+            }
+        },
+        async simpanSemuaPerubahan() {
+            if (this.sedangMenyimpanSemua) return;
+            const root = this.$refs.panelKiri;
+            if (!root) return;
+
+            this.sedangMenyimpanSemua = true;
+            const fd = new FormData();
+            fd.append('_method', 'PUT');
+            fd.append('bagian', 'semua');
+            fd.append('doa_disertakan', '1');
+            fd.append('dress_code_disertakan', '1');
+            fd.append('foto_hitung_mundur_disertakan', '1');
+            fd.append('galeri_disertakan', '1');
+
+            Object.entries(this.sakelarFitur || {}).forEach(([kunci, aktif]) => {
+                fd.append(`fitur_${kunci}`, aktif ? '1' : '0');
+            });
+
+            this.daftarFotoHitungMundur.slice(0, this.maksFotoHitungMundur).forEach((item, idx) => {
+                fd.append(`foto_hitung_mundur_items[${idx}][path]`, item.path || '');
+                const berkasHasil = hitungMundurHasilMap.get(item.uid);
+                if (berkasHasil) {
+                    fd.append(`foto_hitung_mundur_items[${idx}][file]`, berkasHasil);
+                }
+            });
+
+            this.daftarGaleri.slice(0, this.maksGaleri).forEach((item, idx) => {
+                if (item.id) {
+                    fd.append(`galeri_items[${idx}][id]`, String(item.id));
+                }
+                fd.append(`galeri_items[${idx}][keterangan]`, item.keterangan || '');
+                const berkasGaleri = galeriHasilMap.get(item.uid);
+                if (berkasGaleri) {
+                    fd.append(`galeri_items[${idx}][file]`, berkasGaleri);
+                }
+            });
+
+            root.querySelectorAll('input, select, textarea').forEach((el) => {
+                if (!el.name || el.disabled) return;
+                if (el.closest('form')) return;
+                if ([
+                    '_token', '_method', 'bagian', 'doa_disertakan', 'dress_code_disertakan',
+                    'foto_hitung_mundur_disertakan', 'foto_hitung_mundur[]',
+                    'galeri_disertakan', 'galeri_foto[]',
+                ].includes(el.name)) return;
+
+                if (el.type === 'file') {
+                    if (el.files && el.files.length > 0) {
+                        fd.append(el.name, el.files[0]);
+                    }
+                    return;
+                }
+
+                if (el.type === 'checkbox' || el.type === 'radio') {
+                    if (el.checked) {
+                        fd.append(el.name, el.value || '1');
+                    }
+                    return;
+                }
+
+                fd.append(el.name, el.value ?? '');
+            });
+
+            try {
+                const token = document.querySelector('meta[name=csrf-token]')?.content || this.csrfToken;
+                const respon = await fetch(this.urlSimpanFitur, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-HTTP-Method-Override': 'PUT',
+                        'X-CSRF-TOKEN': token,
+                    },
+                    body: fd,
+                });
+
+                const data = await respon.json().catch(() => ({}));
+                if (!respon.ok) {
+                    const daftarGalat = data?.errors ? Object.values(data.errors).flat() : [];
+                    const pesanError = daftarGalat.length > 0
+                        ? daftarGalat.join('\n')
+                        : (data?.message || 'Gagal menyimpan perubahan. Silakan periksa kembali isian Anda.');
+                    window.Swal?.fire({
+                        icon: 'error',
+                        title: 'Periksa Isian Undangan',
+                        text: pesanError,
+                        confirmButtonColor: '#4B6358',
+                    });
+                    return;
+                }
+
+                this.adaPerubahanBelumDisimpan = false;
+                this.statusSimpanTeks = 'Semua perubahan tersimpan';
+                this.fotoLiveMap = {};
+
+                if (data?.url_publik_relatif) {
+                    this.urlPublikPreview = data.url_publik_relatif;
+                }
+                if (data?.url_publik) {
+                    this.urlPublikSalin = data.url_publik;
+                }
+                if (data?.slug) {
+                    const slugInput = root.querySelector('input[name="slug"]');
+                    if (slugInput) slugInput.value = data.slug;
+                }
+                if (data?.musik_kustom) {
+                    this.musikKustomUrlAwal = data.musik_kustom.url || '';
+                    this.musikKustomNamaAwal = data.musik_kustom.nama || '';
+                    this.batalkanMusikKustomBaru();
+                    this.hapusMusikKustom = false;
+                }
+                if (Array.isArray(data?.foto_hitung_mundur)) {
+                    this.daftarFotoHitungMundur.forEach((item) => {
+                        if (item?.url && item.url.startsWith('blob:')) {
+                            URL.revokeObjectURL(item.url);
+                        }
+                    });
+                    hitungMundurAsliMap.clear();
+                    hitungMundurHasilMap.clear();
+                    this.daftarFotoHitungMundur = data.foto_hitung_mundur
+                        .slice(0, this.maksFotoHitungMundur)
+                        .map((item) => buatItemFotoHitungMundur(item?.path, item?.url));
+                    this.pesanGalatHitungMundur = '';
+                }
+                if (Array.isArray(data?.galeri)) {
+                    this.daftarGaleri.forEach((item) => {
+                        if (item?.url && item.url.startsWith('blob:')) {
+                            URL.revokeObjectURL(item.url);
+                        }
+                    });
+                    galeriAsliMap.clear();
+                    galeriHasilMap.clear();
+                    this.daftarGaleri = data.galeri
+                        .slice(0, this.maksGaleri)
+                        .map((item) => buatItemGaleri(item));
+                    this.pesanGalatGaleri = '';
+                }
+                if (Array.isArray(data?.cerita_cinta)) {
+                    this.daftarCerita = data.cerita_cinta.length > 0
+                        ? data.cerita_cinta
+                        : [{ judul: '', tanggal: '', cerita: '', foto: '', foto_url: '', hapus_foto: false }];
+                    root.querySelectorAll('input[name^="cerita_cinta["][type="file"]').forEach((inp) => {
+                        inp.value = '';
+                    });
+                }
+
+                window.dispatchEvent(new CustomEvent('editor-tersimpan', { detail: data }));
+                this.jadwalkanLivePreview(true);
+
+                window.Swal?.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: data?.pesan || 'Semua perubahan undangan berhasil disimpan.',
+                    showConfirmButton: false,
+                    timer: 2600,
+                    timerProgressBar: true,
+                });
+            } catch (_) {
+                window.Swal?.fire({
+                    icon: 'error',
+                    title: 'Koneksi Terputus',
+                    text: 'Tidak dapat menghubungi server saat menyimpan. Silakan coba lagi.',
+                    confirmButtonColor: '#4B6358',
+                });
+            } finally {
+                this.sedangMenyimpanSemua = false;
             }
         },
         toggleBagian(kodeTab) {
@@ -403,8 +702,85 @@ export function editorKelolaUndangan(cfg) {
             const cocokCari = !q || teks.toLowerCase().includes(q);
             return cocokKategori && cocokCari;
         },
+        ubahModeMusik(mode) {
+            if (this.modeMusik === mode) return;
+            this.hentikanAudioPreview();
+            this.pesanGalatMusik = '';
+            this.modeMusik = mode;
+            this.tandaiPerubahan();
+        },
         urlMusikAktif() {
+            if (this.modeMusik === 'kustom') {
+                if (this.musikKustomPreviewUrl) {
+                    return this.musikKustomPreviewUrl;
+                }
+                if (this.hapusMusikKustom) {
+                    return '';
+                }
+                return this.musikKustomUrlAwal || '';
+            }
             return this.musikDipilih ? (this.daftarUrlMusik[this.musikDipilih] || '') : '';
+        },
+        namaMusikKustomTampil() {
+            if (this.musikKustomNamaBaru) {
+                return this.musikKustomNamaBaru;
+            }
+            if (this.hapusMusikKustom) {
+                return '';
+            }
+            return this.musikKustomNamaAwal || '';
+        },
+        saatPilihMusikKustom(event) {
+            this.pesanGalatMusik = '';
+            const file = event?.target?.files?.[0];
+            if (!file) return;
+
+            const ekstensiValid = /\.(mp3|wav|ogg|m4a)$/i.test(file.name || '');
+            const tipeAudio = (file.type || '').startsWith('audio/');
+            if (!ekstensiValid && !tipeAudio) {
+                this.pesanGalatMusik = 'Format audio harus MP3, WAV, OGG, atau M4A.';
+                event.target.value = '';
+                return;
+            }
+            if (file.size > 15 * 1024 * 1024) {
+                this.pesanGalatMusik = 'Ukuran file musik melebihi batas maksimal 15 MB.';
+                event.target.value = '';
+                return;
+            }
+
+            this.hentikanAudioPreview();
+            if (this.musikKustomPreviewUrl) {
+                URL.revokeObjectURL(this.musikKustomPreviewUrl);
+            }
+            this.musikKustomPreviewUrl = URL.createObjectURL(file);
+            this.musikKustomNamaBaru = file.name;
+            this.musikKustomUkuranBaru = file.size < 1024 * 1024
+                ? Math.max(1, Math.round(file.size / 1024)) + ' KB'
+                : (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+            this.hapusMusikKustom = false;
+            this.modeMusik = 'kustom';
+            this.tandaiPerubahan();
+        },
+        batalkanMusikKustomBaru() {
+            this.hentikanAudioPreview();
+            if (this.musikKustomPreviewUrl) {
+                URL.revokeObjectURL(this.musikKustomPreviewUrl);
+            }
+            this.musikKustomPreviewUrl = '';
+            this.musikKustomNamaBaru = '';
+            this.musikKustomUkuranBaru = '';
+            this.pesanGalatMusik = '';
+            if (this.$refs.inputMusikKustom) {
+                this.$refs.inputMusikKustom.value = '';
+            }
+        },
+        tandaiHapusMusikKustom() {
+            this.hentikanAudioPreview();
+            this.hapusMusikKustom = true;
+            this.tandaiPerubahan();
+        },
+        batalHapusMusikKustom() {
+            this.hapusMusikKustom = false;
         },
         hentikanAudioPreview() {
             const audio = this.$refs.audioPreview;
@@ -436,6 +812,7 @@ export function editorKelolaUndangan(cfg) {
         },
         tambahCerita() {
             this.daftarCerita.push({ judul: '', tanggal: '', cerita: '', foto: '', foto_url: '', hapus_foto: false });
+            this.tandaiPerubahan();
             this.jadwalkanLivePreview();
         },
         tambahCeritaPreset(judul, tanggal, cerita) {
@@ -445,30 +822,773 @@ export function editorKelolaUndangan(cfg) {
 
             if (barisKosong) {
                 this.daftarCerita[0] = { judul, tanggal, cerita, foto: '', foto_url: '', hapus_foto: false };
+                this.tandaiPerubahan();
                 this.jadwalkanLivePreview(true);
                 return;
             }
 
             this.daftarCerita.push({ judul, tanggal, cerita, foto: '', foto_url: '', hapus_foto: false });
+            this.tandaiPerubahan();
             this.jadwalkanLivePreview(true);
         },
-        pilihFotoCerita(index, acara) {
-            const file = acara.target?.files?.[0];
-            if (!file || !this.daftarCerita[index]) {
+        pilihFotoHitungMundur(event) {
+            const inputEl = event?.target;
+            const berkasDipilih = Array.from(inputEl?.files || []);
+            if (inputEl) {
+                inputEl.value = '';
+            }
+            if (berkasDipilih.length > 0) {
+                this.prosesAntreanFotoHitungMundur(berkasDipilih);
+            }
+        },
+        jatuhFotoHitungMundur(event) {
+            this.sedangTarikHitungMundur = false;
+            const berkasDipilih = Array.from(event?.dataTransfer?.files || []);
+            if (berkasDipilih.length > 0) {
+                this.prosesAntreanFotoHitungMundur(berkasDipilih);
+            }
+        },
+        prosesAntreanFotoHitungMundur(daftarBerkas) {
+            this.pesanGalatHitungMundur = '';
+            const sisaSlot = Math.max(0, this.maksFotoHitungMundur - this.daftarFotoHitungMundur.length);
+            if (sisaSlot <= 0) {
+                this.pesanGalatHitungMundur = `Maksimal ${this.maksFotoHitungMundur} foto slideshow hitung mundur.`;
                 return;
             }
-            this.daftarCerita[index].foto_url = URL.createObjectURL(file);
-            this.daftarCerita[index].hapus_foto = false;
+
+            const berkasValid = [];
+            let adaTidakValid = false;
+            let adaTerlaluBesar = false;
+            for (const file of daftarBerkas) {
+                if (!file.type || !file.type.startsWith('image/')) {
+                    adaTidakValid = true;
+                    continue;
+                }
+                if (file.size > 15 * 1024 * 1024) {
+                    adaTerlaluBesar = true;
+                    continue;
+                }
+                berkasValid.push(file);
+            }
+
+            if (berkasValid.length === 0) {
+                this.pesanGalatHitungMundur = adaTerlaluBesar
+                    ? 'Ukuran foto melebihi batas maksimal 15 MB sebelum dipotong.'
+                    : 'Format berkas harus berupa gambar (JPG, PNG, atau WebP).';
+                return;
+            }
+
+            const antrean = berkasValid.slice(0, sisaSlot);
+            if (berkasValid.length > sisaSlot) {
+                this.pesanGalatHitungMundur = `Hanya ${sisaSlot} foto pertama yang diproses (maksimal ${this.maksFotoHitungMundur} foto).`;
+            } else if (adaTidakValid || adaTerlaluBesar) {
+                this.pesanGalatHitungMundur = 'Sebagian berkas dilewati karena bukan gambar atau melebihi 15 MB.';
+            }
+
+            const total = antrean.length;
+            const meta = this.rasioFotoTema?.foto_hitung_mundur || { rasio: 1.3333, label: '4:3 Hitung Mundur', bentuk: 'rect' };
+
+            const prosesIndex = (urutan) => {
+                if (urutan >= total || this.daftarFotoHitungMundur.length >= this.maksFotoHitungMundur) {
+                    return;
+                }
+                const file = antrean[urutan];
+                const nomorSlide = this.daftarFotoHitungMundur.length + 1;
+                const judul = total > 1
+                    ? `Potong Foto Slideshow ${nomorSlide} (${urutan + 1}/${total})`
+                    : `Atur Potongan Foto Slideshow #${nomorSlide}`;
+
+                this.bukaCropperFoto({
+                    file,
+                    judul,
+                    rasio: meta.rasio,
+                    labelRasio: meta.label,
+                    bentuk: meta.bentuk,
+                    namaAsli: file.name,
+                    onSelesai: (fileHasil) => {
+                        if (fileHasil.size > 5 * 1024 * 1024) {
+                            this.pesanGalatHitungMundur = 'Ukuran hasil foto melebihi batas maksimal 5 MB.';
+                            return;
+                        }
+                        const itemBaru = buatItemFotoHitungMundur('', URL.createObjectURL(fileHasil));
+                        hitungMundurAsliMap.set(itemBaru.uid, file);
+                        hitungMundurHasilMap.set(itemBaru.uid, fileHasil);
+                        this.daftarFotoHitungMundur = [...this.daftarFotoHitungMundur, itemBaru];
+                        this.tandaiPerubahan();
+                        this.jadwalkanLivePreview(true);
+
+                        if (urutan + 1 < total && this.daftarFotoHitungMundur.length < this.maksFotoHitungMundur) {
+                            this.$nextTick(() => {
+                                window.setTimeout(() => prosesIndex(urutan + 1), 90);
+                            });
+                        }
+                    },
+                });
+            };
+
+            prosesIndex(0);
+        },
+        potongFotoHitungMundur(index) {
+            const item = this.daftarFotoHitungMundur[index];
+            if (!item || !item.url) return;
+            this.pesanGalatHitungMundur = '';
+            const fileAsli = hitungMundurAsliMap.get(item.uid) || null;
+            const meta = this.rasioFotoTema?.foto_hitung_mundur || { rasio: 1.3333, label: '4:3 Hitung Mundur', bentuk: 'rect' };
+
+            this.bukaCropperFoto({
+                file: fileAsli,
+                srcUrl: fileAsli ? '' : item.url,
+                judul: `Atur Potongan Foto Slideshow #${index + 1}`,
+                rasio: meta.rasio,
+                labelRasio: meta.label,
+                bentuk: meta.bentuk,
+                namaAsli: fileAsli?.name || `foto-hitung-mundur-${index + 1}.jpg`,
+                onSelesai: (fileHasil) => {
+                    if (fileHasil.size > 5 * 1024 * 1024) {
+                        this.pesanGalatHitungMundur = 'Ukuran hasil foto melebihi batas maksimal 5 MB.';
+                        return;
+                    }
+                    if (item.url && item.url.startsWith('blob:')) {
+                        URL.revokeObjectURL(item.url);
+                    }
+                    hitungMundurHasilMap.set(item.uid, fileHasil);
+                    item.url = URL.createObjectURL(fileHasil);
+                    this.tandaiPerubahan();
+                    this.jadwalkanLivePreview(true);
+                },
+            });
+        },
+        pindahFotoHitungMundur(index, arah) {
+            const target = index + arah;
+            if (target < 0 || target >= this.daftarFotoHitungMundur.length) return;
+            const salinan = [...this.daftarFotoHitungMundur];
+            [salinan[index], salinan[target]] = [salinan[target], salinan[index]];
+            this.daftarFotoHitungMundur = salinan;
+            this.tandaiPerubahan();
             this.jadwalkanLivePreview(true);
+        },
+        hapusFotoHitungMundur(index) {
+            const item = this.daftarFotoHitungMundur[index];
+            if (!item) return;
+            if (item.url && item.url.startsWith('blob:')) {
+                URL.revokeObjectURL(item.url);
+            }
+            hitungMundurAsliMap.delete(item.uid);
+            hitungMundurHasilMap.delete(item.uid);
+            this.daftarFotoHitungMundur = this.daftarFotoHitungMundur.filter((_, i) => i !== index);
+            this.pesanGalatHitungMundur = '';
+            this.tandaiPerubahan();
+            this.jadwalkanLivePreview(true);
+        },
+        pilihFotoGaleri(event) {
+            const inputEl = event?.target;
+            const berkasDipilih = Array.from(inputEl?.files || []);
+            if (inputEl) {
+                inputEl.value = '';
+            }
+            if (berkasDipilih.length > 0) {
+                this.prosesAntreanFotoGaleri(berkasDipilih);
+            }
+        },
+        jatuhFotoGaleri(event) {
+            this.sedangTarikGaleri = false;
+            const berkasDipilih = Array.from(event?.dataTransfer?.files || []);
+            if (berkasDipilih.length > 0) {
+                this.prosesAntreanFotoGaleri(berkasDipilih);
+            }
+        },
+        prosesAntreanFotoGaleri(daftarBerkas) {
+            this.pesanGalatGaleri = '';
+            const sisaSlot = Math.max(0, this.maksGaleri - this.daftarGaleri.length);
+            if (sisaSlot <= 0) {
+                this.pesanGalatGaleri = `Maksimal ${this.maksGaleri} foto galeri per undangan.`;
+                return;
+            }
+
+            const berkasValid = [];
+            let adaTidakValid = false;
+            let adaTerlaluBesar = false;
+            for (const file of daftarBerkas) {
+                if (!file.type || !file.type.startsWith('image/')) {
+                    adaTidakValid = true;
+                    continue;
+                }
+                if (file.size > 15 * 1024 * 1024) {
+                    adaTerlaluBesar = true;
+                    continue;
+                }
+                berkasValid.push(file);
+            }
+
+            if (berkasValid.length === 0) {
+                this.pesanGalatGaleri = adaTerlaluBesar
+                    ? 'Ukuran foto melebihi batas maksimal 15 MB sebelum dipotong.'
+                    : 'Format berkas harus berupa gambar (JPG, PNG, atau WebP).';
+                return;
+            }
+
+            const antrean = berkasValid.slice(0, sisaSlot);
+            if (berkasValid.length > sisaSlot) {
+                this.pesanGalatGaleri = `Hanya ${sisaSlot} foto pertama yang diproses (kuota maksimal ${this.maksGaleri} foto).`;
+            } else if (adaTidakValid || adaTerlaluBesar) {
+                this.pesanGalatGaleri = 'Sebagian berkas dilewati karena bukan gambar atau melebihi 15 MB.';
+            }
+
+            const total = antrean.length;
+            const meta = this.rasioFotoTema?.foto_galeri || { rasio: 0.75, label: '3:4 Galeri', bentuk: 'rect' };
+
+            const prosesIndex = (urutan) => {
+                if (urutan >= total || this.daftarGaleri.length >= this.maksGaleri) {
+                    return;
+                }
+                const file = antrean[urutan];
+                const nomorFoto = this.daftarGaleri.length + 1;
+                const judul = total > 1
+                    ? `Potong Foto Galeri #${nomorFoto} (${urutan + 1}/${total})`
+                    : `Atur Potongan Foto Galeri #${nomorFoto}`;
+
+                this.bukaCropperFoto({
+                    file,
+                    judul,
+                    rasio: meta.rasio,
+                    labelRasio: meta.label,
+                    bentuk: meta.bentuk,
+                    namaAsli: file.name,
+                    onSelesai: (fileHasil) => {
+                        if (fileHasil.size > 5 * 1024 * 1024) {
+                            this.pesanGalatGaleri = 'Ukuran hasil foto melebihi batas maksimal 5 MB.';
+                            return;
+                        }
+                        const itemBaru = buatItemGaleri({
+                            id: null,
+                            path: '',
+                            url: URL.createObjectURL(fileHasil),
+                            keterangan: '',
+                        });
+                        galeriAsliMap.set(itemBaru.uid, file);
+                        galeriHasilMap.set(itemBaru.uid, fileHasil);
+                        this.daftarGaleri = [...this.daftarGaleri, itemBaru];
+                        this.tandaiPerubahan();
+                        this.jadwalkanLivePreview(true);
+
+                        if (urutan + 1 < total && this.daftarGaleri.length < this.maksGaleri) {
+                            this.$nextTick(() => {
+                                window.setTimeout(() => prosesIndex(urutan + 1), 90);
+                            });
+                        }
+                    },
+                });
+            };
+
+            prosesIndex(0);
+        },
+        potongFotoGaleri(index) {
+            const item = this.daftarGaleri[index];
+            if (!item || !item.url) return;
+            this.pesanGalatGaleri = '';
+            const fileAsli = galeriAsliMap.get(item.uid) || null;
+            const meta = this.rasioFotoTema?.foto_galeri || { rasio: 0.75, label: '3:4 Galeri', bentuk: 'rect' };
+
+            this.bukaCropperFoto({
+                file: fileAsli,
+                srcUrl: fileAsli ? '' : item.url,
+                judul: `Atur Potongan Foto Galeri #${index + 1}`,
+                rasio: meta.rasio,
+                labelRasio: meta.label,
+                bentuk: meta.bentuk,
+                namaAsli: fileAsli?.name || `galeri-${index + 1}.jpg`,
+                onSelesai: (fileHasil) => {
+                    if (fileHasil.size > 5 * 1024 * 1024) {
+                        this.pesanGalatGaleri = 'Ukuran hasil foto melebihi batas maksimal 5 MB.';
+                        return;
+                    }
+                    if (item.url && item.url.startsWith('blob:')) {
+                        URL.revokeObjectURL(item.url);
+                    }
+                    galeriHasilMap.set(item.uid, fileHasil);
+                    item.url = URL.createObjectURL(fileHasil);
+                    this.tandaiPerubahan();
+                    this.jadwalkanLivePreview(true);
+                },
+            });
+        },
+        pindahFotoGaleri(index, arah) {
+            const target = index + arah;
+            if (target < 0 || target >= this.daftarGaleri.length) return;
+            const salinan = [...this.daftarGaleri];
+            [salinan[index], salinan[target]] = [salinan[target], salinan[index]];
+            this.daftarGaleri = salinan;
+            this.tandaiPerubahan();
+            this.jadwalkanLivePreview(true);
+        },
+        hapusFotoGaleri(index) {
+            const item = this.daftarGaleri[index];
+            if (!item) return;
+            if (item.url && item.url.startsWith('blob:')) {
+                URL.revokeObjectURL(item.url);
+            }
+            galeriAsliMap.delete(item.uid);
+            galeriHasilMap.delete(item.uid);
+            this.daftarGaleri = this.daftarGaleri.filter((_, i) => i !== index);
+            this.pesanGalatGaleri = '';
+            this.tandaiPerubahan();
+            this.jadwalkanLivePreview(true);
+        },
+        saatUbahKeteranganGaleri() {
+            this.tandaiPerubahan();
+            this.jadwalkanLivePreview(false);
+        },
+        pilihFotoCerita(index, acara) {
+            const inputEl = acara?.target;
+            const file = inputEl?.files?.[0];
+            const item = this.daftarCerita[index];
+            if (!file || !item) {
+                return;
+            }
+            if (!file.type || !file.type.startsWith('image/')) {
+                inputEl.value = '';
+                return;
+            }
+            if (file.size > 15 * 1024 * 1024) {
+                inputEl.value = '';
+                window.Swal?.fire({
+                    icon: 'warning',
+                    title: 'Ukuran Foto Terlalu Besar',
+                    text: 'Ukuran foto maksimal 15 MB sebelum dipotong.',
+                    confirmButtonColor: '#4B6358',
+                });
+                return;
+            }
+
+            const meta = this.rasioFotoTema?.foto_cerita || { rasio: 1.6, label: '16:10 Cerita', bentuk: 'rect' };
+            this.bukaCropperFoto({
+                file,
+                judul: `Potong Foto Bab ${index + 1}`,
+                rasio: meta.rasio,
+                labelRasio: meta.label,
+                bentuk: meta.bentuk,
+                namaAsli: file.name,
+                onSelesai: (fileHasil) => {
+                    ceritaAsliMap.set(item, file);
+                    ceritaHasilMap.set(item, fileHasil);
+                    const dt = new DataTransfer();
+                    dt.items.add(fileHasil);
+                    inputEl.files = dt.files;
+                    item.foto_url = URL.createObjectURL(fileHasil);
+                    item.hapus_foto = false;
+                    this.tandaiPerubahan();
+                    this.jadwalkanLivePreview(true);
+                },
+                onBatal: () => {
+                    const sebelumnya = ceritaHasilMap.get(item);
+                    if (sebelumnya) {
+                        const dt = new DataTransfer();
+                        dt.items.add(sebelumnya);
+                        inputEl.files = dt.files;
+                    } else {
+                        inputEl.value = '';
+                    }
+                },
+            });
+        },
+        potongFotoCerita(index) {
+            const item = this.daftarCerita[index];
+            if (!item || !item.foto_url) return;
+            const inputEl = this.$refs.panelKiri?.querySelector(`input[name="cerita_cinta[${index}][foto_file]"]`);
+            const fileAsli = ceritaAsliMap.get(item) || null;
+            const meta = this.rasioFotoTema?.foto_cerita || { rasio: 1.6, label: '16:10 Cerita', bentuk: 'rect' };
+            this.bukaCropperFoto({
+                file: fileAsli,
+                srcUrl: fileAsli ? '' : item.foto_url,
+                judul: `Atur Potongan Foto Bab ${index + 1}`,
+                rasio: meta.rasio,
+                labelRasio: meta.label,
+                bentuk: meta.bentuk,
+                namaAsli: fileAsli?.name || `foto-bab-${index + 1}.jpg`,
+                onSelesai: (fileHasil) => {
+                    ceritaHasilMap.set(item, fileHasil);
+                    if (inputEl) {
+                        const dt = new DataTransfer();
+                        dt.items.add(fileHasil);
+                        inputEl.files = dt.files;
+                    }
+                    item.foto_url = URL.createObjectURL(fileHasil);
+                    item.hapus_foto = false;
+                    this.tandaiPerubahan();
+                    this.jadwalkanLivePreview(true);
+                },
+            });
         },
         hapusFotoCerita(index) {
             if (!this.daftarCerita[index]) {
                 return;
             }
-            this.daftarCerita[index].foto = '';
-            this.daftarCerita[index].foto_url = '';
-            this.daftarCerita[index].hapus_foto = true;
+            const item = this.daftarCerita[index];
+            ceritaAsliMap.delete(item);
+            ceritaHasilMap.delete(item);
+            const inputEl = this.$refs.panelKiri?.querySelector(`input[name="cerita_cinta[${index}][foto_file]"]`);
+            if (inputEl) {
+                inputEl.value = '';
+            }
+            item.foto = '';
+            item.foto_url = '';
+            item.hapus_foto = true;
+            this.tandaiPerubahan();
             this.jadwalkanLivePreview(true);
+        },
+        bukaCropperFoto(detail) {
+            if (!detail) return;
+            if (cropTempUrl) {
+                URL.revokeObjectURL(cropTempUrl);
+                cropTempUrl = '';
+            }
+            cropImg = null;
+            cropPointers.clear();
+            cropLastPos = null;
+            cropPinchDist = 0;
+            cropSourceFile = detail.file || null;
+            cropCallbacks = {
+                onSelesai: typeof detail.onSelesai === 'function' ? detail.onSelesai : null,
+                onBatal: typeof detail.onBatal === 'function' ? detail.onBatal : null,
+            };
+
+            const rasioAwal = Number(detail.rasio) > 0 ? Number(detail.rasio) : 0.75;
+            this.cropJudul = detail.judul || 'Atur Potongan Foto';
+            this.cropNamaAsli = detail.namaAsli || cropSourceFile?.name || 'foto.jpg';
+            this.cropRasioTemplate = rasioAwal;
+            this.cropLabelTemplate = detail.labelRasio || 'Sesuai Template';
+            this.cropBentukTemplate = detail.bentuk || 'rect';
+            this.cropRasio = rasioAwal;
+            this.cropBentuk = this.cropBentukTemplate;
+            this.cropZoom = 1;
+            this.cropRotasi = 0;
+            this.cropOffsetX = 0;
+            this.cropOffsetY = 0;
+            this.cropGalat = '';
+            this.cropMenyimpan = false;
+            this.cropMemuat = true;
+            this.cropTerbuka = true;
+
+            let src = '';
+            if (cropSourceFile) {
+                cropTempUrl = URL.createObjectURL(cropSourceFile);
+                src = cropTempUrl;
+            } else if (detail.srcUrl) {
+                src = detail.srcUrl;
+            }
+
+            if (!src) {
+                this.cropMemuat = false;
+                this.cropGalat = 'Sumber gambar tidak ditemukan.';
+                return;
+            }
+
+            const img = new Image();
+            if (!src.startsWith('blob:') && !src.startsWith('data:')) {
+                img.crossOrigin = 'anonymous';
+            }
+            img.onload = () => {
+                cropImg = img;
+                this.cropMemuat = false;
+                this.$nextTick(() => {
+                    window.requestAnimationFrame(() => this.ukurDanGambarCrop());
+                });
+            };
+            img.onerror = () => {
+                this.cropMemuat = false;
+                this.cropGalat = 'Gagal memuat gambar untuk dipotong. Silakan pilih berkas gambar lain.';
+            };
+            img.src = src;
+        },
+        tutupCropperFoto(panggilBatal = true) {
+            const cbBatal = cropCallbacks.onBatal;
+            this.cropTerbuka = false;
+            this.cropMemuat = false;
+            this.cropMenyimpan = false;
+            this.cropGalat = '';
+            cropImg = null;
+            cropSourceFile = null;
+            cropCallbacks = {};
+            cropPointers.clear();
+            cropLastPos = null;
+            cropPinchDist = 0;
+            if (cropTempUrl) {
+                URL.revokeObjectURL(cropTempUrl);
+                cropTempUrl = '';
+            }
+            if (panggilBatal && typeof cbBatal === 'function') {
+                cbBatal();
+            }
+        },
+        putarCrop(derajat = 90) {
+            this.cropRotasi = (this.cropRotasi + derajat + 360) % 360;
+            this.cropOffsetX = 0;
+            this.cropOffsetY = 0;
+            this.gambarKanvasCrop();
+        },
+        resetCrop() {
+            this.cropRasio = this.cropRasioTemplate;
+            this.cropBentuk = this.cropBentukTemplate;
+            this.cropZoom = 1;
+            this.cropRotasi = 0;
+            this.cropOffsetX = 0;
+            this.cropOffsetY = 0;
+            this.ukurDanGambarCrop();
+        },
+        ubahZoomCrop(nilaiBaru) {
+            this.cropZoom = Math.min(3, Math.max(1, Number(nilaiBaru) || 1));
+            this.batasiOffsetCrop();
+            this.gambarKanvasCrop();
+        },
+        dimensiEfektifCrop() {
+            if (!cropImg) return { effW: 1, effH: 1 };
+            const rotasiTegak = this.cropRotasi % 180 !== 0;
+            return {
+                effW: rotasiTegak ? cropImg.naturalHeight : cropImg.naturalWidth,
+                effH: rotasiTegak ? cropImg.naturalWidth : cropImg.naturalHeight,
+            };
+        },
+        skalaDasarCrop() {
+            const { effW, effH } = this.dimensiEfektifCrop();
+            return Math.max(this.cropBoxW / effW, this.cropBoxH / effH);
+        },
+        batasiOffsetCrop() {
+            if (!cropImg) return;
+            const { effW, effH } = this.dimensiEfektifCrop();
+            const scale = this.skalaDasarCrop() * this.cropZoom;
+            const maxX = Math.max(0, (effW * scale - this.cropBoxW) / 2);
+            const maxY = Math.max(0, (effH * scale - this.cropBoxH) / 2);
+            this.cropOffsetX = Math.min(maxX, Math.max(-maxX, this.cropOffsetX));
+            this.cropOffsetY = Math.min(maxY, Math.max(-maxY, this.cropOffsetY));
+        },
+        ukurDanGambarCrop() {
+            const wadah = this.$refs.wadahKanvasCrop;
+            if (!wadah) return;
+            const rect = wadah.getBoundingClientRect();
+            const stageW = Math.max(240, Math.floor(rect.width || 340));
+            const stageH = Math.max(240, Math.floor(rect.height || 340));
+            this.cropStageW = stageW;
+            this.cropStageH = stageH;
+
+            const pad = 24;
+            const maksW = Math.max(140, stageW - pad * 2);
+            const maksH = Math.max(140, stageH - pad * 2);
+            let boxW = maksW;
+            let boxH = boxW / this.cropRasio;
+            if (boxH > maksH) {
+                boxH = maksH;
+                boxW = boxH * this.cropRasio;
+            }
+            this.cropBoxW = Math.round(boxW);
+            this.cropBoxH = Math.round(boxH);
+            this.batasiOffsetCrop();
+            this.gambarKanvasCrop();
+        },
+        gambarKanvasCrop() {
+            const canvas = this.$refs.kanvasCrop;
+            if (!canvas || !cropImg) return;
+
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const W = this.cropStageW;
+            const H = this.cropStageH;
+            if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) {
+                canvas.width = Math.round(W * dpr);
+                canvas.height = Math.round(H * dpr);
+            }
+
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            ctx.save();
+            ctx.scale(dpr, dpr);
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = '#111315';
+            ctx.fillRect(0, 0, W, H);
+
+            this.batasiOffsetCrop();
+            const scale = this.skalaDasarCrop() * this.cropZoom;
+
+            // 1. Gambar foto asli sesuai posisi, rotasi, dan zoom
+            ctx.save();
+            ctx.translate(W / 2 + this.cropOffsetX, H / 2 + this.cropOffsetY);
+            ctx.rotate((this.cropRotasi * Math.PI) / 180);
+            ctx.scale(scale, scale);
+            ctx.drawImage(cropImg, -cropImg.naturalWidth / 2, -cropImg.naturalHeight / 2);
+            ctx.restore();
+
+            // 2. Redupkan area di luar kotak potong
+            const x = Math.round((W - this.cropBoxW) / 2);
+            const y = Math.round((H - this.cropBoxH) / 2);
+            const bw = this.cropBoxW;
+            const bh = this.cropBoxH;
+
+            ctx.fillStyle = 'rgba(10, 12, 14, 0.62)';
+            ctx.beginPath();
+            ctx.rect(0, 0, W, H);
+            ctx.rect(x, y, bw, bh);
+            ctx.fill('evenodd');
+
+            // 3. Garis bantu rule-of-thirds tipis di dalam bingkai potong
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.24)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(x + bw / 3, y);
+            ctx.lineTo(x + bw / 3, y + bh);
+            ctx.moveTo(x + (bw * 2) / 3, y);
+            ctx.lineTo(x + (bw * 2) / 3, y + bh);
+            ctx.moveTo(x, y + bh / 3);
+            ctx.lineTo(x + bw, y + bh / 3);
+            ctx.moveTo(x, y + (bh * 2) / 3);
+            ctx.lineTo(x + bw, y + (bh * 2) / 3);
+            ctx.stroke();
+
+            // 4. Panduan bentuk khusus template (kapsul / lengkung mihrab)
+            if (this.cropBentuk === 'pill' || this.cropBentuk === 'arch') {
+                const rAtas = Math.min(bw / 2, bh / 2);
+                const rBawah = this.cropBentuk === 'pill' ? rAtas : Math.min(14, bw * 0.08);
+                ctx.save();
+                ctx.strokeStyle = 'rgba(243, 229, 171, 0.9)';
+                ctx.lineWidth = 1.6;
+                ctx.setLineDash([6, 4]);
+                ctx.beginPath();
+                ctx.moveTo(x + rAtas, y);
+                ctx.arcTo(x + bw, y, x + bw, y + rAtas, rAtas);
+                ctx.lineTo(x + bw, y + bh - rBawah);
+                ctx.arcTo(x + bw, y + bh, x + bw - rBawah, y + bh, rBawah);
+                ctx.lineTo(x + rBawah, y + bh);
+                ctx.arcTo(x, y + bh, x, y + bh - rBawah, rBawah);
+                ctx.lineTo(x, y + rAtas);
+                ctx.arcTo(x, y, x + rAtas, y, rAtas);
+                ctx.closePath();
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // 5. Bingkai kotak potong & siku sudut tegas
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.92)';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(x + 0.5, y + 0.5, bw - 1, bh - 1);
+
+            const siku = 16;
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x, y + siku); ctx.lineTo(x, y); ctx.lineTo(x + siku, y);
+            ctx.moveTo(x + bw - siku, y); ctx.lineTo(x + bw, y); ctx.lineTo(x + bw, y + siku);
+            ctx.moveTo(x, y + bh - siku); ctx.lineTo(x, y + bh); ctx.lineTo(x + siku, y + bh);
+            ctx.moveTo(x + bw - siku, y + bh); ctx.lineTo(x + bw, y + bh); ctx.lineTo(x + bw, y + bh - siku);
+            ctx.stroke();
+
+            ctx.restore();
+        },
+        cropPointerDown(event) {
+            if (!cropImg) return;
+            event.currentTarget.setPointerCapture?.(event.pointerId);
+            cropPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+            if (cropPointers.size === 1) {
+                cropLastPos = { x: event.clientX, y: event.clientY };
+            } else if (cropPointers.size === 2) {
+                const [p1, p2] = Array.from(cropPointers.values());
+                cropPinchDist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+            }
+        },
+        cropPointerMove(event) {
+            if (!cropPointers.has(event.pointerId) || !cropImg) return;
+            cropPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+            if (cropPointers.size === 1 && cropLastPos) {
+                const dx = event.clientX - cropLastPos.x;
+                const dy = event.clientY - cropLastPos.y;
+                cropLastPos = { x: event.clientX, y: event.clientY };
+                this.cropOffsetX += dx;
+                this.cropOffsetY += dy;
+                this.batasiOffsetCrop();
+                this.gambarKanvasCrop();
+            } else if (cropPointers.size === 2) {
+                const [p1, p2] = Array.from(cropPointers.values());
+                const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+                if (cropPinchDist > 0 && dist > 0) {
+                    this.ubahZoomCrop(this.cropZoom * (dist / cropPinchDist));
+                }
+                cropPinchDist = dist;
+            }
+        },
+        cropPointerUp(event) {
+            cropPointers.delete(event.pointerId);
+            if (cropPointers.size === 1) {
+                const [sisa] = Array.from(cropPointers.values());
+                cropLastPos = { x: sisa.x, y: sisa.y };
+            } else {
+                cropLastPos = null;
+            }
+            if (cropPointers.size < 2) {
+                cropPinchDist = 0;
+            }
+        },
+        cropWheelZoom(event) {
+            if (!cropImg) return;
+            const delta = -event.deltaY * 0.0014;
+            this.ubahZoomCrop(this.cropZoom + delta);
+        },
+        terapkanPotonganFoto() {
+            if (!cropImg || this.cropMenyimpan) return;
+            this.cropMenyimpan = true;
+            this.cropGalat = '';
+
+            try {
+                this.batasiOffsetCrop();
+                const scale = this.skalaDasarCrop() * this.cropZoom;
+                const maksSisi = 1600;
+                let outW;
+                let outH;
+                if (this.cropRasio >= 1) {
+                    outW = Math.min(maksSisi, Math.max(720, Math.round(this.cropBoxW / scale)));
+                    outH = Math.max(1, Math.round(outW / this.cropRasio));
+                } else {
+                    outH = Math.min(maksSisi, Math.max(720, Math.round(this.cropBoxH / scale)));
+                    outW = Math.max(1, Math.round(outH * this.cropRasio));
+                }
+
+                const exportScale = outW / this.cropBoxW;
+                const outCanvas = document.createElement('canvas');
+                outCanvas.width = outW;
+                outCanvas.height = outH;
+                const outCtx = outCanvas.getContext('2d');
+                if (!outCtx) {
+                    throw new Error('Canvas tidak tersedia');
+                }
+
+                outCtx.fillStyle = '#18181B';
+                outCtx.fillRect(0, 0, outW, outH);
+                outCtx.save();
+                outCtx.translate(outW / 2 + this.cropOffsetX * exportScale, outH / 2 + this.cropOffsetY * exportScale);
+                outCtx.rotate((this.cropRotasi * Math.PI) / 180);
+                outCtx.scale(scale * exportScale, scale * exportScale);
+                outCtx.drawImage(cropImg, -cropImg.naturalWidth / 2, -cropImg.naturalHeight / 2);
+                outCtx.restore();
+
+                const namaDasar = (this.cropNamaAsli || 'foto').replace(/\.[^.]+$/, '');
+                const cbSelesai = cropCallbacks.onSelesai;
+
+                outCanvas.toBlob((blob) => {
+                    if (!blob) {
+                        this.cropMenyimpan = false;
+                        this.cropGalat = 'Gagal memproses potongan foto. Silakan coba lagi.';
+                        return;
+                    }
+                    const fileHasil = new File([blob], `${namaDasar}.jpg`, {
+                        type: 'image/jpeg',
+                        lastModified: Date.now(),
+                    });
+                    this.tutupCropperFoto(false);
+                    if (typeof cbSelesai === 'function') {
+                        cbSelesai(fileHasil);
+                    }
+                }, 'image/jpeg', 0.92);
+            } catch (_) {
+                this.cropMenyimpan = false;
+                this.cropGalat = 'Tidak dapat memotong gambar ini. Coba unggah ulang file dari perangkat.';
+            }
         },
         pindahCerita(index, arah) {
             const target = index + arah;

@@ -244,7 +244,6 @@ class HalamanUtamaController extends Controller
                 'foto_sampul' => $tanpaFoto ? null : $dataDemo['foto_sampul'],
                 'foto_pembuka' => $tanpaFoto ? null : ($dataDemo['foto_pembuka'] ?? null),
                 'foto_penutup' => $tanpaFoto ? null : ($dataDemo['foto_penutup'] ?? null),
-                'foto_latar_tema' => null,
                 'hashtag' => $dataDemo['hashtag'] ?? '',
                 'sosial_media' => $dataDemo['sosial_media'] ?? [
                     'instagram_pria' => '',

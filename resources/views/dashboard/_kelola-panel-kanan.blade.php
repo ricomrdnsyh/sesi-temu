@@ -72,6 +72,7 @@
             </button>
 
             <a
+                :href="urlPublikSalin || @js($urlPublik)"
                 href="{{ $urlPublik }}"
                 target="_blank"
                 title="Buka undangan di tab baru"
