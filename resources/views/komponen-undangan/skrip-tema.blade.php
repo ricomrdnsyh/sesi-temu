@@ -4,6 +4,7 @@
         return {
             undanganTerbuka: false,
             musikBerputar: false,
+            musikDijedaManual: false,
             galeriModalTerbuka: false,
             galeriAktifUrl: '',
             galeriAktifKeterangan: '',
@@ -537,12 +538,45 @@
                     this.jadwalkanAutoScrollSetelahVideo(jedaAutoScroll);
                 }
 
-                if (this.$refs.pemutarAudio) {
-                    this.$refs.pemutarAudio.play().then(() => {
-                        this.musikBerputar = true;
-                    }).catch(() => {
-                        this.musikBerputar = false;
-                    });
+                if (!modeEmbed && this.$refs.pemutarAudio) {
+                    const audio = this.$refs.pemutarAudio;
+                    const putarDenganFade = () => {
+                        try {
+                            audio.volume = 0.24;
+                        } catch (e) {}
+                        const janjiAudio = audio.play();
+                        if (janjiAudio && typeof janjiAudio.then === 'function') {
+                            janjiAudio.then(() => {
+                                this.musikBerputar = true;
+                                let vol = 0.24;
+                                const timerFade = window.setInterval(() => {
+                                    if (audio.paused || vol >= 0.82) {
+                                        window.clearInterval(timerFade);
+                                        return;
+                                    }
+                                    vol = Math.min(0.82, vol + 0.12);
+                                    try {
+                                        audio.volume = vol;
+                                    } catch (e) {
+                                        window.clearInterval(timerFade);
+                                    }
+                                }, 110);
+                            }).catch(() => {
+                                this.musikBerputar = false;
+                            });
+                        }
+                    };
+
+                    if (audio.readyState >= 2) {
+                        putarDenganFade();
+                    } else {
+                        putarDenganFade();
+                        audio.addEventListener('canplay', () => {
+                            if (this.undanganTerbuka && audio.paused && !this.musikDijedaManual) {
+                                putarDenganFade();
+                            }
+                        }, { once: true });
+                    }
                 }
 
                 // Tunda pemindaian DOM reveal/AOS hingga animasi transisi sampul selesai agar tidak memicu layout spike di tengah transisi
@@ -774,9 +808,14 @@
                     return;
                 }
                 if (this.musikBerputar) {
+                    this.musikDijedaManual = true;
                     this.$refs.pemutarAudio.pause();
                     this.musikBerputar = false;
                 } else {
+                    this.musikDijedaManual = false;
+                    try {
+                        this.$refs.pemutarAudio.volume = 0.82;
+                    } catch (e) {}
                     this.$refs.pemutarAudio.play().then(() => {
                         this.musikBerputar = true;
                     }).catch(() => {});

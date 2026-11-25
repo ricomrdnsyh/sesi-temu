@@ -450,6 +450,106 @@ class Tema extends Model
     }
 
     /**
+     * Daftar kurasi lagu latar populer bawaan platform yang disesuaikan per karakter tema.
+     *
+     * @return list<array{judul: string, artis: string, path_file: string, kategori: string, urutan: int}>
+     */
+    public static function katalogMusikBawaan(): array
+    {
+        return [
+            [
+                'judul' => 'Penjaga Hati',
+                'artis' => 'Nadhif Basalamah',
+                'path_file' => 'musik/penjaga-hati.mp3',
+                'kategori' => 'Pop Romantis & Floral',
+                'urutan' => 1,
+            ],
+            [
+                'judul' => 'A Thousand Years',
+                'artis' => 'Christina Perri',
+                'path_file' => 'musik/a-thousand-years.mp3',
+                'kategori' => 'Botanical & Garden',
+                'urutan' => 2,
+            ],
+            [
+                'judul' => 'Until I Found You',
+                'artis' => 'Stephen Sanchez',
+                'path_file' => 'musik/until-i-found-you.mp3',
+                'kategori' => 'Modern & Editorial',
+                'urutan' => 3,
+            ],
+            [
+                'judul' => "Can't Help Falling in Love (Grand Piano)",
+                'artis' => 'Romantic Ballroom Cover',
+                'path_file' => 'musik/cant-help-falling-in-love.mp3',
+                'kategori' => 'Elegan & Gala',
+                'urutan' => 4,
+            ],
+            [
+                'judul' => 'Beautiful in White',
+                'artis' => 'Shane Filan',
+                'path_file' => 'musik/beautiful-in-white.mp3',
+                'kategori' => 'Klasik & Royal',
+                'urutan' => 5,
+            ],
+            [
+                'judul' => 'Lagu Pernikahan Kita',
+                'artis' => 'Arsy Widianto & Tiara Andini',
+                'path_file' => 'musik/lagu-pernikahan-kita.mp3',
+                'kategori' => 'Pop Romantis Indonesia',
+                'urutan' => 6,
+            ],
+            [
+                'judul' => 'Gending Temanten Kebo Giro',
+                'artis' => 'Karawitan Adat Jawa',
+                'path_file' => 'musik/gamelan-lembut.mp3',
+                'kategori' => 'Adat Jawa',
+                'urutan' => 7,
+            ],
+            [
+                'judul' => 'Degung Sabilulungan',
+                'artis' => 'Kacapi Suling Priangan',
+                'path_file' => 'musik/degung-sabilulungan.mp3',
+                'kategori' => 'Adat Sunda',
+                'urutan' => 8,
+            ],
+            [
+                'judul' => 'Barakallahu Lakuma',
+                'artis' => 'Maher Zain',
+                'path_file' => 'musik/barakallahu-lakuma.mp3',
+                'kategori' => 'Islami & Walimah',
+                'urutan' => 9,
+            ],
+            [
+                'judul' => "Rahmatun Lil'Alameen",
+                'artis' => 'Maher Zain',
+                'path_file' => 'musik/rahmatun-lil-alameen.mp3',
+                'kategori' => 'Islami & Syahdu',
+                'urutan' => 10,
+            ],
+        ];
+    }
+
+    /**
+     * Lagu latar bawaan yang paling selaras untuk masing-masing slug tema.
+     */
+    public static function musikBawaanUntukSlug(?string $slug): string
+    {
+        return match ($slug) {
+            'rustic-floral' => 'musik/penjaga-hati.mp3',
+            'velvet-garden' => 'musik/a-thousand-years.mp3',
+            'editorial-monokrom' => 'musik/until-i-found-you.mp3',
+            'luxury-noir' => 'musik/cant-help-falling-in-love.mp3',
+            'royal-ivory' => 'musik/beautiful-in-white.mp3',
+            'adat-jawa' => 'musik/gamelan-lembut.mp3',
+            'sunda-heritage' => 'musik/degung-sabilulungan.mp3',
+            'islami-syari' => 'musik/barakallahu-lakuma.mp3',
+            'islamic-heavenly' => 'musik/rahmatun-lil-alameen.mp3',
+            default => 'musik/penjaga-hati.mp3',
+        };
+    }
+
+    /**
      * Token visual palet poster sampul bergaya triple-phone yang tersinkronisasi dengan tema undangan.
      *
      * @return array{

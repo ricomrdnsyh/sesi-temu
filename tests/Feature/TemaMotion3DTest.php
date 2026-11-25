@@ -788,6 +788,49 @@ class TemaMotion3DTest extends TestCase
     }
 
     /**
+     * Setiap tema memiliki lagu latar bawaan yang berbeda sesuai karakternya dan seluruh file MP3 berisi audio nyata.
+     */
+    public function test_setiap_tema_memiliki_musik_latar_kurasi_nyata_yang_sesuai_karakter_tema(): void
+    {
+        foreach (Tema::katalogMusikBawaan() as $musik) {
+            $pathPenuh = public_path($musik['path_file']);
+            $this->assertFileExists($pathPenuh, "File audio {$musik['path_file']} wajib tersedia.");
+            $this->assertGreaterThan(500000, filesize($pathPenuh), "File audio {$musik['path_file']} wajib berisi audio utuh (>500 KB).");
+        }
+
+        $petaEkspektasi = [
+            'rustic-floral' => 'musik/penjaga-hati.mp3',
+            'velvet-garden' => 'musik/a-thousand-years.mp3',
+            'editorial-monokrom' => 'musik/until-i-found-you.mp3',
+            'luxury-noir' => 'musik/cant-help-falling-in-love.mp3',
+            'royal-ivory' => 'musik/beautiful-in-white.mp3',
+            'adat-jawa' => 'musik/gamelan-lembut.mp3',
+            'sunda-heritage' => 'musik/degung-sabilulungan.mp3',
+            'islami-syari' => 'musik/barakallahu-lakuma.mp3',
+            'islamic-heavenly' => 'musik/rahmatun-lil-alameen.mp3',
+        ];
+
+        foreach ($petaEkspektasi as $slug => $jalurMusik) {
+            Tema::create([
+                'nama_tema' => ucwords(str_replace('-', ' ', $slug)),
+                'slug' => $slug,
+                'kategori' => 'modern',
+                'tier' => 'premium',
+                'harga' => 79000,
+                'lokasi_view' => "tema.{$slug}.index",
+                'aktif' => true,
+            ]);
+
+            $this->assertSame($jalurMusik, Tema::musikBawaanUntukSlug($slug));
+
+            $this->get("/demo/{$slug}?kanvas=1")
+                ->assertOk()
+                ->assertSee($jalurMusik, false)
+                ->assertSee('x-ref="pemutarAudio"', false);
+        }
+    }
+
+    /**
      * Tema Rustic Floral merender video motion hero Watercolor Garden 15 detik,
      * poster katalog triple-phone, slideshow foto di atas countdown, amplop buka-tutup,
      * galeri kolase bervariasi rasio, doa pengantin, turut mengundang, dan aman Mode Tanpa Foto.

@@ -142,6 +142,19 @@ class DatabaseSeeder extends Seeder
             }
         }
 
+        foreach (Tema::katalogMusikBawaan() as $musikItem) {
+            \App\Models\MusikLatar::updateOrCreate(
+                ['path_file' => $musikItem['path_file']],
+                [
+                    'judul' => $musikItem['judul'],
+                    'artis' => $musikItem['artis'],
+                    'kategori' => $musikItem['kategori'],
+                    'aktif' => true,
+                    'urutan' => $musikItem['urutan'],
+                ]
+            );
+        }
+
         if ($temaUtama === null) {
             return;
         }
@@ -162,7 +175,7 @@ class DatabaseSeeder extends Seeder
                 'nama_ibu_wanita' => 'Ibu Sri Wahyuni',
                 'foto_wanita' => 'aset-demo/mempelai-wanita.webp',
                 'kutipan_ayat' => 'Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya di antaramu rasa kasih dan sayang. (QS. Ar-Rum: 21)',
-                'musik_latar' => 'musik/romantis-akustik.mp3',
+                'musik_latar' => 'musik/penjaga-hati.mp3',
                 'pengaturan' => [
                     'cerita_cinta' => [
                         [

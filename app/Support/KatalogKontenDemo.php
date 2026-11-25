@@ -43,7 +43,7 @@ class KatalogKontenDemo
                 'foto_sampul' => 'aset-demo/sampul-rustic.webp',
                 'foto_pembuka' => 'aset-demo/galeri/rustic-floral/galeri-02.webp',
                 'foto_penutup' => 'aset-demo/galeri/rustic-floral/galeri-03.webp',
-                'musik_latar' => 'musik/romantis-akustik.mp3',
+                'musik_latar' => 'musik/penjaga-hati.mp3',
                 'hari_lagi' => 21,
                 'sosial_media' => [
                     'instagram_pria' => 'dimas.pratama',
@@ -257,7 +257,7 @@ class KatalogKontenDemo
                 'foto_sampul' => 'aset-demo/sampul-sunda.webp',
                 'foto_pembuka' => 'aset-demo/galeri/sunda-heritage/galeri-02.webp',
                 'foto_penutup' => 'aset-demo/galeri/sunda-heritage/galeri-03.webp',
-                'musik_latar' => 'musik/gamelan-lembut.mp3',
+                'musik_latar' => 'musik/degung-sabilulungan.mp3',
                 'hari_lagi' => 28,
                 'sosial_media' => [
                     'instagram_pria' => 'bagja.natawijaya',
@@ -364,7 +364,7 @@ class KatalogKontenDemo
                 'foto_sampul' => 'aset-demo/sampul-editorial.webp',
                 'foto_pembuka' => 'aset-demo/galeri/editorial-monokrom/galeri-02.webp',
                 'foto_penutup' => 'aset-demo/galeri/editorial-monokrom/galeri-03.webp',
-                'musik_latar' => 'musik/romantis-akustik.mp3',
+                'musik_latar' => 'musik/until-i-found-you.mp3',
                 'hari_lagi' => 42,
                 'sosial_media' => [
                     'instagram_pria' => 'arsen.tanoto',
@@ -471,7 +471,7 @@ class KatalogKontenDemo
                 'foto_sampul' => 'aset-demo/sampul-luxury.webp',
                 'foto_pembuka' => 'aset-demo/galeri/luxury-noir/galeri-02.webp',
                 'foto_penutup' => 'aset-demo/galeri/luxury-noir/galeri-03.webp',
-                'musik_latar' => 'musik/romantis-akustik.mp3',
+                'musik_latar' => 'musik/cant-help-falling-in-love.mp3',
                 'hari_lagi' => 49,
                 'sosial_media' => [
                     'instagram_pria' => 'alvaro.dirgantara',
@@ -578,7 +578,7 @@ class KatalogKontenDemo
                 'foto_sampul' => 'aset-demo/sampul-royal.webp',
                 'foto_pembuka' => 'aset-demo/galeri/royal-ivory/galeri-02.webp',
                 'foto_penutup' => 'aset-demo/galeri/royal-ivory/galeri-03.webp',
-                'musik_latar' => 'musik/romantis-akustik.mp3',
+                'musik_latar' => 'musik/beautiful-in-white.mp3',
                 'hari_lagi' => 33,
                 'sosial_media' => [
                     'instagram_pria' => 'raka.bramantyo',
@@ -685,7 +685,7 @@ class KatalogKontenDemo
                 'foto_sampul' => 'aset-demo/sampul-garden.webp',
                 'foto_pembuka' => 'aset-demo/galeri/velvet-garden/galeri-02.webp',
                 'foto_penutup' => 'aset-demo/galeri/velvet-garden/galeri-03.webp',
-                'musik_latar' => 'musik/romantis-akustik.mp3',
+                'musik_latar' => 'musik/a-thousand-years.mp3',
                 'hari_lagi' => 19,
                 'sosial_media' => [
                     'instagram_pria' => 'narendra.senoaji',
@@ -792,7 +792,7 @@ class KatalogKontenDemo
                 'foto_sampul' => 'aset-demo/sampul-islami.webp',
                 'foto_pembuka' => 'aset-demo/galeri/islami-syari/galeri-02.webp',
                 'foto_penutup' => 'aset-demo/galeri/islami-syari/galeri-03.webp',
-                'musik_latar' => 'musik/instrumen-islami.mp3',
+                'musik_latar' => 'musik/barakallahu-lakuma.mp3',
                 'hari_lagi' => 24,
                 'sosial_media' => [
                     'instagram_pria' => 'zayd.alfaruq',
@@ -899,7 +899,7 @@ class KatalogKontenDemo
                 'foto_sampul' => 'aset-demo/sampul-islamic-heavenly.webp',
                 'foto_pembuka' => 'aset-demo/galeri/islamic-heavenly/galeri-02.webp',
                 'foto_penutup' => 'aset-demo/galeri/islamic-heavenly/galeri-09.webp',
-                'musik_latar' => 'musik/instrumen-islami.mp3',
+                'musik_latar' => 'musik/rahmatun-lil-alameen.mp3',
                 'hari_lagi' => 45,
                 'sosial_media' => [
                     'instagram_pria' => 'dr.farhanhakim',

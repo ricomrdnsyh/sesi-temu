@@ -329,14 +329,17 @@ class DashboardUndanganController extends Controller
             return back()->withErrors(['slug' => "Link sesitemu.id/{$slug} sudah dipakai. Gunakan nama link lain."])->withInput();
         }
 
+        $temaDipilih = Tema::findOrFail((int) $tervalidasi['tema_id']);
+
         $undangan = Undangan::create([
             'pengguna_id' => $request->user()->id,
-            'tema_id' => (int) $tervalidasi['tema_id'],
+            'tema_id' => $temaDipilih->id,
             'slug' => $slug,
             'nama_panggilan_pria' => $tervalidasi['nama_panggilan_pria'],
             'nama_lengkap_pria' => $tervalidasi['nama_lengkap_pria'],
             'nama_panggilan_wanita' => $tervalidasi['nama_panggilan_wanita'],
             'nama_lengkap_wanita' => $tervalidasi['nama_lengkap_wanita'],
+            'musik_latar' => Tema::musikBawaanUntukSlug($temaDipilih->slug),
             'pengaturan' => Undangan::pengaturanBawaan(),
             'status_publikasi' => false,
         ]);
