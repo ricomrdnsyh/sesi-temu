@@ -63,6 +63,7 @@ class Tahap3LandingDemoTest extends TestCase
             ->assertSee('Jadi Dulu, Baru Bayar')
             ->assertSee('Siap dalam 5 Menit')
             ->assertSee('data-hero-typewriter', false)
+            ->assertSee('data-hero-mockup-iphone="2"', false)
             ->assertSee('aset-tema/adat-jawa/hero-poster.webp', false)
             ->assertSee('sunda-heritage', false)
             ->assertSee('Bagja', false)

@@ -799,8 +799,8 @@ class TemaMotion3DTest extends TestCase
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('02 / CHRONOMETER', false)
-            ->assertSee('PASS 01 &middot; ADMIT ONE', false)
+            ->assertSee('data-mockup-iphone="2"', false)
+            ->assertSee('data-dynamic-island="true"', false)
             ->assertSee('01 / DOSSIER', false)
             ->assertSee('35MM B&amp;W', false);
     }
@@ -929,11 +929,12 @@ class TemaMotion3DTest extends TestCase
 
         $this->get('/')
             ->assertOk()
+            ->assertSee('data-mockup-iphone="2"', false)
             ->assertSee('aset-tema/rustic-floral/hero-poster.webp', false)
             ->assertSee('aset-tema/rustic-floral/garland-bunga-rustic.webp', false)
-            ->assertSee('Menuju Hari Bahagia', false)
-            ->assertSee('Rangkaian Acara', false)
-            ->assertSee('Mempelai Wanita', false);
+            ->assertSee('aset-tema/rustic-floral/bingkai-bunga-mempelai.webp', false)
+            ->assertSee('Mempelai Wanita', false)
+            ->assertSee('Save The Date', false);
     }
 
     /**
@@ -1142,6 +1143,9 @@ class TemaMotion3DTest extends TestCase
 
         $this->get('/')
             ->assertOk()
+            ->assertSee('data-mockup-iphone="2"', false)
+            ->assertSee('data-iphone-frame="hero"', false)
+            ->assertSee('data-iphone-frame="interior"', false)
             ->assertSee('aset-tema/luxury-noir/bingkai-artdeco.webp', false)
             ->assertSee('aset-tema/royal-ivory/ornamen-katedral.webp', false);
     }
