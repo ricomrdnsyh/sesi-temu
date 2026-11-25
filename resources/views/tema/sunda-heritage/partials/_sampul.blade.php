@@ -73,7 +73,7 @@
             <div class="relative z-20 px-8 pt-7 sm:pt-9 text-center text-white space-y-1.5">
                 <img src="{{ $asetSunda['siger'] }}" alt="" class="w-12 mx-auto opacity-95 animasi-ayun-3d">
                 <p class="text-[10px] font-semibold uppercase tracking-[0.35em] text-[#F3E5AB] drop-shadow">
-                    Sampurasun &bull; Walimatul Ursy
+                    {{ $undangan->teksKustom('sampul_judul', 'Sampurasun • Walimatul Ursy') }}
                 </p>
                 <h1 class="font-serif text-4xl sm:text-[2.75rem] font-bold leading-tight text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.5)]">
                     {{ $undangan->nama_panggilan_pria }}
@@ -95,7 +95,7 @@
                 </div>
                 <span class="sr-only">Kepada Yth. {{ $namaTamu }}</span>
                 <p class="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#F3E5AB]">
-                    Kepada Yth. Bapak/Ibu/Saudara/i
+                    {{ $undangan->teksKustom('sampul_sapaan', 'Kepada Yth. Bapak/Ibu/Saudara/i') }}
                 </p>
                 <p class="font-serif text-xl sm:text-2xl font-bold text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.55)]">
                     {{ $namaTamu }}
@@ -110,11 +110,11 @@
                             <rect width="20" height="16" x="2" y="4" rx="2"/>
                             <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
                         </svg>
-                        <span>Buka Undangan</span>
+                        <span>{{ $undangan->teksKustom('sampul_tombol', 'Buka Undangan') }}</span>
                     </button>
                 </div>
                 <p class="text-[10px] italic text-[#FAF4E8]/75 pt-1 max-w-xs mx-auto leading-relaxed">
-                    Mohon maaf apabila ada kesalahan penulisan nama/gelar
+                    {{ $undangan->teksKustom('sampul_catatan', 'Mohon maaf apabila ada kesalahan penulisan nama/gelar') }}
                 </p>
             </div>
         @else
@@ -128,7 +128,7 @@
                             class="w-11 sm:w-12 mx-auto opacity-95 drop-shadow-[0_4px_10px_rgba(90,30,30,0.2)]"
                         >
                         <p class="text-[9.5px] font-semibold uppercase tracking-[0.34em] text-[#8E6620]">
-                            The Wedding Of
+                            {{ $undangan->teksKustom('sampul_judul', 'The Wedding Of') }}
                         </p>
                         <h1 class="font-serif text-[2.35rem] sm:text-[2.65rem] font-semibold uppercase tracking-[0.1em] leading-[1.08] text-[#5A1E1E] pt-0.5">
                             <span class="block">{{ $undangan->nama_panggilan_pria }}</span>
@@ -143,8 +143,12 @@
                     <div class="space-y-1.5 pt-2">
                         <span class="sr-only">Kepada Yth. {{ $namaTamu }}</span>
                         <p class="text-[10px] font-medium tracking-[0.12em] text-[#6E3434]/85 leading-relaxed">
-                            Kepada Yth.<br>
-                            Bapak/Ibu/Saudara/i
+                            @if ($undangan->teksKustom('sampul_sapaan') !== '')
+                                {{ $undangan->teksKustom('sampul_sapaan') }}
+                            @else
+                                Kepada Yth.<br>
+                                Bapak/Ibu/Saudara/i
+                            @endif
                         </p>
                         <p class="font-serif text-xl sm:text-[1.4rem] font-bold text-[#4A1818] leading-snug pt-0.5">
                             {{ $namaTamu }}
@@ -161,12 +165,12 @@
                                 <rect width="20" height="16" x="2" y="4" rx="2"/>
                                 <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
                             </svg>
-                            <span>Buka Undangan</span>
+                            <span>{{ $undangan->teksKustom('sampul_tombol', 'Buka Undangan') }}</span>
                         </button>
                     </div>
 
                     <p class="text-[9.5px] italic text-[#4A2020]/68 max-w-[230px] mx-auto leading-relaxed">
-                        Mohon maaf apabila ada kesalahan penulisan nama/gelar
+                        {{ $undangan->teksKustom('sampul_catatan', 'Mohon maaf apabila ada kesalahan penulisan nama/gelar') }}
                     </p>
                 </div>
             </div>

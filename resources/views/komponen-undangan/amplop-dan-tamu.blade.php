@@ -55,9 +55,9 @@
     <div class="max-w-md mx-auto text-center">
         <div class="fx-rise {{ $kelasRadiusBesar }} p-6 sm:p-7 kartu-3d masuk-3d {{ $ekstraKartu }} {{ $kelasKartu ?? 'bg-white ring-1 ring-champagne/25 text-charcoal' }}">
             <p class="text-[11px] font-semibold uppercase tracking-[0.28em] {{ $aksenKartu }}">Tanda Kasih</p>
-            <h2 class="mt-1.5 {{ $sudutTajam ? 'font-serif text-2xl sm:text-3xl font-bold uppercase tracking-[0.14em]' : 'font-kaligrafi text-4xl font-normal leading-tight' }}">Amplop Digital</h2>
+            <h2 class="mt-1.5 {{ $sudutTajam ? 'font-serif text-2xl sm:text-3xl font-bold uppercase tracking-[0.14em]' : 'font-kaligrafi text-4xl font-normal leading-tight' }}">{{ $undangan->teksKustom('judul_amplop', 'Amplop Digital') }}</h2>
             <p class="mt-2 text-xs sm:text-sm opacity-75 leading-relaxed">
-                Doa restu Anda merupakan karunia terindah bagi kami. Apabila hendak mengirimkan tanda kasih, dapat melalui rekening berikut:
+                {{ $undangan->teksKustom('pengantar_amplop', 'Doa restu Anda merupakan karunia terindah bagi kami. Apabila hendak mengirimkan tanda kasih, dapat melalui rekening berikut:') }}
             </p>
 
             <button
@@ -155,7 +155,7 @@
             @endif
             <p class="text-[11px] font-semibold uppercase tracking-[0.3em] opacity-80">Konfirmasi &amp; Doa</p>
             <h2 class="fx-scale-in {{ $sudutTajam ? 'font-serif text-2xl sm:text-3xl font-bold uppercase tracking-[0.16em]' : 'font-serif text-3xl sm:text-4xl font-bold' }}">
-                Buku Tamu &amp; RSVP
+                {{ $undangan->teksKustom('judul_buku_tamu', 'Buku Tamu & RSVP') }}
             </h2>
         </div>
 
@@ -341,14 +341,14 @@
                 </p>
             @endif
 
-            <p class="text-[10px] font-bold uppercase tracking-[0.34em] {{ $aksenKartu }}">Terima Kasih</p>
+            <p class="text-[10px] font-bold uppercase tracking-[0.34em] {{ $aksenKartu }}">{{ $undangan->teksKustom('judul_penutup', 'Terima Kasih') }}</p>
 
             <p class="text-xs sm:text-sm opacity-80 leading-relaxed max-w-xs mx-auto">
-                Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu bagi kedua mempelai.
+                {{ $undangan->teksKustom('ucapan_penutup', 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu bagi kedua mempelai.') }}
             </p>
 
             <div class="pt-3">
-                <p class="text-[10px] uppercase tracking-[0.28em] opacity-65">Kami Yang Berbahagia</p>
+                <p class="text-[10px] uppercase tracking-[0.28em] opacity-65">{{ $undangan->teksKustom('label_penutup', 'Kami Yang Berbahagia') }}</p>
                 <p class="mt-2 {{ $sudutTajam ? 'font-serif text-2xl sm:text-3xl font-bold uppercase tracking-[0.16em]' : 'font-kaligrafi text-4xl sm:text-5xl leading-tight' }} {{ $aksenKartu }}">
                     {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}
                 </p>

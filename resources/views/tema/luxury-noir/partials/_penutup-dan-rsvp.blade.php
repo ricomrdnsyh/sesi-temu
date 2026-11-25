@@ -9,9 +9,9 @@
 
         <div class="space-y-1.5">
             <p data-gsap="turun" class="text-[10px] font-semibold uppercase tracking-[0.38em] text-[#D4AF37]">Tanda Kasih</p>
-            <h2 data-gsap="naik" data-gsap-delay="0.05" class="noir-font-judul text-2xl sm:text-3xl font-bold text-[#F3E5AB]">Amplop Digital</h2>
+            <h2 data-gsap="naik" data-gsap-delay="0.05" class="noir-font-judul text-2xl sm:text-3xl font-bold text-[#F3E5AB]">{{ $undangan->teksKustom('judul_amplop', 'Amplop Digital') }}</h2>
             <p data-gsap="teks" data-gsap-delay="0.09" class="text-xs text-[#F5EFE6]/78 leading-relaxed max-w-xs mx-auto">
-                Doa restu dan kehadiran Bapak/Ibu/Saudara/i adalah kado terindah. Apabila berkenan memberikan tanda kasih, dapat melalui:
+                {{ $undangan->teksKustom('pengantar_amplop', 'Doa restu dan kehadiran Bapak/Ibu/Saudara/i adalah kado terindah. Apabila berkenan memberikan tanda kasih, dapat melalui:') }}
             </p>
         </div>
 
@@ -119,7 +119,7 @@
         <div class="text-center space-y-2 mb-6">
             <img src="{{ $asetNoir['emas'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-gsap="turun" class="w-10 mx-auto opacity-90">
             <p data-gsap="turun" class="text-[10px] font-semibold uppercase tracking-[0.38em] text-[#D4AF37]">Buku Tamu Kehormatan</p>
-            <h2 data-gsap="mekar" data-gsap-delay="0.05" class="noir-font-judul text-2xl sm:text-3xl font-bold tracking-wider text-[#F3E5AB]">RSVP &amp; Wishes</h2>
+            <h2 data-gsap="mekar" data-gsap-delay="0.05" class="noir-font-judul text-2xl sm:text-3xl font-bold tracking-wider text-[#F3E5AB]">{{ $undangan->teksKustom('judul_buku_tamu', 'RSVP & Wishes') }}</h2>
             <p data-gsap="teks" data-gsap-delay="0.08" class="text-xs text-[#F5EFE6]/76 max-w-xs mx-auto leading-relaxed">
                 Kami mempersilakan Bapak/Ibu/Saudara/i menyampaikan ucapan selamat, doa terbaik, serta konfirmasi kehadiran.
             </p>
@@ -251,36 +251,53 @@
 @endif
 
 {{-- SEKSI 11: DOA UNTUK PENGANTIN & TURUT MENGUNDANG (URUTAN SERAGAM SEMUA KATEGORI) --}}
+@if ($undangan->fiturAktif('doa_pengantin') || $adaTurutMengundang)
 <section data-kartu-tumpuk class="noir-kartu-tumpuk relative bg-[#0B0B0F] px-4 py-12 space-y-6 overflow-hidden">
     {{-- Kartu Doa Untuk Pengantin --}}
-    <div data-section-doa-pengantin="artdeco" class="relative max-w-md mx-auto rounded-2xl bg-[#15141B] border border-[#D4AF37]/55 p-6 text-center shadow-xl kartu-3d efek-shimmer-kartu space-y-3.5">
-        <span aria-hidden="true" class="pointer-events-none absolute top-2.5 left-2.5 h-3.5 w-3.5 border-t-2 border-l-2 border-[#D4AF37]"></span>
-        <span aria-hidden="true" class="pointer-events-none absolute top-2.5 right-2.5 h-3.5 w-3.5 border-t-2 border-r-2 border-[#D4AF37]"></span>
-        <span aria-hidden="true" class="pointer-events-none absolute bottom-2.5 left-2.5 h-3.5 w-3.5 border-b-2 border-l-2 border-[#D4AF37]"></span>
-        <span aria-hidden="true" class="pointer-events-none absolute bottom-2.5 right-2.5 h-3.5 w-3.5 border-b-2 border-r-2 border-[#D4AF37]"></span>
+    @if ($undangan->fiturAktif('doa_pengantin'))
+        @php
+            $doaPengantin = $undangan->doaPengantin([
+                'arab' => '',
+                'latin' => 'Semoga Tuhan Yang Maha Kuasa senantiasa melimpahkan kasih, kedamaian, dan keberkahan dalam setiap langkah rumah tangga yang dibangun bersama.',
+                'isi' => 'Kiranya ikatan suci ini menjadi awal perjalanan hidup yang rukun, saling menguatkan dalam suka maupun duka, serta membawa kebahagiaan abadi.',
+            ]);
+        @endphp
+        <div data-section-doa-pengantin="artdeco" class="relative max-w-md mx-auto rounded-2xl bg-[#15141B] border border-[#D4AF37]/55 p-6 text-center shadow-xl kartu-3d efek-shimmer-kartu space-y-3.5">
+            <span aria-hidden="true" class="pointer-events-none absolute top-2.5 left-2.5 h-3.5 w-3.5 border-t-2 border-l-2 border-[#D4AF37]"></span>
+            <span aria-hidden="true" class="pointer-events-none absolute top-2.5 right-2.5 h-3.5 w-3.5 border-t-2 border-r-2 border-[#D4AF37]"></span>
+            <span aria-hidden="true" class="pointer-events-none absolute bottom-2.5 left-2.5 h-3.5 w-3.5 border-b-2 border-l-2 border-[#D4AF37]"></span>
+            <span aria-hidden="true" class="pointer-events-none absolute bottom-2.5 right-2.5 h-3.5 w-3.5 border-b-2 border-r-2 border-[#D4AF37]"></span>
 
-        <img data-gsap="turun" src="{{ $asetNoir['emas'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" class="w-10 mx-auto opacity-90">
-        <p data-gsap="mekar" class="text-[10px] font-semibold uppercase tracking-[0.36em] text-[#D4AF37]">Untaian Doa Restu</p>
-        <h2 data-gsap="naik" class="noir-font-judul text-xl sm:text-2xl font-bold text-[#F3E5AB]">Doa Untuk Pengantin</h2>
-        <p data-gsap="teks" data-gsap-delay="0.06" class="font-serif italic text-sm sm:text-[15px] text-white/90 leading-relaxed max-w-xs mx-auto">
-            &ldquo;Semoga Tuhan Yang Maha Kuasa senantiasa melimpahkan kasih, kedamaian, dan keberkahan dalam setiap langkah rumah tangga yang dibangun bersama.&rdquo;
-        </p>
-        <div data-gsap="garis" class="flex items-center justify-center gap-3 px-10" aria-hidden="true">
-            <span class="h-px flex-1 bg-[#D4AF37]/45"></span>
-            <span class="w-1.5 h-1.5 rotate-45 bg-[#D4AF37]"></span>
-            <span class="h-px flex-1 bg-[#D4AF37]/45"></span>
+            <img data-gsap="turun" src="{{ $asetNoir['emas'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" class="w-10 mx-auto opacity-90">
+            <p data-gsap="mekar" class="text-[10px] font-semibold uppercase tracking-[0.36em] text-[#D4AF37]">Untaian Doa Restu</p>
+            <h2 data-gsap="naik" class="noir-font-judul text-xl sm:text-2xl font-bold text-[#F3E5AB]">{{ $doaPengantin['judul'] }}</h2>
+            @if ($doaPengantin['arab'] !== '')
+                <p data-gsap="mekar" data-gsap-delay="0.05" class="text-xl leading-loose text-[#F3E5AB]" style="font-family: 'Amiri', serif;" dir="rtl">
+                    {{ $doaPengantin['arab'] }}
+                </p>
+            @endif
+            @if ($doaPengantin['latin'] !== '')
+                <p data-gsap="teks" data-gsap-delay="0.06" class="font-serif italic text-sm sm:text-[15px] text-white/90 leading-relaxed max-w-xs mx-auto">
+                    &ldquo;{{ $doaPengantin['latin'] }}&rdquo;
+                </p>
+            @endif
+            <div data-gsap="garis" class="flex items-center justify-center gap-3 px-10" aria-hidden="true">
+                <span class="h-px flex-1 bg-[#D4AF37]/45"></span>
+                <span class="w-1.5 h-1.5 rotate-45 bg-[#D4AF37]"></span>
+                <span class="h-px flex-1 bg-[#D4AF37]/45"></span>
+            </div>
+            <p data-gsap="teks" data-gsap-delay="0.10" class="text-xs text-[#F5EFE6]/78 leading-relaxed max-w-xs mx-auto">
+                {{ $doaPengantin['isi'] }}
+            </p>
         </div>
-        <p data-gsap="teks" data-gsap-delay="0.10" class="text-xs text-[#F5EFE6]/78 leading-relaxed max-w-xs mx-auto">
-            Kiranya ikatan suci ini menjadi awal perjalanan hidup yang rukun, saling menguatkan dalam suka maupun duka, serta membawa kebahagiaan abadi.
-        </p>
-    </div>
+    @endif
 
     {{-- Kartu Turut Mengundang --}}
     @if ($adaTurutMengundang)
         <div data-section-turut-mengundang="artdeco" class="max-w-md mx-auto rounded-2xl bg-[#15141B] border border-[#D4AF37]/45 p-6 text-center shadow-xl kartu-3d space-y-4">
             <div class="space-y-1">
                 <p data-gsap="turun" class="text-[10px] font-semibold uppercase tracking-[0.38em] text-[#D4AF37]">Keluarga Besar</p>
-                <h2 data-gsap="naik" data-gsap-delay="0.05" class="noir-font-judul text-xl font-bold text-[#F3E5AB]">Turut Mengundang</h2>
+                <h2 data-gsap="naik" data-gsap-delay="0.05" class="noir-font-judul text-xl font-bold text-[#F3E5AB]">{{ $undangan->teksKustom('judul_turut_mengundang', 'Turut Mengundang') }}</h2>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
                 @if (! empty($turutPria))
@@ -303,6 +320,7 @@
         </div>
     @endif
 </section>
+@endif
 
 {{-- SEKSI 12: PENUTUP FULL-BLEED CINEMATIC GALA POSTCARD & FOOTER --}}
 <div data-kartu-tumpuk class="noir-kartu-tumpuk bg-[#09090D]">
@@ -350,14 +368,14 @@
                 </div>
 
                 <div class="space-y-1.5">
-                    <p data-gsap="naik" class="text-[9.5px] font-semibold uppercase tracking-[0.36em] text-[#D4AF37]">Terima Kasih</p>
+                    <p data-gsap="naik" class="text-[9.5px] font-semibold uppercase tracking-[0.36em] text-[#D4AF37]">{{ $undangan->teksKustom('judul_penutup', 'Terima Kasih') }}</p>
                     <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs sm:text-[13px] text-[#F5EFE6]/86 leading-relaxed max-w-xs mx-auto">
-                        Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu pada malam bahagia kami.
+                        {{ $undangan->teksKustom('ucapan_penutup', 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu pada malam bahagia kami.') }}
                     </p>
                 </div>
 
                 <div class="pt-3 border-t border-[#D4AF37]/25 flex flex-col items-center space-y-1.5">
-                    <p data-gsap="naik" data-gsap-delay="0.1" class="text-[9.5px] uppercase tracking-[0.28em] text-[#D4AF37]/85">Kami Yang Berbahagia</p>
+                    <p data-gsap="naik" data-gsap-delay="0.1" class="text-[9.5px] uppercase tracking-[0.28em] text-[#D4AF37]/85">{{ $undangan->teksKustom('label_penutup', 'Kami Yang Berbahagia') }}</p>
                     <p data-gsap="mekar" data-gsap-delay="0.13" class="noir-font-judul text-2xl sm:text-3xl font-bold tracking-wider text-[#F3E5AB]">
                         {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}
                     </p>
@@ -377,13 +395,13 @@
                 <span class="relative noir-font-judul text-xl font-bold tracking-widest text-[#F3E5AB]">{{ $undangan->inisialPria() }}&amp;{{ $undangan->inisialWanita() }}</span>
             </div>
             <div class="relative z-10 space-y-2">
-                <p data-gsap="mekar" class="text-[10px] font-semibold uppercase tracking-[0.38em] text-[#D4AF37]">Terima Kasih</p>
+                <p data-gsap="mekar" class="text-[10px] font-semibold uppercase tracking-[0.38em] text-[#D4AF37]">{{ $undangan->teksKustom('judul_penutup', 'Terima Kasih') }}</p>
                 <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs sm:text-sm text-[#F5EFE6]/82 leading-relaxed max-w-xs mx-auto">
-                    Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu pada malam bahagia kami.
+                    {{ $undangan->teksKustom('ucapan_penutup', 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu pada malam bahagia kami.') }}
                 </p>
             </div>
             <div class="relative z-10 pt-3 border-t border-[#D4AF37]/25 space-y-1.5">
-                <p data-gsap="naik" data-gsap-delay="0.1" class="text-[9.5px] uppercase tracking-[0.28em] text-[#D4AF37]/85">Kami Yang Berbahagia</p>
+                <p data-gsap="naik" data-gsap-delay="0.1" class="text-[9.5px] uppercase tracking-[0.28em] text-[#D4AF37]/85">{{ $undangan->teksKustom('label_penutup', 'Kami Yang Berbahagia') }}</p>
                 <p data-gsap="mekar" data-gsap-delay="0.13" class="noir-font-judul text-2xl sm:text-3xl font-bold tracking-wider text-[#F3E5AB]">
                     {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}
                 </p>

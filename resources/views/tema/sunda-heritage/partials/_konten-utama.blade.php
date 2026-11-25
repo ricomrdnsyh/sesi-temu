@@ -25,10 +25,10 @@
                 <span aria-hidden="true" class="h-px w-8 bg-gradient-to-l from-transparent to-[#C59B43]"></span>
             </div>
             <h2 data-gsap="naik" class="font-serif text-[2rem] sm:text-[2.2rem] font-bold leading-tight text-[#5A1E1E]">
-                Mempelai Berbahagia
+                {{ $undangan->teksKustom('judul_mempelai', 'Mempelai Berbahagia') }}
             </h2>
             <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs sm:text-[13px] text-[#4A2020]/80 max-w-xs mx-auto leading-relaxed">
-                Kalayan nyuhunkeun rido sareng rahmat Gusti Nu Maha Suci, sim kuring nyanggakeun pangulem nikah:
+                {{ $undangan->teksKustom('pengantar_mempelai', 'Kalayan nyuhunkeun rido sareng rahmat Gusti Nu Maha Suci, sim kuring nyanggakeun pangulem nikah:') }}
             </p>
             <svg data-gsap="garis" viewBox="0 0 280 24" class="w-36 mx-auto pt-1 opacity-80" aria-hidden="true">
                 <path d="M12 18 C36 4 68 4 92 14 C112 2 168 2 188 14 C212 4 244 4 268 18" fill="none" stroke="#C59B43" stroke-width="1.8" stroke-linecap="round"/>
@@ -140,7 +140,7 @@
                             <span class="h-px flex-1 bg-gradient-to-l from-transparent to-[#C59B43]/65"></span>
                         </div>
                         <p data-gsap="teks" class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#8E6620] pt-1">
-                            Putri ti
+                            {{ $undangan->teksKustom('label_wanita', 'Putri ti') }}
                         </p>
                         <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs sm:text-[13px] font-medium text-[#4A2020]/85 leading-relaxed max-w-xs mx-auto">
                             {{ $undangan->nama_ayah_wanita }} &amp; {{ $undangan->nama_ibu_wanita }}
@@ -286,7 +286,7 @@
                             <span class="h-px flex-1 bg-gradient-to-l from-transparent to-[#C59B43]/65"></span>
                         </div>
                         <p data-gsap="teks" class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#8E6620] pt-1">
-                            Putra ti
+                            {{ $undangan->teksKustom('label_pria', 'Putra ti') }}
                         </p>
                         <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs sm:text-[13px] font-medium text-[#4A2020]/85 leading-relaxed max-w-xs mx-auto">
                             {{ $undangan->nama_ayah_pria }} &amp; {{ $undangan->nama_ibu_pria }}
@@ -382,7 +382,7 @@
         >
 
         <div data-gsap="naik" class="space-y-1">
-            <h2 class="font-kaligrafi text-5xl text-white leading-tight">Save The Date</h2>
+            <h2 class="font-kaligrafi text-5xl text-white leading-tight">{{ $undangan->teksKustom('judul_hitung_mundur', 'Save The Date') }}</h2>
         </div>
 
         <div class="grid grid-cols-4 gap-2.5 pt-1 panggung-3d">
@@ -403,7 +403,7 @@
         </div>
 
         <p data-gsap="teks" class="text-xs text-[#FAF4E8]/85 max-w-xs mx-auto leading-relaxed pt-1">
-            Merupakan kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu.
+            {{ $undangan->teksKustom('pengantar_hitung_mundur', 'Merupakan kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu.') }}
         </p>
 
         @if ($googleCalUrl)
@@ -445,7 +445,7 @@
                 <span aria-hidden="true" class="h-px w-8 bg-gradient-to-l from-transparent to-[#C59B43]"></span>
             </div>
             <h2 data-gsap="naik" class="font-serif text-[2rem] sm:text-[2.15rem] font-bold leading-tight text-[#5A1E1E]">
-                Rangkaian Acara
+                {{ $undangan->teksKustom('judul_acara', 'Rangkaian Acara') }}
             </h2>
         </div>
 
@@ -603,7 +603,7 @@
             <p class="scroll-scrub-kiri text-[11px] font-bold uppercase tracking-[0.34em] text-[#8E6620]">Lalakon Tresna</p>
         </div>
         <div data-gsap="kanan" data-gsap-delay="0.06">
-            <h2 class="scroll-scrub-kanan mt-1 font-serif text-3xl font-bold text-[#5A1E1E]">Cerita Cinta</h2>
+            <h2 class="scroll-scrub-kanan mt-1 font-serif text-3xl font-bold text-[#5A1E1E]">{{ $undangan->teksKustom('judul_cerita', 'Cerita Cinta') }}</h2>
         </div>
     </div>
 
@@ -649,7 +649,7 @@
 >
     <div data-scroll-scrub class="text-center mb-6 overflow-hidden space-y-2">
         <div data-gsap="kiri">
-            <h2 class="scroll-scrub-kiri font-kaligrafi text-5xl text-white leading-tight">Our Gallery</h2>
+            <h2 class="scroll-scrub-kiri font-kaligrafi text-5xl text-white leading-tight">{{ $undangan->teksKustom('judul_galeri', 'Our Gallery') }}</h2>
         </div>
         <div data-gsap="kanan" data-gsap-delay="0.06">
             <div class="scroll-scrub-kanan flex items-center justify-center gap-3 text-[10px] font-semibold uppercase tracking-[0.34em] text-[#E7C87D]">

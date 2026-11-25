@@ -56,6 +56,7 @@
             this.namaFile = file.name;
             this.ukuranFile = this.formatUkuran(file.size);
             this.ditandaiHapus = false;
+            this.$dispatch('foto-live-berubah', { nama: @js($name), url: this.pratinjauUrl });
         },
         saatPilih(event) {
             const file = event.target.files?.[0];
@@ -88,6 +89,7 @@
             if (this.$refs.berkas) {
                 this.$refs.berkas.value = '';
             }
+            this.$dispatch('foto-live-berubah', { nama: @js($name), url: '' });
         }
     }"
     class="{{ $varian === 'galeri' ? 'w-full h-full flex flex-col gap-2' : 'space-y-2.5' }}"

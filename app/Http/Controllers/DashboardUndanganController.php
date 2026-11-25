@@ -192,12 +192,216 @@ class DashboardUndanganController extends Controller
         ]);
     }
 
+    public function pratinjauLangsung(Request $request, Undangan $undangan): View
+    {
+        Gate::authorize('kelola', $undangan);
+
+        $undangan->load(['tema', 'daftarAcara', 'daftarGaleri', 'daftarAmplop', 'bukuTamu']);
+
+        $pratinjau = clone $undangan;
+        $pengaturan = array_replace_recursive(Undangan::pengaturanBawaan(), $pratinjau->pengaturan ?? []);
+
+        foreach ([
+            'nama_panggilan_pria' => 80,
+            'nama_lengkap_pria' => 150,
+            'nama_panggilan_wanita' => 80,
+            'nama_lengkap_wanita' => 150,
+        ] as $kolomWajib => $batas) {
+            if ($request->has($kolomWajib)) {
+                $nilai = trim((string) $request->input($kolomWajib, ''));
+                if ($nilai !== '') {
+                    $pratinjau->{$kolomWajib} = Str::limit($nilai, $batas, '');
+                }
+            }
+        }
+
+        foreach ([
+            'nama_ayah_pria' => 150,
+            'nama_ibu_pria' => 150,
+            'nama_ayah_wanita' => 150,
+            'nama_ibu_wanita' => 150,
+            'kutipan_ayat' => 2000,
+        ] as $kolomOpsional => $batas) {
+            if ($request->has($kolomOpsional)) {
+                $nilai = trim((string) $request->input($kolomOpsional, ''));
+                $pratinjau->{$kolomOpsional} = $nilai !== '' ? Str::limit($nilai, $batas, '') : null;
+            }
+        }
+
+        if ($request->has('gaya_font')) {
+            $gayaFont = (string) $request->input('gaya_font', 'bawaan');
+            if (array_key_exists($gayaFont, Undangan::GAYA_FONT_TERSEDIA)) {
+                $pengaturan['gaya_font'] = $gayaFont;
+            }
+        }
+
+        if ($request->has('tanpa_foto')) {
+            $pengaturan['tanpa_foto'] = $request->boolean('tanpa_foto');
+        }
+
+        if (is_array($request->input('fitur_aktif'))) {
+            foreach (['hitung_mundur', 'cerita_cinta', 'galeri', 'amplop_digital', 'buku_tamu', 'doa_pengantin'] as $kunciFitur) {
+                if (array_key_exists($kunciFitur, $request->input('fitur_aktif', []))) {
+                    $pengaturan['fitur_aktif'][$kunciFitur] = (bool) $request->input("fitur_aktif.{$kunciFitur}");
+                }
+            }
+        }
+
+        if (is_array($request->input('teks'))) {
+            $kunciTeksDiizinkan = [
+                'sampul_judul', 'sampul_tombol', 'sampul_sapaan', 'sampul_catatan',
+                'judul_mempelai', 'pengantar_mempelai', 'label_pria', 'label_wanita',
+                'judul_hitung_mundur', 'pengantar_hitung_mundur', 'judul_acara',
+                'judul_cerita', 'judul_galeri', 'judul_amplop', 'pengantar_amplop',
+                'judul_buku_tamu', 'doa_judul', 'doa_arab', 'doa_latin', 'doa_isi',
+                'judul_turut_mengundang', 'judul_penutup', 'ucapan_penutup', 'label_penutup',
+            ];
+            $teksTersimpan = (array) ($pengaturan['teks'] ?? []);
+            foreach ($kunciTeksDiizinkan as $kunciTeks) {
+                if (array_key_exists($kunciTeks, $request->input('teks', []))) {
+                    $teksTersimpan[$kunciTeks] = Str::limit(trim((string) $request->input("teks.{$kunciTeks}", '')), 1000, '');
+                }
+            }
+            if ($request->boolean('doa_disertakan')) {
+                $teksTersimpan['doa_kustom'] = true;
+            }
+            $pengaturan['teks'] = $teksTersimpan;
+        }
+
+        if ($request->has('instagram_pria') || $request->has('instagram_wanita')) {
+            $pengaturan['sosial_media'] = [
+                'instagram_pria' => Undangan::bersihkanUsernameInstagram((string) $request->input('instagram_pria', data_get($pengaturan, 'sosial_media.instagram_pria', ''))),
+                'instagram_wanita' => Undangan::bersihkanUsernameInstagram((string) $request->input('instagram_wanita', data_get($pengaturan, 'sosial_media.instagram_wanita', ''))),
+            ];
+        }
+
+        if ($request->has('hashtag')) {
+            $hashtagBersih = ltrim(trim((string) $request->input('hashtag', '')), '# ');
+            $pengaturan['hashtag'] = $hashtagBersih !== '' ? '#'.Str::limit($hashtagBersih, 79, '') : '';
+        }
+
+        if ($request->has('dress_code_catatan') || $request->has('dress_code_warna')) {
+            $warnaBersih = [];
+            foreach ((array) $request->input('dress_code_warna', []) as $hex) {
+                $kode = strtoupper(trim((string) $hex));
+                if (preg_match('/^#[0-9A-F]{6}$/', $kode) === 1 && ! in_array($kode, $warnaBersih, true)) {
+                    $warnaBersih[] = $kode;
+                }
+                if (count($warnaBersih) >= 5) {
+                    break;
+                }
+            }
+            $pengaturan['dress_code'] = [
+                'catatan' => Str::limit(trim((string) $request->input('dress_code_catatan', '')), 300, ''),
+                'warna' => $warnaBersih,
+            ];
+        }
+
+        if ($request->has('live_aktif') || $request->has('live_platform') || $request->has('live_link')) {
+            $pengaturan['live_streaming'] = [
+                'aktif' => $request->boolean('live_aktif'),
+                'platform' => Str::limit(trim((string) $request->input('live_platform', 'Instagram / YouTube')), 100, ''),
+                'link' => Str::limit(trim((string) $request->input('live_link', '')), 500, ''),
+            ];
+        }
+
+        if ($request->has('alamat_kado_fisik')) {
+            $pengaturan['alamat_kado_fisik'] = Str::limit(trim((string) $request->input('alamat_kado_fisik', '')), 500, '');
+        }
+
+        if ($request->has('turut_mengundang_wanita') || $request->has('turut_mengundang_pria')) {
+            $pengaturan['turut_mengundang'] = [
+                'pihak_wanita' => Str::limit(trim((string) $request->input('turut_mengundang_wanita', '')), 1500, ''),
+                'pihak_pria' => Str::limit(trim((string) $request->input('turut_mengundang_pria', '')), 1500, ''),
+            ];
+        }
+
+        if (is_array($request->input('cerita_cinta'))) {
+            $fotoCeritaLama = collect((array) data_get($pengaturan, 'cerita_cinta', []))
+                ->pluck('foto')
+                ->filter(static fn ($path): bool => is_string($path) && $path !== '')
+                ->all();
+            $ceritaBersih = [];
+            foreach ((array) $request->input('cerita_cinta', []) as $item) {
+                if (! is_array($item)) {
+                    continue;
+                }
+                $judul = Str::limit(trim((string) ($item['judul'] ?? '')), 100, '');
+                $tanggal = Str::limit(trim((string) ($item['tanggal'] ?? '')), 50, '');
+                $cerita = Str::limit(trim((string) ($item['cerita'] ?? '')), 1000, '');
+                $fotoPath = trim((string) ($item['foto'] ?? ''));
+                $fotoUrlBlob = trim((string) ($item['foto_url'] ?? ''));
+                $hapusFoto = ! empty($item['hapus_foto']);
+
+                if ($hapusFoto) {
+                    $fotoFinal = '';
+                } elseif (preg_match('/^blob:https?:\/\/[^\s"\'<>]+$/', $fotoUrlBlob) === 1) {
+                    $fotoFinal = $fotoUrlBlob;
+                } elseif ($fotoPath !== '' && in_array($fotoPath, $fotoCeritaLama, true)) {
+                    $fotoFinal = $fotoPath;
+                } else {
+                    $fotoFinal = '';
+                }
+
+                if ($judul !== '' || $cerita !== '' || $fotoFinal !== '') {
+                    $entri = ['judul' => $judul, 'tanggal' => $tanggal, 'cerita' => $cerita];
+                    if ($fotoFinal !== '') {
+                        $entri['foto'] = $fotoFinal;
+                    }
+                    $ceritaBersih[] = $entri;
+                }
+            }
+            $pengaturan['cerita_cinta'] = $ceritaBersih;
+        }
+
+        $fotoLive = (array) $request->input('foto_live', []);
+        foreach (['foto_pria', 'foto_wanita'] as $kolomFotoMempelai) {
+            $blob = trim((string) ($fotoLive[$kolomFotoMempelai] ?? ''));
+            if (preg_match('/^blob:https?:\/\/[^\s"\'<>]+$/', $blob) === 1) {
+                $pratinjau->{$kolomFotoMempelai} = $blob;
+            }
+        }
+        foreach ([
+            'foto_sampul' => 'hapus_foto_sampul',
+            'foto_pembuka' => 'hapus_foto_pembuka',
+            'foto_penutup' => 'hapus_foto_penutup',
+            'foto_latar_tema' => 'hapus_foto_latar_tema',
+        ] as $kunciFoto => $kunciHapus) {
+            $blob = trim((string) ($fotoLive[$kunciFoto] ?? ''));
+            if (preg_match('/^blob:https?:\/\/[^\s"\'<>]+$/', $blob) === 1) {
+                $pengaturan[$kunciFoto] = $blob;
+            } elseif ($request->boolean($kunciHapus)) {
+                $pengaturan[$kunciFoto] = null;
+            }
+        }
+
+        $pratinjau->pengaturan = $pengaturan;
+        $fokusBagian = (string) $request->input('fokus_bagian', '');
+        if (! in_array($fokusBagian, ['tema', 'mempelai', 'acara', 'cerita', 'galeri', 'amplop', 'penutup'], true)) {
+            $fokusBagian = '';
+        }
+
+        $lokasiView = $pratinjau->tema?->lokasi_view ?: 'tema.rustic-floral.index';
+
+        return view($lokasiView, [
+            'undangan' => $pratinjau,
+            'namaTamu' => 'Tamu Undangan',
+            'modeDemo' => false,
+            'modePratinjau' => ! $pratinjau->status_publikasi,
+            'livePreviewState' => [
+                'bukaSampul' => $request->boolean('buka_sampul'),
+                'scrollY' => max(0, (int) $request->input('scroll_y', 0)),
+                'fokusBagian' => $fokusBagian,
+            ],
+        ]);
+    }
+
     public function gantiTema(Request $request, Undangan $undangan): RedirectResponse
     {
         Gate::authorize('kelola', $undangan);
 
         $tabKembali = (string) $request->input('tab_kembali', 'tema');
-        if (! in_array($tabKembali, ['', 'tema', 'mempelai', 'acara', 'galeri', 'amplop', 'aktivasi'], true)) {
+        if (! in_array($tabKembali, ['', 'tema', 'mempelai', 'acara', 'cerita', 'galeri', 'amplop', 'penutup', 'aktivasi'], true)) {
             $tabKembali = 'tema';
         }
 
@@ -423,15 +627,16 @@ class DashboardUndanganController extends Controller
             $bagianLama = (string) $request->old('bagian', '');
             $tabAktif = match (true) {
                 $bagianLama === 'mempelai' => 'mempelai',
-                $bagianLama === 'cerita_streaming' => 'galeri',
+                $bagianLama === 'acara_tambahan' || $request->old('nama_acara') !== null => 'acara',
+                $bagianLama === 'cerita' || $bagianLama === 'cerita_streaming' => 'cerita',
                 $bagianLama === 'kado_fisik' || $request->old('nama_bank') !== null => 'amplop',
-                $request->old('nama_acara') !== null => 'acara',
+                $bagianLama === 'penutup' => 'penutup',
                 $request->old('paket') !== null => 'aktivasi',
                 default => 'tema',
             };
         }
 
-        if ($tabAktif !== '' && ! in_array($tabAktif, ['tema', 'mempelai', 'acara', 'galeri', 'amplop', 'aktivasi'], true)) {
+        if ($tabAktif !== '' && ! in_array($tabAktif, ['tema', 'mempelai', 'acara', 'cerita', 'galeri', 'amplop', 'penutup', 'aktivasi'], true)) {
             $tabAktif = '';
         }
 
@@ -456,11 +661,77 @@ class DashboardUndanganController extends Controller
         Request $request,
         Undangan $undangan,
         PengolahGambarService $pengolahGambar
-    ): RedirectResponse {
+    ): RedirectResponse|JsonResponse {
         Gate::authorize('kelola', $undangan);
 
         $bagian = (string) $request->input('bagian', 'semua');
         $pengaturan = array_replace_recursive(Undangan::pengaturanBawaan(), $undangan->pengaturan ?? []);
+
+        if ($bagian === 'fitur') {
+            $tervalidasiFitur = $request->validate([
+                'kunci' => ['required', Rule::in(['hitung_mundur', 'cerita_cinta', 'galeri', 'amplop_digital', 'buku_tamu', 'doa_pengantin'])],
+                'aktif' => ['required', 'boolean'],
+            ]);
+
+            $kunciFitur = (string) $tervalidasiFitur['kunci'];
+            $aktifFitur = (bool) $tervalidasiFitur['aktif'];
+            $pengaturan['fitur_aktif'][$kunciFitur] = $aktifFitur;
+            $undangan->pengaturan = $pengaturan;
+            $undangan->save();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'ok' => true,
+                    'kunci' => $kunciFitur,
+                    'aktif' => $aktifFitur,
+                ]);
+            }
+
+            return back()->with('sukses', 'Status fitur undangan berhasil diperbarui.');
+        }
+
+        if ($request->has('teks') && is_array($request->input('teks'))) {
+            $request->validate([
+                'teks' => ['array'],
+                'teks.*' => ['nullable', 'string', 'max:1000'],
+            ]);
+            $kunciTeksDiizinkan = [
+                'sampul_judul',
+                'sampul_tombol',
+                'sampul_sapaan',
+                'sampul_catatan',
+                'judul_mempelai',
+                'pengantar_mempelai',
+                'label_pria',
+                'label_wanita',
+                'judul_hitung_mundur',
+                'pengantar_hitung_mundur',
+                'judul_acara',
+                'judul_cerita',
+                'judul_galeri',
+                'judul_amplop',
+                'pengantar_amplop',
+                'judul_buku_tamu',
+                'doa_judul',
+                'doa_arab',
+                'doa_latin',
+                'doa_isi',
+                'judul_turut_mengundang',
+                'judul_penutup',
+                'ucapan_penutup',
+                'label_penutup',
+            ];
+            $teksTersimpan = (array) ($pengaturan['teks'] ?? []);
+            foreach ($kunciTeksDiizinkan as $kunciTeks) {
+                if (array_key_exists($kunciTeks, $request->input('teks', []))) {
+                    $teksTersimpan[$kunciTeks] = trim((string) $request->input("teks.{$kunciTeks}", ''));
+                }
+            }
+            if ($request->boolean('doa_disertakan')) {
+                $teksTersimpan['doa_kustom'] = true;
+            }
+            $pengaturan['teks'] = $teksTersimpan;
+        }
 
         if ($bagian === 'tema' || $bagian === 'semua') {
             $tervalidasi = $request->validate([
@@ -526,13 +797,12 @@ class DashboardUndanganController extends Controller
             if ($bagian === 'tema') {
                 $pengaturan['gaya_font'] = $tervalidasi['gaya_font'] ?? 'bawaan';
                 $pengaturan['tanpa_foto'] = $request->boolean('tanpa_foto');
-                $pengaturan['fitur_aktif'] = [
-                    'hitung_mundur' => $request->boolean('fitur_hitung_mundur'),
-                    'cerita_cinta' => $request->boolean('fitur_cerita_cinta'),
-                    'galeri' => $request->boolean('fitur_galeri'),
-                    'amplop_digital' => $request->boolean('fitur_amplop_digital'),
-                    'buku_tamu' => $request->boolean('fitur_buku_tamu'),
-                ];
+                // Pertahankan sakelar fitur bila form tema tidak mengirim input fitur_*
+                foreach (['hitung_mundur', 'cerita_cinta', 'galeri', 'amplop_digital', 'buku_tamu', 'doa_pengantin'] as $kunciFitur) {
+                    if ($request->has("fitur_{$kunciFitur}")) {
+                        $pengaturan['fitur_aktif'][$kunciFitur] = $request->boolean("fitur_{$kunciFitur}");
+                    }
+                }
             }
         }
 
@@ -548,15 +818,6 @@ class DashboardUndanganController extends Controller
                 'nama_ayah_wanita' => ['nullable', 'string', 'max:150'],
                 'nama_ibu_wanita' => ['nullable', 'string', 'max:150'],
                 'foto_wanita' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
-                'foto_sampul' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
-                'hapus_foto_sampul' => ['nullable', 'boolean'],
-                'foto_pembuka' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
-                'hapus_foto_pembuka' => ['nullable', 'boolean'],
-                'foto_penutup' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
-                'hapus_foto_penutup' => ['nullable', 'boolean'],
-                'foto_latar_tema' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
-                'hapus_foto_latar_tema' => ['nullable', 'boolean'],
-                'hashtag' => ['nullable', 'string', 'max:80'],
                 'instagram_pria' => ['nullable', 'string', 'max:120'],
                 'instagram_wanita' => ['nullable', 'string', 'max:120'],
                 'kutipan_ayat' => ['nullable', 'string', 'max:2000'],
@@ -592,6 +853,27 @@ class DashboardUndanganController extends Controller
                 );
             }
 
+            if ($request->has('instagram_pria') || $request->has('instagram_wanita')) {
+                $pengaturan['sosial_media'] = [
+                    'instagram_pria' => Undangan::bersihkanUsernameInstagram((string) $request->input('instagram_pria', data_get($pengaturan, 'sosial_media.instagram_pria', ''))),
+                    'instagram_wanita' => Undangan::bersihkanUsernameInstagram((string) $request->input('instagram_wanita', data_get($pengaturan, 'sosial_media.instagram_wanita', ''))),
+                ];
+            }
+        }
+
+        if (in_array($bagian, ['tema', 'mempelai', 'penutup', 'semua'], true)) {
+            $request->validate([
+                'foto_sampul' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'hapus_foto_sampul' => ['nullable', 'boolean'],
+                'foto_pembuka' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'hapus_foto_pembuka' => ['nullable', 'boolean'],
+                'foto_penutup' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'hapus_foto_penutup' => ['nullable', 'boolean'],
+                'foto_latar_tema' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'hapus_foto_latar_tema' => ['nullable', 'boolean'],
+                'hashtag' => ['nullable', 'string', 'max:80'],
+            ]);
+
             foreach ([
                 'foto_sampul' => ['hapus' => 'hapus_foto_sampul', 'awalan' => 'foto-sampul'],
                 'foto_pembuka' => ['hapus' => 'hapus_foto_pembuka', 'awalan' => 'foto-pembuka'],
@@ -618,16 +900,9 @@ class DashboardUndanganController extends Controller
                 $hashtagBersih = ltrim(trim((string) $request->input('hashtag', '')), '# ');
                 $pengaturan['hashtag'] = $hashtagBersih !== '' ? '#'.$hashtagBersih : '';
             }
-
-            if ($request->has('instagram_pria') || $request->has('instagram_wanita')) {
-                $pengaturan['sosial_media'] = [
-                    'instagram_pria' => Undangan::bersihkanUsernameInstagram((string) $request->input('instagram_pria', data_get($pengaturan, 'sosial_media.instagram_pria', ''))),
-                    'instagram_wanita' => Undangan::bersihkanUsernameInstagram((string) $request->input('instagram_wanita', data_get($pengaturan, 'sosial_media.instagram_wanita', ''))),
-                ];
-            }
         }
 
-        if ($bagian === 'cerita_streaming' || $bagian === 'semua') {
+        if (in_array($bagian, ['cerita', 'acara_tambahan', 'penutup', 'cerita_streaming', 'semua'], true)) {
             $request->validate([
                 'cerita_cinta' => ['nullable', 'array'],
                 'cerita_cinta.*.judul' => ['nullable', 'string', 'max:100'],
@@ -645,59 +920,62 @@ class DashboardUndanganController extends Controller
                 'turut_mengundang_pria' => ['nullable', 'string', 'max:1500'],
             ]);
 
-            $fotoCeritaLama = collect((array) data_get($pengaturan, 'cerita_cinta', []))
-                ->pluck('foto')
-                ->filter(static fn ($path): bool => is_string($path) && $path !== '')
-                ->values()
-                ->all();
+            if ($bagian === 'cerita' || $request->has('cerita_cinta')) {
+                $fotoCeritaLama = collect((array) data_get($pengaturan, 'cerita_cinta', []))
+                    ->pluck('foto')
+                    ->filter(static fn ($path): bool => is_string($path) && $path !== '')
+                    ->values()
+                    ->all();
 
-            $ceritaBersih = [];
-            $fotoCeritaDipertahankan = [];
-            foreach ((array) $request->input('cerita_cinta', []) as $idx => $item) {
-                $judul = trim((string) ($item['judul'] ?? ''));
-                $tanggal = trim((string) ($item['tanggal'] ?? ''));
-                $cerita = trim((string) ($item['cerita'] ?? ''));
-                $fotoPath = trim((string) ($item['foto'] ?? ''));
-                $hapusFotoBab = ! empty($item['hapus_foto']);
+                $ceritaBersih = [];
+                $fotoCeritaDipertahankan = [];
+                foreach ((array) $request->input('cerita_cinta', []) as $idx => $item) {
+                    $judul = trim((string) ($item['judul'] ?? ''));
+                    $tanggal = trim((string) ($item['tanggal'] ?? ''));
+                    $cerita = trim((string) ($item['cerita'] ?? ''));
+                    $fotoPath = trim((string) ($item['foto'] ?? ''));
+                    $hapusFotoBab = ! empty($item['hapus_foto']);
 
-                // Keamanan: hanya pertahankan jalur foto yang memang berasal dari undangan ini sebelumnya
-                if ($fotoPath !== '' && ! in_array($fotoPath, $fotoCeritaLama, true)) {
-                    $fotoPath = '';
-                }
-
-                if ($hapusFotoBab) {
-                    $fotoPath = '';
-                }
-
-                if ($request->hasFile("cerita_cinta.{$idx}.foto_file")) {
-                    $fotoPath = $pengolahGambar->simpanGambarUndangan(
-                        $request->file("cerita_cinta.{$idx}.foto_file"),
-                        $undangan->id,
-                        'cerita-'.($idx + 1)
-                    );
-                }
-
-                if ($judul !== '' || $cerita !== '' || $fotoPath !== '') {
-                    $entriCerita = [
-                        'judul' => $judul,
-                        'tanggal' => $tanggal,
-                        'cerita' => $cerita,
-                    ];
-                    if ($fotoPath !== '') {
-                        $entriCerita['foto'] = $fotoPath;
-                        $fotoCeritaDipertahankan[] = $fotoPath;
+                    // Keamanan: hanya pertahankan jalur foto yang memang berasal dari undangan ini sebelumnya
+                    if ($fotoPath !== '' && ! in_array($fotoPath, $fotoCeritaLama, true)) {
+                        $fotoPath = '';
                     }
-                    $ceritaBersih[] = $entriCerita;
-                }
-            }
 
-            if ($request->has('cerita_cinta') || $bagian === 'cerita_streaming') {
+                    if ($hapusFotoBab) {
+                        $fotoPath = '';
+                    }
+
+                    if ($request->hasFile("cerita_cinta.{$idx}.foto_file")) {
+                        $fotoPath = $pengolahGambar->simpanGambarUndangan(
+                            $request->file("cerita_cinta.{$idx}.foto_file"),
+                            $undangan->id,
+                            'cerita-'.($idx + 1)
+                        );
+                    }
+
+                    if ($judul !== '' || $cerita !== '' || $fotoPath !== '') {
+                        $entriCerita = [
+                            'judul' => $judul,
+                            'tanggal' => $tanggal,
+                            'cerita' => $cerita,
+                        ];
+                        if ($fotoPath !== '') {
+                            $entriCerita['foto'] = $fotoPath;
+                            $fotoCeritaDipertahankan[] = $fotoPath;
+                        }
+                        $ceritaBersih[] = $entriCerita;
+                    }
+                }
+
                 foreach ($fotoCeritaLama as $jalurLama) {
                     if (! in_array($jalurLama, $fotoCeritaDipertahankan, true)) {
                         $pengolahGambar->hapusBerkasJikaAda($jalurLama);
                     }
                 }
                 $pengaturan['cerita_cinta'] = $ceritaBersih;
+            }
+
+            if ($bagian === 'acara_tambahan' || $request->has('live_aktif') || $request->has('live_platform') || $request->has('live_link')) {
                 $pengaturan['live_streaming'] = [
                     'aktif' => $request->boolean('live_aktif'),
                     'platform' => (string) $request->input('live_platform', 'Instagram / YouTube'),
@@ -705,7 +983,7 @@ class DashboardUndanganController extends Controller
                 ];
             }
 
-            if ($request->has('dress_code_catatan') || $request->has('dress_code_warna') || $request->has('dress_code_disertakan')) {
+            if ($bagian === 'acara_tambahan' || $request->has('dress_code_catatan') || $request->has('dress_code_warna') || $request->has('dress_code_disertakan')) {
                 $warnaBersih = [];
                 foreach ((array) $request->input('dress_code_warna', []) as $hex) {
                     $kode = strtoupper(trim((string) $hex));
@@ -723,7 +1001,7 @@ class DashboardUndanganController extends Controller
                 ];
             }
 
-            if ($request->has('turut_mengundang_wanita') || $request->has('turut_mengundang_pria')) {
+            if ($bagian === 'penutup' || $request->has('turut_mengundang_wanita') || $request->has('turut_mengundang_pria')) {
                 $pengaturan['turut_mengundang'] = [
                     'pihak_wanita' => trim((string) $request->input('turut_mengundang_wanita', '')),
                     'pihak_pria' => trim((string) $request->input('turut_mengundang_pria', '')),
@@ -747,8 +1025,14 @@ class DashboardUndanganController extends Controller
         $tabTujuan = match ($bagian) {
             'tema' => 'mempelai',
             'mempelai' => 'acara',
+            'acara_teks' => 'acara',
+            'acara_tambahan' => 'cerita',
+            'cerita' => 'galeri',
+            'galeri' => 'galeri',
+            'amplop_teks' => 'amplop',
             'cerita_streaming' => 'amplop',
-            'kado_fisik' => 'aktivasi',
+            'kado_fisik' => 'penutup',
+            'penutup' => 'aktivasi',
             default => 'tema',
         };
 

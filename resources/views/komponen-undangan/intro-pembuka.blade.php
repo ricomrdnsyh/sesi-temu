@@ -1,4 +1,4 @@
-@if (! request()->boolean('embed'))
+@if (! request()->boolean('embed') && empty($livePreviewState))
 @php
     $slugIntro = $undangan->tema?->slug ?? 'rustic-floral';
     $inisialPriaIntro = $undangan->inisialPria();

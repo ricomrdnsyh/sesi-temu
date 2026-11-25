@@ -1,8 +1,11 @@
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script>
+    window.__SESITEMU_LIVE_PREVIEW__ = @js($livePreviewState ?? null);
+
     function temaUndangan() {
+        const livePreviewState = window.__SESITEMU_LIVE_PREVIEW__ || null;
         return {
-            undanganTerbuka: false,
+            undanganTerbuka: Boolean(livePreviewState?.bukaSampul),
             musikBerputar: false,
             musikDijedaManual: false,
             galeriModalTerbuka: false,
@@ -120,6 +123,41 @@
 
                 if (window.SesiTemuSinema) {
                     window.SesiTemuSinema.inisialisasi();
+                }
+
+                if (livePreviewState) {
+                    document.querySelectorAll('.masuk-3d').forEach((el) => el.classList.add('terlihat'));
+                    document.querySelectorAll(
+                        '.fx-rise, .fx-rise-down, .fx-scale-in, .fx-scale-out, .fx-slide-left, .fx-slide-right, .fx-flip-in'
+                    ).forEach((el) => el.classList.add('active', 'fx-selesai'));
+
+                    if (livePreviewState.bukaSampul) {
+                        const terapkanPosisiLive = () => {
+                            let targetEl = null;
+                            if (livePreviewState.fokusBagian === 'mempelai') {
+                                targetEl = document.querySelector('[data-layout-mempelai]');
+                            } else if (livePreviewState.fokusBagian === 'acara') {
+                                targetEl = document.querySelector('[data-layout-countdown], [data-layout-acara]');
+                            } else if (livePreviewState.fokusBagian === 'cerita') {
+                                targetEl = document.querySelector('[data-layout-cerita]');
+                            } else if (livePreviewState.fokusBagian === 'galeri') {
+                                targetEl = document.querySelector('[data-layout-galeri]');
+                            } else if (livePreviewState.fokusBagian === 'amplop') {
+                                const rsvpEl = document.querySelector('#buku-tamu');
+                                targetEl = document.querySelector('[data-layout-amplop]') || rsvpEl?.previousElementSibling || rsvpEl;
+                            } else if (livePreviewState.fokusBagian === 'penutup') {
+                                targetEl = document.querySelector('#buku-tamu, [data-layout-penutup]');
+                            }
+
+                            if (targetEl) {
+                                const top = Math.max(0, Math.round(targetEl.getBoundingClientRect().top + window.scrollY - 12));
+                                window.scrollTo({ top, behavior: 'auto' });
+                            } else if (livePreviewState.scrollY > 0) {
+                                window.scrollTo({ top: livePreviewState.scrollY, behavior: 'auto' });
+                            }
+                        };
+                        window.requestAnimationFrame(() => window.requestAnimationFrame(terapkanPosisiLive));
+                    }
                 }
 
                 this.$watch('galeriModalTerbuka', (terbuka) => {
@@ -339,7 +377,7 @@
                     return;
                 }
                 const kurangiGerak = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-                const modeEmbed = new URLSearchParams(window.location.search).get('embed') === '1';
+                const modeEmbed = new URLSearchParams(window.location.search).get('embed') === '1' || Boolean(window.__SESITEMU_LIVE_PREVIEW__);
                 const mulaiDetik = Math.max(0, Number.parseFloat(vid.dataset.startAt || '0') || 0);
                 this.videoHeroMulaiDetik = mulaiDetik;
                 this.teksHeroTampil = kurangiGerak || modeEmbed;
@@ -443,7 +481,7 @@
 
                 // Prioritas utama: putar video motion hero serentak di frame klik agar menyatu mulus dengan animasi sampul naik
                 const kurangiGerak = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-                const modeEmbed = new URLSearchParams(window.location.search).get('embed') === '1';
+                const modeEmbed = new URLSearchParams(window.location.search).get('embed') === '1' || Boolean(window.__SESITEMU_LIVE_PREVIEW__);
 
                 if (this.$refs.heroVideo && !this.videoHeroGagal) {
                     const vid = this.$refs.heroVideo;
@@ -683,7 +721,7 @@
             },
             jadwalkanAutoScrollSetelahVideo(jedaMs = 3400) {
                 const kurangiGerak = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-                const modeEmbed = new URLSearchParams(window.location.search).get('embed') === '1';
+                const modeEmbed = new URLSearchParams(window.location.search).get('embed') === '1' || Boolean(window.__SESITEMU_LIVE_PREVIEW__);
                 if (kurangiGerak || modeEmbed) {
                     return;
                 }

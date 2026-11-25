@@ -9,9 +9,9 @@
                 <img src="{{ $asetRustic['garland'] }}" alt="" loading="lazy" decoding="async" class="w-36 mx-auto drop-shadow-xs animasi-melayang">
             </div>
             <p data-gsap="mekar" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#B86B4B]">The Couple</p>
-            <h2 data-gsap="naik" class="font-serif text-3xl font-bold text-[#1F2937]">Mempelai Berbahagia</h2>
+            <h2 data-gsap="naik" class="font-serif text-3xl font-bold text-[#1F2937]">{{ $undangan->teksKustom('judul_mempelai', 'Mempelai Berbahagia') }}</h2>
             <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs text-[#4B6358]/85 max-w-xs mx-auto leading-relaxed">
-                Dengan memohon rahmat dan ridho Tuhan Yang Maha Esa, kami bermaksud menyelenggarakan pernikahan putra-putri kami:
+                {{ $undangan->teksKustom('pengantar_mempelai', 'Dengan memohon rahmat dan ridho Tuhan Yang Maha Esa, kami bermaksud menyelenggarakan pernikahan putra-putri kami:') }}
             </p>
         </div>
 
@@ -65,7 +65,7 @@
                 <h3 data-gsap="kiri" class="font-kaligrafi text-5xl text-[#4B6358] leading-tight">{{ $undangan->nama_panggilan_pria }}</h3>
                 <p data-gsap="teks" data-gsap-delay="0.06" class="font-serif text-base font-bold text-[#1F2937]">{{ $undangan->nama_lengkap_pria }}</p>
                 @if ($undangan->nama_ayah_pria || $undangan->nama_ibu_pria)
-                    <p data-gsap="teks" data-gsap-delay="0.09" class="text-xs text-[#1F2937]/75 leading-relaxed">Putra dari {{ $undangan->nama_ayah_pria }} &amp; {{ $undangan->nama_ibu_pria }}</p>
+                    <p data-gsap="teks" data-gsap-delay="0.09" class="text-xs text-[#1F2937]/75 leading-relaxed">{{ $undangan->teksKustom('label_pria', 'Putra dari') }} {{ $undangan->nama_ayah_pria }} &amp; {{ $undangan->nama_ibu_pria }}</p>
                 @endif
                 @if ($instagramPria !== '')
                     <div data-gsap="mekar" data-gsap-delay="0.10" class="pt-1.5">
@@ -143,7 +143,7 @@
                 <h3 data-gsap="kanan" class="font-kaligrafi text-5xl text-[#4B6358] leading-tight">{{ $undangan->nama_panggilan_wanita }}</h3>
                 <p data-gsap="teks" data-gsap-delay="0.06" class="font-serif text-base font-bold text-[#1F2937]">{{ $undangan->nama_lengkap_wanita }}</p>
                 @if ($undangan->nama_ayah_wanita || $undangan->nama_ibu_wanita)
-                    <p data-gsap="teks" data-gsap-delay="0.09" class="text-xs text-[#1F2937]/75 leading-relaxed">Putri dari {{ $undangan->nama_ayah_wanita }} &amp; {{ $undangan->nama_ibu_wanita }}</p>
+                    <p data-gsap="teks" data-gsap-delay="0.09" class="text-xs text-[#1F2937]/75 leading-relaxed">{{ $undangan->teksKustom('label_wanita', 'Putri dari') }} {{ $undangan->nama_ayah_wanita }} &amp; {{ $undangan->nama_ibu_wanita }}</p>
                 @endif
                 @if ($instagramWanita !== '')
                     <div data-gsap="mekar" data-gsap-delay="0.10" class="pt-1.5">
@@ -231,7 +231,7 @@
         <div class="space-y-1">
             <img src="{{ $asetRustic['garland'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-gsap="turun" class="w-32 mx-auto pb-1 drop-shadow">
             <p data-gsap="turun" class="text-[10px] font-semibold uppercase tracking-[0.34em] text-[#E5D5C0]">Menuju Hari Bahagia</p>
-            <h2 data-gsap="naik" class="font-serif text-3xl font-bold text-white">Save The Date</h2>
+            <h2 data-gsap="naik" class="font-serif text-3xl font-bold text-white">{{ $undangan->teksKustom('judul_hitung_mundur', 'Save The Date') }}</h2>
             <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs text-[#E5D5C0]/90">{{ $tanggalLengkap }}</p>
         </div>
 
@@ -276,9 +276,9 @@
         <div class="text-center space-y-1.5 mb-8">
             <img src="{{ $asetRustic['garland'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-gsap="turun" class="w-36 mx-auto pb-1 drop-shadow-xs">
             <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#B86B4B]">Jadwal &amp; Lokasi</p>
-            <h2 data-gsap="naik" class="font-serif text-3xl font-bold text-[#1F2937]">Rangkaian Acara</h2>
+            <h2 data-gsap="naik" class="font-serif text-3xl font-bold text-[#1F2937]">{{ $undangan->teksKustom('judul_acara', 'Rangkaian Acara') }}</h2>
             <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs text-[#4B6358]/85 max-w-xs mx-auto leading-relaxed">
-                Dengan penuh suka cita, kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri momen bahagia kami:
+                {{ $undangan->teksKustom('pengantar_hitung_mundur', 'Dengan penuh suka cita, kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri momen bahagia kami:') }}
             </p>
         </div>
 
@@ -480,7 +480,7 @@
                 <p class="scroll-scrub-kiri text-[10px] font-bold uppercase tracking-[0.36em] text-[#E5D5C0]">Kisah Kami</p>
             </div>
             <div data-gsap="kanan" data-gsap-delay="0.06">
-                <h2 class="scroll-scrub-kanan font-kaligrafi text-5xl text-[#FDFBF7] leading-tight">Cerita Cinta</h2>
+                <h2 class="scroll-scrub-kanan font-kaligrafi text-5xl text-[#FDFBF7] leading-tight">{{ $undangan->teksKustom('judul_cerita', 'Cerita Cinta') }}</h2>
             </div>
             <p data-gsap="teks" data-gsap-delay="0.09" class="text-xs text-[#E5D5C0]/82 max-w-xs mx-auto leading-relaxed">
                 Lembaran perjalanan singkat yang merangkai pertemuan kami hingga melangkah ke pelaminan.
@@ -661,7 +661,7 @@
             <p class="scroll-scrub-kanan text-[10px] font-bold uppercase tracking-[0.34em] text-[#B86B4B]">Galeri Momen</p>
         </div>
         <div data-gsap="kiri" data-gsap-delay="0.06">
-            <h2 class="scroll-scrub-kiri mt-1 font-serif text-3xl font-bold text-[#1F2937]">Potret Kebahagiaan</h2>
+            <h2 class="scroll-scrub-kiri mt-1 font-serif text-3xl font-bold text-[#1F2937]">{{ $undangan->teksKustom('judul_galeri', 'Potret Kebahagiaan') }}</h2>
         </div>
     </div>
 

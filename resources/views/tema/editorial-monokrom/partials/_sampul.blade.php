@@ -58,7 +58,7 @@
 
             @if ($pakaiFotoSampul)
                 <div class="text-left space-y-1 pt-0.5">
-                    <p class="ed-mono text-[9px] uppercase tracking-[0.34em] text-white/70">The Editorial Invitation</p>
+                    <p class="ed-mono text-[9px] uppercase tracking-[0.34em] text-white/70">{{ $undangan->teksKustom('sampul_judul', 'The Editorial Invitation') }}</p>
                     <h1 class="ed-serif text-[2.35rem] sm:text-[2.85rem] uppercase tracking-[0.05em] leading-[0.98] text-white drop-shadow">
                         {{ $undangan->nama_panggilan_pria }}
                         <span class="ed-mono text-base sm:text-lg align-middle text-white/60 mx-1">/</span>
@@ -80,7 +80,7 @@
                             <span>COLLECTOR ISSUE</span>
                             <span>MONOGRAM</span>
                         </div>
-                        <p class="ed-mono text-[9.5px] uppercase tracking-[0.32em] text-[#52525B]">The Editorial Invitation</p>
+                        <p class="ed-mono text-[9.5px] uppercase tracking-[0.32em] text-[#52525B]">{{ $undangan->teksKustom('sampul_judul', 'The Editorial Invitation') }}</p>
                         <h1 class="ed-serif text-4xl sm:text-[2.7rem] uppercase tracking-[0.06em] leading-[1.03] text-[#18181B]">
                             <span class="block">{{ $undangan->nama_panggilan_pria }}</span>
                             <span class="my-1 flex items-center justify-center gap-3">
@@ -118,7 +118,7 @@
                     <div class="min-w-0">
                         <span class="sr-only">Kepada Yth. {{ $namaTamu }}</span>
                         <p class="ed-mono text-[8.5px] uppercase tracking-[0.22em] text-[#52525B]">
-                            Kepada Yth. Bapak/Ibu/Saudara/i
+                            {{ $undangan->teksKustom('sampul_sapaan', 'Kepada Yth. Bapak/Ibu/Saudara/i') }}
                         </p>
                         <p class="ed-serif text-xl sm:text-2xl text-[#18181B] leading-snug truncate mt-0.5">
                             {{ $namaTamu }}
@@ -143,14 +143,14 @@
                 >
                     <span class="inline-flex items-center gap-2">
                         <span class="inline-block h-2 w-2 border border-white/80 rounded-full"></span>
-                        <span>Buka Undangan</span>
+                        <span>{{ $undangan->teksKustom('sampul_tombol', 'Buka Undangan') }}</span>
                     </span>
                     <span class="ed-mono text-xs">&rarr;</span>
                 </button>
             </div>
 
             <p class="text-[9.5px] text-center italic text-white/65 leading-relaxed">
-                Mohon maaf apabila ada kesalahan penulisan nama/gelar
+                {{ $undangan->teksKustom('sampul_catatan', 'Mohon maaf apabila ada kesalahan penulisan nama/gelar') }}
             </p>
         </div>
     </div>

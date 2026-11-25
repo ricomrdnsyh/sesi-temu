@@ -10,8 +10,14 @@
             class="sticky {{ $tampilBarDemo ? 'top-14' : 'top-0' }} z-30 -mx-5 px-5 py-3 bg-[#FAF9F6]/95 backdrop-blur-md ed-mono flex items-center justify-between border-b border-[#18181B] text-[9.5px] font-bold uppercase tracking-[0.3em] text-[#18181B]"
         >
             <span>01 / DOSSIER</span>
-            <span>THE COUPLE</span>
+            <span>{{ $undangan->teksKustom('judul_mempelai', 'THE COUPLE') }}</span>
         </div>
+
+        @if ($undangan->teksKustom('pengantar_mempelai') !== '')
+            <p data-gsap="teks" class="text-xs text-[#52525B] leading-relaxed border-l-2 border-[#18181B]/35 pl-3">
+                {{ $undangan->teksKustom('pengantar_mempelai') }}
+            </p>
+        @endif
 
         {{-- 01 / THE GROOM — GALLERY IVORY SHEET --}}
         <article class="relative bg-white border border-[#18181B] p-5 ed-bayangan-tajam kartu-3d space-y-4">
@@ -46,7 +52,7 @@
                     </p>
                     @if ($undangan->nama_ayah_pria || $undangan->nama_ibu_pria)
                         <p data-gsap="teks" data-gsap-delay="0.11" class="text-xs text-[#52525B] leading-relaxed border-l-2 border-[#18181B]/25 pl-2.5">
-                            Putra dari {{ $undangan->nama_ayah_pria }} &amp; {{ $undangan->nama_ibu_pria }}
+                            {{ $undangan->teksKustom('label_pria', 'Putra dari') }} {{ $undangan->nama_ayah_pria }} &amp; {{ $undangan->nama_ibu_pria }}
                         </p>
                     @endif
                     @if ($instagramPria !== '')
@@ -90,7 +96,7 @@
                     </p>
                     @if ($undangan->nama_ayah_wanita || $undangan->nama_ibu_wanita)
                         <p data-gsap="teks" data-gsap-delay="0.11" class="text-xs text-white/70 leading-relaxed border-l-2 border-white/30 pl-2.5">
-                            Putri dari {{ $undangan->nama_ayah_wanita }} &amp; {{ $undangan->nama_ibu_wanita }}
+                            {{ $undangan->teksKustom('label_wanita', 'Putri dari') }} {{ $undangan->nama_ayah_wanita }} &amp; {{ $undangan->nama_ibu_wanita }}
                         </p>
                     @endif
                     @if ($instagramWanita !== '')
@@ -236,9 +242,14 @@
 
         <div class="text-left space-y-1">
             <h2 data-gsap="naik" data-gsap-delay="0.05" class="ed-serif text-3xl sm:text-4xl uppercase tracking-[0.06em] text-white">
-                Save The Date
+                {{ $undangan->teksKustom('judul_hitung_mundur', 'Save The Date') }}
             </h2>
             <p class="ed-mono text-[9.5px] uppercase tracking-[0.22em] text-white/60">{{ $tanggalLengkap }}</p>
+            @if ($undangan->teksKustom('pengantar_hitung_mundur') !== '')
+                <p data-gsap="teks" class="text-xs text-white/75 leading-relaxed pt-1">
+                    {{ $undangan->teksKustom('pengantar_hitung_mundur') }}
+                </p>
+            @endif
         </div>
 
         {{-- Kotak Split-Flap Mekanis Arsitektural --}}
@@ -287,7 +298,7 @@
             class="sticky {{ $tampilBarDemo ? 'top-14' : 'top-0' }} z-30 -mx-5 px-5 py-3 bg-[#FAF9F6]/95 backdrop-blur-md ed-mono flex items-center justify-between border-b border-[#18181B] text-[9.5px] font-bold uppercase tracking-[0.3em] text-[#18181B]"
         >
             <span>02 / ITINERARY</span>
-            <span>EXHIBITION PASS</span>
+            <span>{{ $undangan->teksKustom('judul_acara', 'EXHIBITION PASS') }}</span>
         </div>
 
         @foreach ($undangan->daftarAcara as $idx => $acara)
@@ -471,7 +482,7 @@
 
         <div data-scroll-scrub class="overflow-hidden">
             <div data-gsap="kanan" class="flex items-end justify-between gap-3">
-                <h2 class="scroll-scrub-kanan ed-serif text-3xl sm:text-4xl uppercase tracking-wide text-[#18181B]">Kisah Kami</h2>
+                <h2 class="scroll-scrub-kanan ed-serif text-3xl sm:text-4xl uppercase tracking-wide text-[#18181B]">{{ $undangan->teksKustom('judul_cerita', 'Kisah Kami') }}</h2>
                 @if (count($ceritaList) > 1)
                     <span x-show="!semuaBabCerita" class="ed-mono text-[8.5px] uppercase tracking-[0.22em] text-[#52525B] pb-1">
                         SWIPE &harr;
@@ -667,7 +678,7 @@
 
         <div data-scroll-scrub class="overflow-hidden">
             <div data-gsap="kiri" class="flex items-end justify-between gap-3">
-                <h2 class="scroll-scrub-kiri ed-serif text-3xl sm:text-4xl uppercase tracking-wide text-white">Editorial Galeri</h2>
+                <h2 class="scroll-scrub-kiri ed-serif text-3xl sm:text-4xl uppercase tracking-wide text-white">{{ $undangan->teksKustom('judul_galeri', 'Editorial Galeri') }}</h2>
                 <span class="ed-mono text-[8.5px] uppercase tracking-[0.22em] text-white/50 pb-1" x-text="modeContactSheet ? 'TAP TO ENLARGE' : 'DRAG / SWIPE'">DRAG / SWIPE</span>
             </div>
         </div>

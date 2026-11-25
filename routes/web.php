@@ -48,6 +48,7 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
     Route::get('/undangan/{undangan}/kelola', [DashboardUndanganController::class, 'kelola'])->name('undangan.kelola');
     Route::get('/undangan/{undangan}/tamu', [DashboardUndanganController::class, 'tamuUndangan'])->name('undangan.tamu');
     Route::get('/undangan/{undangan}/pratinjau-tema/{tema}', [DashboardUndanganController::class, 'pratinjauTema'])->name('undangan.pratinjau-tema');
+    Route::post('/undangan/{undangan}/pratinjau-langsung', [DashboardUndanganController::class, 'pratinjauLangsung'])->name('undangan.pratinjau-langsung');
     Route::patch('/undangan/{undangan}/tema', [DashboardUndanganController::class, 'gantiTema'])->name('undangan.ganti-tema');
     Route::put('/undangan/{undangan}', [DashboardUndanganController::class, 'perbaruiDataUtama'])->name('undangan.perbarui');
     Route::delete('/undangan/{undangan}', [DashboardUndanganController::class, 'hapusUndangan'])->name('undangan.hapus');

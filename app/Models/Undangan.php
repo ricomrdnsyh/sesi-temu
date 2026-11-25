@@ -187,12 +187,14 @@ class Undangan extends Model
                 'link' => '',
             ],
             'alamat_kado_fisik' => '',
+            'teks' => [],
             'fitur_aktif' => [
                 'hitung_mundur' => true,
                 'cerita_cinta' => true,
                 'galeri' => true,
                 'amplop_digital' => true,
                 'buku_tamu' => true,
+                'doa_pengantin' => true,
             ],
         ];
     }
@@ -411,6 +413,30 @@ class Undangan extends Model
         $fiturAktif = $this->pengaturan['fitur_aktif'] ?? [];
 
         return (bool) ($fiturAktif[$fitur] ?? true);
+    }
+
+    public function teksKustom(string $kunci, string $bawaan = ''): string
+    {
+        $nilai = trim((string) data_get($this->pengaturan, "teks.{$kunci}", ''));
+
+        return $nilai !== '' ? $nilai : $bawaan;
+    }
+
+    /**
+     * @param  array{judul?: string, arab?: string, latin?: string, isi?: string}  $bawaan
+     * @return array{judul: string, arab: string, latin: string, isi: string}
+     */
+    public function doaPengantin(array $bawaan = []): array
+    {
+        $teks = (array) data_get($this->pengaturan, 'teks', []);
+        $dikustom = ! empty($teks['doa_kustom']);
+
+        return [
+            'judul' => trim((string) ($teks['doa_judul'] ?? '')) ?: (string) ($bawaan['judul'] ?? 'Doa Untuk Pengantin'),
+            'arab' => $dikustom ? trim((string) ($teks['doa_arab'] ?? '')) : (string) ($bawaan['arab'] ?? 'بَارَكَ اللّٰهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ'),
+            'latin' => $dikustom ? trim((string) ($teks['doa_latin'] ?? '')) : (string) ($bawaan['latin'] ?? 'Baarakallahu laka wa baaraka ‘alaika wa jama‘a bainakuma fii khair.'),
+            'isi' => trim((string) ($teks['doa_isi'] ?? '')) ?: (string) ($bawaan['isi'] ?? 'Semoga Allah memberkahimu di waktu bahagia dan memberkahimu di waktu susah, serta semoga Allah mempersatukan kalian berdua dalam kebaikan. (HR. Abu Daud)'),
+        ];
     }
 
     public function modeTanpaFoto(): bool

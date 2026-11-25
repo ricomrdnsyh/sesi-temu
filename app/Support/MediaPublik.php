@@ -12,6 +12,10 @@ class MediaPublik
             return null;
         }
 
+        if (Str::startsWith($path, 'blob:')) {
+            return $path;
+        }
+
         if (Str::startsWith($path, ['http://', 'https://', 'aset-demo/', 'aset-tema/', 'storage/'])) {
             return asset($path);
         }

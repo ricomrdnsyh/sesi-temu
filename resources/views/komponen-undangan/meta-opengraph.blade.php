@@ -237,6 +237,14 @@
 <link href="{{ $gayaFont['google_fonts_url'] }}" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
 @vite(['resources/css/app.css', 'resources/js/app.js'])
+@if (! empty($livePreviewState['bukaSampul']))
+<style>
+    [data-transisi-sampul],
+    [data-selendang-transisi] {
+        display: none !important;
+    }
+</style>
+@endif
 
 <style>
     :root {

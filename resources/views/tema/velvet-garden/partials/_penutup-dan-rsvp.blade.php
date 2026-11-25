@@ -8,9 +8,9 @@
             <div class="space-y-1.5">
                 <img src="{{ $asetGarden['garland'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-gsap="turun" class="w-32 mx-auto pb-0.5">
                 <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#7D6027]">Tanda Kasih</p>
-                <h2 data-gsap="naik" class="font-serif text-3xl font-bold text-[#132623]">Amplop Digital</h2>
+                <h2 data-gsap="naik" class="font-serif text-3xl font-bold text-[#132623]">{{ $undangan->teksKustom('judul_amplop', 'Amplop Digital') }}</h2>
                 <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs text-[#1F3431]/75 leading-relaxed max-w-xs mx-auto">
-                    Doa restu Bapak/Ibu/Saudara/i merupakan hadiah terindah bagi kami. Namun apabila ingin memberikan tanda kasih, dapat disalurkan melalui:
+                    {{ $undangan->teksKustom('pengantar_amplop', 'Doa restu Bapak/Ibu/Saudara/i merupakan hadiah terindah bagi kami. Namun apabila ingin memberikan tanda kasih, dapat disalurkan melalui:') }}
                 </p>
             </div>
 
@@ -102,7 +102,7 @@
             class="max-w-md mx-auto rounded-3xl bg-[#FDFBF7] text-[#1F3431] border-2 border-[#C8A464]/65 p-6 shadow-2xl space-y-5">
             <div class="text-center space-y-1">
                 <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#7D6027]">Garden Guestbook</p>
-                <h2 data-gsap="mekar" class="font-serif text-3xl font-bold text-[#132623]">RSVP &amp; Wishes</h2>
+                <h2 data-gsap="mekar" class="font-serif text-3xl font-bold text-[#132623]">{{ $undangan->teksKustom('judul_buku_tamu', 'RSVP & Wishes') }}</h2>
                 <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs text-[#1F3431]/72">
                     Konfirmasikan kehadiran serta sampaikan doa terbaik bagi kami.
                 </p>
@@ -238,26 +238,43 @@
 @endif
 
 {{-- SEKSI 11: DOA UNTUK PENGANTIN & TURUT MENGUNDANG --}}
+@if ($undangan->fiturAktif('doa_pengantin') || $adaTurutMengundang)
 <section class="relative bg-[#132623] px-4 py-6 space-y-6 overflow-hidden">
     {{-- Kartu Doa Untuk Pengantin --}}
-    <div data-section-doa-pengantin="taman" class="max-w-md mx-auto rounded-3xl bg-[#FDFBF7] text-[#1F3431] border-2 border-[#C8A464]/65 p-6 text-center shadow-xl kartu-3d efek-shimmer-kartu space-y-3.5">
-        <div data-gsap="turun">
-            <img src="{{ $asetGarden['garland'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" class="w-36 mx-auto opacity-95 animasi-melayang">
+    @if ($undangan->fiturAktif('doa_pengantin'))
+        @php
+            $doaPengantin = $undangan->doaPengantin([
+                'arab' => '',
+                'latin' => 'Bārakallāhu laka wa bāraka ‘alaika wa jama‘a bainakumā fī khair.',
+                'isi' => 'Semoga Allah memberkahi kalian berdua di kala suka maupun duka, serta senantiasa menghimpun kalian dalam kebaikan, ketenteraman, dan kasih sayang hingga akhir hayat.',
+            ]);
+        @endphp
+        <div data-section-doa-pengantin="taman" class="max-w-md mx-auto rounded-3xl bg-[#FDFBF7] text-[#1F3431] border-2 border-[#C8A464]/65 p-6 text-center shadow-xl kartu-3d efek-shimmer-kartu space-y-3.5">
+            <div data-gsap="turun">
+                <img src="{{ $asetGarden['garland'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" class="w-36 mx-auto opacity-95 animasi-melayang">
+            </div>
+            <p data-gsap="mekar" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#8D6F3A]">Doa Restu</p>
+            <h2 data-gsap="naik" class="font-serif text-2xl sm:text-[1.75rem] font-bold text-[#132623]">{{ $doaPengantin['judul'] }}</h2>
+            @if ($doaPengantin['arab'] !== '')
+                <p data-gsap="mekar" data-gsap-delay="0.05" class="text-xl leading-loose text-[#132623]" style="font-family: 'Amiri', serif;" dir="rtl">
+                    {{ $doaPengantin['arab'] }}
+                </p>
+            @endif
+            @if ($doaPengantin['latin'] !== '')
+                <p data-gsap="teks" data-gsap-delay="0.06" class="font-serif italic text-sm sm:text-[15px] text-[#26403E] leading-relaxed">
+                    &ldquo;{{ $doaPengantin['latin'] }}&rdquo;
+                </p>
+            @endif
+            <div data-gsap="garis" class="flex items-center justify-center gap-3 px-10" aria-hidden="true">
+                <span class="h-px flex-1 bg-[#C8A464]/50"></span>
+                <span class="w-1.5 h-1.5 rotate-45 bg-[#C8A464]"></span>
+                <span class="h-px flex-1 bg-[#C8A464]/50"></span>
+            </div>
+            <p data-gsap="teks" data-gsap-delay="0.1" class="text-xs text-[#1F3431]/78 leading-relaxed">
+                {{ $doaPengantin['isi'] }}
+            </p>
         </div>
-        <p data-gsap="mekar" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#8D6F3A]">Doa Restu</p>
-        <h2 data-gsap="naik" class="font-serif text-2xl sm:text-[1.75rem] font-bold text-[#132623]">Doa Untuk Pengantin</h2>
-        <p data-gsap="teks" data-gsap-delay="0.06" class="font-serif italic text-sm sm:text-[15px] text-[#26403E] leading-relaxed">
-            &ldquo;B&#257;rakall&#257;hu laka wa b&#257;raka &lsquo;alaika wa jama&lsquo;a bainakum&#257; f&#299; khair.&rdquo;
-        </p>
-        <div data-gsap="garis" class="flex items-center justify-center gap-3 px-10" aria-hidden="true">
-            <span class="h-px flex-1 bg-[#C8A464]/50"></span>
-            <span class="w-1.5 h-1.5 rotate-45 bg-[#C8A464]"></span>
-            <span class="h-px flex-1 bg-[#C8A464]/50"></span>
-        </div>
-        <p data-gsap="teks" data-gsap-delay="0.1" class="text-xs text-[#1F3431]/78 leading-relaxed">
-            Semoga Allah memberkahi kalian berdua di kala suka maupun duka, serta senantiasa menghimpun kalian dalam kebaikan, ketenteraman, dan kasih sayang hingga akhir hayat.
-        </p>
-    </div>
+    @endif
 
     {{-- Kartu Turut Mengundang --}}
     @if ($adaTurutMengundang)
@@ -265,7 +282,7 @@
             <div class="space-y-1">
                 <img src="{{ $asetGarden['garland'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-gsap="turun" class="w-32 mx-auto pb-0.5 drop-shadow">
                 <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#EEDAD4]">Keluarga Besar</p>
-                <h2 data-gsap="naik" class="font-serif text-2xl font-bold text-white">Turut Mengundang</h2>
+                <h2 data-gsap="naik" class="font-serif text-2xl font-bold text-white">{{ $undangan->teksKustom('judul_turut_mengundang', 'Turut Mengundang') }}</h2>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
                 @if (!empty($turutPria))
@@ -292,6 +309,7 @@
         </div>
     @endif
 </section>
+@endif
 
 {{-- SEKSI 12: KUBAH PENUTUP KONSERVATORI BERHAMPARAN BUNGA DI ATAS FOOTER --}}
 <section
@@ -329,7 +347,7 @@
             @else
                 <div data-gsap="potret" class="relative mx-auto w-[196px] sm:w-[210px] aspect-[780/960] flex items-center justify-center">
                     <div class="absolute inset-x-[12.5%] top-[8.5%] bottom-[11.5%] rounded-t-[10rem] rounded-b-[1.35rem] overflow-hidden bg-gradient-to-b from-[#23423B] via-[#172E29] to-[#0E1E18] text-[#F3DFA2] flex flex-col items-center justify-center gap-1 shadow-md">
-                        <span class="text-[9px] uppercase tracking-[0.28em] text-[#EEDAD4]">Terima Kasih</span>
+                        <span class="text-[9px] uppercase tracking-[0.28em] text-[#EEDAD4]">{{ $undangan->teksKustom('judul_penutup', 'Terima Kasih') }}</span>
                         <span class="font-serif text-4xl font-bold tracking-wider">
                             {{ $undangan->inisialPria() }} &amp; {{ $undangan->inisialWanita() }}
                         </span>
@@ -348,9 +366,9 @@
             <div data-gsap="turun">
                 <img src="{{ $asetGarden['garland'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" class="w-28 mx-auto opacity-95 animasi-melayang">
             </div>
-            <p data-gsap="mekar" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#7D6027]">Terima Kasih</p>
+            <p data-gsap="mekar" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#7D6027]">{{ $undangan->teksKustom('judul_penutup', 'Terima Kasih') }}</p>
             <p data-gsap="teks" class="text-xs sm:text-sm text-[#1F3431]/80 leading-relaxed max-w-xs mx-auto">
-                Atas kehadiran dan doa restu Bapak/Ibu/Saudara/i, kami menghaturkan terima kasih yang sebesar-besarnya.
+                {{ $undangan->teksKustom('ucapan_penutup', 'Atas kehadiran dan doa restu Bapak/Ibu/Saudara/i, kami menghaturkan terima kasih yang sebesar-besarnya.') }}
             </p>
 
             <div data-gsap="garis" class="flex items-center justify-center gap-3 px-10 pt-0.5" aria-hidden="true">
@@ -360,7 +378,7 @@
             </div>
 
             <div class="pt-1">
-                <p data-gsap="naik" class="text-[10px] uppercase tracking-[0.28em] text-[#7D6027]/85">Kami Yang Berbahagia</p>
+                <p data-gsap="naik" class="text-[10px] uppercase tracking-[0.28em] text-[#7D6027]/85">{{ $undangan->teksKustom('label_penutup', 'Kami Yang Berbahagia') }}</p>
                 <p data-gsap="mekar" data-gsap-delay="0.06" class="mt-1.5 font-kaligrafi text-5xl text-[#132623] leading-tight">
                     {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}
                 </p>

@@ -3,11 +3,14 @@ import DataTable from 'datatables.net-dt';
 import Swal from 'sweetalert2';
 import { amatiSelect2Baru, inisialisasiSemuaSelect2 } from './select2-init';
 import { buatPengendaliSinemaScroll } from './sinema-scroll';
+import { editorKelolaUndangan } from './editor-kelola';
 
 window.Alpine = Alpine;
 window.Swal = Swal;
 window.SesiTemuSinema = buatPengendaliSinemaScroll();
+window.editorKelolaUndangan = editorKelolaUndangan;
 
+Alpine.data('editorKelolaUndangan', editorKelolaUndangan);
 Alpine.start();
 
 const escapeHtml = (teks) => String(teks)

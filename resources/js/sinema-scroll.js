@@ -181,7 +181,8 @@ export function buatPengendaliSinemaScroll() {
 
     const adalahEmbed = () =>
         typeof window !== 'undefined' &&
-        new URLSearchParams(window.location.search).get('embed') === '1';
+        (new URLSearchParams(window.location.search).get('embed') === '1' ||
+            Boolean(window.__SESITEMU_LIVE_PREVIEW__));
 
     function konfigurasiGerak(jenis) {
         switch (jenis) {

@@ -1,37 +1,27 @@
 {{-- PITA KILAU EMAS SAMPANYE PENYINGKAP TIRAI BELUDRU MALAM (SAAT BUKA UNDANGAN) --}}
-<div
-    aria-hidden="true"
-    data-selendang-transisi="noir"
-    :class="undanganTerbuka ? 'noir-pita-cahaya-aktif' : 'opacity-0'"
-    class="pointer-events-none fixed inset-0 mx-auto h-dvh w-full lg:w-[460px] xl:w-[490px] z-[45] overflow-hidden"
->
-    <div
-        class="w-full h-full"
-        style="background: linear-gradient(180deg, transparent 0%, rgba(212,175,55,0.08) 32%, rgba(243,229,171,0.42) 48%, rgba(255,248,220,0.75) 50%, rgba(212,175,55,0.28) 54%, rgba(9,9,13,0.45) 70%, transparent 100%);"
-    ></div>
+<div aria-hidden="true" data-selendang-transisi="noir" :class="undanganTerbuka ? 'noir-pita-cahaya-aktif' : 'opacity-0'"
+    class="pointer-events-none fixed inset-0 mx-auto h-dvh w-full lg:w-[460px] xl:w-[490px] z-[45] overflow-hidden">
+    <div class="w-full h-full"
+        style="background: linear-gradient(180deg, transparent 0%, rgba(212,175,55,0.08) 32%, rgba(243,229,171,0.42) 48%, rgba(255,248,220,0.75) 50%, rgba(212,175,55,0.28) 54%, rgba(9,9,13,0.45) 70%, transparent 100%);">
+    </div>
 </div>
 
 {{-- SAMPUL PEMBUKA LUXURY NOIR (TIRAI BELUDRU MALAM MELENGKUNG + SAPUAN EMAS) --}}
-<section
-    data-transisi-sampul="fade-halus"
+<section data-transisi-sampul="fade-halus"
     class="tirai-fade-halus tirai-gulir-atas fixed inset-0 mx-auto h-dvh w-full lg:w-[460px] xl:w-[490px] z-40 {{ $tampilBarDemo ? 'pt-28 sm:pt-20 lg:pt-14' : '' }}"
-    style="height: 100dvh;"
-    :class="undanganTerbuka ? 'tirai-terbuka pointer-events-none' : ''"
->
-    <div class="relative w-full h-full flex flex-col {{ $pakaiFotoSampul ? 'justify-between' : 'justify-center items-center px-6 py-8' }} overflow-hidden bg-[#09090D]">
-        <img
-            src="{{ $pakaiFotoSampul ? $urlFotoSampul : $urlFotoLatar }}"
+    style="height: 100dvh;" :class="undanganTerbuka ? 'tirai-terbuka pointer-events-none' : ''">
+    <div
+        class="relative w-full h-full flex flex-col {{ $pakaiFotoSampul ? 'justify-between' : 'justify-center items-center px-6 py-8' }} overflow-hidden bg-[#09090D]">
+        <img src="{{ $pakaiFotoSampul ? $urlFotoSampul : $urlFotoLatar }}"
             alt="Sampul {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}"
-            class="absolute inset-0 w-full h-full object-cover {{ $pakaiFotoSampul ? 'object-top scale-[1.02] animasi-nafas' : 'object-center scale-105 animasi-nafas' }}"
-        >
+            class="absolute inset-0 w-full h-full object-cover {{ $pakaiFotoSampul ? 'object-top scale-[1.02] animasi-nafas' : 'object-center scale-105 animasi-nafas' }}">
 
         @if ($pakaiFotoSampul)
-            <div
-                aria-hidden="true"
-                class="pointer-events-none absolute inset-0"
-                style="background: linear-gradient(180deg, rgba(9,9,13,0.82) 0%, rgba(9,9,13,0.28) 24%, rgba(9,9,13,0.03) 48%, rgba(9,9,13,0.24) 66%, rgba(9,9,13,0.88) 86%, rgba(6,6,9,0.98) 100%);"
-            ></div>
-            <div aria-hidden="true" class="pointer-events-none absolute inset-3.5 rounded-xl border border-[#D4AF37]/40 z-10">
+            <div aria-hidden="true" class="pointer-events-none absolute inset-0"
+                style="background: linear-gradient(180deg, rgba(9,9,13,0.82) 0%, rgba(9,9,13,0.28) 24%, rgba(9,9,13,0.03) 48%, rgba(9,9,13,0.24) 66%, rgba(9,9,13,0.88) 86%, rgba(6,6,9,0.98) 100%);">
+            </div>
+            <div aria-hidden="true"
+                class="pointer-events-none absolute inset-3.5 rounded-xl border border-[#D4AF37]/40 z-10">
                 <span class="absolute -top-0.5 -left-0.5 h-5 w-5 border-t-2 border-l-2 border-[#D4AF37]"></span>
                 <span class="absolute -top-0.5 -right-0.5 h-5 w-5 border-t-2 border-r-2 border-[#D4AF37]"></span>
                 <span class="absolute -bottom-0.5 -left-0.5 h-5 w-5 border-b-2 border-l-2 border-[#D4AF37]"></span>
@@ -39,7 +29,8 @@
             </div>
         @else
             <div class="absolute inset-0 bg-gradient-to-b from-black/78 via-black/48 to-black/92"></div>
-            <img src="{{ $asetNoir['bingkai'] }}" alt="" aria-hidden="true" class="pointer-events-none absolute inset-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)] object-contain opacity-30">
+            <img src="{{ $asetNoir['bingkai'] }}" alt="" aria-hidden="true"
+                class="pointer-events-none absolute inset-4 h-[calc(100%-2rem)] w-[calc(100%-2rem)] object-contain opacity-30">
         @endif
 
         @include('komponen-undangan.lapisan-motion', ['efekMotion' => 'debu-emas', 'konteks' => 'sampul'])
@@ -47,9 +38,10 @@
         @if ($pakaiFotoSampul)
             <div class="noir-isi-sampul relative z-20 px-8 pt-8 sm:pt-10 text-center text-[#F5EFE6] space-y-1.5">
                 <p class="text-[10px] font-semibold uppercase tracking-[0.4em] text-[#D4AF37] drop-shadow">
-                    The Grand Celebration
+                    {{ $undangan->teksKustom('sampul_judul', 'The Grand Celebration') }}
                 </p>
-                <h1 class="noir-font-judul text-3xl sm:text-[2.6rem] font-bold tracking-wider leading-tight text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.55)]">
+                <h1
+                    class="noir-font-judul text-3xl sm:text-[2.6rem] font-bold tracking-wider leading-tight text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.55)]">
                     {{ $undangan->nama_panggilan_pria }}
                     <span class="font-kaligrafi font-normal text-[#D4AF37] mx-1">&amp;</span>
                     {{ $undangan->nama_panggilan_wanita }}
@@ -69,46 +61,53 @@
                 </div>
                 <span class="sr-only">Kepada Yth. {{ $namaTamu }}</span>
                 <p class="text-[10px] font-semibold uppercase tracking-[0.26em] text-[#D4AF37]">
-                    Kepada Yth. Bapak/Ibu/Saudara/i
+                    {{ $undangan->teksKustom('sampul_sapaan', 'Kepada Yth. Bapak/Ibu/Saudara/i') }}
                 </p>
-                <p class="noir-font-judul text-lg sm:text-xl font-bold tracking-wide text-[#F3E5AB] drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)]">
+                <p
+                    class="noir-font-judul text-lg sm:text-xl font-bold tracking-wide text-[#F3E5AB] drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)]">
                     {{ $namaTamu }}
                 </p>
                 <div class="pt-2">
-                    <button
-                        type="button"
-                        @click="bukaUndangan()"
-                        class="noir-tombol-emas animasi-segel inline-flex items-center justify-center gap-2 rounded-full px-8 py-3 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] active:scale-95 transition cursor-pointer"
-                    >
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <rect width="20" height="16" x="2" y="4" rx="2"/>
-                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                    <button type="button" @click="bukaUndangan()"
+                        class="noir-tombol-emas animasi-segel inline-flex items-center justify-center gap-2 rounded-full px-8 py-3 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] active:scale-95 transition cursor-pointer">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect width="20" height="16" x="2" y="4" rx="2" />
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                         </svg>
-                        <span>Buka Undangan</span>
+                        <span>{{ $undangan->teksKustom('sampul_tombol', 'Buka Undangan') }}</span>
                     </button>
                 </div>
                 <p class="text-[10px] italic text-[#F5EFE6]/70 pt-1 max-w-xs mx-auto leading-relaxed">
-                    Mohon maaf apabila ada kesalahan penulisan nama/gelar
+                    {{ $undangan->teksKustom('sampul_catatan', 'Mohon maaf apabila ada kesalahan penulisan nama/gelar') }}
                 </p>
             </div>
         @else
             {{-- Mode Tanpa Foto: Plakat Art Deco Emas Terpusat --}}
             <div class="noir-isi-sampul relative z-20 w-full max-w-[360px]">
-                <div class="relative kartu-3d efek-shimmer-kartu rounded-xl bg-[#111016]/90 backdrop-blur-md border border-[#D4AF37]/65 px-6 py-8 text-center text-[#F5EFE6] shadow-[0_28px_70px_-16px_rgba(0,0,0,0.85)] space-y-4">
-                    <span aria-hidden="true" class="pointer-events-none absolute -top-1 -left-1 h-5 w-5 border-t-2 border-l-2 border-[#D4AF37]"></span>
-                    <span aria-hidden="true" class="pointer-events-none absolute -top-1 -right-1 h-5 w-5 border-t-2 border-r-2 border-[#D4AF37]"></span>
-                    <span aria-hidden="true" class="pointer-events-none absolute -bottom-1 -left-1 h-5 w-5 border-b-2 border-l-2 border-[#D4AF37]"></span>
-                    <span aria-hidden="true" class="pointer-events-none absolute -bottom-1 -right-1 h-5 w-5 border-b-2 border-r-2 border-[#D4AF37]"></span>
+                <div
+                    class="relative kartu-3d efek-shimmer-kartu rounded-xl bg-[#111016]/90 backdrop-blur-md border border-[#D4AF37]/65 px-6 py-8 text-center text-[#F5EFE6] shadow-[0_28px_70px_-16px_rgba(0,0,0,0.85)] space-y-4">
+                    <span aria-hidden="true"
+                        class="pointer-events-none absolute -top-1 -left-1 h-5 w-5 border-t-2 border-l-2 border-[#D4AF37]"></span>
+                    <span aria-hidden="true"
+                        class="pointer-events-none absolute -top-1 -right-1 h-5 w-5 border-t-2 border-r-2 border-[#D4AF37]"></span>
+                    <span aria-hidden="true"
+                        class="pointer-events-none absolute -bottom-1 -left-1 h-5 w-5 border-b-2 border-l-2 border-[#D4AF37]"></span>
+                    <span aria-hidden="true"
+                        class="pointer-events-none absolute -bottom-1 -right-1 h-5 w-5 border-b-2 border-r-2 border-[#D4AF37]"></span>
 
                     <div class="space-y-2">
                         <div class="mx-auto w-16 h-16 relative flex items-center justify-center">
-                            <span class="absolute inset-0 rounded-full border border-dashed border-[#D4AF37]/65 animasi-orbit"></span>
-                            <span class="noir-font-judul text-sm font-bold tracking-widest text-[#F3E5AB]">{{ $undangan->inisialPria() }}&amp;{{ $undangan->inisialWanita() }}</span>
+                            <span
+                                class="absolute inset-0 rounded-full border border-dashed border-[#D4AF37]/65 animasi-orbit"></span>
+                            <span
+                                class="noir-font-judul text-sm font-bold tracking-widest text-[#F3E5AB]">{{ $undangan->inisialPria() }}&amp;{{ $undangan->inisialWanita() }}</span>
                         </div>
                         <p class="text-[10px] font-semibold uppercase tracking-[0.4em] text-[#D4AF37]">
-                            The Grand Celebration
+                            {{ $undangan->teksKustom('sampul_judul', 'The Grand Celebration') }}
                         </p>
-                        <h1 class="noir-font-judul text-3xl sm:text-[2.45rem] font-bold tracking-wider leading-[1.1] text-white pt-1">
+                        <h1
+                            class="noir-font-judul text-3xl sm:text-[2.45rem] font-bold tracking-wider leading-[1.1] text-white pt-1">
                             <span class="block">{{ $undangan->nama_panggilan_pria }}</span>
                             <span class="block font-kaligrafi font-normal text-3xl text-[#D4AF37] my-0.5">&amp;</span>
                             <span class="block">{{ $undangan->nama_panggilan_wanita }}</span>
@@ -127,22 +126,20 @@
                     <div class="space-y-2.5 pt-0.5">
                         <span class="sr-only">Kepada Yth. {{ $namaTamu }}</span>
                         <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#D4AF37]">
-                            Kepada Yth. Bapak/Ibu/Saudara/i
+                            {{ $undangan->teksKustom('sampul_sapaan', 'Kepada Yth. Bapak/Ibu/Saudara/i') }}
                         </p>
-                        <p class="noir-font-judul text-lg sm:text-xl font-bold tracking-wide text-[#F3E5AB] leading-snug">
+                        <p
+                            class="noir-font-judul text-lg sm:text-xl font-bold tracking-wide text-[#F3E5AB] leading-snug">
                             {{ $namaTamu }}
                         </p>
                         <div class="pt-2">
-                            <button
-                                type="button"
-                                @click="bukaUndangan()"
-                                class="noir-tombol-emas animasi-segel inline-flex items-center justify-center gap-2 rounded-full px-8 py-3 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] transition cursor-pointer"
-                            >
-                                <span>Buka Undangan</span>
+                            <button type="button" @click="bukaUndangan()"
+                                class="noir-tombol-emas animasi-segel inline-flex items-center justify-center gap-2 rounded-full px-8 py-3 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] transition cursor-pointer">
+                                <span>{{ $undangan->teksKustom('sampul_tombol', 'Buka Undangan') }}</span>
                             </button>
                         </div>
                         <p class="text-[10px] italic text-[#F5EFE6]/70 pt-1 max-w-xs mx-auto leading-relaxed">
-                            Mohon maaf apabila ada kesalahan penulisan nama/gelar
+                            {{ $undangan->teksKustom('sampul_catatan', 'Mohon maaf apabila ada kesalahan penulisan nama/gelar') }}
                         </p>
                     </div>
                 </div>

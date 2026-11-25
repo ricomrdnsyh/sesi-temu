@@ -12,11 +12,11 @@
 
         <div class="bg-white border border-[#18181B] p-6 text-left space-y-5 ed-bayangan-tajam kartu-3d">
             <div class="border-b border-[#18181B]/20 pb-3.5 space-y-1">
-                <h2 data-gsap="naik" data-gsap-delay="0.05" class="ed-serif text-3xl uppercase tracking-wide text-[#18181B]">Amplop Digital</h2>
+                <h2 data-gsap="naik" data-gsap-delay="0.05" class="ed-serif text-3xl uppercase tracking-wide text-[#18181B]">{{ $undangan->teksKustom('judul_amplop', 'Amplop Digital') }}</h2>
             </div>
 
         <p data-gsap="teks" data-gsap-delay="0.08" class="text-xs text-[#52525B] leading-relaxed">
-            Doa restu Bapak/Ibu/Saudara/i merupakan karunia terindah bagi kami. Namun apabila bermaksud memberikan tanda kasih secara digital, dapat melalui akses di bawah ini:
+            {{ $undangan->teksKustom('pengantar_amplop', 'Doa restu Bapak/Ibu/Saudara/i merupakan karunia terindah bagi kami. Namun apabila bermaksud memberikan tanda kasih secara digital, dapat melalui akses di bawah ini:') }}
         </p>
 
         <div>
@@ -113,7 +113,7 @@
 
         <div class="bg-white border border-[#18181B] p-6 text-left space-y-5 ed-bayangan-tajam">
             <div class="border-b border-[#18181B]/20 pb-3.5 space-y-1">
-                <h2 data-gsap="mekar" data-gsap-delay="0.06" class="ed-serif text-3xl uppercase tracking-wide text-[#18181B]">RSVP &amp; Notes</h2>
+                <h2 data-gsap="mekar" data-gsap-delay="0.06" class="ed-serif text-3xl uppercase tracking-wide text-[#18181B]">{{ $undangan->teksKustom('judul_buku_tamu', 'RSVP & Notes') }}</h2>
             </div>
 
         @if (! empty($modeDemo))
@@ -233,46 +233,65 @@
 @endif
 
 {{-- SEKSI 11: 07 / BLESSING & VOW + 08 / TURUT MENGUNDANG --}}
+@if ($undangan->fiturAktif('doa_pengantin') || $adaTurutMengundang)
 <section class="relative bg-[#FAF9F6] px-5 pt-7 pb-14 space-y-7 overflow-hidden">
-    <div data-section-doa-pengantin="editorial" class="max-w-md mx-auto bg-white border border-[#18181B] p-2 ed-bayangan-tajam kartu-3d">
-        <div class="border border-[#18181B]/25 px-6 py-7 text-center space-y-4">
-            <div data-gsap="turun" class="ed-mono flex items-center justify-between text-[9px] font-bold uppercase tracking-[0.28em] text-[#52525B] border-b border-[#18181B]/15 pb-2.5">
-                <span>07 / BLESSING</span>
-                <span>DOA RESTU</span>
+    @if ($undangan->fiturAktif('doa_pengantin'))
+        @php
+            $doaPengantin = $undangan->doaPengantin([
+                'judul' => 'Doa & Harapan',
+                'arab' => '',
+                'latin' => 'May your home always be a quiet sanctuary of grace, patience, and enduring love — growing deeper with every passing season.',
+                'isi' => 'Semoga cinta yang dipersatukan hari ini senantiasa dilimpahi keteduhan, keberkahan, kesetiaan, dan kebahagiaan dalam setiap langkah kehidupan bersama — hari ini, esok, dan selamanya.',
+            ]);
+        @endphp
+        <div data-section-doa-pengantin="editorial" class="max-w-md mx-auto bg-white border border-[#18181B] p-2 ed-bayangan-tajam kartu-3d">
+            <div class="border border-[#18181B]/25 px-6 py-7 text-center space-y-4">
+                <div data-gsap="turun" class="ed-mono flex items-center justify-between text-[9px] font-bold uppercase tracking-[0.28em] text-[#52525B] border-b border-[#18181B]/15 pb-2.5">
+                    <span>07 / BLESSING</span>
+                    <span>DOA RESTU</span>
+                </div>
+
+                <img
+                    src="{{ $asetEditorial['bingkai'] }}"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    data-gsap="mekar"
+                    class="w-11 mx-auto opacity-85"
+                >
+
+                <h2 data-gsap="naik" class="ed-serif text-2xl sm:text-[1.85rem] uppercase tracking-[0.08em] text-[#18181B]">
+                    {{ $doaPengantin['judul'] }}
+                </h2>
+
+                @if ($doaPengantin['arab'] !== '')
+                    <p data-gsap="mekar" data-gsap-delay="0.05" class="text-xl leading-loose text-[#18181B]" style="font-family: 'Amiri', serif;" dir="rtl">
+                        {{ $doaPengantin['arab'] }}
+                    </p>
+                @endif
+
+                @if ($doaPengantin['latin'] !== '')
+                    <p data-gsap="teks" data-gsap-delay="0.06" class="ed-serif italic text-base sm:text-[1.06rem] leading-relaxed text-[#18181B]">
+                        &ldquo;{{ $doaPengantin['latin'] }}&rdquo;
+                    </p>
+                @endif
+
+                <div data-gsap="garis" class="flex items-center justify-center gap-3 px-10" aria-hidden="true">
+                    <span class="h-px flex-1 bg-[#18181B]/25"></span>
+                    <span class="w-1.5 h-1.5 bg-[#18181B]"></span>
+                    <span class="h-px flex-1 bg-[#18181B]/25"></span>
+                </div>
+
+                <p data-gsap="teks" data-gsap-delay="0.1" class="text-xs sm:text-[13px] text-[#52525B] leading-relaxed">
+                    {{ $doaPengantin['isi'] }}
+                </p>
+
+                <p data-gsap="naik" data-gsap-delay="0.12" class="pt-1 ed-mono text-[9px] font-bold uppercase tracking-[0.3em] text-[#18181B]/80">
+                    {{ $undangan->inisialPria() }} / {{ $undangan->inisialWanita() }} &middot; FOREVER &amp; ALWAYS
+                </p>
             </div>
-
-            <img
-                src="{{ $asetEditorial['bingkai'] }}"
-                alt=""
-                loading="lazy"
-                decoding="async"
-                data-gsap="mekar"
-                class="w-11 mx-auto opacity-85"
-            >
-
-            <h2 data-gsap="naik" class="ed-serif text-2xl sm:text-[1.85rem] uppercase tracking-[0.08em] text-[#18181B]">
-                Doa &amp; Harapan
-            </h2>
-
-            <p data-gsap="teks" data-gsap-delay="0.06" class="ed-serif italic text-base sm:text-[1.06rem] leading-relaxed text-[#18181B]">
-                &ldquo;May your home always be a quiet sanctuary of grace, patience, and enduring love &mdash; growing deeper with every passing season.&rdquo;
-            </p>
-
-            <div data-gsap="garis" class="flex items-center justify-center gap-3 px-10" aria-hidden="true">
-                <span class="h-px flex-1 bg-[#18181B]/25"></span>
-                <span class="w-1.5 h-1.5 bg-[#18181B]"></span>
-                <span class="h-px flex-1 bg-[#18181B]/25"></span>
-            </div>
-
-            <p data-gsap="teks" data-gsap-delay="0.1" class="text-xs sm:text-[13px] text-[#52525B] leading-relaxed">
-                Semoga cinta yang dipersatukan hari ini senantiasa dilimpahi keteduhan, keberkahan, kesetiaan, dan kebahagiaan dalam setiap langkah kehidupan bersama &mdash; hari ini, esok, dan selamanya.
-            </p>
-
-            <p data-gsap="naik" data-gsap-delay="0.12" class="pt-1 ed-mono text-[9px] font-bold uppercase tracking-[0.3em] text-[#18181B]/80">
-                {{ $undangan->inisialPria() }} / {{ $undangan->inisialWanita() }} &middot; FOREVER &amp; ALWAYS
-            </p>
         </div>
-    </div>
+    @endif
 
     {{-- 08 / TURUT MENGUNDANG — OBSIDIAN ARCHIVE SPREAD --}}
     @if ($adaTurutMengundang)
@@ -283,7 +302,7 @@
             </div>
 
             <h2 data-gsap="naik" data-gsap-delay="0.05" class="ed-serif text-2xl sm:text-[1.75rem] uppercase tracking-[0.06em] text-white">
-                Turut Mengundang
+                {{ $undangan->teksKustom('judul_turut_mengundang', 'Turut Mengundang') }}
             </h2>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs pt-1">
@@ -311,6 +330,7 @@
         </div>
     @endif
 </section>
+@endif
 
 {{-- SEKSI 12: EDITORIAL COLOPHON PENUTUP & FOOTER --}}
 <section
@@ -338,13 +358,19 @@
             </div>
         @endif
 
+        @if ($undangan->teksKustom('judul_penutup') !== '')
+            <p data-gsap="mekar" class="ed-mono text-[10px] font-bold uppercase tracking-[0.34em] text-white/80">
+                {{ $undangan->teksKustom('judul_penutup') }}
+            </p>
+        @endif
+
         <p data-gsap="teks" data-gsap-delay="0.08" class="text-xs text-white/80 leading-relaxed max-w-xs mx-auto">
-            Merupakan kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu pada hari bahagia kami.
+            {{ $undangan->teksKustom('ucapan_penutup', 'Merupakan kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu pada hari bahagia kami.') }}
         </p>
 
         <div class="border-t border-white/20 pt-4 space-y-1.5">
             <p data-gsap="naik" data-gsap-delay="0.12" class="ed-mono text-[9.5px] uppercase tracking-[0.28em] text-white/60">
-                Kami Yang Berbahagia
+                {{ $undangan->teksKustom('label_penutup', 'Kami Yang Berbahagia') }}
             </p>
             <p data-gsap="mekar" data-gsap-delay="0.15" class="ed-serif text-3xl uppercase tracking-[0.1em] text-white">
                 {{ $undangan->nama_panggilan_pria }} &amp; {{ $undangan->nama_panggilan_wanita }}

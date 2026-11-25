@@ -9,9 +9,9 @@
                 <img src="{{ $asetGarden['garland'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" class="w-36 mx-auto drop-shadow animasi-melayang">
             </div>
             <p data-gsap="mekar" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#EEDAD4]">The Couple</p>
-            <h2 data-gsap="naik" class="font-serif text-3xl font-bold text-white">Mempelai Berbahagia</h2>
+            <h2 data-gsap="naik" class="font-serif text-3xl font-bold text-white">{{ $undangan->teksKustom('judul_mempelai', 'Mempelai Berbahagia') }}</h2>
             <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs text-[#EEDAD4]/80 max-w-xs mx-auto leading-relaxed">
-                Dengan memohon rahmat dan ridho Tuhan Yang Maha Esa, kami bermaksud menyelenggarakan pernikahan putra-putri kami:
+                {{ $undangan->teksKustom('pengantar_mempelai', 'Dengan memohon rahmat dan ridho Tuhan Yang Maha Esa, kami bermaksud menyelenggarakan pernikahan putra-putri kami:') }}
             </p>
         </div>
 
@@ -77,7 +77,7 @@
                 <p data-gsap="teks" data-gsap-delay="0.06" class="font-serif text-base font-bold text-[#1F3431]">{{ $undangan->nama_lengkap_pria }}</p>
                 @if ($undangan->nama_ayah_pria || $undangan->nama_ibu_pria)
                     <p data-gsap="teks" data-gsap-delay="0.09" class="text-xs text-[#1F3431]/75 leading-relaxed">
-                        Putra dari {{ $undangan->nama_ayah_pria }} &amp; {{ $undangan->nama_ibu_pria }}
+                        {{ $undangan->teksKustom('label_pria', 'Putra dari') }} {{ $undangan->nama_ayah_pria }} &amp; {{ $undangan->nama_ibu_pria }}
                     </p>
                 @endif
                 @if ($instagramPria !== '')
@@ -169,7 +169,7 @@
                 <p data-gsap="teks" data-gsap-delay="0.06" class="font-serif text-base font-bold text-[#1F3431]">{{ $undangan->nama_lengkap_wanita }}</p>
                 @if ($undangan->nama_ayah_wanita || $undangan->nama_ibu_wanita)
                     <p data-gsap="teks" data-gsap-delay="0.09" class="text-xs text-[#1F3431]/75 leading-relaxed">
-                        Putri dari {{ $undangan->nama_ayah_wanita }} &amp; {{ $undangan->nama_ibu_wanita }}
+                        {{ $undangan->teksKustom('label_wanita', 'Putri dari') }} {{ $undangan->nama_ayah_wanita }} &amp; {{ $undangan->nama_ibu_wanita }}
                     </p>
                 @endif
                 @if ($instagramWanita !== '')
@@ -256,7 +256,7 @@
         <div class="space-y-1">
             <img src="{{ $asetGarden['garland'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-gsap="turun" class="w-32 mx-auto pb-1 drop-shadow">
             <p data-gsap="turun" class="text-[10px] font-semibold uppercase tracking-[0.34em] text-[#EEDAD4]">Menghitung Hari Bahagia</p>
-            <h2 data-gsap="naik" class="font-serif text-3xl font-bold text-white">Save The Date</h2>
+            <h2 data-gsap="naik" class="font-serif text-3xl font-bold text-white">{{ $undangan->teksKustom('judul_hitung_mundur', 'Save The Date') }}</h2>
             <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs text-[#F3DFA2]/90">{{ $tanggalLengkap }}</p>
         </div>
 
@@ -302,9 +302,9 @@
         <div class="text-center space-y-1.5 mb-8">
             <img src="{{ $asetGarden['garland'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-gsap="turun" class="w-36 mx-auto pb-1 drop-shadow">
             <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#EEDAD4]">Momen Bahagia</p>
-            <h2 data-gsap="naik" class="font-serif text-3xl font-bold text-white">Rangkaian Acara</h2>
+            <h2 data-gsap="naik" class="font-serif text-3xl font-bold text-white">{{ $undangan->teksKustom('judul_acara', 'Rangkaian Acara') }}</h2>
             <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs text-[#EEDAD4]/78 max-w-xs mx-auto leading-relaxed">
-                Merupakan kehormatan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir pada rangkaian acara berikut:
+                {{ $undangan->teksKustom('pengantar_hitung_mundur', 'Merupakan kehormatan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir pada rangkaian acara berikut:') }}
             </p>
         </div>
 
@@ -465,7 +465,7 @@
             <p class="scroll-scrub-kiri text-[10px] font-bold uppercase tracking-[0.36em] text-[#EEDAD4]">Jejak Langkah</p>
         </div>
         <div data-gsap="kanan" data-gsap-delay="0.06">
-            <h2 class="scroll-scrub-kanan font-kaligrafi text-5xl text-white leading-tight">Cerita Cinta</h2>
+            <h2 class="scroll-scrub-kanan font-kaligrafi text-5xl text-white leading-tight">{{ $undangan->teksKustom('judul_cerita', 'Cerita Cinta') }}</h2>
         </div>
     </div>
 
@@ -536,7 +536,7 @@
             <p class="scroll-scrub-kanan text-[10px] font-bold uppercase tracking-[0.34em] text-[#EEDAD4]">Garden Gallery</p>
         </div>
         <div data-gsap="kiri" data-gsap-delay="0.06">
-            <h2 class="scroll-scrub-kiri mt-1 font-serif text-3xl font-bold text-white">Potret Kebahagiaan</h2>
+            <h2 class="scroll-scrub-kiri mt-1 font-serif text-3xl font-bold text-white">{{ $undangan->teksKustom('judul_galeri', 'Potret Kebahagiaan') }}</h2>
         </div>
     </div>
 
