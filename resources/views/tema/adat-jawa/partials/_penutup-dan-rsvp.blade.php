@@ -5,7 +5,7 @@
             class="rounded-[22px] border-[3px] border-[#D7BB83] bg-[#FFFAF5]/93 px-6 py-9 text-center text-[#2B180F] shadow-2xl space-y-4 kartu-3d">
             <div class="space-y-1">
                 <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.32em] text-[#8C6823]">Tanda Kasih</p>
-                <h2 data-gsap="naik" class="font-kaligrafi text-[2.65rem] text-[#472A1C] leading-tight">Amplop Digital</h2>
+                <h2 data-gsap="naik" class="font-kaligrafi text-[1.95rem] sm:text-[2.15rem] tracking-[0.01em] text-[#472A1C] leading-tight">Amplop Digital</h2>
             </div>
             <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs sm:text-sm text-[#472A1C]/85 leading-relaxed max-w-xs mx-auto">
                 Tanpa mengurangi rasa hormat, bagi Bapak/Ibu/Saudara/i yang ingin memberikan tanda kasih untuk kami,

@@ -154,7 +154,7 @@
             :class="({{ $pakaiVideoHeroJawa ? 'teksHeroTampil' : 'undanganTerbuka' }}) ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-3 pointer-events-none'"
         >
             <div class="space-y-1.5 drop-shadow-[0_3px_14px_rgba(32,18,10,0.65)]">
-                <p class="font-kaligrafi text-2xl sm:text-[1.85rem] text-[#FFF8EC] leading-tight">
+                <p class="font-serif italic font-medium text-lg sm:text-xl tracking-[0.06em] text-[#FFF8EC] leading-tight">
                     The Wedding of
                 </p>
 
@@ -162,7 +162,7 @@
                     <span class="block">{{ $undangan->nama_panggilan_pria }}</span>
                     <span class="my-0.5 flex items-center justify-center gap-2.5">
                         <span aria-hidden="true" class="h-px w-7 bg-[#D7BB83]/70"></span>
-                        <span class="font-kaligrafi normal-case text-3xl text-[#E6C987] leading-none">&amp;</span>
+                        <span class="font-kaligrafi normal-case text-2xl text-[#E6C987] leading-none">&amp;</span>
                         <span aria-hidden="true" class="h-px w-7 bg-[#D7BB83]/70"></span>
                     </span>
                     <span class="block">{{ $undangan->nama_panggilan_wanita }}</span>

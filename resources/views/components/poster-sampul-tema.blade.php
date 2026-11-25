@@ -536,7 +536,7 @@
                                 class="mx-auto drop-shadow"
                                 style="width: {{ $adalahAdatJawa ? '3.15cqw' : ($adalahIslamiSyari ? '3.2cqw' : ($adalahIslamicHeavenly ? '3cqw' : '3.65cqw')) }};"
                             >
-                            <p class="font-script leading-none text-white" style="margin-top: 0.5cqw; font-size: 3.05cqw;">
+                            <p class="{{ $adalahAdatJawa ? 'font-serif-poster font-bold tracking-[0.03em]' : 'font-script' }} leading-none text-white" style="margin-top: 0.5cqw; font-size: {{ $adalahAdatJawa ? '2.25cqw' : '3.05cqw' }};">
                                 Save The Date
                             </p>
 
@@ -568,7 +568,7 @@
                                 class="text-center shadow-md"
                                 style="border-radius: 1.35cqw; border: 0.2cqw solid #D7BB83; background-color: #FFFAF5; color: #2B180F; padding: 2.15cqw 1cqw;"
                             >
-                                <p class="font-script leading-tight truncate" style="font-size: 2.7cqw; color: #472A1C;">
+                                <p class="font-serif-poster font-bold leading-tight truncate" style="font-size: 2.05cqw; color: #472A1C;">
                                     Ijab Qabul
                                 </p>
                                 <p class="font-serif-poster font-bold uppercase tracking-wider leading-tight" style="margin-top: 0.45cqw; font-size: 1.2cqw;">
@@ -773,7 +773,7 @@
                                     class="mx-auto"
                                     style="width: 3.1cqw;"
                                 >
-                                <p class="font-script leading-[1.06]" style="margin-top: 0.65cqw; font-size: 2.6cqw; color: #472A1C;">
+                                <p class="font-serif-poster font-bold leading-[1.08]" style="margin-top: 0.65cqw; font-size: 2.05cqw; color: #472A1C;">
                                     We Are Getting<br>Married!
                                 </p>
                                 <p class="opacity-70 leading-tight mx-auto" style="margin-top: 0.6cqw; font-size: 0.88cqw; max-width: 19cqw; color: #472A1C;">
@@ -796,7 +796,7 @@
                             </div>
 
                             <div class="relative z-10 w-full">
-                                <p class="font-script leading-none" style="font-size: 2.85cqw; color: #472A1C;">
+                                <p class="font-serif-poster font-bold leading-none" style="font-size: 2.35cqw; color: #472A1C;">
                                     {{ $wanitaPanggilan }}
                                 </p>
                                 <p class="font-serif-poster font-bold truncate leading-tight" style="margin-top: 0.35cqw; font-size: 1.15cqw;">

@@ -245,7 +245,8 @@ class TemaMotion3DTest extends TestCase
         $respon = $this->get('/demo/adat-jawa?kanvas=1&to=Raden+Bagus');
         $respon->assertOk()
             ->assertSee('Raden Bagus', false)
-            ->assertSee('Pinyon+Script', false)
+            ->assertSee('Berkshire+Swash', false)
+            ->assertDontSee('Pinyon+Script', false)
             ->assertSee('Cormorant+Infant', false)
             ->assertSee('jawa-sapu-kiri', false)
             ->assertSee('jawa-bingkai-masuk', false)

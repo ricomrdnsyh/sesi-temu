@@ -72,7 +72,7 @@
             </div>
 
             <div class="space-y-2.5">
-                <h2 data-gsap="naik" class="font-kaligrafi text-[2.55rem] leading-tight text-[#472A1C]">
+                <h2 data-gsap="naik" class="font-kaligrafi text-[1.95rem] sm:text-[2.15rem] leading-[1.18] tracking-[0.01em] text-[#472A1C]">
                     We Are Getting Married!
                 </h2>
                 <p data-gsap="teks" data-gsap-delay="0.08" class="text-xs text-[#472A1C]/80 leading-relaxed px-2">
@@ -120,7 +120,7 @@
                 </div>
 
                 <div class="pt-3 space-y-1">
-                    <p data-gsap="naik" class="font-kaligrafi text-4xl text-[#472A1C] leading-none">{{ $undangan->nama_panggilan_wanita }}</p>
+                    <p data-gsap="naik" class="font-kaligrafi text-[2.15rem] sm:text-[2.35rem] text-[#472A1C] leading-tight">{{ $undangan->nama_panggilan_wanita }}</p>
                     <h3 data-gsap="teks" data-gsap-delay="0.06" class="font-serif text-xl font-bold text-[#2B180F]">{{ $undangan->nama_lengkap_wanita }}</h3>
                     @if ($undangan->nama_ayah_wanita || $undangan->nama_ibu_wanita)
                         <p data-gsap="teks" data-gsap-delay="0.10" class="text-xs text-[#472A1C]/80 leading-relaxed pt-0.5">
@@ -149,7 +149,7 @@
             </div>
 
             {{-- Penghubung & --}}
-            <div data-gsap="mekar" class="font-kaligrafi text-5xl text-[#8C6823] py-2">&amp;</div>
+            <div data-gsap="mekar" class="font-kaligrafi text-4xl text-[#8C6823] py-1.5">&amp;</div>
 
             {{-- Mempelai Pria --}}
             <div class="space-y-3 pb-2">
@@ -191,7 +191,7 @@
                 </div>
 
                 <div class="pt-3 space-y-1">
-                    <p data-gsap="naik" class="font-kaligrafi text-4xl text-[#472A1C] leading-none">{{ $undangan->nama_panggilan_pria }}</p>
+                    <p data-gsap="naik" class="font-kaligrafi text-[2.15rem] sm:text-[2.35rem] text-[#472A1C] leading-tight">{{ $undangan->nama_panggilan_pria }}</p>
                     <h3 data-gsap="teks" data-gsap-delay="0.06" class="font-serif text-xl font-bold text-[#2B180F]">{{ $undangan->nama_lengkap_pria }}</h3>
                     @if ($undangan->nama_ayah_pria || $undangan->nama_ibu_pria)
                         <p data-gsap="teks" data-gsap-delay="0.10" class="text-xs text-[#472A1C]/80 leading-relaxed pt-0.5">
@@ -282,7 +282,7 @@
         <img src="{{ $asetJawa['gununganKecil'] }}" alt="" data-gsap="turun" class="w-14 mx-auto drop-shadow-lg">
 
         <div data-gsap="naik" class="space-y-1">
-            <h2 class="font-kaligrafi text-5xl text-white leading-tight">Save The Date</h2>
+            <h2 class="font-kaligrafi text-[2.25rem] sm:text-[2.5rem] tracking-[0.02em] text-[#FFFBF4] leading-tight">Save The Date</h2>
         </div>
 
         <div class="grid grid-cols-4 gap-2.5 pt-1 panggung-3d">
@@ -342,7 +342,7 @@
 
             {{-- Kartu Dalam Gading Berborder Emas — Setiap Elemen Bergerak Rinci Per Komponen --}}
             <div class="relative z-10 rounded-[18px] border-2 border-[#D7BB83] bg-[#FFFAF5]/90 px-5 py-9 text-center text-[#2B180F] space-y-3">
-                <h3 data-gsap="mekar" class="font-kaligrafi text-[2.5rem] leading-tight text-[#472A1C]">
+                <h3 data-gsap="mekar" class="font-kaligrafi text-[1.75rem] sm:text-[1.95rem] leading-[1.22] tracking-[0.01em] text-[#472A1C]">
                     {{ $acara->nama_acara }}
                 </h3>
 
@@ -396,7 +396,7 @@
 <section class="relative py-12 px-5 space-y-6">
     @if ($adaDressCode)
         <div data-section-dress-code="keraton" class="rounded-[22px] border-[3px] border-[#D7BB83] bg-[#FFFAF5]/92 px-6 py-9 text-center text-[#2B180F] shadow-xl space-y-4 kartu-3d">
-            <h2 data-gsap="naik" class="font-kaligrafi text-4xl text-[#472A1C] leading-tight">Dress Code</h2>
+            <h2 data-gsap="naik" class="font-kaligrafi text-[1.9rem] sm:text-[2.1rem] tracking-[0.01em] text-[#472A1C] leading-tight">Dress Code</h2>
             @if ($dressCodeCatatan !== '')
                 <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs sm:text-sm text-[#472A1C]/85 leading-relaxed max-w-xs mx-auto">
                     {{ $dressCodeCatatan }}
@@ -420,7 +420,7 @@
 
     @if (! empty($live['aktif']) && ! empty($live['link']))
         <div class="rounded-[22px] border-[3px] border-[#D7BB83] bg-[#FFFAF5]/92 px-6 py-9 text-center text-[#2B180F] shadow-xl space-y-3 kartu-3d">
-            <h2 data-gsap="naik" class="font-kaligrafi text-4xl text-[#472A1C] leading-tight">Live Streaming</h2>
+            <h2 data-gsap="naik" class="font-kaligrafi text-[1.9rem] sm:text-[2.1rem] tracking-[0.01em] text-[#472A1C] leading-tight">Live Streaming</h2>
             <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs sm:text-sm text-[#472A1C]/85 leading-relaxed max-w-xs mx-auto">
                 Bagi kerabat yang berhalangan hadir secara langsung, silakan menyaksikan momen bahagia kami via {{ $live['platform'] ?? 'Online' }}.
             </p>
@@ -509,7 +509,7 @@
 >
     <div data-scroll-scrub class="text-center mb-6 overflow-hidden space-y-2">
         <div data-gsap="kiri">
-            <h2 class="scroll-scrub-kiri font-kaligrafi text-5xl text-white leading-tight">Our Gallery</h2>
+            <h2 class="scroll-scrub-kiri font-kaligrafi text-[2.2rem] sm:text-[2.45rem] tracking-[0.02em] text-[#FFFBF4] leading-tight">Our Gallery</h2>
         </div>
         <div data-gsap="kanan" data-gsap-delay="0.06">
             <div class="scroll-scrub-kanan flex items-center justify-center gap-3 text-[10px] font-semibold uppercase tracking-[0.34em] text-[#D7BB83]">

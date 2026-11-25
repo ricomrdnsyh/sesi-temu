@@ -101,7 +101,7 @@
             {{-- 2. KOMPOSISI EDITORIAL BAWAH: MELAYANG RAPI TANPA KOTAK BERLAPIS --}}
             <div class="relative z-20 shrink-0 px-7 pb-7 sm:pb-8 text-center text-[#FFFBF4]">
                 <div class="jawa-masuk-2 space-y-1">
-                    <p class="font-kaligrafi text-[1.65rem] sm:text-[1.85rem] leading-none text-[#EED597] drop-shadow-[0_2px_10px_rgba(0,0,0,0.75)]">
+                    <p class="font-serif italic font-medium text-[1.2rem] sm:text-[1.35rem] tracking-[0.06em] leading-none text-[#EED597] drop-shadow-[0_2px_10px_rgba(0,0,0,0.75)]">
                         The Wedding of
                     </p>
                     <h1 class="font-serif text-[2.45rem] sm:text-[2.75rem] font-semibold tracking-[0.03em] leading-[1.06] text-[#FFFBF4] drop-shadow-[0_4px_18px_rgba(0,0,0,0.8)]">
@@ -159,12 +159,12 @@
                             aria-hidden="true"
                             class="w-9 sm:w-10 mx-auto opacity-95 drop-shadow-[0_4px_12px_rgba(18,9,4,0.75)] animasi-ayun-3d"
                         >
-                        <p class="pt-1 font-kaligrafi text-[1.75rem] sm:text-[1.95rem] leading-none text-[#F4E0AA] drop-shadow-[0_2px_10px_rgba(18,9,4,0.7)]">
+                        <p class="pt-1 font-serif italic font-medium text-[1.25rem] sm:text-[1.4rem] tracking-[0.06em] leading-none text-[#F4E0AA] drop-shadow-[0_2px_10px_rgba(18,9,4,0.7)]">
                             The Wedding of
                         </p>
                         <h1 class="font-serif text-[2.35rem] sm:text-[2.65rem] font-semibold tracking-[0.04em] leading-[1.06] text-[#FFFBF4] drop-shadow-[0_4px_16px_rgba(18,9,4,0.78)] pt-0.5">
                             <span class="block">{{ $undangan->nama_panggilan_pria }}</span>
-                            <span class="block font-kaligrafi font-normal text-3xl text-[#EED597] my-0.5">&amp;</span>
+                            <span class="block font-kaligrafi font-normal text-2xl text-[#EED597] my-0.5">&amp;</span>
                             <span class="block">{{ $undangan->nama_panggilan_wanita }}</span>
                         </h1>
                         <div aria-hidden="true" class="mx-auto my-2 h-px w-12 bg-gradient-to-r from-transparent via-[#F3E5AB]/70 to-transparent"></div>

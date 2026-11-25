@@ -32,11 +32,11 @@ class Undangan extends Model
             'google_families' => ['Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400', 'Great+Vibes', 'Poppins:wght@300;400;500;600;700'],
         ],
         'java_heritage' => [
-            'label' => 'Cormorant Infant & Pinyon Script (Java Heritage Keraton)',
+            'label' => 'Cormorant Infant & Berkshire Swash (Java Heritage Keraton)',
             'judul_css' => "'Cormorant Infant', 'Playfair Display', Georgia, serif",
             'isi_css' => "'Poppins', ui-sans-serif, system-ui, sans-serif",
-            'aksen_css' => "'Pinyon Script', 'Great Vibes', cursive",
-            'google_families' => ['Cormorant+Infant:ital,wght@0,500;0,600;0,700;1,400', 'Playfair+Display:ital,wght@0,500;0,600;0,700;1,400', 'Pinyon+Script', 'Great+Vibes', 'Poppins:wght@300;400;500;600;700'],
+            'aksen_css' => "'Berkshire Swash', 'Playfair Display', Georgia, serif",
+            'google_families' => ['Cormorant+Infant:ital,wght@0,500;0,600;0,700;1,400;1,600', 'Berkshire+Swash', 'Playfair+Display:ital,wght@0,500;0,600;0,700;1,400', 'Poppins:wght@300;400;500;600;700'],
         ],
         'berkshire_adat' => [
             'label' => 'Berkshire Swash & Marcellus (Etnik Klasik TemuWaktu)',

@@ -31,9 +31,9 @@
             The Wedding Of
         </p>
 
-        <h2 class="mt-3 font-kaligrafi text-4xl xl:text-5xl 2xl:text-[3.4rem] font-normal leading-[1.12] text-white drop-shadow-[0_4px_14px_rgba(20,10,5,0.65)]">
+        <h2 class="mt-3 font-kaligrafi text-3xl xl:text-4xl 2xl:text-[2.75rem] font-normal leading-[1.18] text-white drop-shadow-[0_4px_14px_rgba(20,10,5,0.65)]">
             <span class="block">{{ $undangan->nama_panggilan_pria }}</span>
-            <span class="block text-2xl xl:text-3xl text-[#D7BB83] my-0.5">&amp;</span>
+            <span class="block text-xl xl:text-2xl text-[#D7BB83] my-0.5">&amp;</span>
             <span class="block">{{ $undangan->nama_panggilan_wanita }}</span>
         </h2>
 
