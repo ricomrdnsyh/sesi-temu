@@ -429,7 +429,7 @@
 @endif
 
 {{-- SEKSI 6: RANGKAIAN ACARA — PIAGAM ELEGAN PRIANGAN (BERSIH, BERSAHAJA & MEWAH) --}}
-@if ($undangan->daftarAcara->isNotEmpty())
+@if ($undangan->fiturAktif('acara') && $undangan->daftarAcara->isNotEmpty())
 <section
     data-layout-acara="priangan"
     class="relative px-4 py-14 overflow-hidden"

@@ -1,6 +1,7 @@
 {{-- SEKSI 9: AMPLOP DIGITAL CELESTIAL (BRANKAS KACA SAFIR MODERN & LACI KARTU BANK GLOSSY) --}}
 @if ($undangan->fiturAktif('amplop_digital') && ($undangan->daftarAmplop->isNotEmpty() || $alamatKado !== ''))
-    <section x-data="{ amplopTerbuka: false }" class="relative bg-[#08101E] celestial-pola-bintang px-5 py-12 overflow-hidden">
+    <section data-layout-amplop x-data="{ amplopTerbuka: false }"
+        class="relative bg-[#08101E] celestial-pola-bintang px-5 py-12 overflow-hidden">
         <div
             class="relative max-w-md mx-auto rounded-2xl bg-gradient-to-br from-[#12233B] via-[#0D1B2E] to-[#081220] border border-[#D9B664]/42 px-5 sm:px-6 py-7 shadow-[0_24px_52px_-18px_rgba(0,0,0,0.85)] overflow-hidden kartu-3d">
             <span aria-hidden="true"
@@ -166,7 +167,6 @@
 @endif
 
 {{-- SEKSI 10: RSVP & WISHES (PANEL BUKU TAMU MALAM BERSIH) --}}
-@if ($undangan->fiturAktif('buku_tamu'))
     <section id="buku-tamu"
         class="relative bg-gradient-to-b from-[#08101E] via-[#0A1628] to-[#08101E] py-14 px-5 overflow-hidden">
         <div class="max-w-md mx-auto">
@@ -373,7 +373,6 @@
             </div>
         </div>
     </section>
-@endif
 
 {{-- SEKSI 11: DOA UNTUK PENGANTIN (PITA EDITORIAL TERBUKA) & TURUT MENGUNDANG --}}
 @if ($undangan->fiturAktif('doa_pengantin') || $adaTurutMengundang)
@@ -414,13 +413,16 @@
             </div>
         @endif
 
-    {{-- Turut Mengundang (Panel Kolom Minimalis Berpemisah Garis Halus) --}}
-    @if ($adaTurutMengundang)
-        <div data-section-turut-mengundang="celestial" class="max-w-md mx-auto rounded-2xl bg-[#0D1B2E]/85 border border-[#D9B664]/35 p-6 text-center shadow-xl space-y-4">
-            <div class="space-y-1">
-                <p data-gsap="turun" class="text-[9.5px] font-bold uppercase tracking-[0.34em] text-[#D9B664]">Keluarga Besar</p>
-                <h2 data-gsap="naik" class="font-serif text-xl sm:text-2xl font-semibold text-white">{{ $undangan->teksKustom('judul_turut_mengundang', 'Turut Mengundang') }}</h2>
-            </div>
+        {{-- Turut Mengundang (Panel Kolom Minimalis Berpemisah Garis Halus) --}}
+        @if ($adaTurutMengundang)
+            <div data-section-turut-mengundang="celestial"
+                class="max-w-md mx-auto rounded-2xl bg-[#0D1B2E]/85 border border-[#D9B664]/35 p-6 text-center shadow-xl space-y-4">
+                <div class="space-y-1">
+                    <p data-gsap="turun" class="text-[9.5px] font-bold uppercase tracking-[0.34em] text-[#D9B664]">
+                        Keluarga Besar</p>
+                    <h2 data-gsap="naik" class="font-serif text-xl sm:text-2xl font-semibold text-white">
+                        {{ $undangan->teksKustom('judul_turut_mengundang', 'Turut Mengundang') }}</h2>
+                </div>
 
                 <div
                     class="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-[#D9B664]/25 text-xs">

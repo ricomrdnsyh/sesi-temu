@@ -157,13 +157,13 @@
     @include('dashboard._drawer-ganti-tema')
 @endif
 
-{{-- Lightbox Pratinjau Penuh Foto Galeri --}}
+{{-- Lightbox Pratinjau Penuh Foto Galeri / Bukti Pembayaran --}}
 <div
     x-show="galeriLightbox"
     x-cloak
-    @keydown.escape.window="galeriLightbox = null"
+    @keydown.escape.window="if (galeriLightbox) galeriLightbox = null"
     @click="galeriLightbox = null"
-    class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs p-4 flex items-center justify-center"
+    class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-xs p-4 flex items-center justify-center"
 >
     <div @click.stop class="relative max-w-2xl w-full rounded-3xl overflow-hidden bg-white shadow-2xl">
         <button

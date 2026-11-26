@@ -205,6 +205,7 @@
 </section>
 
 {{-- SEKSI 2: PRELUDE EDITORIAL OBSERVATORIUM MALAM — SALAM, POTRET BERSIH, MONOGRAM & KALAM DOA --}}
+@if ($undangan->fiturAktif('ayat_pembuka'))
 <section
     data-section-pembuka="celestial"
     class="relative bg-gradient-to-b from-[#091322] via-[#0B172A] to-[#0A1526] shadow-[0_-2px_0_0_#091322] celestial-pola-bintang px-5 pt-12 pb-14 overflow-hidden"
@@ -319,3 +320,4 @@
         @endif
     </div>
 </section>
+@endif

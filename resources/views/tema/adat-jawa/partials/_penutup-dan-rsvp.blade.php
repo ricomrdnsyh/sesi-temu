@@ -1,11 +1,14 @@
 {{-- SEKSI 10: AMPLOP DIGITAL KERATON (BUKA-TUTUP KARTU BANK GLOSSY) --}}
 @if ($undangan->fiturAktif('amplop_digital') && ($undangan->daftarAmplop->isNotEmpty() || $alamatKado !== ''))
-    <section x-data="{ amplopTerbuka: false }" class="relative py-12 px-5">
+    <section data-layout-amplop x-data="{ amplopTerbuka: false }" class="relative py-12 px-5">
         <div
             class="rounded-[22px] border-[3px] border-[#D7BB83] bg-[#FFFAF5]/93 px-6 py-9 text-center text-[#2B180F] shadow-2xl space-y-4 kartu-3d">
             <div class="space-y-1">
-                <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.32em] text-[#8C6823]">Tanda Kasih</p>
-                <h2 data-gsap="naik" class="font-kaligrafi text-[1.95rem] sm:text-[2.15rem] tracking-[0.01em] text-[#472A1C] leading-tight">{{ $undangan->teksKustom('judul_amplop', 'Amplop Digital') }}</h2>
+                <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.32em] text-[#8C6823]">Tanda Kasih
+                </p>
+                <h2 data-gsap="naik"
+                    class="font-kaligrafi text-[1.95rem] sm:text-[2.15rem] tracking-[0.01em] text-[#472A1C] leading-tight">
+                    {{ $undangan->teksKustom('judul_amplop', 'Amplop Digital') }}</h2>
             </div>
             <p data-gsap="teks" data-gsap-delay="0.06"
                 class="text-xs sm:text-sm text-[#472A1C]/85 leading-relaxed max-w-xs mx-auto">
@@ -106,7 +109,6 @@
 @endif
 
 {{-- SEKSI 11: RSVP & WISHES (BLOK SOGAN PADAT #472A1C) --}}
-@if ($undangan->fiturAktif('buku_tamu'))
     <section id="buku-tamu" class="relative bg-[#472A1C] shadow-[0_0_0_2px_#472A1C] text-[#FFFAF5] py-14 px-5">
         <div class="max-w-md mx-auto">
             <div class="text-center space-y-2">
@@ -331,7 +333,6 @@
             </div>
         </div>
     </section>
-@endif
 
 {{-- SEKSI 12: DOA UNTUK PENGANTIN & TURUT MENGUNDANG (DI ATAS DIORAMA TERPIN) --}}
 @php $doaPengantin = $undangan->doaPengantin(); @endphp
@@ -364,13 +365,14 @@
             </div>
         @endif
 
-    {{-- Kartu Turut Mengundang (Opsional) --}}
-    @if ($adaTurutMengundang)
-        <div data-section-turut-mengundang="keraton"
-            class="rounded-[22px] border-[4px] border-[#D7BB83] bg-[#FFFAF5]/93 px-6 py-10 text-center text-[#2B180F] shadow-xl space-y-6 kartu-3d">
-            <h2 data-gsap="naik" class="font-serif text-2xl sm:text-3xl font-bold uppercase tracking-[0.14em] text-[#2B180F]">
-                {{ $undangan->teksKustom('judul_turut_mengundang', 'Turut Mengundang') }}
-            </h2>
+        {{-- Kartu Turut Mengundang (Opsional) --}}
+        @if ($adaTurutMengundang)
+            <div data-section-turut-mengundang="keraton"
+                class="rounded-[22px] border-[4px] border-[#D7BB83] bg-[#FFFAF5]/93 px-6 py-10 text-center text-[#2B180F] shadow-xl space-y-6 kartu-3d">
+                <h2 data-gsap="naik"
+                    class="font-serif text-2xl sm:text-3xl font-bold uppercase tracking-[0.14em] text-[#2B180F]">
+                    {{ $undangan->teksKustom('judul_turut_mengundang', 'Turut Mengundang') }}
+                </h2>
 
                 @if (!empty($turutWanita))
                     <div class="space-y-1.5">

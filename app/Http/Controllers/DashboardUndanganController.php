@@ -14,12 +14,14 @@ use App\Models\Transaksi;
 use App\Models\Undangan;
 use App\Services\LayananTransaksiService;
 use App\Services\PengolahGambarService;
+use App\Support\GayaKartuBank;
 use App\Support\MediaPublik;
 use App\Support\PengaturanSesiTemu;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
@@ -70,17 +72,30 @@ class DashboardUndanganController extends Controller
 
     public function tamu(Request $request): RedirectResponse
     {
+        return $this->arahkanKeRuangTamuAtauRsvp($request, 'tamu');
+    }
+
+    public function rsvp(Request $request): RedirectResponse
+    {
+        return $this->arahkanKeRuangTamuAtauRsvp($request, 'rsvp');
+    }
+
+    private function arahkanKeRuangTamuAtauRsvp(Request $request, string $tujuanDefault): RedirectResponse
+    {
         $pengguna = $request->user();
-        $subtab = in_array($request->query('subtab'), ['tamu', 'rsvp'], true)
-            ? ['subtab' => (string) $request->query('subtab')]
-            : [];
+        $tujuan = $request->query('subtab') === 'rsvp' ? 'rsvp' : $tujuanDefault;
+        $namaRute = $tujuan === 'rsvp' ? 'dashboard.undangan.rsvp' : 'dashboard.undangan.tamu';
 
         $undanganDipilihId = (int) $request->query('undangan', 0);
         if ($undanganDipilihId > 0) {
             $undangan = Undangan::findOrFail($undanganDipilihId);
             Gate::authorize('kelola', $undangan);
 
-            return redirect()->route('dashboard.undangan.tamu', array_merge(['undangan' => $undangan], $subtab));
+            if ($terkunci = $this->responsJikaTamuRsvpTerkunci($request, $undangan)) {
+                return $terkunci;
+            }
+
+            return redirect()->route($namaRute, $undangan);
         }
 
         $daftarUndangan = $pengguna->undangan()->latest()->get();
@@ -93,12 +108,40 @@ class DashboardUndanganController extends Controller
                 ->with('peringatan', 'Buat draft undangan terlebih dahulu untuk mulai mengelola Tamu & RSVP.');
         }
 
-        return redirect()->route('dashboard.undangan.tamu', array_merge(['undangan' => $target], $subtab));
+        if ($terkunci = $this->responsJikaTamuRsvpTerkunci($request, $target)) {
+            return $terkunci;
+        }
+
+        return redirect()->route($namaRute, $target);
     }
 
-    public function tamuUndangan(Request $request, Undangan $undangan): View
+    public function tamuUndangan(Request $request, Undangan $undangan): View|RedirectResponse
     {
         Gate::authorize('kelola', $undangan);
+
+        if ($terkunci = $this->responsJikaTamuRsvpTerkunci($request, $undangan)) {
+            return $terkunci;
+        }
+
+        $subtab = (string) ($request->session()->get('subtab_tamu') ?: $request->query('subtab', 'tamu'));
+        if ($subtab === 'rsvp') {
+            return redirect()->route('dashboard.undangan.rsvp', $undangan);
+        }
+
+        $undangan->load(['tema', 'daftarTamu', 'bukuTamu', 'transaksi']);
+
+        return view('dashboard.tamu', [
+            'undangan' => $undangan,
+        ]);
+    }
+
+    public function rsvpUndangan(Request $request, Undangan $undangan): View|RedirectResponse
+    {
+        Gate::authorize('kelola', $undangan);
+
+        if ($terkunci = $this->responsJikaTamuRsvpTerkunci($request, $undangan)) {
+            return $terkunci;
+        }
 
         $undangan->load(['tema', 'daftarTamu', 'bukuTamu', 'transaksi']);
 
@@ -109,16 +152,34 @@ class DashboardUndanganController extends Controller
             'total_orang_hadir' => (int) $undangan->bukuTamu->where('status_kehadiran', 'hadir')->sum('jumlah_tamu'),
         ];
 
-        $subtab = (string) ($request->session()->get('subtab_tamu') ?: $request->query('subtab', 'tamu'));
-        if (! in_array($subtab, ['tamu', 'rsvp'], true)) {
-            $subtab = 'tamu';
-        }
-
-        return view('dashboard.tamu', [
+        return view('dashboard.rsvp', [
             'undangan' => $undangan,
             'rekapRsvp' => $rekapRsvp,
-            'subtabAktif' => $subtab,
         ]);
+    }
+
+    private function responsJikaTamuRsvpTerkunci(Request $request, Undangan $undangan): RedirectResponse|JsonResponse|null
+    {
+        if ($undangan->sudahAktifPublik()) {
+            return null;
+        }
+
+        $pesan = $undangan->sudahKedaluwarsa()
+            ? 'Masa aktif undangan telah berakhir. Perpanjang aktivasi terlebih dahulu untuk membuka menu Tamu & RSVP.'
+            : ($undangan->transaksi()->where('status', 'menunggu_verifikasi')->exists()
+                ? 'Bukti pembayaran sedang diverifikasi Admin. Menu Tamu & RSVP otomatis terbuka setelah aktivasi selesai.'
+                : 'Menu Tamu & RSVP dikunci sebelum pembayaran & aktivasi undangan selesai.');
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => false,
+                'pesan' => $pesan,
+            ], 403);
+        }
+
+        return redirect()
+            ->route('dashboard.undangan.kelola', [$undangan, 'tab' => 'aktivasi'])
+            ->with('peringatan', $pesan);
     }
 
     public function katalog(Request $request): View
@@ -244,10 +305,13 @@ class DashboardUndanganController extends Controller
         }
 
         if (is_array($request->input('fitur_aktif'))) {
-            foreach (['hitung_mundur', 'cerita_cinta', 'galeri', 'amplop_digital', 'buku_tamu', 'doa_pengantin'] as $kunciFitur) {
+            foreach (Undangan::KUNCI_FITUR_AKTIF as $kunciFitur) {
                 if (array_key_exists($kunciFitur, $request->input('fitur_aktif', []))) {
                     $pengaturan['fitur_aktif'][$kunciFitur] = (bool) $request->input("fitur_aktif.{$kunciFitur}");
                 }
+            }
+            if (array_key_exists('live_streaming', $request->input('fitur_aktif', []))) {
+                $pengaturan['live_streaming']['aktif'] = (bool) $request->input('fitur_aktif.live_streaming');
             }
         }
 
@@ -323,11 +387,15 @@ class DashboardUndanganController extends Controller
         }
 
         if ($request->has('live_aktif') || $request->has('live_platform') || $request->has('live_link')) {
+            $liveAktifPratinjau = $request->has('live_aktif')
+                ? $request->boolean('live_aktif')
+                : (bool) data_get($pengaturan, 'fitur_aktif.live_streaming', data_get($pengaturan, 'live_streaming.aktif', false));
             $pengaturan['live_streaming'] = [
-                'aktif' => $request->boolean('live_aktif'),
+                'aktif' => $liveAktifPratinjau,
                 'platform' => Str::limit(trim((string) $request->input('live_platform', 'Instagram / YouTube')), 100, ''),
                 'link' => Str::limit(trim((string) $request->input('live_link', '')), 500, ''),
             ];
+            $pengaturan['fitur_aktif']['live_streaming'] = $liveAktifPratinjau;
         }
 
         if ($request->has('alamat_kado_fisik')) {
@@ -470,7 +538,7 @@ class DashboardUndanganController extends Controller
         }
 
         $fokusBagian = (string) $request->input('fokus_bagian', '');
-        if (! in_array($fokusBagian, ['tema', 'mempelai', 'acara', 'cerita', 'galeri', 'amplop', 'penutup'], true)) {
+        if (! in_array($fokusBagian, ['tema', 'ayat', 'mempelai', 'hitung_mundur', 'acara', 'dress_code', 'live_streaming', 'cerita', 'galeri', 'amplop', 'buku_tamu', 'doa_pengantin', 'turut_mengundang', 'penutup'], true)) {
             $fokusBagian = '';
         }
 
@@ -494,7 +562,7 @@ class DashboardUndanganController extends Controller
         Gate::authorize('kelola', $undangan);
 
         $tabKembali = (string) $request->input('tab_kembali', 'tema');
-        if (! in_array($tabKembali, ['', 'tema', 'mempelai', 'acara', 'cerita', 'galeri', 'amplop', 'penutup', 'aktivasi'], true)) {
+        if (! in_array($tabKembali, ['', 'tema', 'ayat', 'mempelai', 'hitung_mundur', 'acara', 'dress_code', 'live_streaming', 'cerita', 'galeri', 'amplop', 'buku_tamu', 'doa_pengantin', 'turut_mengundang', 'penutup', 'aktivasi'], true)) {
             $tabKembali = 'tema';
         }
 
@@ -725,6 +793,10 @@ class DashboardUndanganController extends Controller
             return redirect()->route('dashboard.undangan.tamu', $undangan);
         }
 
+        if ($tabAktif === 'rsvp') {
+            return redirect()->route('dashboard.undangan.rsvp', $undangan);
+        }
+
         if ($tabAktif === '' && $request->session()->has('errors')) {
             $bagianLama = (string) $request->old('bagian', '');
             $tabAktif = match (true) {
@@ -738,7 +810,7 @@ class DashboardUndanganController extends Controller
             };
         }
 
-        if ($tabAktif !== '' && ! in_array($tabAktif, ['tema', 'mempelai', 'acara', 'cerita', 'galeri', 'amplop', 'penutup', 'aktivasi'], true)) {
+        if ($tabAktif !== '' && ! in_array($tabAktif, ['tema', 'ayat', 'mempelai', 'hitung_mundur', 'acara', 'dress_code', 'live_streaming', 'cerita', 'galeri', 'amplop', 'buku_tamu', 'doa_pengantin', 'turut_mengundang', 'penutup', 'aktivasi'], true)) {
             $tabAktif = '';
         }
 
@@ -752,6 +824,8 @@ class DashboardUndanganController extends Controller
             'daftarTema' => $daftarTema,
             'daftarMusik' => $daftarMusik,
             'daftarGayaFont' => Undangan::GAYA_FONT_TERSEDIA,
+            'daftarAcaraEditor' => $this->formatDaftarAcara($undangan),
+            'daftarAmplopEditor' => $this->formatDaftarAmplop($undangan),
             'tabAktif' => $tabAktif,
             'infoRekening' => PengaturanSesiTemu::infoRekening(),
             'biayaTerimaBeres' => PengaturanSesiTemu::biayaTerimaBeres(),
@@ -771,15 +845,23 @@ class DashboardUndanganController extends Controller
 
         if ($bagian === 'fitur') {
             $tervalidasiFitur = $request->validate([
-                'kunci' => ['required', Rule::in(['hitung_mundur', 'cerita_cinta', 'galeri', 'amplop_digital', 'buku_tamu', 'doa_pengantin'])],
+                'kunci' => ['required', Rule::in(Undangan::KUNCI_FITUR_AKTIF)],
                 'aktif' => ['required', 'boolean'],
             ]);
 
             $kunciFitur = (string) $tervalidasiFitur['kunci'];
             $aktifFitur = (bool) $tervalidasiFitur['aktif'];
-            $pengaturan['fitur_aktif'][$kunciFitur] = $aktifFitur;
-            $undangan->pengaturan = $pengaturan;
-            $undangan->save();
+
+            DB::transaction(static function () use ($undangan, $kunciFitur, $aktifFitur): void {
+                $terbaru = Undangan::whereKey($undangan->id)->lockForUpdate()->firstOrFail();
+                $pengaturanTerkini = array_replace_recursive(Undangan::pengaturanBawaan(), $terbaru->pengaturan ?? []);
+                $pengaturanTerkini['fitur_aktif'][$kunciFitur] = $aktifFitur;
+                if ($kunciFitur === 'live_streaming') {
+                    $pengaturanTerkini['live_streaming']['aktif'] = $aktifFitur;
+                }
+                $terbaru->pengaturan = $pengaturanTerkini;
+                $terbaru->save();
+            });
 
             if ($request->expectsJson()) {
                 return response()->json([
@@ -990,10 +1072,13 @@ class DashboardUndanganController extends Controller
                     $pengaturan['tanpa_foto'] = $request->boolean('tanpa_foto');
                 }
                 // Pertahankan sakelar fitur bila form tidak mengirim input fitur_*
-                foreach (['hitung_mundur', 'cerita_cinta', 'galeri', 'amplop_digital', 'buku_tamu', 'doa_pengantin'] as $kunciFitur) {
+                foreach (Undangan::KUNCI_FITUR_AKTIF as $kunciFitur) {
                     if ($request->has("fitur_{$kunciFitur}")) {
                         $pengaturan['fitur_aktif'][$kunciFitur] = $request->boolean("fitur_{$kunciFitur}");
                     }
+                }
+                if ($request->has('fitur_live_streaming')) {
+                    $pengaturan['live_streaming']['aktif'] = $request->boolean('fitur_live_streaming');
                 }
             }
         }
@@ -1252,11 +1337,15 @@ class DashboardUndanganController extends Controller
             }
 
             if ($bagian === 'acara_tambahan' || $request->has('live_aktif') || $request->has('live_platform') || $request->has('live_link')) {
+                $liveAktifFinal = $request->has('live_aktif')
+                    ? $request->boolean('live_aktif')
+                    : (bool) data_get($pengaturan, 'fitur_aktif.live_streaming', data_get($pengaturan, 'live_streaming.aktif', false));
                 $pengaturan['live_streaming'] = [
-                    'aktif' => $request->boolean('live_aktif'),
+                    'aktif' => $liveAktifFinal,
                     'platform' => (string) $request->input('live_platform', 'Instagram / YouTube'),
                     'link' => (string) $request->input('live_link', ''),
                 ];
+                $pengaturan['fitur_aktif']['live_streaming'] = $liveAktifFinal;
             }
 
             if ($bagian === 'acara_tambahan' || $request->has('dress_code_catatan') || $request->has('dress_code_warna') || $request->has('dress_code_disertakan')) {
@@ -1408,14 +1497,9 @@ class DashboardUndanganController extends Controller
                 'url_publik_relatif' => Route::has('undangan.tampil')
                     ? route('undangan.tampil', $undangan->slug, false)
                     : '/'.$undangan->slug,
-                'fitur_aktif' => [
-                    'hitung_mundur' => $undangan->fiturAktif('hitung_mundur'),
-                    'cerita_cinta' => $undangan->fiturAktif('cerita_cinta'),
-                    'galeri' => $undangan->fiturAktif('galeri'),
-                    'amplop_digital' => $undangan->fiturAktif('amplop_digital'),
-                    'buku_tamu' => $undangan->fiturAktif('buku_tamu'),
-                    'doa_pengantin' => $undangan->fiturAktif('doa_pengantin'),
-                ],
+                'fitur_aktif' => collect(Undangan::KUNCI_FITUR_AKTIF)
+                    ->mapWithKeys(static fn (string $kunci): array => [$kunci => $undangan->fiturAktif($kunci)])
+                    ->all(),
                 'foto' => [
                     'foto_sampul' => $undangan->urlFotoSampulKhususDashboard(),
                     'foto_pembuka' => $undangan->urlFotoPembukaKhususDashboard(),
@@ -1455,7 +1539,7 @@ class DashboardUndanganController extends Controller
             ->with('sukses', 'Perubahan undangan berhasil disimpan.');
     }
 
-    public function simpanAcara(Request $request, Undangan $undangan): RedirectResponse
+    public function simpanAcara(Request $request, Undangan $undangan): RedirectResponse|JsonResponse
     {
         Gate::authorize('kelola', $undangan);
 
@@ -1499,13 +1583,23 @@ class DashboardUndanganController extends Controller
             $pesan = 'Jadwal acara baru berhasil ditambahkan.';
         }
 
+        if ($request->expectsJson()) {
+            $undangan->load('daftarAcara');
+
+            return response()->json([
+                'ok' => true,
+                'pesan' => $pesan,
+                'daftar_acara' => $this->formatDaftarAcara($undangan),
+            ]);
+        }
+
         return redirect()
             ->route('dashboard.undangan.kelola', $undangan)
             ->with('tab_aktif', 'acara')
             ->with('sukses', $pesan);
     }
 
-    public function hapusAcara(Undangan $undangan, AcaraUndangan $acara): RedirectResponse
+    public function hapusAcara(Request $request, Undangan $undangan, AcaraUndangan $acara): RedirectResponse|JsonResponse
     {
         Gate::authorize('kelola', $undangan);
 
@@ -1515,10 +1609,65 @@ class DashboardUndanganController extends Controller
 
         $acara->delete();
 
+        if ($request->expectsJson()) {
+            $undangan->load('daftarAcara');
+
+            return response()->json([
+                'ok' => true,
+                'pesan' => 'Jadwal acara berhasil dihapus.',
+                'daftar_acara' => $this->formatDaftarAcara($undangan),
+            ]);
+        }
+
         return redirect()
             ->route('dashboard.undangan.kelola', $undangan)
             ->with('tab_aktif', 'acara')
             ->with('sukses', 'Jadwal acara berhasil dihapus.');
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function formatDaftarAcara(Undangan $undangan): array
+    {
+        $hariIni = now()->startOfDay();
+
+        return $undangan->daftarAcara
+            ->values()
+            ->map(static function (AcaraUndangan $acara, int $idx) use ($undangan, $hariIni): array {
+                $selisihHari = (int) $hariIni->diffInDays($acara->tanggal_acara->copy()->startOfDay(), false);
+                $badgeHari = match (true) {
+                    $selisihHari > 0 => "H-{$selisihHari} Hari",
+                    $selisihHari === 0 => 'Hari Ini',
+                    default => 'Sudah Lewat',
+                };
+                $waktuMulai = substr((string) $acara->waktu_mulai, 0, 5);
+                $waktuSelesai = $acara->waktu_selesai ? substr((string) $acara->waktu_selesai, 0, 5) : '';
+
+                return [
+                    'id' => (int) $acara->id,
+                    'label_urutan' => 'Acara #'.($idx + 1),
+                    'nama_acara' => (string) $acara->nama_acara,
+                    'tanggal_acara' => $acara->tanggal_acara->format('Y-m-d'),
+                    'bulan_singkat' => Str::upper($acara->tanggal_acara->locale('id')->translatedFormat('M')),
+                    'hari_angka' => $acara->tanggal_acara->format('d'),
+                    'tahun' => $acara->tanggal_acara->format('Y'),
+                    'tanggal_label' => $acara->tanggal_acara->locale('id')->translatedFormat('l, d F Y'),
+                    'waktu_mulai' => $waktuMulai,
+                    'waktu_selesai' => $waktuSelesai,
+                    'waktu_label' => $waktuSelesai !== ''
+                        ? "{$waktuMulai} - {$waktuSelesai} {$acara->zona_waktu}"
+                        : "{$waktuMulai} {$acara->zona_waktu}",
+                    'zona_waktu' => (string) $acara->zona_waktu,
+                    'nama_tempat' => (string) $acara->nama_tempat,
+                    'alamat_lengkap' => (string) $acara->alamat_lengkap,
+                    'link_maps' => (string) ($acara->link_maps ?? ''),
+                    'selisih_hari' => $selisihHari,
+                    'badge_hari' => $badgeHari,
+                    'url_hapus' => route('dashboard.acara.hapus', [$undangan, $acara], false),
+                ];
+            })
+            ->all();
     }
 
     public function unggahGaleri(
@@ -1576,7 +1725,7 @@ class DashboardUndanganController extends Controller
             ->with('sukses', 'Foto galeri berhasil dihapus.');
     }
 
-    public function simpanAmplop(Request $request, Undangan $undangan): RedirectResponse
+    public function simpanAmplop(Request $request, Undangan $undangan): RedirectResponse|JsonResponse
     {
         Gate::authorize('kelola', $undangan);
 
@@ -1593,13 +1742,23 @@ class DashboardUndanganController extends Controller
             'atas_nama' => $tervalidasi['atas_nama'],
         ]);
 
+        if ($request->expectsJson()) {
+            $undangan->load('daftarAmplop');
+
+            return response()->json([
+                'ok' => true,
+                'pesan' => 'Rekening amplop digital berhasil ditambahkan.',
+                'daftar_amplop' => $this->formatDaftarAmplop($undangan),
+            ]);
+        }
+
         return redirect()
             ->route('dashboard.undangan.kelola', $undangan)
             ->with('tab_aktif', 'amplop')
             ->with('sukses', 'Rekening amplop digital berhasil ditambahkan.');
     }
 
-    public function hapusAmplop(Undangan $undangan, AmplopDigital $amplop): RedirectResponse
+    public function hapusAmplop(Request $request, Undangan $undangan, AmplopDigital $amplop): RedirectResponse|JsonResponse
     {
         Gate::authorize('kelola', $undangan);
 
@@ -1609,15 +1768,54 @@ class DashboardUndanganController extends Controller
 
         $amplop->delete();
 
+        if ($request->expectsJson()) {
+            $undangan->load('daftarAmplop');
+
+            return response()->json([
+                'ok' => true,
+                'pesan' => 'Rekening amplop digital berhasil dihapus.',
+                'daftar_amplop' => $this->formatDaftarAmplop($undangan),
+            ]);
+        }
+
         return redirect()
             ->route('dashboard.undangan.kelola', $undangan)
             ->with('tab_aktif', 'amplop')
             ->with('sukses', 'Rekening amplop digital berhasil dihapus.');
     }
 
-    public function simpanTamu(Request $request, Undangan $undangan): RedirectResponse
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function formatDaftarAmplop(Undangan $undangan): array
+    {
+        return $undangan->daftarAmplop
+            ->values()
+            ->map(static function (AmplopDigital $amplop) use ($undangan): array {
+                $gaya = GayaKartuBank::untukNamaBank($amplop->nama_bank);
+
+                return [
+                    'id' => (int) $amplop->id,
+                    'nama_bank' => (string) $amplop->nama_bank,
+                    'nomor_rekening' => (string) $amplop->nomor_rekening,
+                    'nomor_tampil' => GayaKartuBank::formatNomor($amplop->nomor_rekening),
+                    'atas_nama' => (string) $amplop->atas_nama,
+                    'subjudul' => (string) $gaya['subjudul'],
+                    'warna_utama' => (string) $gaya['warna_utama'],
+                    'logo_url' => (string) ($gaya['logo_url'] ?? ''),
+                    'url_hapus' => route('dashboard.amplop.hapus', [$undangan, $amplop], false),
+                ];
+            })
+            ->all();
+    }
+
+    public function simpanTamu(Request $request, Undangan $undangan): RedirectResponse|JsonResponse
     {
         Gate::authorize('kelola', $undangan);
+
+        if ($terkunci = $this->responsJikaTamuRsvpTerkunci($request, $undangan)) {
+            return $terkunci;
+        }
 
         $mode = (string) $request->input('mode', 'satuan');
 
@@ -1712,6 +1910,10 @@ class DashboardUndanganController extends Controller
     {
         Gate::authorize('kelola', $undangan);
 
+        if ($terkunci = $this->responsJikaTamuRsvpTerkunci($request, $undangan)) {
+            return $terkunci;
+        }
+
         if ($tamu->undangan_id !== $undangan->id) {
             abort(404);
         }
@@ -1764,6 +1966,10 @@ class DashboardUndanganController extends Controller
     {
         Gate::authorize('kelola', $undangan);
 
+        if ($terkunci = $this->responsJikaTamuRsvpTerkunci($request, $undangan)) {
+            return $terkunci;
+        }
+
         if ($tamu->undangan_id !== $undangan->id) {
             abort(404);
         }
@@ -1792,9 +1998,13 @@ class DashboardUndanganController extends Controller
             ->with('sukses', $terkirim ? "Tamu \"{$tamu->nama_tamu}\" ditandai sudah dikirim." : "Status kirim tamu \"{$tamu->nama_tamu}\" direset ke Belum Dikirim.");
     }
 
-    public function hapusTamu(Undangan $undangan, TamuUndangan $tamu): RedirectResponse
+    public function hapusTamu(Request $request, Undangan $undangan, TamuUndangan $tamu): RedirectResponse|JsonResponse
     {
         Gate::authorize('kelola', $undangan);
+
+        if ($terkunci = $this->responsJikaTamuRsvpTerkunci($request, $undangan)) {
+            return $terkunci;
+        }
 
         if ($tamu->undangan_id !== $undangan->id) {
             abort(404);
@@ -1808,9 +2018,13 @@ class DashboardUndanganController extends Controller
             ->with('sukses', "Tamu \"{$namaTamu}\" berhasil dihapus dari daftar sebar.");
     }
 
-    public function hapusUcapan(Undangan $undangan, BukuTamu $ucapan): RedirectResponse
+    public function hapusUcapan(Request $request, Undangan $undangan, BukuTamu $ucapan): RedirectResponse|JsonResponse
     {
         Gate::authorize('kelola', $undangan);
+
+        if ($terkunci = $this->responsJikaTamuRsvpTerkunci($request, $undangan)) {
+            return $terkunci;
+        }
 
         if ($ucapan->undangan_id !== $undangan->id) {
             abort(404);
@@ -1819,7 +2033,7 @@ class DashboardUndanganController extends Controller
         $ucapan->delete();
 
         return redirect()
-            ->route('dashboard.undangan.tamu', ['undangan' => $undangan, 'subtab' => 'rsvp'])
+            ->route('dashboard.undangan.rsvp', $undangan)
             ->with('sukses', 'Ucapan buku tamu berhasil dihapus.');
     }
 

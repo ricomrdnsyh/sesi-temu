@@ -134,6 +134,7 @@
 </div>
 
 {{-- SEKSI 2: PRELUDE KARTU SURAT GANDA + FOTO PEMBUKA ROYAL IVORY --}}
+@if ($undangan->fiturAktif('ayat_pembuka'))
 <section
     data-kartu-tumpuk
     data-section-pembuka="katedral"
@@ -169,3 +170,4 @@
         </div>
     </div>
 </section>
+@endif

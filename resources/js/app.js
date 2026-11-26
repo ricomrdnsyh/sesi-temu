@@ -1,13 +1,18 @@
 import Alpine from 'alpinejs';
 import DataTable from 'datatables.net-dt';
 import Swal from 'sweetalert2';
-import { amatiSelect2Baru, inisialisasiSemuaSelect2 } from './select2-init';
+import { amatiSelect2Baru, inisialisasiSemuaSelect2, tutupSemuaSelect2 } from './select2-init';
 import { buatPengendaliSinemaScroll } from './sinema-scroll';
 import { editorKelolaUndangan } from './editor-kelola';
 
 window.Alpine = Alpine;
+window.DataTable = DataTable;
 window.Swal = Swal;
 window.SesiTemuSinema = buatPengendaliSinemaScroll();
+window.SesiTemuSelect2 = {
+    init: inisialisasiSemuaSelect2,
+    close: tutupSemuaSelect2,
+};
 window.editorKelolaUndangan = editorKelolaUndangan;
 
 Alpine.data('editorKelolaUndangan', editorKelolaUndangan);
@@ -20,7 +25,7 @@ const escapeHtml = (teks) => String(teks)
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 
-document.addEventListener('DOMContentLoaded', () => {
+const inisialisasiHalaman = () => {
     const flashErrors = document.querySelector('[data-swal-errors]');
     let daftarGalat = [];
     if (flashErrors?.dataset.swalErrors) {
@@ -113,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        new DataTable(table, {
+        table._sesiTemuDt = new DataTable(table, {
             pageLength,
             lengthMenu: [5, 10, 25, 50],
             order: [],
@@ -140,7 +145,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     inisialisasiSemuaSelect2();
     amatiSelect2Baru();
-});
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inisialisasiHalaman);
+} else {
+    inisialisasiHalaman();
+}
 
 const tampilkanSwalProses = (form) => {
     Swal.fire({

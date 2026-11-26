@@ -1,6 +1,7 @@
 {{-- SEKSI 9: AMPLOP DIGITAL SYAR'I (PLAKAT ALABASTER MIHRAB & LACI KARTU BANK GLOSSY) --}}
 @if ($undangan->fiturAktif('amplop_digital') && ($undangan->daftarAmplop->isNotEmpty() || $alamatKado !== ''))
-    <section x-data="{ amplopTerbuka: false }" class="relative bg-[#F7FBF8] syari-pola-zellige px-4 py-12 overflow-hidden">
+    <section data-layout-amplop x-data="{ amplopTerbuka: false }"
+        class="relative bg-[#F7FBF8] syari-pola-zellige px-4 py-12 overflow-hidden">
         <div
             class="relative max-w-md mx-auto rounded-t-[8.5rem] rounded-b-[1.75rem] bg-[#FCFEFD] border-2 border-[#C5A059]/75 px-5 sm:px-6 pt-9 pb-7 text-center text-[#0E3A36] shadow-[0_18px_42px_-16px_rgba(14,58,54,0.2)] overflow-hidden kartu-3d">
             <span aria-hidden="true"
@@ -171,7 +172,6 @@
 @endif
 
 {{-- SEKSI 10: RSVP & WISHES (BLOK ZAMRUD ELEGAN) --}}
-@if ($undangan->fiturAktif('buku_tamu'))
     <section id="buku-tamu"
         class="relative bg-[#0E3A36] shadow-[0_0_0_2px_#0E3A36] text-[#F7FBF8] py-14 px-5 overflow-hidden">
         <div class="max-w-md mx-auto">
@@ -364,7 +364,6 @@
             </div>
         </div>
     </section>
-@endif
 
 {{-- SEKSI 11: DOA UNTUK PENGANTIN & TURUT MENGUNDANG --}}
 @if ($undangan->fiturAktif('doa_pengantin') || $adaTurutMengundang)
@@ -383,41 +382,18 @@
                 <span aria-hidden="true"
                     class="pointer-events-none absolute bottom-3 right-3 h-3.5 w-3.5 border-b border-r border-[#C5A059]/70"></span>
 
-            <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#9E7D40]">Doa Restu</p>
-            <h2 data-gsap="naik" class="font-serif text-2xl sm:text-3xl font-bold uppercase tracking-[0.1em] text-[#0E3A36]">
-                {{ $doaPengantin['judul'] }}
-            </h2>
-            @if ($doaPengantin['arab'] !== '')
-                <p data-gsap="mekar" data-gsap-delay="0.06" class="text-xl sm:text-2xl leading-loose text-[#0E3A36]" style="font-family: 'Amiri', serif;" dir="rtl">
-                    {{ $doaPengantin['arab'] }}
-                </p>
-            @endif
-            @if ($doaPengantin['latin'] !== '')
-                <p data-gsap="teks" data-gsap-delay="0.08" class="text-xs italic text-[#9E7D40]">
-                    &ldquo;{{ $doaPengantin['latin'] }}&rdquo;
-                </p>
-            @endif
-            <p data-gsap="teks" data-gsap-delay="0.10" class="text-xs sm:text-sm text-[#0E3A36]/82 leading-relaxed">
-                {{ $doaPengantin['isi'] }}
-            </p>
-        </div>
-    @endif
-
-    {{-- Kartu Turut Mengundang (Opsional) --}}
-    @if ($adaTurutMengundang)
-        <div data-section-turut-mengundang="mihrab" class="max-w-md mx-auto rounded-[1.75rem] bg-[#0E3A36] text-[#F7FBF8] border-2 border-[#C5A059]/65 p-6 text-center shadow-xl space-y-4 kartu-3d">
-            <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#E6D19C]">Keluarga Besar</p>
-            <h2 data-gsap="naik" class="font-serif text-2xl font-bold text-white">{{ $undangan->teksKustom('judul_turut_mengundang', 'Turut Mengundang') }}</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                @if (! empty($turutPria))
-                    <div data-gsap="kiri" class="rounded-2xl bg-[#08221F]/75 border border-[#C5A059]/40 p-3.5 space-y-1">
-                        <p class="font-bold uppercase tracking-wider text-[#E6D19C] text-[10px]">
-                            Pihak {{ $undangan->nama_panggilan_pria }}
-                        </p>
-                        @foreach ($turutPria as $baris)
-                            <p class="text-[#F7FBF8]/90">{{ $baris }}</p>
-                        @endforeach
-                    </div>
+                <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#9E7D40]">Doa
+                    Restu</p>
+                <h2 data-gsap="naik"
+                    class="font-serif text-2xl sm:text-3xl font-bold uppercase tracking-[0.1em] text-[#0E3A36]">
+                    {{ $doaPengantin['judul'] }}
+                </h2>
+                @if ($doaPengantin['arab'] !== '')
+                    <p data-gsap="mekar" data-gsap-delay="0.06"
+                        class="text-xl sm:text-2xl leading-loose text-[#0E3A36]" style="font-family: 'Amiri', serif;"
+                        dir="rtl">
+                        {{ $doaPengantin['arab'] }}
+                    </p>
                 @endif
                 @if ($doaPengantin['latin'] !== '')
                     <p data-gsap="teks" data-gsap-delay="0.08" class="text-xs italic text-[#9E7D40]">
@@ -429,6 +405,38 @@
                     {{ $doaPengantin['isi'] }}
                 </p>
             </div>
+        @endif
+
+        {{-- Kartu Turut Mengundang (Opsional) --}}
+        @if ($adaTurutMengundang)
+            <div data-section-turut-mengundang="mihrab"
+                class="max-w-md mx-auto rounded-[1.75rem] bg-[#0E3A36] text-[#F7FBF8] border-2 border-[#C5A059]/65 p-6 text-center shadow-xl space-y-4 kartu-3d">
+                <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#E6D19C]">Keluarga
+                    Besar</p>
+                <h2 data-gsap="naik" class="font-serif text-2xl font-bold text-white">
+                    {{ $undangan->teksKustom('judul_turut_mengundang', 'Turut Mengundang') }}</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    @if (!empty($turutPria))
+                        <div data-gsap="kiri"
+                            class="rounded-2xl bg-[#08221F]/75 border border-[#C5A059]/40 p-3.5 space-y-1">
+                            <p class="font-bold uppercase tracking-wider text-[#E6D19C] text-[10px]">
+                                Pihak {{ $undangan->nama_panggilan_pria }}
+                            </p>
+                            @foreach ($turutPria as $baris)
+                                <p class="text-[#F7FBF8]/90">{{ $baris }}</p>
+                            @endforeach
+                        </div>
+                    @endif
+                    @if ($doaPengantin['latin'] !== '')
+                        <p data-gsap="teks" data-gsap-delay="0.08" class="text-xs italic text-[#9E7D40]">
+                            &ldquo;{{ $doaPengantin['latin'] }}&rdquo;
+                        </p>
+                    @endif
+                    <p data-gsap="teks" data-gsap-delay="0.10"
+                        class="text-xs sm:text-sm text-[#0E3A36]/82 leading-relaxed">
+                        {{ $doaPengantin['isi'] }}
+                    </p>
+                </div>
         @endif
 
         {{-- Kartu Turut Mengundang (Opsional) --}}
@@ -515,7 +523,8 @@
             <div data-gsap="turun" class="flex items-center justify-center gap-2.5 pt-0.5">
                 <span aria-hidden="true" class="h-px w-8 bg-gradient-to-r from-transparent to-[#E6D19C]/70"></span>
                 <span aria-hidden="true" class="w-1.5 h-1.5 rotate-45 bg-[#E6D19C]"></span>
-                <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#E6D19C]">{{ $undangan->teksKustom('judul_penutup', 'Jazakumullahu Khairan') }}</p>
+                <p class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#E6D19C]">
+                    {{ $undangan->teksKustom('judul_penutup', 'Jazakumullahu Khairan') }}</p>
                 <span aria-hidden="true" class="w-1.5 h-1.5 rotate-45 bg-[#E6D19C]"></span>
                 <span aria-hidden="true" class="h-px w-8 bg-gradient-to-l from-transparent to-[#E6D19C]/70"></span>
             </div>

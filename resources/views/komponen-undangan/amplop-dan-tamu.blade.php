@@ -146,7 +146,6 @@
 @endif
 
 {{-- Buku Tamu & RSVP (Permukaan Kontras Solid Sesuai Ritme Tema) --}}
-@if ($undangan->fiturAktif('buku_tamu'))
 <section id="buku-tamu" data-aos="fade-up" data-aos-duration="950" class="relative py-14 px-5 {{ $latarRsvp }}">
     <div class="max-w-md mx-auto">
         <div class="text-center space-y-1.5">
@@ -306,7 +305,6 @@
         </div>
     </div>
 </section>
-@endif
 
 {{-- SEKSI PENUTUP & TERIMA KASIH (Kapsul Arsitektur Berhias Ornamen Miring Simetris di Atas Jendela Paralaks) --}}
 <section

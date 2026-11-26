@@ -1,6 +1,6 @@
 {{-- SEKSI 9: AMPLOP DIGITAL RUSTIC LINEN (INTERAKTIF BUKA-TUTUP) --}}
 @if ($undangan->fiturAktif('amplop_digital') && ($undangan->daftarAmplop->isNotEmpty() || $alamatKado !== ''))
-    <section class="relative px-4 pt-12 pb-6 overflow-hidden">
+    <section data-layout-amplop class="relative px-4 pt-12 pb-6 overflow-hidden">
         <div x-data="{ amplopTerbuka: false }"
             class="max-w-md mx-auto rounded-3xl bg-white/95 border border-[#BFA15F]/50 p-6 text-center shadow-[0_18px_42px_-16px_rgba(47,64,55,0.2)] kartu-3d space-y-5">
             <div class="space-y-1.5">
@@ -8,7 +8,8 @@
                     data-gsap="turun" class="w-32 mx-auto pb-0.5">
                 <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#B86B4B]">Tanda
                     Kasih</p>
-                <h2 data-gsap="naik" class="font-serif text-3xl font-bold text-[#1F2937]">{{ $undangan->teksKustom('judul_amplop', 'Amplop Digital') }}</h2>
+                <h2 data-gsap="naik" class="font-serif text-3xl font-bold text-[#1F2937]">
+                    {{ $undangan->teksKustom('judul_amplop', 'Amplop Digital') }}</h2>
                 <p data-gsap="teks" data-gsap-delay="0.06"
                     class="text-xs text-[#1F2937]/75 leading-relaxed max-w-xs mx-auto">
                     {{ $undangan->teksKustom('pengantar_amplop', 'Doa restu Bapak/Ibu/Saudara/i merupakan kado terindah bagi kami. Namun apabila ingin memberikan tanda kasih, dapat disalurkan melalui:') }}
@@ -63,14 +64,14 @@
 @endif
 
 {{-- SEKSI 10: BUKU TAMU & RSVP --}}
-@if ($undangan->fiturAktif('buku_tamu'))
     <section id="buku-tamu" class="relative px-4 py-6 overflow-hidden">
         <div
             class="max-w-md mx-auto rounded-3xl bg-white/95 border border-[#BFA15F]/50 p-6 shadow-[0_18px_42px_-16px_rgba(47,64,55,0.2)] space-y-5">
             <div class="text-center space-y-1">
                 <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#B86B4B]">Guestbook
                 </p>
-                <h2 data-gsap="mekar" class="font-serif text-3xl font-bold text-[#1F2937]">{{ $undangan->teksKustom('judul_buku_tamu', 'RSVP & Wishes') }}</h2>
+                <h2 data-gsap="mekar" class="font-serif text-3xl font-bold text-[#1F2937]">
+                    {{ $undangan->teksKustom('judul_buku_tamu', 'RSVP & Wishes') }}</h2>
                 <p data-gsap="teks" data-gsap-delay="0.06" class="text-xs text-[#1F2937]/70">
                     Konfirmasikan kehadiran serta sampaikan doa terbaik bagi kami.
                 </p>
@@ -230,7 +231,6 @@
             @endif
         </div>
     </section>
-@endif
 
 {{-- SEKSI 11: DOA UNTUK PENGANTIN & TURUT MENGUNDANG --}}
 @if ($undangan->fiturAktif('doa_pengantin') || $adaTurutMengundang)
@@ -278,14 +278,18 @@
             </div>
         @endif
 
-    {{-- Kartu Turut Mengundang (Harmoni Forest-Sage) --}}
-    @if ($adaTurutMengundang)
-        <div data-section-turut-mengundang="klasik" class="max-w-md mx-auto rounded-3xl bg-gradient-to-b from-[#3E5349] to-[#2C3D35] border border-[#E5D5C0]/35 p-6 text-center text-[#FDFBF7] shadow-lg kartu-3d space-y-4">
-            <div class="space-y-1">
-                <img src="{{ $asetRustic['garland'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-gsap="turun" class="w-32 mx-auto pb-0.5 drop-shadow">
-                <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#E5D5C0]">Keluarga Besar</p>
-                <h2 data-gsap="naik" class="font-serif text-2xl font-bold text-white">{{ $undangan->teksKustom('judul_turut_mengundang', 'Turut Mengundang') }}</h2>
-            </div>
+        {{-- Kartu Turut Mengundang (Harmoni Forest-Sage) --}}
+        @if ($adaTurutMengundang)
+            <div data-section-turut-mengundang="klasik"
+                class="max-w-md mx-auto rounded-3xl bg-gradient-to-b from-[#3E5349] to-[#2C3D35] border border-[#E5D5C0]/35 p-6 text-center text-[#FDFBF7] shadow-lg kartu-3d space-y-4">
+                <div class="space-y-1">
+                    <img src="{{ $asetRustic['garland'] }}" alt="" aria-hidden="true" loading="lazy"
+                        decoding="async" data-gsap="turun" class="w-32 mx-auto pb-0.5 drop-shadow">
+                    <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#E5D5C0]">
+                        Keluarga Besar</p>
+                    <h2 data-gsap="naik" class="font-serif text-2xl font-bold text-white">
+                        {{ $undangan->teksKustom('judul_turut_mengundang', 'Turut Mengundang') }}</h2>
+                </div>
         @endif
     </section>
 @endif
@@ -319,7 +323,8 @@
                     class="relative mx-auto w-[196px] sm:w-[210px] aspect-[780/960] flex items-center justify-center">
                     <div
                         class="absolute inset-x-[12.5%] top-[8.5%] bottom-[11.5%] rounded-t-[10rem] rounded-b-[1.35rem] overflow-hidden bg-gradient-to-b from-[#4B6358] via-[#3A4E45] to-[#26352E] text-[#FDFBF7] flex flex-col items-center justify-center gap-1 shadow-md">
-                        <span class="text-[9px] uppercase tracking-[0.28em] text-[#E5D5C0]">{{ $undangan->teksKustom('judul_penutup', 'Terima Kasih') }}</span>
+                        <span
+                            class="text-[9px] uppercase tracking-[0.28em] text-[#E5D5C0]">{{ $undangan->teksKustom('judul_penutup', 'Terima Kasih') }}</span>
                         <span class="font-serif text-4xl font-bold tracking-wider text-[#F3E5AB]">
                             {{ $undangan->inisialPria() }} &amp; {{ $undangan->inisialWanita() }}
                         </span>
@@ -334,7 +339,8 @@
                 <img src="{{ $asetRustic['garland'] }}" alt="" aria-hidden="true" loading="lazy"
                     decoding="async" class="w-28 mx-auto opacity-95 animasi-melayang">
             </div>
-            <p data-gsap="mekar" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#B86B4B]">{{ $undangan->teksKustom('judul_penutup', 'Terima Kasih') }}</p>
+            <p data-gsap="mekar" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#B86B4B]">
+                {{ $undangan->teksKustom('judul_penutup', 'Terima Kasih') }}</p>
             <p data-gsap="teks" class="text-xs sm:text-sm text-[#1F2937]/80 leading-relaxed max-w-xs mx-auto">
                 {{ $undangan->teksKustom('ucapan_penutup', 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu.') }}
             </p>

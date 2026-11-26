@@ -173,6 +173,7 @@
 </div>
 
 {{-- SEKSI 2: 00 / PRELUDE SPREAD (SWISS GRID MONOGRAM + INK CURTAIN PHOTO WIPE) --}}
+@if ($undangan->fiturAktif('ayat_pembuka'))
 <section
     data-section-pembuka="editorial"
     class="relative bg-[#111113] text-[#FAF9F6] px-5 pb-14 pt-4 overflow-x-clip"
@@ -230,3 +231,4 @@
         @endif
     </div>
 </section>
+@endif

@@ -1,6 +1,6 @@
 {{-- SEKSI 9: AMPLOP DIGITAL ROYAL (BUKA-TUTUP KARTU BANK GLOSSY + SALIN ALAMAT) --}}
 @if ($undangan->fiturAktif('amplop_digital') && ($undangan->daftarAmplop->isNotEmpty() || $alamatKado !== ''))
-<section id="elegan-amplop" data-kartu-tumpuk x-data="{ amplopTerbuka: false }" class="royal-kartu-tumpuk relative bg-[#FBF8F3] px-4 py-12 overflow-hidden">
+<section id="elegan-amplop" data-layout-amplop data-kartu-tumpuk x-data="{ amplopTerbuka: false }" class="royal-kartu-tumpuk relative bg-[#FBF8F3] px-4 py-12 overflow-hidden">
     <div class="max-w-md mx-auto rounded-3xl bg-white border border-[#9E7B4F]/55 p-2 shadow-xl kartu-3d">
         <div class="rounded-[1.25rem] border border-dashed border-[#9E7B4F]/45 px-5 py-7 text-center space-y-5">
             <div class="space-y-1.5">
@@ -108,7 +108,6 @@
 @endif
 
 {{-- SEKSI 10: BUKU TAMU — UCAPAN & RSVP --}}
-@if ($undangan->fiturAktif('buku_tamu'))
 <section id="buku-tamu" data-kartu-tumpuk class="royal-kartu-tumpuk relative bg-[#EFE7DA] px-4 py-13 border-b border-[#9E7B4F]/25 overflow-hidden">
     <div class="max-w-md mx-auto">
         <div class="text-center space-y-2 mb-6">
@@ -243,7 +242,6 @@
         </div>
     </div>
 </section>
-@endif
 
 {{-- SEKSI 11: DOA UNTUK PENGANTIN & TURUT MENGUNDANG (URUTAN SERAGAM SEMUA KATEGORI) --}}
 @if ($undangan->fiturAktif('doa_pengantin') || $adaTurutMengundang)

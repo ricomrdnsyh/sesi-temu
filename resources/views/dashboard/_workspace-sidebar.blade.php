@@ -1,5 +1,7 @@
 @php
     $menuAktif = $menuAktif ?? 'undangan';
+    $menuTamuRsvpTerkunci = ! $undangan->sudahAktifPublik();
+    $urlAktivasiTerkunci = route('dashboard.undangan.kelola', [$undangan, 'tab' => 'aktivasi']);
     $jumlahTamuRail = $undangan->relationLoaded('daftarTamu')
         ? $undangan->daftarTamu->count()
         : $undangan->daftarTamu()->count();
@@ -10,142 +12,154 @@
         ? route('admin.undangan.index')
         : route('dashboard.index');
     $labelKembaliRail = auth()->user()->adalahAdmin() ? 'Admin' : 'Dashboard';
+    $menuTamuRsvp = [
+        [
+            'kode' => 'tamu',
+            'label' => 'Tamu',
+            'judul' => 'Daftar Tamu',
+            'href' => $menuTamuRsvpTerkunci ? $urlAktivasiTerkunci : route('dashboard.undangan.tamu', $undangan),
+            'jumlah' => $jumlahTamuRail,
+        ],
+        [
+            'kode' => 'rsvp',
+            'label' => 'RSVP',
+            'judul' => 'RSVP & Ucapan',
+            'href' => $menuTamuRsvpTerkunci ? $urlAktivasiTerkunci : route('dashboard.undangan.rsvp', $undangan),
+            'jumlah' => $jumlahRsvpRail,
+        ],
+    ];
 @endphp
 
-{{-- Sidebar Vertikal Ramping Desktop (Gaya Studio Editor) --}}
+{{-- Sidebar Mengambang Ramping Desktop --}}
 <aside
     aria-label="Navigasi Ruang Kerja Undangan"
     data-workspace-sidebar
-    class="hidden lg:flex lg:flex-col relative overflow-hidden w-[84px] shrink-0 bg-gradient-to-b from-[#2F4239] via-[#3A5045] to-[#2B3C34] text-ivory h-screen sticky top-0 py-4 border-r border-champagne/20 items-center justify-between select-none z-30 shadow-[4px_0_24px_-8px_rgba(20,32,26,0.28)]"
+    class="hidden lg:flex lg:flex-col w-[74px] shrink-0 h-[calc(100vh-1.5rem)] sticky top-3 my-3 ml-3 rounded-3xl bg-gradient-to-b from-[#2A3E35] to-[#203029] text-ivory py-4 ring-1 ring-white/10 items-center justify-between select-none z-30 shadow-[0_14px_34px_-12px_rgba(16,28,22,0.38)]"
 >
-    <div aria-hidden="true" class="pointer-events-none absolute -top-10 inset-x-0 h-32 bg-champagne/12 blur-2xl"></div>
+    {{-- Logo --}}
+    <a
+        href="{{ route('beranda') }}"
+        title="Beranda SesiTemu"
+        class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 p-1.5 ring-1 ring-[#E2C27D]/30 hover:bg-white/15 hover:scale-105 transition"
+    >
+        <img
+            src="{{ asset('logo/logo-ikon-gelap.webp') }}"
+            alt="Logo SesiTemu"
+            class="h-full w-full object-contain"
+        >
+    </a>
 
-    <div class="relative z-10 w-full flex flex-col items-center flex-1 min-h-0">
-        {{-- Atas: Logo Gelap SesiTemu --}}
-        <div class="w-full px-2 pb-4 border-b border-white/10 flex flex-col items-center gap-1.5">
-            <a
-                href="{{ route('beranda') }}"
-                title="Beranda SesiTemu"
-                class="group inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/[0.06] p-1 ring-1 ring-champagne/25 hover:bg-white/[0.12] hover:ring-champagne/55 hover:scale-105 transition-all duration-200"
-            >
-                <img
-                    src="{{ asset('logo/logo-ikon-gelap.webp') }}"
-                    alt="Logo SesiTemu"
-                    class="h-full w-full object-contain"
-                >
-            </a>
-            <span class="font-logo text-[11px] font-bold tracking-tight text-white leading-none">
-                Sesi<span class="text-[#F5E3B8]">Temu</span>
-            </span>
-        </div>
-
-        {{-- Menu Utama Ruang Kerja --}}
-        <nav aria-label="Menu Ruang Kerja" class="mt-4 flex flex-col items-center gap-2 w-full px-2.5">
-            <a
-                href="{{ $urlKembaliRail }}"
-                title="Kembali ke {{ $labelKembaliRail }}"
-                class="group flex flex-col items-center justify-center gap-1.5 w-full rounded-2xl py-2.5 text-ivory/75 hover:bg-white/10 hover:text-white hover:-translate-y-0.5 transition-all duration-200"
-            >
-                <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect width="7" height="7" x="3" y="3" rx="1"/>
-                    <rect width="7" height="7" x="14" y="3" rx="1"/>
-                    <rect width="7" height="7" x="14" y="14" rx="1"/>
-                    <rect width="7" height="7" x="3" y="14" rx="1"/>
+    {{-- Menu Utama --}}
+    <nav aria-label="Menu Ruang Kerja" class="flex flex-col items-center gap-3 w-full px-2">
+        <a
+            href="{{ $urlKembaliRail }}"
+            title="Kembali ke {{ $labelKembaliRail }}"
+            class="group flex flex-col items-center gap-1 text-ivory/60 hover:text-white transition"
+        >
+            <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl group-hover:bg-white/10 transition">
+                <svg class="h-[18px] w-[18px] group-hover:-translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="m15 18-6-6 6-6"/>
                 </svg>
-                <span class="text-[10px] font-medium leading-none">{{ $labelKembaliRail }}</span>
-            </a>
+            </span>
+            <span class="text-[9.5px] font-medium leading-none">{{ $labelKembaliRail }}</span>
+        </a>
 
-            <a
-                href="{{ route('dashboard.undangan.kelola', $undangan) }}"
-                data-workspace-menu="undangan"
-                class="relative group flex flex-col items-center justify-center gap-1.5 w-full rounded-2xl py-2.5 transition-all duration-200 {{ $menuAktif === 'undangan' ? 'bg-gradient-to-b from-white/18 to-white/10 text-white ring-1 ring-champagne/35 shadow-sm font-semibold' : 'text-ivory/75 hover:bg-white/10 hover:text-white hover:-translate-y-0.5 font-medium' }}"
-            >
-                @if ($menuAktif === 'undangan')
-                    <span class="pointer-events-none absolute -left-2.5 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-champagne shadow-[0_0_8px_rgba(191,161,95,0.75)]"></span>
-                @endif
-                <svg class="h-5 w-5 shrink-0 {{ $menuAktif === 'undangan' ? 'text-[#F5E3B8]' : '' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $menuAktif === 'undangan' ? '2.1' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <div class="w-6 h-px bg-white/12" aria-hidden="true"></div>
+
+        <a
+            href="{{ route('dashboard.undangan.kelola', $undangan) }}"
+            data-workspace-menu="undangan"
+            title="Edit Undangan"
+            class="group flex flex-col items-center gap-1 transition {{ $menuAktif === 'undangan' ? 'text-white font-semibold' : 'text-ivory/65 hover:text-white font-medium' }}"
+        >
+            <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl transition {{ $menuAktif === 'undangan' ? 'bg-[#F5E3B8] text-[#203029] shadow-[0_6px_16px_-4px_rgba(245,227,184,0.45)]' : 'group-hover:bg-white/10' }}">
+                <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $menuAktif === 'undangan' ? '2.1' : '1.85' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <rect width="20" height="16" x="2" y="4" rx="2"/>
                     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
                 </svg>
-                <span class="text-[10px] leading-none">Undangan</span>
-            </a>
+            </span>
+            <span class="text-[9.5px] leading-none">Undangan</span>
+        </a>
 
+        @foreach ($menuTamuRsvp as $itemRail)
+            @php
+                $sedangAktifRail = ! $menuTamuRsvpTerkunci && $menuAktif === $itemRail['kode'];
+            @endphp
             <a
-                href="{{ route('dashboard.undangan.tamu', $undangan) }}"
-                data-workspace-menu="tamu"
-                class="relative group flex flex-col items-center justify-center gap-1.5 w-full rounded-2xl py-2.5 transition-all duration-200 {{ $menuAktif === 'tamu' ? 'bg-gradient-to-b from-white/18 to-white/10 text-white ring-1 ring-champagne/35 shadow-sm font-semibold' : 'text-ivory/75 hover:bg-white/10 hover:text-white hover:-translate-y-0.5 font-medium' }}"
+                href="{{ $itemRail['href'] }}"
+                @if ($menuTamuRsvpTerkunci)
+                    @click="if (typeof bukaModalAktivasi === 'function') { $event.preventDefault(); bukaModalAktivasi(); }"
+                    data-workspace-locked="true"
+                @endif
+                data-workspace-menu="{{ $itemRail['kode'] }}"
+                title="{{ $menuTamuRsvpTerkunci ? $itemRail['judul'] . ' terkunci — selesaikan pembayaran & aktivasi terlebih dahulu' : $itemRail['judul'] }}"
+                class="group flex flex-col items-center gap-1 transition {{ $menuTamuRsvpTerkunci ? 'text-ivory/40 hover:text-amber-200 font-medium' : ($sedangAktifRail ? 'text-white font-semibold' : 'text-ivory/65 hover:text-white font-medium') }}"
             >
-                @if ($menuAktif === 'tamu')
-                    <span class="pointer-events-none absolute -left-2.5 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-champagne shadow-[0_0_8px_rgba(191,161,95,0.75)]"></span>
-                @endif
-                @if ($jumlahTamuRail > 0)
-                    <span class="absolute top-1.5 right-2 rounded-full bg-champagne px-1.5 py-0.5 font-sans tabular-nums text-[9px] font-bold leading-none text-charcoal">
-                        {{ $jumlahTamuRail }}
-                    </span>
-                @endif
-                <svg class="h-5 w-5 shrink-0 {{ $menuAktif === 'tamu' ? 'text-[#F5E3B8]' : '' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $menuAktif === 'tamu' ? '2.1' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                </svg>
-                <span class="text-[10px] leading-none">Tamu</span>
+                <span class="relative inline-flex h-10 w-10 items-center justify-center rounded-2xl transition {{ $menuTamuRsvpTerkunci ? 'bg-white/6 text-ivory/45 ring-1 ring-white/10 group-hover:bg-amber-400/15 group-hover:text-amber-200' : ($sedangAktifRail ? 'bg-[#F5E3B8] text-[#203029] shadow-[0_6px_16px_-4px_rgba(245,227,184,0.45)]' : 'group-hover:bg-white/10') }}">
+                    @if ($itemRail['kode'] === 'tamu')
+                        <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $sedangAktifRail ? '2.1' : '1.85' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    @else
+                        <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $sedangAktifRail ? '2.1' : '1.85' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                    @endif
+                    @if ($menuTamuRsvpTerkunci)
+                        <span class="absolute -top-1 -right-1 inline-flex h-[17px] w-[17px] items-center justify-center rounded-full bg-amber-400 ring-2 ring-[#25372F] text-[#203029]" aria-hidden="true">
+                            <svg class="h-2.5 w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
+                        </span>
+                    @elseif ($itemRail['jumlah'] > 0)
+                        <span class="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 inline-flex items-center justify-center rounded-full bg-[#E2C27D] ring-2 ring-[#25372F] font-sans tabular-nums text-[8.5px] font-bold leading-none text-[#203029]">
+                            {{ $itemRail['jumlah'] }}
+                        </span>
+                    @endif
+                </span>
+                <span class="text-[9.5px] leading-none">{{ $itemRail['label'] }}</span>
             </a>
-
-            <a
-                href="{{ route('dashboard.undangan.tamu', ['undangan' => $undangan, 'subtab' => 'rsvp']) }}"
-                data-workspace-menu="rsvp"
-                class="relative group flex flex-col items-center justify-center gap-1.5 w-full rounded-2xl py-2.5 transition-all duration-200 {{ $menuAktif === 'rsvp' ? 'bg-gradient-to-b from-white/18 to-white/10 text-white ring-1 ring-champagne/35 shadow-sm font-semibold' : 'text-ivory/75 hover:bg-white/10 hover:text-white hover:-translate-y-0.5 font-medium' }}"
-            >
-                @if ($menuAktif === 'rsvp')
-                    <span class="pointer-events-none absolute -left-2.5 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-champagne shadow-[0_0_8px_rgba(191,161,95,0.75)]"></span>
-                @endif
-                @if ($jumlahRsvpRail > 0)
-                    <span class="absolute top-1.5 right-2 rounded-full bg-white/20 px-1.5 py-0.5 font-sans tabular-nums text-[9px] font-bold leading-none text-white">
-                        {{ $jumlahRsvpRail }}
-                    </span>
-                @endif
-                <svg class="h-5 w-5 shrink-0 {{ $menuAktif === 'rsvp' ? 'text-[#F5E3B8]' : '' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $menuAktif === 'rsvp' ? '2.1' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>
-                <span class="text-[10px] leading-none">RSVP</span>
-            </a>
-        </nav>
-    </div>
+        @endforeach
+    </nav>
 
     {{-- Bawah: Keluar --}}
-    <div class="relative z-10 w-full px-2.5 pt-3 border-t border-white/10">
-        <form
-            action="{{ route('keluar') }}"
-            method="POST"
-            data-swal-confirm="Yakin ingin keluar dari akun SesiTemu Anda?"
-            data-swal-title="Keluar dari Akun"
-            data-swal-confirm-button="Ya, Keluar"
-            data-swal-confirm-color="#DC2626"
-            data-swal-loading-title="Keluar dari Akun..."
-            data-swal-loading-text="Sedang mengakhiri sesi akun Anda..."
+    <form
+        action="{{ route('keluar') }}"
+        method="POST"
+        data-swal-confirm="Yakin ingin keluar dari akun SesiTemu Anda?"
+        data-swal-title="Keluar dari Akun"
+        data-swal-confirm-button="Ya, Keluar"
+        data-swal-confirm-color="#DC2626"
+        data-swal-loading-title="Keluar dari Akun..."
+        data-swal-loading-text="Sedang mengakhiri sesi akun Anda..."
+    >
+        @csrf
+        <button
+            type="submit"
+            title="Keluar"
+            class="group flex flex-col items-center gap-1 text-ivory/55 hover:text-rose-200 transition cursor-pointer"
         >
-            @csrf
-            <button
-                type="submit"
-                class="group flex flex-col items-center justify-center gap-1.5 w-full rounded-2xl py-2.5 text-ivory/70 hover:bg-rose-500/20 hover:text-rose-200 hover:ring-1 hover:ring-rose-300/30 transition-all duration-200 cursor-pointer"
-            >
-                <svg class="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl group-hover:bg-rose-500/20 transition">
+                <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                     <polyline points="16 17 21 12 16 7"/>
                     <line x1="21" x2="9" y1="12" y2="12"/>
                 </svg>
-                <span class="text-[10px] font-medium leading-none">Keluar</span>
-            </button>
-        </form>
-    </div>
+            </span>
+            <span class="text-[9.5px] font-medium leading-none">Keluar</span>
+        </button>
+    </form>
 </aside>
 
-{{-- Navigasi Bottom Bar Ruang Kerja (Khusus Mobile & Tablet < lg) --}}
+{{-- Navigasi Bottom Bar Ruang Kerja (Mobile & Tablet < lg) --}}
 <nav
     aria-label="Navigasi Ruang Kerja Mobile"
     data-client-bottom-nav
-    class="lg:hidden fixed bottom-0 inset-x-0 z-40 rounded-t-2xl bg-white/96 backdrop-blur-lg border-t border-champagne/25 shadow-[0_-10px_30px_-12px_rgba(31,41,55,0.14)] pb-[env(safe-area-inset-bottom)]"
+    class="lg:hidden fixed bottom-0 inset-x-0 z-40 rounded-t-2xl bg-white/96 backdrop-blur-lg border-t border-champagne/30 shadow-[0_-12px_32px_-12px_rgba(31,41,55,0.16)] pb-[env(safe-area-inset-bottom)]"
 >
     <div class="max-w-lg mx-auto grid grid-cols-4 h-[64px] px-2 items-center">
         <a
@@ -153,11 +167,8 @@
             class="flex flex-col items-center justify-center gap-1 py-1 text-charcoal/60 hover:text-sage font-medium active:scale-95 transition"
         >
             <span class="inline-flex items-center justify-center rounded-full px-3 py-1">
-                <svg class="h-[19px] w-[19px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect width="7" height="7" x="3" y="3" rx="1"/>
-                    <rect width="7" height="7" x="14" y="3" rx="1"/>
-                    <rect width="7" height="7" x="14" y="14" rx="1"/>
-                    <rect width="7" height="7" x="3" y="14" rx="1"/>
+                <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="m15 18-6-6 6-6"/>
                 </svg>
             </span>
             <span class="text-[10px] leading-none">{{ $labelKembaliRail }}</span>
@@ -167,11 +178,8 @@
             href="{{ route('dashboard.undangan.kelola', $undangan) }}"
             class="relative flex flex-col items-center justify-center gap-1 py-1 active:scale-95 transition {{ $menuAktif === 'undangan' ? 'text-sage font-bold' : 'text-charcoal/60 hover:text-sage font-medium' }}"
         >
-            @if ($menuAktif === 'undangan')
-                <span class="pointer-events-none absolute -top-1 h-1 w-6 rounded-b-full bg-sage"></span>
-            @endif
-            <span class="inline-flex items-center justify-center rounded-full px-3 py-1 {{ $menuAktif === 'undangan' ? 'bg-sage/15 text-sage ring-1 ring-sage/20' : '' }}">
-                <svg class="h-[19px] w-[19px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $menuAktif === 'undangan' ? '2.2' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <span class="inline-flex items-center justify-center rounded-full px-3.5 py-1 transition {{ $menuAktif === 'undangan' ? 'bg-sage text-white shadow-xs' : '' }}">
+                <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $menuAktif === 'undangan' ? '2.2' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <rect width="20" height="16" x="2" y="4" rx="2"/>
                     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
                 </svg>
@@ -179,37 +187,46 @@
             <span class="text-[10px] leading-none">Undangan</span>
         </a>
 
-        <a
-            href="{{ route('dashboard.undangan.tamu', $undangan) }}"
-            class="relative flex flex-col items-center justify-center gap-1 py-1 active:scale-95 transition {{ $menuAktif === 'tamu' ? 'text-sage font-bold' : 'text-charcoal/60 hover:text-sage font-medium' }}"
-        >
-            @if ($menuAktif === 'tamu')
-                <span class="pointer-events-none absolute -top-1 h-1 w-6 rounded-b-full bg-sage"></span>
-            @endif
-            <span class="inline-flex items-center justify-center rounded-full px-3 py-1 {{ $menuAktif === 'tamu' ? 'bg-sage/15 text-sage ring-1 ring-sage/20' : '' }}">
-                <svg class="h-[19px] w-[19px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $menuAktif === 'tamu' ? '2.2' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                </svg>
-            </span>
-            <span class="text-[10px] leading-none">Tamu</span>
-        </a>
-
-        <a
-            href="{{ route('dashboard.undangan.tamu', ['undangan' => $undangan, 'subtab' => 'rsvp']) }}"
-            class="relative flex flex-col items-center justify-center gap-1 py-1 active:scale-95 transition {{ $menuAktif === 'rsvp' ? 'text-sage font-bold' : 'text-charcoal/60 hover:text-sage font-medium' }}"
-        >
-            @if ($menuAktif === 'rsvp')
-                <span class="pointer-events-none absolute -top-1 h-1 w-6 rounded-b-full bg-sage"></span>
-            @endif
-            <span class="inline-flex items-center justify-center rounded-full px-3 py-1 {{ $menuAktif === 'rsvp' ? 'bg-sage/15 text-sage ring-1 ring-sage/20' : '' }}">
-                <svg class="h-[19px] w-[19px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $menuAktif === 'rsvp' ? '2.2' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>
-            </span>
-            <span class="text-[10px] leading-none">RSVP</span>
-        </a>
+        @foreach ($menuTamuRsvp as $itemRail)
+            @php
+                $sedangAktifMobile = ! $menuTamuRsvpTerkunci && $menuAktif === $itemRail['kode'];
+            @endphp
+            <a
+                href="{{ $itemRail['href'] }}"
+                @if ($menuTamuRsvpTerkunci)
+                    @click="if (typeof bukaModalAktivasi === 'function') { $event.preventDefault(); bukaModalAktivasi(); }"
+                @endif
+                title="{{ $menuTamuRsvpTerkunci ? $itemRail['judul'] . ' terkunci — bayar & aktifkan terlebih dahulu' : $itemRail['judul'] }}"
+                class="relative flex flex-col items-center justify-center gap-1 py-1 active:scale-95 transition {{ $menuTamuRsvpTerkunci ? 'text-charcoal/40 hover:text-amber-700 font-medium' : ($sedangAktifMobile ? 'text-sage font-bold' : 'text-charcoal/60 hover:text-sage font-medium') }}"
+            >
+                <span class="relative inline-flex items-center justify-center rounded-full px-3.5 py-1 transition {{ $menuTamuRsvpTerkunci ? 'bg-charcoal/5 text-charcoal/40' : ($sedangAktifMobile ? 'bg-sage text-white shadow-xs' : '') }}">
+                    @if ($itemRail['kode'] === 'tamu')
+                        <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $sedangAktifMobile ? '2.2' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    @else
+                        <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $sedangAktifMobile ? '2.2' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                    @endif
+                    @if ($menuTamuRsvpTerkunci)
+                        <span class="absolute -top-0.5 right-0.5 inline-flex h-[15px] w-[15px] items-center justify-center rounded-full bg-amber-400 text-[#203029] ring-1 ring-white" aria-hidden="true">
+                            <svg class="h-2.5 w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
+                        </span>
+                    @elseif ($itemRail['jumlah'] > 0)
+                        <span class="absolute -top-0.5 right-0.5 min-w-[15px] h-[15px] px-1 inline-flex items-center justify-center rounded-full bg-champagne font-sans tabular-nums text-[8.5px] font-bold leading-none text-charcoal">
+                            {{ $itemRail['jumlah'] }}
+                        </span>
+                    @endif
+                </span>
+                <span class="text-[10px] leading-none">{{ $itemRail['label'] }}</span>
+            </a>
+        @endforeach
     </div>
 </nav>

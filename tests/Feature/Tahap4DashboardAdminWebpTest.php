@@ -38,7 +38,7 @@ class Tahap4DashboardAdminWebpTest extends TestCase
         $warna = imagecolorallocate($img, 75, 99, 88);
         imagefill($img, 0, 0, $warna);
 
-        $tmpPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.uniqid('uji_', true).'.png';
+        $tmpPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('uji_', true) . '.png';
         imagepng($img, $tmpPath);
         imagedestroy($img);
 
@@ -89,7 +89,7 @@ class Tahap4DashboardAdminWebpTest extends TestCase
         $undangan = Undangan::where('slug', 'raka-maya')->firstOrFail();
         $this->assertSame($clientA->id, $undangan->pengguna_id);
 
-        // Client A buka dashboard, ruang kerja undangan, dan menu Tamu & RSVP di dalamnya
+        // Client A buka dashboard, ruang kerja undangan, dan lihat menu Tamu & RSVP terkunci saat draft
         $this->actingAs($clientA)->get('/dashboard')->assertOk()->assertSee('raka-maya');
         $this->actingAs($clientA)
             ->get("/dashboard/undangan/{$undangan->id}/kelola")
@@ -97,8 +97,14 @@ class Tahap4DashboardAdminWebpTest extends TestCase
             ->assertSee('data-workspace-menu="undangan"', false)
             ->assertSee('data-workspace-menu="tamu"', false)
             ->assertSee('data-workspace-menu="rsvp"', false)
+            ->assertSee('data-workspace-locked="true"', false)
             ->assertSee('Edit Undangan');
-        $this->actingAs($clientA)->get("/dashboard/undangan/{$undangan->id}/tamu")->assertOk()->assertSee('Daftar Tamu');
+        $this->actingAs($clientA)
+            ->get("/dashboard/undangan/{$undangan->id}/tamu")
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola?tab=aktivasi");
+        $this->actingAs($clientA)
+            ->get("/dashboard/undangan/{$undangan->id}/rsvp")
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola?tab=aktivasi");
 
         // Client B tidak boleh kelola undangan Client A
         $this->actingAs($clientB)
@@ -150,7 +156,7 @@ class Tahap4DashboardAdminWebpTest extends TestCase
 
         $amplop = AmplopDigital::where('undangan_id', $undangan->id)->firstOrFail();
 
-        // Hapus ucapan buku tamu
+        // Hapus ucapan buku tamu hanya setelah undangan aktif (terkunci saat draft)
         $ucapan = BukuTamu::create([
             'undangan_id' => $undangan->id,
             'nama_tamu' => 'Spammer',
@@ -161,7 +167,20 @@ class Tahap4DashboardAdminWebpTest extends TestCase
 
         $this->actingAs($clientA)
             ->delete("/dashboard/undangan/{$undangan->id}/buku-tamu/{$ucapan->id}")
-            ->assertRedirect();
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola?tab=aktivasi");
+        $this->assertDatabaseHas('buku_tamu', ['id' => $ucapan->id]);
+
+        $undangan->update([
+            'status_publikasi' => true,
+            'berlaku_sampai' => now()->addMonths(3),
+        ]);
+
+        $this->actingAs($clientA)->get("/dashboard/undangan/{$undangan->id}/tamu")->assertOk()->assertSee('Daftar Tamu');
+        $this->actingAs($clientA)->get("/dashboard/undangan/{$undangan->id}/rsvp")->assertOk()->assertSee('RSVP &amp; Ucapan', false);
+
+        $this->actingAs($clientA)
+            ->delete("/dashboard/undangan/{$undangan->id}/buku-tamu/{$ucapan->id}")
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/rsvp");
         $this->assertDatabaseMissing('buku_tamu', ['id' => $ucapan->id]);
 
         $this->actingAs($clientA)

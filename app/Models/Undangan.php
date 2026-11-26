@@ -145,6 +145,24 @@ class Undangan extends Model
     }
 
     /**
+     * Daftar seluruh kunci sakelar tampil/sembunyi fitur pada editor undangan.
+     *
+     * @var list<string>
+     */
+    public const KUNCI_FITUR_AKTIF = [
+        'ayat_pembuka',
+        'hitung_mundur',
+        'acara',
+        'dress_code',
+        'live_streaming',
+        'cerita_cinta',
+        'galeri',
+        'amplop_digital',
+        'doa_pengantin',
+        'turut_mengundang',
+    ];
+
+    /**
      * @return array{
      *     gaya_font: string,
      *     tanpa_foto: bool,
@@ -152,11 +170,17 @@ class Undangan extends Model
      *     live_streaming: array{aktif: bool, platform: string, link: string},
      *     alamat_kado_fisik: string,
      *     fitur_aktif: array{
+     *         ayat_pembuka: bool,
      *         hitung_mundur: bool,
+     *         acara: bool,
+     *         dress_code: bool,
+     *         live_streaming: bool,
      *         cerita_cinta: bool,
      *         galeri: bool,
      *         amplop_digital: bool,
-     *         buku_tamu: bool
+     *         buku_tamu: bool,
+     *         doa_pengantin: bool,
+     *         turut_mengundang: bool
      *     }
      * }
      */
@@ -192,12 +216,17 @@ class Undangan extends Model
             'alamat_kado_fisik' => '',
             'teks' => [],
             'fitur_aktif' => [
+                'ayat_pembuka' => true,
                 'hitung_mundur' => true,
+                'acara' => true,
+                'dress_code' => true,
+                'live_streaming' => false,
                 'cerita_cinta' => true,
                 'galeri' => true,
                 'amplop_digital' => true,
                 'buku_tamu' => true,
                 'doa_pengantin' => true,
+                'turut_mengundang' => true,
             ],
         ];
     }
@@ -415,6 +444,14 @@ class Undangan extends Model
     {
         $fiturAktif = $this->pengaturan['fitur_aktif'] ?? [];
 
+        if ($fitur === 'live_streaming') {
+            if (array_key_exists('live_streaming', $fiturAktif)) {
+                return (bool) $fiturAktif['live_streaming'];
+            }
+
+            return (bool) data_get($this->pengaturan, 'live_streaming.aktif', false);
+        }
+
         return (bool) ($fiturAktif[$fitur] ?? true);
     }
 
@@ -465,7 +502,6 @@ class Undangan extends Model
                 'judul_mempelai' => 'We Are Getting Married!',
                 'pengantar_mempelai' => 'Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud menyelenggarakan upacara pernikahan putra-putri kami:',
                 'pengantar_hitung_mundur' => 'Merupakan kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu.',
-                'judul_acara' => '',
                 'judul_cerita' => 'Our Love Story',
                 'judul_galeri' => 'Our Gallery',
                 'pengantar_amplop' => 'Tanpa mengurangi rasa hormat, bagi Bapak/Ibu/Saudara/i yang ingin memberikan tanda kasih untuk kami, dapat melalui:',

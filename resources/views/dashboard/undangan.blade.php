@@ -142,7 +142,7 @@
                             <p class="mt-1.5 text-[11px] sm:text-xs font-medium text-charcoal/60">Aktif</p>
                         </button>
 
-                        <a href="{{ route('dashboard.tamu.index', ['subtab' => 'rsvp']) }}"
+                        <a href="{{ route('dashboard.rsvp.index') }}"
                             class="group px-2 flex flex-col items-center justify-center active:scale-95 transition">
                             <p
                                 class="font-sans tabular-nums text-lg sm:text-2xl font-bold text-[#8A6D33] group-hover:scale-105 transition-transform leading-none">

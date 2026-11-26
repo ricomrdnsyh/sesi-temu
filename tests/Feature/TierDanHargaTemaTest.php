@@ -516,8 +516,10 @@ class TierDanHargaTemaTest extends TestCase
         $this->actingAs($client)
             ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=amplop")
             ->assertOk()
-            ->assertSee('Pratinjau Kartu Bank Live')
+            ->assertDontSee('Pratinjau Kartu Bank Live')
             ->assertSee('Koleksi Kartu Rekening Tersimpan')
+            ->assertSee('aset-bank/bca.svg', false)
+            ->assertSee('aset-bank/gopay.svg', false)
             ->assertSee('Bank Central Asia')
             ->assertSee('Dompet Digital GoPay')
             ->assertSee('1234 5678 90')
@@ -531,15 +533,25 @@ class TierDanHargaTemaTest extends TestCase
             ->assertSee('Menghapus Rekening...')
             ->assertDontSee('onsubmit="return confirm', false);
 
-        // Halaman Tamu & RSVP dalam mode draft mengunci tombol Kirim WA
+        // Menu & halaman Tamu serta RSVP dalam mode draft dikunci sebelum pembayaran & diarahkan ke modal aktivasi
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/kelola")
+            ->assertOk()
+            ->assertSee('data-workspace-menu="tamu"', false)
+            ->assertSee('data-workspace-menu="rsvp"', false)
+            ->assertSee('data-workspace-locked="true"', false);
+
         $this->actingAs($client)
             ->get("/dashboard/undangan/{$undangan->id}/tamu")
-            ->assertOk()
-            ->assertSee('Mode Simulasi — Aktifkan Undangan untuk Menyebar Link WA')
-            ->assertSee('Bayar &amp; Aktifkan Undangan', false)
-            ->assertDontSee(':href="tamu.waUrl"', false);
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola?tab=aktivasi")
+            ->assertSessionHas('peringatan');
 
-        // Setelah undangan diaktifkan, tombol Salin & Kirim WA pada halaman Tamu & RSVP terbuka
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/rsvp")
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola?tab=aktivasi")
+            ->assertSessionHas('peringatan');
+
+        // Setelah undangan diaktifkan, halaman Daftar Tamu & halaman RSVP & Ucapan terbuka terpisah
         $undangan->update([
             'status_publikasi' => true,
             'berlaku_sampai' => now()->addMonths(3),
@@ -548,19 +560,32 @@ class TierDanHargaTemaTest extends TestCase
         $this->actingAs($client)
             ->get("/dashboard/undangan/{$undangan->id}/tamu")
             ->assertOk()
-            ->assertDontSee('Mode Simulasi — Aktifkan Undangan untuk Menyebar Link WA')
-            ->assertSee(':href="tamu.waUrl"', false);
+            ->assertSee('Daftar Tamu')
+            ->assertSee('data-datatable', false)
+            ->assertDontSee('Ucapan &amp; RSVP', false);
 
-        // Jika masa aktif sudah habis, Kirim WA kembali dikunci
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/rsvp")
+            ->assertOk()
+            ->assertSee('RSVP &amp; Ucapan', false)
+            ->assertSee('data-datatable', false)
+            ->assertDontSee('Import Banyak')
+            ->assertDontSee('Tambah Tamu');
+
+        // Jika masa aktif sudah habis, menu Tamu & RSVP kembali dikunci
         $undangan->update([
             'berlaku_sampai' => now()->subDay(),
         ]);
 
         $this->actingAs($client)
             ->get("/dashboard/undangan/{$undangan->id}/tamu")
-            ->assertOk()
-            ->assertSee('Kirim WA Dikunci — Masa Aktif Undangan Berakhir')
-            ->assertDontSee(':href="tamu.waUrl"', false);
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola?tab=aktivasi")
+            ->assertSessionHas('peringatan');
+
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/rsvp")
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola?tab=aktivasi")
+            ->assertSessionHas('peringatan');
 
         $this->actingAs($client)
             ->get('/dashboard')
@@ -591,12 +616,14 @@ class TierDanHargaTemaTest extends TestCase
             ->get("/dashboard/undangan/{$undangan->id}/kelola")
             ->assertOk()
             ->assertDontSee('Sakelar Fitur Undangan')
+            ->assertDontSee('data-toggle-fitur="buku_tamu"', false)
+            ->assertSee('data-toggle-fitur="ayat_pembuka"', false)
             ->assertSee('data-toggle-fitur="hitung_mundur"', false)
             ->assertSee('data-toggle-fitur="cerita_cinta"', false)
             ->assertSee('data-toggle-fitur="galeri"', false)
             ->assertSee('data-toggle-fitur="amplop_digital"', false)
-            ->assertSee('data-toggle-fitur="buku_tamu"', false)
             ->assertSee('data-toggle-fitur="doa_pengantin"', false)
+            ->assertSee('data-toggle-fitur="turut_mengundang"', false)
             ->assertSee('role="switch"', false)
             ->assertSee('name="teks[sampul_judul]"', false)
             ->assertSee('name="teks[sampul_sapaan]"', false)
@@ -617,7 +644,9 @@ class TierDanHargaTemaTest extends TestCase
             ->assertSee('name="teks[ucapan_penutup]"', false)
             ->getContent();
 
-        $urutan = ['tema', 'mempelai', 'acara', 'cerita', 'galeri', 'amplop', 'penutup', 'aktivasi'];
+        $urutan = ['tema', 'ayat', 'mempelai', 'hitung_mundur', 'acara', 'dress_code', 'live_streaming', 'cerita', 'galeri', 'amplop', 'buku_tamu', 'doa_pengantin', 'turut_mengundang', 'penutup'];
+        $this->assertSame(0, substr_count($html, 'data-mobile-tab="aktivasi"'), 'Pembayaran & Aktivasi dipindah ke modal terpisah, tidak boleh ada di accordion menu.');
+        $this->assertSame(1, substr_count($html, 'data-modal-aktivasi'), 'Modal Pembayaran & Aktivasi wajib tersedia di halaman editor.');
         $posisiSebelumnya = -1;
         foreach ($urutan as $kodeTab) {
             $jumlah = substr_count($html, "data-mobile-tab=\"{$kodeTab}\"");
@@ -626,7 +655,7 @@ class TierDanHargaTemaTest extends TestCase
             $this->assertGreaterThan($posisiSebelumnya, $pos, "Tab {$kodeTab} harus berada sesuai urutan undangan.");
             $posisiSebelumnya = $pos;
         }
-        foreach (['hitung_mundur', 'cerita_cinta', 'galeri', 'amplop_digital', 'buku_tamu', 'doa_pengantin'] as $kodeFitur) {
+        foreach (Undangan::KUNCI_FITUR_AKTIF as $kodeFitur) {
             $this->assertSame(1, substr_count($html, "data-toggle-fitur=\"{$kodeFitur}\""), "Sakelar {$kodeFitur} wajib muncul tepat 1 kali.");
         }
 
@@ -634,8 +663,8 @@ class TierDanHargaTemaTest extends TestCase
         $urutanIsiUndangan = [
             'name="foto_sampul"',
             'name="teks[sampul_judul]"',
-            'name="kutipan_ayat"',
             'name="foto_pembuka"',
+            'name="kutipan_ayat"',
             'name="nama_panggilan_pria"',
             'data-toggle-fitur="hitung_mundur"',
             'name="foto_hitung_mundur[]"',
@@ -1082,8 +1111,8 @@ class TierDanHargaTemaTest extends TestCase
             ->assertDontSee('Simpan Cerita &amp; Lanjut', false)
             ->assertDontSee('Simpan Penutup &amp; Lanjut', false);
 
-        // 2. Toggle ON/OFF seluruh 6 fitur melalui PUT JSON (persis seperti fetch() di browser)
-        foreach (['hitung_mundur', 'cerita_cinta', 'galeri', 'amplop_digital', 'buku_tamu', 'doa_pengantin'] as $kunciFitur) {
+        // 2. Toggle ON/OFF fitur melalui PUT JSON (persis seperti fetch() di browser)
+        foreach (['ayat_pembuka', 'hitung_mundur', 'cerita_cinta', 'galeri', 'amplop_digital', 'doa_pengantin'] as $kunciFitur) {
             $this->actingAs($client)
                 ->putJson("/dashboard/undangan/{$undangan->id}", [
                     'bagian' => 'fitur',
@@ -1099,11 +1128,11 @@ class TierDanHargaTemaTest extends TestCase
         }
 
         $undangan->refresh();
-        foreach (['hitung_mundur', 'cerita_cinta', 'galeri', 'amplop_digital', 'buku_tamu', 'doa_pengantin'] as $kunciFitur) {
+        foreach (['ayat_pembuka', 'hitung_mundur', 'cerita_cinta', 'galeri', 'amplop_digital', 'doa_pengantin'] as $kunciFitur) {
             $this->assertFalse($undangan->fiturAktif($kunciFitur), "Fitur {$kunciFitur} harus tersimpan nonaktif.");
         }
 
-        // Aktifkan kembali cerita_cinta & buku_tamu via PUT JSON
+        // Aktifkan kembali cerita_cinta via PUT JSON
         $this->actingAs($client)
             ->putJson("/dashboard/undangan/{$undangan->id}", [
                 'bagian' => 'fitur',
@@ -1127,11 +1156,11 @@ class TierDanHargaTemaTest extends TestCase
                 'tanpa_foto' => '0',
                 'sumber_musik' => 'katalog',
                 'musik_latar' => 'musik/gamelan-lembut.mp3',
+                'fitur_ayat_pembuka' => '1',
                 'fitur_hitung_mundur' => '1',
                 'fitur_cerita_cinta' => '1',
                 'fitur_galeri' => '0',
                 'fitur_amplop_digital' => '1',
-                'fitur_buku_tamu' => '1',
                 'fitur_doa_pengantin' => '0',
                 'nama_panggilan_pria' => 'Dodi',
                 'nama_lengkap_pria' => 'Dodi Pratama, S.T.',
@@ -1163,11 +1192,11 @@ class TierDanHargaTemaTest extends TestCase
                 'ok' => true,
                 'slug' => 'uji-simpan-semua-baru',
                 'fitur_aktif' => [
+                    'ayat_pembuka' => true,
                     'hitung_mundur' => true,
                     'cerita_cinta' => true,
                     'galeri' => false,
                     'amplop_digital' => true,
-                    'buku_tamu' => true,
                     'doa_pengantin' => false,
                 ],
             ]);
@@ -1264,5 +1293,357 @@ class TierDanHargaTemaTest extends TestCase
         Storage::disk('public')->assertMissing($pathGaleri1);
         Storage::disk('public')->assertMissing($pathGaleri2);
         Storage::disk('public')->assertExists($pathGaleri2Baru);
+    }
+
+    public function test_tambah_edit_dan_hapus_acara_via_json_tanpa_refresh_halaman(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        $client = Pengguna::factory()->create(['peran' => 'client']);
+        $clientLain = Pengguna::factory()->create(['peran' => 'client']);
+        $tema = Tema::firstOrFail();
+
+        $undangan = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $tema->id,
+            'slug' => 'uji-acara-tanpa-refresh',
+            'nama_panggilan_pria' => 'Dodi',
+            'nama_lengkap_pria' => 'Dodi Pratama',
+            'nama_panggilan_wanita' => 'Windy',
+            'nama_lengkap_wanita' => 'Windy Sari',
+            'pengaturan' => Undangan::pengaturanBawaan(),
+        ]);
+
+        // 1. Halaman kelola merender form acara dengan @submit.prevent, picker kalender/jam kustom, dan konfigurasi daftarAcara
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=acara")
+            ->assertOk()
+            ->assertSee('@submit.prevent="simpanAcara($event)"', false)
+            ->assertSee('data-picker-acara="tanggal"', false)
+            ->assertSee('data-picker-acara="mulai"', false)
+            ->assertSee('data-picker-acara="selesai"', false)
+            ->assertSee('"urlSimpanAcara"', false)
+            ->assertSee('"daftarAcara"', false);
+
+        // 2. Tambah acara via POST JSON (tanpa redirect/refresh)
+        $tanggalResepsi = now()->addDays(20)->toDateString();
+        $tanggalAkad = now()->addDays(10)->toDateString();
+
+        $responResepsi = $this->actingAs($client)
+            ->postJson("/dashboard/undangan/{$undangan->id}/acara", [
+                'nama_acara' => 'Resepsi',
+                'tanggal_acara' => $tanggalResepsi,
+                'waktu_mulai' => '11:00',
+                'waktu_selesai' => '14:00',
+                'zona_waktu' => 'WIB',
+                'nama_tempat' => 'Grand Ballroom',
+                'alamat_lengkap' => 'Jl. Diponegoro No. 20, Yogyakarta',
+                'link_maps' => 'https://maps.google.com/?q=Grand+Ballroom',
+            ]);
+
+        $responResepsi->assertOk()
+            ->assertJson([
+                'ok' => true,
+            ])
+            ->assertJsonCount(1, 'daftar_acara')
+            ->assertJsonPath('daftar_acara.0.nama_acara', 'Resepsi')
+            ->assertJsonPath('daftar_acara.0.label_urutan', 'Acara #1')
+            ->assertJsonPath('daftar_acara.0.badge_hari', 'H-20 Hari');
+
+        $idResepsi = $responResepsi->json('daftar_acara.0.id');
+
+        // Tambah acara kedua yang tanggalnya lebih awal -> daftar_acara tetap terurut kronologis
+        $responAkad = $this->actingAs($client)
+            ->postJson("/dashboard/undangan/{$undangan->id}/acara", [
+                'nama_acara' => 'Akad Nikah',
+                'tanggal_acara' => $tanggalAkad,
+                'waktu_mulai' => '08:00',
+                'waktu_selesai' => '10:00',
+                'zona_waktu' => 'WIB',
+                'nama_tempat' => 'Masjid Agung',
+                'alamat_lengkap' => 'Jl. Merdeka No. 1, Yogyakarta',
+                'link_maps' => '',
+            ]);
+
+        $responAkad->assertOk()
+            ->assertJson(['ok' => true])
+            ->assertJsonCount(2, 'daftar_acara')
+            ->assertJsonPath('daftar_acara.0.nama_acara', 'Akad Nikah')
+            ->assertJsonPath('daftar_acara.0.label_urutan', 'Acara #1')
+            ->assertJsonPath('daftar_acara.0.badge_hari', 'H-10 Hari')
+            ->assertJsonPath('daftar_acara.1.nama_acara', 'Resepsi')
+            ->assertJsonPath('daftar_acara.1.label_urutan', 'Acara #2');
+
+        $idAkad = $responAkad->json('daftar_acara.0.id');
+
+        // 3. Edit acara via POST JSON dengan acara_id
+        $responEdit = $this->actingAs($client)
+            ->postJson("/dashboard/undangan/{$undangan->id}/acara", [
+                'acara_id' => $idAkad,
+                'nama_acara' => 'Akad Nikah & Sungkeman',
+                'tanggal_acara' => $tanggalAkad,
+                'waktu_mulai' => '07:30',
+                'waktu_selesai' => '',
+                'zona_waktu' => 'WITA',
+                'nama_tempat' => 'Masjid Agung Baru',
+                'alamat_lengkap' => 'Jl. Merdeka No. 2, Yogyakarta',
+                'link_maps' => 'https://maps.google.com/?q=Masjid+Agung',
+            ]);
+
+        $responEdit->assertOk()
+            ->assertJson(['ok' => true])
+            ->assertJsonCount(2, 'daftar_acara')
+            ->assertJsonPath('daftar_acara.0.id', $idAkad)
+            ->assertJsonPath('daftar_acara.0.nama_acara', 'Akad Nikah & Sungkeman')
+            ->assertJsonPath('daftar_acara.0.waktu_label', '07:30 WITA');
+
+        // 4. Validasi gagal mengembalikan 422 JSON tanpa redirect
+        $this->actingAs($client)
+            ->postJson("/dashboard/undangan/{$undangan->id}/acara", [
+                'nama_acara' => '',
+                'link_maps' => 'bukan-url',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['nama_acara', 'tanggal_acara', 'link_maps']);
+
+        // 5. Client lain tidak boleh tambah atau hapus acara undangan ini
+        $this->actingAs($clientLain)
+            ->postJson("/dashboard/undangan/{$undangan->id}/acara", [
+                'nama_acara' => 'Ilegal',
+                'tanggal_acara' => $tanggalAkad,
+                'waktu_mulai' => '08:00',
+                'zona_waktu' => 'WIB',
+                'nama_tempat' => 'X',
+                'alamat_lengkap' => 'Y',
+            ])
+            ->assertForbidden();
+
+        $this->actingAs($clientLain)
+            ->deleteJson("/dashboard/undangan/{$undangan->id}/acara/{$idResepsi}")
+            ->assertForbidden();
+
+        // 6. Hapus acara via DELETE JSON (tanpa redirect/refresh)
+        $this->actingAs($client)
+            ->deleteJson("/dashboard/undangan/{$undangan->id}/acara/{$idResepsi}")
+            ->assertOk()
+            ->assertJson(['ok' => true])
+            ->assertJsonCount(1, 'daftar_acara')
+            ->assertJsonPath('daftar_acara.0.id', $idAkad);
+
+        $this->assertDatabaseMissing('acara_undangan', ['id' => $idResepsi]);
+        $this->assertDatabaseHas('acara_undangan', ['id' => $idAkad, 'nama_acara' => 'Akad Nikah & Sungkeman']);
+    }
+
+    public function test_tambah_dan_hapus_rekening_amplop_berjalan_via_json_tanpa_refresh_halaman(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        $tema = Tema::firstOrFail();
+        $client = Pengguna::factory()->create(['peran' => 'client']);
+        $clientLain = Pengguna::factory()->create(['peran' => 'client']);
+
+        $undangan = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $tema->id,
+            'slug' => 'uji-amplop-ajax',
+            'nama_panggilan_pria' => 'Dodi',
+            'nama_lengkap_pria' => 'Dodi Dwi',
+            'nama_panggilan_wanita' => 'Windy',
+            'nama_lengkap_wanita' => 'Windy Sari',
+            'pengaturan' => Undangan::pengaturanBawaan(),
+            'status_publikasi' => false,
+        ]);
+
+        // 1. Halaman kelola merender form amplop reaktif tanpa reload dan Select2 tidak terjebak di kontainer scrollable
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/kelola?tab=amplop")
+            ->assertOk()
+            ->assertDontSee('data-select2-parent', false)
+            ->assertSee('@submit.prevent="simpanAmplop($event)"', false)
+            ->assertSee('"urlSimpanAmplop"', false)
+            ->assertSee('"daftarAmplop"', false);
+
+        // 2. Tambah rekening via POST JSON (tanpa redirect)
+        $responMandiri = $this->actingAs($client)
+            ->postJson("/dashboard/undangan/{$undangan->id}/amplop", [
+                'nama_bank' => 'Mandiri',
+                'nomor_rekening' => '12345678900',
+                'atas_nama' => 'Dodi Dwi',
+            ]);
+
+        $responMandiri->assertOk()
+            ->assertJson(['ok' => true])
+            ->assertJsonCount(1, 'daftar_amplop')
+            ->assertJsonPath('daftar_amplop.0.nama_bank', 'Mandiri')
+            ->assertJsonPath('daftar_amplop.0.nomor_tampil', '1234 5678 900')
+            ->assertJsonPath('daftar_amplop.0.subjudul', 'Bank Mandiri');
+        $this->assertStringContainsString('aset-bank/mandiri.svg', (string) $responMandiri->json('daftar_amplop.0.logo_url'));
+
+        $idMandiri = $responMandiri->json('daftar_amplop.0.id');
+
+        // 3. Validasi gagal mengembalikan 422 JSON tanpa redirect
+        $this->actingAs($client)
+            ->postJson("/dashboard/undangan/{$undangan->id}/amplop", [
+                'nama_bank' => '',
+                'nomor_rekening' => '',
+                'atas_nama' => '',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['nama_bank', 'nomor_rekening', 'atas_nama']);
+
+        // 4. Client lain dilarang menambah atau menghapus rekening
+        $this->actingAs($clientLain)
+            ->postJson("/dashboard/undangan/{$undangan->id}/amplop", [
+                'nama_bank' => 'BCA',
+                'nomor_rekening' => '99999999',
+                'atas_nama' => 'Ilegal',
+            ])
+            ->assertForbidden();
+
+        $this->actingAs($clientLain)
+            ->deleteJson("/dashboard/undangan/{$undangan->id}/amplop/{$idMandiri}")
+            ->assertForbidden();
+
+        // 5. Hapus rekening via DELETE JSON (tanpa redirect/refresh)
+        $this->actingAs($client)
+            ->deleteJson("/dashboard/undangan/{$undangan->id}/amplop/{$idMandiri}")
+            ->assertOk()
+            ->assertJson(['ok' => true])
+            ->assertJsonCount(0, 'daftar_amplop');
+
+        $this->assertDatabaseMissing('amplop_digital', ['id' => $idMandiri]);
+    }
+
+    public function test_semua_sakelar_on_off_fitur_termasuk_acara_dress_code_dan_live_streaming_berfungsi(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+
+        $tema = Tema::where('slug', 'adat-jawa')->firstOrFail();
+        $client = Pengguna::factory()->create(['peran' => 'client']);
+
+        $pengaturan = Undangan::pengaturanBawaan();
+        $pengaturan['dress_code'] = [
+            'catatan' => 'Batik Sogan Elegan',
+            'warna' => ['#472A1C', '#D7BB83'],
+        ];
+        $pengaturan['turut_mengundang'] = [
+            'pihak_wanita' => 'Keluarga Besar Wanita Uji',
+            'pihak_pria' => 'Keluarga Besar Pria Uji',
+        ];
+        $pengaturan['live_streaming'] = [
+            'aktif' => true,
+            'platform' => 'YouTube Live',
+            'link' => 'https://youtube.com/live/uji-sakelar',
+        ];
+        $pengaturan['fitur_aktif']['live_streaming'] = true;
+
+        $undangan = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $tema->id,
+            'slug' => 'uji-sakelar-semua',
+            'nama_panggilan_pria' => 'Dodi',
+            'nama_lengkap_pria' => 'Dodi Dwi',
+            'nama_panggilan_wanita' => 'Windy',
+            'nama_lengkap_wanita' => 'Windy Sari',
+            'kutipan_ayat' => 'Kutipan Ayat Pembuka Uji Sakelar',
+            'pengaturan' => $pengaturan,
+            'status_publikasi' => false,
+        ]);
+
+        $undangan->daftarAcara()->create([
+            'nama_acara' => 'Akad Nikah Sakelar',
+            'tanggal_acara' => now()->addDays(14)->toDateString(),
+            'waktu_mulai' => '08:00',
+            'waktu_selesai' => '10:00',
+            'zona_waktu' => 'WIB',
+            'nama_tempat' => 'Masjid Agung',
+            'alamat_lengkap' => 'Jl. Merdeka No. 1',
+        ]);
+
+        // Pastikan seluruh 9 sakelar ON/OFF tidak memakai binding dot mentah (:disabled="fiturMenyimpan.x")
+        // yang diubah Alpine menjadi disabled="disabled" saat properti undefined
+        $responKelola = $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/kelola")
+            ->assertOk()
+            ->assertDontSee(':disabled="fiturMenyimpan.', false);
+
+        foreach (Undangan::KUNCI_FITUR_AKTIF as $kunciSakelar) {
+            $responKelola->assertSee(":disabled=\"Boolean(fiturMenyimpan.{$kunciSakelar})\"", false);
+        }
+
+        // Matikan ayat_pembuka, acara, dress_code, live_streaming, dan turut_mengundang lewat endpoint toggle JSON (POST + X-HTTP-Method-Override: PUT)
+        foreach (['ayat_pembuka', 'acara', 'dress_code', 'live_streaming', 'turut_mengundang'] as $kunci) {
+            $this->actingAs($client)
+                ->postJson("/dashboard/undangan/{$undangan->id}", [
+                    '_method' => 'PUT',
+                    'bagian' => 'fitur',
+                    'kunci' => $kunci,
+                    'aktif' => false,
+                ], ['X-HTTP-Method-Override' => 'PUT'])
+                ->assertOk()
+                ->assertJson([
+                    'ok' => true,
+                    'kunci' => $kunci,
+                    'aktif' => false,
+                ]);
+        }
+
+        $undangan->refresh();
+        $this->assertFalse($undangan->fiturAktif('ayat_pembuka'));
+        $this->assertFalse($undangan->fiturAktif('acara'));
+        $this->assertFalse($undangan->fiturAktif('dress_code'));
+        $this->assertFalse($undangan->fiturAktif('live_streaming'));
+        $this->assertFalse($undangan->fiturAktif('turut_mengundang'));
+        $this->assertFalse((bool) data_get($undangan->pengaturan, 'live_streaming.aktif'));
+
+        // Pratinjau langsung menyembunyikan kelimanya ketika sakelar OFF, sedangkan Buku Tamu & RSVP tetap selalu tampil
+        $this->actingAs($client)
+            ->post("/dashboard/undangan/{$undangan->id}/pratinjau-langsung", [
+                'fitur_aktif' => [
+                    'ayat_pembuka' => false,
+                    'acara' => false,
+                    'dress_code' => false,
+                    'live_streaming' => false,
+                    'turut_mengundang' => false,
+                ],
+                'buka_sampul' => true,
+            ])
+            ->assertOk()
+            ->assertDontSee('Kutipan Ayat Pembuka Uji Sakelar')
+            ->assertDontSee('Akad Nikah Sakelar')
+            ->assertDontSee('Batik Sogan Elegan')
+            ->assertDontSee('Gabung Live Streaming')
+            ->assertDontSee('Keluarga Besar Wanita Uji')
+            ->assertSee('id="buku-tamu"', false);
+
+        // Nyalakan kembali kelimanya -> tampil lagi di pratinjau langsung
+        foreach (['ayat_pembuka', 'acara', 'dress_code', 'live_streaming', 'turut_mengundang'] as $kunci) {
+            $this->actingAs($client)
+                ->putJson("/dashboard/undangan/{$undangan->id}", [
+                    'bagian' => 'fitur',
+                    'kunci' => $kunci,
+                    'aktif' => true,
+                ])
+                ->assertOk()
+                ->assertJson(['ok' => true, 'kunci' => $kunci, 'aktif' => true]);
+        }
+
+        $this->actingAs($client)
+            ->post("/dashboard/undangan/{$undangan->id}/pratinjau-langsung", [
+                'fitur_aktif' => [
+                    'ayat_pembuka' => true,
+                    'acara' => true,
+                    'dress_code' => true,
+                    'live_streaming' => true,
+                    'turut_mengundang' => true,
+                ],
+                'buka_sampul' => true,
+            ])
+            ->assertOk()
+            ->assertSee('Kutipan Ayat Pembuka Uji Sakelar')
+            ->assertSee('Akad Nikah Sakelar')
+            ->assertSee('Batik Sogan Elegan')
+            ->assertSee('Gabung Live Streaming')
+            ->assertSee('Keluarga Besar Wanita Uji');
     }
 }

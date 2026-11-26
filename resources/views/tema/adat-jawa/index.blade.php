@@ -38,15 +38,16 @@
     $pengaturan = $undangan->pengaturan ?? [];
     $ceritaList = $pengaturan['cerita_cinta'] ?? [];
     $live = $pengaturan['live_streaming'] ?? [];
+    $live['aktif'] = $undangan->fiturAktif('live_streaming');
     $alamatKado = trim((string) ($pengaturan['alamat_kado_fisik'] ?? ''));
     $instagramPria = $undangan->instagramPria();
     $instagramWanita = $undangan->instagramWanita();
     $dressCodeCatatan = $undangan->dressCodeCatatan();
     $dressCodeWarna = $undangan->dressCodeWarna();
-    $adaDressCode = $dressCodeCatatan !== '' || !empty($dressCodeWarna);
+    $adaDressCode = $undangan->fiturAktif('dress_code') && ($dressCodeCatatan !== '' || !empty($dressCodeWarna));
     $turutWanita = $undangan->turutMengundangWanita();
     $turutPria = $undangan->turutMengundangPria();
-    $adaTurutMengundang = !empty($turutWanita) || !empty($turutPria);
+    $adaTurutMengundang = $undangan->fiturAktif('turut_mengundang') && (!empty($turutWanita) || !empty($turutPria));
 
     $fotoGaleriSlideshow = collect();
     if (!$tanpaFoto && $undangan->fiturAktif('hitung_mundur')) {
@@ -161,10 +162,12 @@
             height: 100dvh;
             min-height: 520px;
         }
+
         .jawa-hero-layar-penuh.dengan-bar-demo {
             height: calc(100svh - 3.5rem);
             height: calc(100dvh - 3.5rem);
         }
+
         html.desktop-triptych [data-kolom-undangan] .jawa-hero-layar-penuh,
         html.tablet-stage [data-kolom-undangan] .jawa-hero-layar-penuh {
             height: var(--tinggi-tirai-dalam-inv, 100dvh) !important;
@@ -182,9 +185,11 @@
             will-change: transform;
             backface-visibility: hidden;
         }
-        .tirai-fade-halus.tirai-gulir-atas > div {
+
+        .tirai-fade-halus.tirai-gulir-atas>div {
             box-shadow: 0 28px 56px -10px rgba(24, 12, 6, 0.65);
         }
+
         .tirai-fade-halus.tirai-gulir-atas.tirai-terbuka {
             opacity: 1;
             transform: translate3d(0, -105%, 0);
@@ -193,6 +198,7 @@
                 transform 0.9s cubic-bezier(0.32, 0.72, 0, 1),
                 visibility 0s linear 0.92s;
         }
+
         /* Hentikan animasi sampul saat tirai tergulir naik agar GPU fokus 100% ke video hero */
         .tirai-fade-halus.tirai-terbuka *,
         .tirai-fade-halus.tirai-terbuka *::before,
@@ -216,6 +222,7 @@
                 opacity: 0;
                 transform: translate3d(0, 16px, 0) scale(0.98);
             }
+
             100% {
                 opacity: 1;
                 transform: translate3d(0, 0, 0) scale(1);
@@ -223,19 +230,25 @@
         }
 
         @keyframes jawaSayapSampul {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: rotate(3deg) translate3d(0, 0, 0);
             }
+
             50% {
                 transform: rotate(-4deg) translate3d(3px, -5px, 0);
             }
         }
 
         @keyframes jawaSinarKeraton {
-            0%, 100% {
+
+            0%,
+            100% {
                 opacity: 0.14;
                 transform: translate3d(-10%, 0, 0) rotate(-18deg);
             }
+
             50% {
                 opacity: 0.34;
                 transform: translate3d(12%, 0, 0) rotate(-14deg);
@@ -243,19 +256,26 @@
         }
 
         @keyframes jawaTombolKilau {
-            0%, 25% {
+
+            0%,
+            25% {
                 transform: translate3d(-140%, 0, 0) skewX(-20deg);
             }
-            60%, 100% {
+
+            60%,
+            100% {
                 transform: translate3d(260%, 0, 0) skewX(-20deg);
             }
         }
 
         @keyframes jawaGarisCahaya {
-            0%, 100% {
+
+            0%,
+            100% {
                 opacity: 0.55;
                 transform: scaleX(0.92);
             }
+
             50% {
                 opacity: 1;
                 transform: scaleX(1);
@@ -265,9 +285,11 @@
         .jawa-masuk-1 {
             animation: jawaSampulMasuk 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
         }
+
         .jawa-masuk-2 {
             animation: jawaSampulMasuk 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
         }
+
         .jawa-masuk-3 {
             animation: jawaSampulMasuk 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.38s both;
         }
@@ -277,14 +299,17 @@
             animation: jawaSayapSampul 7.2s ease-in-out infinite;
             will-change: transform;
         }
+
         .jawa-sinar-keraton {
             animation: jawaSinarKeraton 10.5s ease-in-out infinite;
             will-change: transform, opacity;
         }
+
         .jawa-garis-cahaya {
             animation: jawaGarisCahaya 5.5s ease-in-out infinite;
             will-change: transform, opacity;
         }
+
         .jawa-tombol-kilau::after {
             content: "";
             position: absolute;
@@ -311,14 +336,17 @@
         }
 
         @media (prefers-reduced-motion: reduce) {
+
             .tirai-fade-halus.tirai-gulir-atas,
             .tirai-fade-halus.tirai-gulir-atas.tirai-terbuka {
                 transition: none !important;
                 transform: none !important;
             }
+
             .tirai-fade-halus.tirai-gulir-atas.tirai-terbuka {
                 opacity: 0;
             }
+
             .jawa-masuk-1,
             .jawa-masuk-2,
             .jawa-masuk-3,
@@ -375,7 +403,8 @@
             @include('tema.adat-jawa.partials._sampul')
 
             {{-- KONTEN UTAMA 13 SEKSI ADAT JAWA KERATON --}}
-            <main data-panggung-3d data-sinema-gsap="jawa" class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
+            <main data-panggung-3d data-sinema-gsap="jawa"
+                class="panggung-3d relative z-10 {{ $tampilBarDemo ? 'pt-14' : '' }}">
                 @include('tema.adat-jawa.partials._hero-diorama')
                 @include('tema.adat-jawa.partials._konten-utama')
                 @include('tema.adat-jawa.partials._penutup-dan-rsvp')

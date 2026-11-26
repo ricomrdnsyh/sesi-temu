@@ -115,6 +115,7 @@
 </div>
 
 {{-- SEKSI 2: PRELUDE GALA & LANDSCAPE SPOTLIGHT FOTO PEMBUKA --}}
+@if ($undangan->fiturAktif('ayat_pembuka'))
 <section
     data-kartu-tumpuk
     data-section-pembuka="artdeco"
@@ -156,3 +157,4 @@
         @endif
     </div>
 </section>
+@endif

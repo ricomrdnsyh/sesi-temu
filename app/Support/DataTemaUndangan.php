@@ -45,16 +45,17 @@ class DataTemaUndangan
         $pengaturan = $undangan->pengaturan ?? [];
         $ceritaList = $pengaturan['cerita_cinta'] ?? [];
         $live = $pengaturan['live_streaming'] ?? [];
+        $live['aktif'] = $undangan->fiturAktif('live_streaming');
         $alamatKado = trim((string) ($pengaturan['alamat_kado_fisik'] ?? ''));
 
         $instagramPria = $undangan->instagramPria();
         $instagramWanita = $undangan->instagramWanita();
         $dressCodeCatatan = $undangan->dressCodeCatatan();
         $dressCodeWarna = $undangan->dressCodeWarna();
-        $adaDressCode = $dressCodeCatatan !== '' || ! empty($dressCodeWarna);
+        $adaDressCode = $undangan->fiturAktif('dress_code') && ($dressCodeCatatan !== '' || ! empty($dressCodeWarna));
         $turutWanita = $undangan->turutMengundangWanita();
         $turutPria = $undangan->turutMengundangPria();
-        $adaTurutMengundang = ! empty($turutWanita) || ! empty($turutPria);
+        $adaTurutMengundang = $undangan->fiturAktif('turut_mengundang') && (! empty($turutWanita) || ! empty($turutPria));
 
         $galeriPanggungKanan = collect();
         $fotoGaleriSlideshow = collect();

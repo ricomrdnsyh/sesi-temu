@@ -292,7 +292,7 @@
 @endif
 
 {{-- SEKSI 5: RANGKAIAN ACARA — KARTU LENTERA KONSERVATORI KACA ZAMRUD & PITA KUNINGAN --}}
-@if ($undangan->daftarAcara->isNotEmpty())
+@if ($undangan->fiturAktif('acara') && $undangan->daftarAcara->isNotEmpty())
 <section
     data-layout-acara="taman"
     data-acara-konservatori-velvet

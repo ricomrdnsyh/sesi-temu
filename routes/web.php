@@ -40,6 +40,7 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
     Route::get('/', [DashboardUndanganController::class, 'index'])->name('index');
     Route::get('/undangan', [DashboardUndanganController::class, 'daftarUndangan'])->name('undangan.index');
     Route::get('/tamu', [DashboardUndanganController::class, 'tamu'])->name('tamu.index');
+    Route::get('/rsvp', [DashboardUndanganController::class, 'rsvp'])->name('rsvp.index');
     Route::get('/katalog', [DashboardUndanganController::class, 'katalog'])->name('katalog');
     Route::post('/katalog/terapkan-tema', [DashboardUndanganController::class, 'terapkanTema'])->name('katalog.terapkan');
     Route::get('/profil', [DashboardUndanganController::class, 'profil'])->name('profil.tampil');
@@ -47,6 +48,7 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
     Route::post('/undangan', [DashboardUndanganController::class, 'simpanUndanganBaru'])->name('undangan.simpan');
     Route::get('/undangan/{undangan}/kelola', [DashboardUndanganController::class, 'kelola'])->name('undangan.kelola');
     Route::get('/undangan/{undangan}/tamu', [DashboardUndanganController::class, 'tamuUndangan'])->name('undangan.tamu');
+    Route::get('/undangan/{undangan}/rsvp', [DashboardUndanganController::class, 'rsvpUndangan'])->name('undangan.rsvp');
     Route::get('/undangan/{undangan}/pratinjau-tema/{tema}', [DashboardUndanganController::class, 'pratinjauTema'])->name('undangan.pratinjau-tema');
     Route::post('/undangan/{undangan}/pratinjau-langsung', [DashboardUndanganController::class, 'pratinjauLangsung'])->name('undangan.pratinjau-langsung');
     Route::patch('/undangan/{undangan}/tema', [DashboardUndanganController::class, 'gantiTema'])->name('undangan.ganti-tema');

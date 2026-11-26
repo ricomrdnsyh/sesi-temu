@@ -1,6 +1,6 @@
 {{-- SEKSI 9: AMPLOP DIGITAL KONSERVATORI (INTERAKTIF BUKA-TUTUP KARTU BANK GLOSSY) --}}
 @if ($undangan->fiturAktif('amplop_digital') && ($undangan->daftarAmplop->isNotEmpty() || $alamatKado !== ''))
-    <section class="relative bg-[#132623] px-4 pt-12 pb-6 overflow-hidden">
+    <section data-layout-amplop class="relative bg-[#132623] px-4 pt-12 pb-6 overflow-hidden">
         <div
             x-data="{ amplopTerbuka: false }"
             class="max-w-md mx-auto rounded-3xl bg-[#FDFBF7] text-[#1F3431] border-2 border-[#C8A464]/65 p-6 text-center shadow-2xl kartu-3d efek-shimmer-kartu space-y-5"
@@ -96,7 +96,6 @@
 @endif
 
 {{-- SEKSI 10: BUKU TAMU & RSVP --}}
-@if ($undangan->fiturAktif('buku_tamu'))
     <section id="buku-tamu" class="relative bg-[#132623] px-4 py-6 overflow-hidden">
         <div
             class="max-w-md mx-auto rounded-3xl bg-[#FDFBF7] text-[#1F3431] border-2 border-[#C8A464]/65 p-6 shadow-2xl space-y-5">
@@ -235,7 +234,6 @@
             @endif
         </div>
     </section>
-@endif
 
 {{-- SEKSI 11: DOA UNTUK PENGANTIN & TURUT MENGUNDANG --}}
 @if ($undangan->fiturAktif('doa_pengantin') || $adaTurutMengundang)

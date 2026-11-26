@@ -181,19 +181,39 @@ class TamuUndanganPelacakanTest extends TestCase
             ->get("/dashboard/tamu?undangan={$undangan->id}")
             ->assertRedirect($urlHalamanTamu);
 
-        // Halaman ruang kerja Tamu & RSVP menampilkan menu Undangan + Tamu & RSVP serta data tamu tersimpan
+        // Halaman ruang kerja Daftar Tamu menampilkan DataTable + menu Undangan, Tamu & RSVP terpisah serta data tamu tersimpan
         $this->actingAs($pemilik)
             ->get($urlHalamanTamu)
             ->assertOk()
             ->assertSee('data-workspace-menu="undangan"', false)
             ->assertSee('data-workspace-menu="tamu"', false)
-            ->assertSee('Tamu &amp; RSVP', false)
+            ->assertSee('data-workspace-menu="rsvp"', false)
+            ->assertSee('id="tabel-daftar-tamu"', false)
+            ->assertSee('data-datatable', false)
+            ->assertSee(':href="tamu.waUrl"', false)
+            ->assertSee('Daftar Tamu')
             ->assertSee('Budi Santoso')
             ->assertSee('6281234567890')
             ->assertSee('Sudah Dibuka')
             ->assertSee('Belum Dikirim')
             ->assertSee('Import Banyak')
-            ->assertSee('Tambah Tamu');
+            ->assertSee('Tambah Tamu')
+            ->assertDontSee('Ucapan &amp; RSVP', false);
+
+        // Halaman RSVP & Ucapan memakai DataTable terpisah tanpa form tambah tamu
+        $this->actingAs($pemilik)
+            ->get(route('dashboard.undangan.rsvp', $undangan))
+            ->assertOk()
+            ->assertSee('id="tabel-rsvp-ucapan"', false)
+            ->assertSee('data-datatable', false)
+            ->assertSee('RSVP &amp; Ucapan', false)
+            ->assertSee('Konfirmasi Hadir')
+            ->assertDontSee('Import Banyak')
+            ->assertDontSee('Tambah Tamu');
+
+        $this->actingAs($pemilik)
+            ->get("/dashboard/undangan/{$undangan->id}/tamu?subtab=rsvp")
+            ->assertRedirect(route('dashboard.undangan.rsvp', $undangan));
 
         // 9. Pemilik dapat menghapus tamu
         $this->actingAs($pemilik)

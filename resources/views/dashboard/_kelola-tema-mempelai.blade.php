@@ -144,7 +144,13 @@
             <div class="rounded-2xl bg-ivory/65 p-4 ring-1 ring-champagne/20 space-y-3.5">
                 <div>
                     <label for="gaya_font" class="block text-xs font-semibold text-charcoal/80 mb-1">Gaya Huruf (Font)</label>
-                    <select id="gaya_font" name="gaya_font" class="w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm focus:border-sage focus:outline-none">
+                    <select
+                        id="gaya_font"
+                        name="gaya_font"
+                        data-select2-variant="white"
+                        data-select2-search="true"
+                        class="w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm focus:border-sage focus:outline-none"
+                    >
                         @foreach ($daftarGayaFont as $kodeFont => $infoFont)
                             <option value="{{ $kodeFont }}" @selected($undangan->kodeGayaFontTerpilih() === $kodeFont)>
                                 {{ $infoFont['label'] }}
@@ -195,6 +201,8 @@
                             name="musik_latar"
                             x-model="musikDipilih"
                             @change="hentikanAudioPreview()"
+                            data-select2-variant="white"
+                            data-select2-search="true"
                             class="w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm focus:border-sage focus:outline-none"
                         >
                             <option value="">-- Tanpa Musik Latar --</option>
@@ -454,52 +462,81 @@
     </section>
 </div>
 
-{{-- ACCORDION 2: Ayat Pembuka & Data Mempelai (Seksi 2 & 3 Undangan) --}}
+{{-- ACCORDION 2: Ayat Pembuka (Seksi 2 Undangan) --}}
 <div
-    :class="tab === 'mempelai' ? 'border-sage/45 ring-1 ring-sage/15 shadow-xs' : 'border-champagne/30 hover:border-champagne/60'"
+    :class="tab === 'ayat' ? 'border-sage/45 ring-1 ring-sage/15 shadow-xs' : 'border-champagne/30 hover:border-champagne/60'"
     class="rounded-2xl border bg-white overflow-hidden transition"
 >
-    <button
-        type="button"
-        data-mobile-tab="mempelai"
-        @click="toggleBagian('mempelai')"
-        class="w-full px-4 py-3.5 flex items-center justify-between gap-3 text-left cursor-pointer hover:bg-ivory/50 transition"
-    >
-        <div class="flex items-center gap-2.5 min-w-0">
-            <svg
-                :class="tab === 'mempelai' ? 'rotate-90 text-sage' : 'text-charcoal/45'"
-                class="h-4 w-4 shrink-0 transition-transform duration-200"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
-            >
-                <path d="m9 18 6-6-6-6"/>
-            </svg>
-            <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-sage/12 text-[11px] font-bold text-sage shrink-0">2</span>
-            <span class="font-sans text-sm font-semibold text-charcoal truncate">Ayat Pembuka &amp; Mempelai</span>
-        </div>
-        @if ($tabSelesai['mempelai'])
-            <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-sage/12 text-sage shrink-0">
-                <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <polyline points="20 6 9 17 4 12"/>
+    <div class="px-4 py-3.5 flex items-center justify-between gap-2 hover:bg-ivory/50 transition">
+        <button
+            type="button"
+            data-mobile-tab="ayat"
+            @click="toggleBagian('ayat')"
+            class="flex-1 flex items-center justify-between gap-2 min-w-0 text-left cursor-pointer"
+        >
+            <span class="flex items-center gap-2.5 min-w-0">
+                <svg
+                    :class="tab === 'ayat' ? 'rotate-90 text-sage' : 'text-charcoal/45'"
+                    class="h-4 w-4 shrink-0 transition-transform duration-200"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                >
+                    <path d="m9 18 6-6-6-6"/>
                 </svg>
+                <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-sage/12 text-[11px] font-bold text-sage shrink-0">2</span>
+                <span class="font-sans text-sm font-semibold text-charcoal truncate" :class="!sakelarFitur.ayat_pembuka ? 'opacity-55' : ''">Ayat Pembuka</span>
             </span>
-        @endif
-    </button>
+            @if ($tabSelesai['ayat'])
+                <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-sage/12 text-sage shrink-0">
+                    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                </span>
+            @endif
+        </button>
+        <button
+            type="button"
+            role="switch"
+            data-toggle-fitur="ayat_pembuka"
+            :aria-checked="sakelarFitur.ayat_pembuka ? 'true' : 'false'"
+            :disabled="Boolean(fiturMenyimpan.ayat_pembuka)"
+            @click.stop="toggleFitur('ayat_pembuka')"
+            :class="sakelarFitur.ayat_pembuka ? 'bg-sage' : 'bg-charcoal/25'"
+            class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors cursor-pointer disabled:opacity-60"
+            title="Tampilkan atau sembunyikan Ayat Pembuka"
+            aria-label="Tampilkan Ayat Pembuka"
+        >
+            <span
+                :class="sakelarFitur.ayat_pembuka ? 'translate-x-4' : 'translate-x-0'"
+                class="pointer-events-none block h-4 w-4 rounded-full bg-white shadow-xs transition-transform"
+            ></span>
+        </button>
+    </div>
 
-    <section x-show="tab === 'mempelai'" x-cloak class="px-4 pb-5 pt-3 border-t border-champagne/20 space-y-4">
-        @if ($undangan->modeTanpaFoto())
-            <button
-                type="button"
-                @click="pilihTab('tema')"
-                class="w-full inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800 hover:bg-amber-100 transition cursor-pointer text-left"
-            >
-                <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
-                <span>Mode Tanpa Foto aktif &mdash; ubah di bagian Sampul &amp; Tema jika ingin menampilkan foto</span>
-            </button>
-        @endif
+    <section x-show="tab === 'ayat'" x-cloak class="px-4 pb-5 pt-3 border-t border-champagne/20 space-y-4">
+        <div x-show="!sakelarFitur.ayat_pembuka" x-cloak class="rounded-xl border border-amber-200 bg-amber-50/80 px-3 py-2 text-xs text-amber-800">
+            Bagian <strong>Ayat Pembuka</strong> sedang disembunyikan. Nyalakan sakelar di kanan atas untuk menampilkannya.
+        </div>
+        <div data-bagian-utama="ayat" class="rounded-2xl bg-ivory/75 p-4 ring-1 ring-champagne/25 space-y-4">
+            {{-- Foto Pembuka / Seksi Ayat (Langsung Tampil) --}}
+            <div class="space-y-2">
+                <div class="flex items-center justify-between gap-2">
+                    <span class="text-xs font-bold text-charcoal">Foto Pembuka / Seksi Ayat</span>
+                    <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $adaFotoPembuka ? 'bg-sage/12 text-sage' : 'bg-white text-charcoal/50 ring-1 ring-champagne/30' }}">
+                        {{ $adaFotoPembuka ? 'Terisi' : 'Opsional' }}
+                    </span>
+                </div>
+                @include('dashboard._input-foto-pratinjau', [
+                    'name' => 'foto_pembuka',
+                    'varian' => 'sampul',
+                    'label' => 'Foto Pembuka / Seksi Ayat',
+                    'petunjuk' => 'Rasio template: '.$rasioFotoTema['foto_pembuka']['label'].' • Kosong = pakai Foto Sampul',
+                    'urlAwal' => $undangan->urlFotoPembukaKhususDashboard(),
+                    'hapusNama' => 'hapus_foto_pembuka',
+                    'hapusLabel' => 'Hapus foto pembuka',
+                ])
+            </div>
 
-        <div data-bagian-utama="mempelai" class="space-y-4">
-            {{-- Bagian 2A (Tampil Pertama di Undangan): Kutipan Ayat & Foto Pembuka --}}
-            <div class="rounded-2xl bg-ivory/75 p-4 ring-1 ring-champagne/25 space-y-3">
+            <div class="space-y-3 pt-1 border-t border-champagne/20">
                 <div>
                     <label for="kutipan_ayat" class="block text-xs font-bold text-charcoal">Kutipan Ayat / Doa Pembuka</label>
                     <p class="text-[11px] text-charcoal/55 mt-0.5">Tampil tepat setelah sampul dibuka, sebelum profil mempelai.</p>
@@ -528,39 +565,56 @@
                     placeholder="Masukkan ayat suci, doa pernikahan, atau kata mutiara..."
                     class="w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2.5 text-sm leading-relaxed focus:border-sage focus:outline-none"
                 >{{ old('kutipan_ayat', $undangan->kutipan_ayat) }}</textarea>
-
-                {{-- Foto Pembuka / Seksi Ayat --}}
-                <div x-data="{ buka: false }" class="rounded-xl border border-champagne/30 bg-white/80 overflow-hidden">
-                    <button
-                        type="button"
-                        @click="buka = !buka"
-                        class="w-full px-3 py-2 flex items-center justify-between gap-2 text-left hover:bg-ivory/60 transition cursor-pointer"
-                    >
-                        <span class="text-xs font-semibold text-charcoal truncate">Foto Pembuka / Seksi Ayat</span>
-                        <span class="flex items-center gap-1.5 shrink-0">
-                            <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold {{ $adaFotoPembuka ? 'bg-sage/12 text-sage' : 'bg-ivory text-charcoal/50 ring-1 ring-champagne/30' }}">
-                                {{ $adaFotoPembuka ? 'Terisi' : 'Opsional' }}
-                            </span>
-                            <svg :class="buka ? 'rotate-180 text-sage' : 'text-charcoal/45'" class="h-3.5 w-3.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="m6 9 6 6 6-6"/>
-                            </svg>
-                        </span>
-                    </button>
-                    <div x-show="buka" x-cloak class="p-3 border-t border-champagne/20">
-                        @include('dashboard._input-foto-pratinjau', [
-                            'name' => 'foto_pembuka',
-                            'varian' => 'sampul',
-                            'label' => 'Foto Pembuka / Seksi Ayat',
-                            'petunjuk' => 'Rasio template: '.$rasioFotoTema['foto_pembuka']['label'].' • Kosong = pakai Foto Sampul',
-                            'urlAwal' => $undangan->urlFotoPembukaKhususDashboard(),
-                            'hapusNama' => 'hapus_foto_pembuka',
-                            'hapusLabel' => 'Hapus foto pembuka',
-                        ])
-                    </div>
-                </div>
             </div>
+        </div>
+    </section>
+</div>
 
-            {{-- Bagian 2B: Judul, Pengantar & Label Mempelai (Tampil di Atas Kartu Mempelai) --}}
+{{-- ACCORDION 3: Profil Mempelai (Seksi 3 Undangan) --}}
+<div
+    :class="tab === 'mempelai' ? 'border-sage/45 ring-1 ring-sage/15 shadow-xs' : 'border-champagne/30 hover:border-champagne/60'"
+    class="rounded-2xl border bg-white overflow-hidden transition"
+>
+    <button
+        type="button"
+        data-mobile-tab="mempelai"
+        @click="toggleBagian('mempelai')"
+        class="w-full px-4 py-3.5 flex items-center justify-between gap-3 text-left cursor-pointer hover:bg-ivory/50 transition"
+    >
+        <div class="flex items-center gap-2.5 min-w-0">
+            <svg
+                :class="tab === 'mempelai' ? 'rotate-90 text-sage' : 'text-charcoal/45'"
+                class="h-4 w-4 shrink-0 transition-transform duration-200"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+            >
+                <path d="m9 18 6-6-6-6"/>
+            </svg>
+            <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-sage/12 text-[11px] font-bold text-sage shrink-0">3</span>
+            <span class="font-sans text-sm font-semibold text-charcoal truncate">Profil Mempelai</span>
+        </div>
+        @if ($tabSelesai['mempelai'])
+            <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-sage/12 text-sage shrink-0">
+                <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            </span>
+        @endif
+    </button>
+
+    <section x-show="tab === 'mempelai'" x-cloak class="px-4 pb-5 pt-3 border-t border-champagne/20 space-y-4">
+        @if ($undangan->modeTanpaFoto())
+            <button
+                type="button"
+                @click="pilihTab('tema')"
+                class="w-full inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800 hover:bg-amber-100 transition cursor-pointer text-left"
+            >
+                <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+                <span>Mode Tanpa Foto aktif &mdash; ubah di bagian Sampul &amp; Tema jika ingin menampilkan foto</span>
+            </button>
+        @endif
+
+        <div data-bagian-utama="mempelai" class="space-y-4">
+            {{-- Judul, Pengantar & Label Mempelai (Tampil di Atas Kartu Mempelai) --}}
             <div x-data="{ buka: false }" class="rounded-2xl border border-champagne/30 bg-ivory/50 overflow-hidden">
                 <button
                     type="button"

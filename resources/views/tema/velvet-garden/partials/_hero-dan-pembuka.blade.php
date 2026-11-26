@@ -236,6 +236,7 @@
 </div>
 
 {{-- SEKSI 2: PRELUDE GREENHOUSE SANCTUARY — MONOGRAM, POTRET LENGKUNG & KALAM DOA --}}
+@if ($undangan->fiturAktif('ayat_pembuka'))
 <section
     data-section-pembuka="taman"
     class="relative bg-gradient-to-b from-[#0E1E18] via-[#132623] to-[#162C28] text-[#F4F8F6] px-5 pt-11 pb-14 overflow-hidden"
@@ -312,3 +313,4 @@
         @endif
     </div>
 </section>
+@endif

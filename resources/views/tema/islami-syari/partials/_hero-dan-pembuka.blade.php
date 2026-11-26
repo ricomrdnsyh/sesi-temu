@@ -200,6 +200,7 @@
 </section>
 
 {{-- SEKSI 2: PRELUDE SANCTUARY ZAMRUD — SALAM, POTRET PEMBUKA, SEGEL RUB EL HIZB & KALAM AYAT --}}
+@if ($undangan->fiturAktif('ayat_pembuka'))
 <section
     data-section-pembuka="mihrab"
     class="relative bg-gradient-to-b from-[#0E3A36] via-[#0B2E2A] to-[#08221F] shadow-[0_-2px_0_0_#0E3A36] text-[#F7FBF8] px-5 pt-11 pb-14 overflow-hidden"
@@ -322,3 +323,4 @@
         @endif
     </div>
 </section>
+@endif

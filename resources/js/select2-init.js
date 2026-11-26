@@ -46,11 +46,18 @@ const tentukanVarian = (selectEl) => {
 const tentukanDropdownParent = (selectEl, varian) => {
     const parentKhusus = selectEl.closest('[data-select2-parent]');
     if (parentKhusus) {
-        if (getComputedStyle(parentKhusus).position === 'static') {
-            parentKhusus.style.position = 'relative';
-        }
+        const gayaParent = getComputedStyle(parentKhusus);
+        const bisaScroll = ['auto', 'scroll'].includes(gayaParent.overflowY)
+            || ['auto', 'scroll'].includes(gayaParent.overflow);
 
-        return $(parentKhusus);
+        // Jangan menempelkan dropdown ke kontainer yang bisa di-scroll: Select2 v4 tidak menjumlahkan scrollTop parent.
+        if (!bisaScroll) {
+            if (gayaParent.position === 'static') {
+                parentKhusus.style.position = 'relative';
+            }
+
+            return $(parentKhusus);
+        }
     }
 
     // Jika berada di dalam modal fixed inset-0, tempelkan ke panel modal agar klik opsi tidak memicu @click.away.
@@ -65,6 +72,31 @@ const tentukanDropdownParent = (selectEl, varian) => {
     }
 
     return $(document.body);
+};
+
+const sesuaikanPosisiDropdown = (selectEl, dropdownParent) => {
+    const instance = $(selectEl).data('select2');
+    const dropdown = instance?.dropdown;
+    if (!dropdown || !dropdown.$dropdownContainer) {
+        return;
+    }
+
+    dropdown._positionDropdown();
+    dropdown._resizeDropdown();
+
+    const parentEl = dropdownParent?.[0];
+    if (parentEl && parentEl !== document.body && parentEl !== document.documentElement) {
+        const scrollY = parentEl.scrollTop || 0;
+        const scrollX = parentEl.scrollLeft || 0;
+        if (scrollY !== 0 || scrollX !== 0) {
+            const topSaatIni = Number.parseFloat(dropdown.$dropdownContainer.css('top')) || 0;
+            const leftSaatIni = Number.parseFloat(dropdown.$dropdownContainer.css('left')) || 0;
+            dropdown.$dropdownContainer.css({
+                top: `${topSaatIni + scrollY}px`,
+                left: `${leftSaatIni + scrollX}px`,
+            });
+        }
+    }
 };
 
 const sinkronNilaiProgramatik = (selectEl) => {
@@ -104,6 +136,36 @@ const harusDilewatiSelect2 = (selectEl) => (
     || Boolean(selectEl.closest('.swal2-container, [data-no-select2-container], template'))
 );
 
+const renderOpsiBankSelect2 = (data) => {
+    if (!data?.id) {
+        return data?.text || '';
+    }
+
+    const logoUrl = data.element?.dataset?.bankLogo || '';
+    const baris = document.createElement('span');
+    baris.className = 's2-bank-option';
+
+    const wadahIkon = document.createElement('span');
+    wadahIkon.className = 's2-bank-icon';
+    if (logoUrl) {
+        const img = document.createElement('img');
+        img.src = logoUrl;
+        img.alt = '';
+        img.className = 's2-bank-img';
+        wadahIkon.appendChild(img);
+    } else {
+        wadahIkon.innerHTML = '<svg viewBox="0 0 24 18" fill="none" aria-hidden="true"><rect x="1.5" y="2" width="21" height="14" rx="3" stroke="#4B6358" stroke-width="1.6"/><path d="M1.5 7h21" stroke="#BFA15F" stroke-width="1.8"/><rect x="4.5" y="10" width="5" height="2" rx="0.8" fill="#4B6358"/></svg>';
+    }
+    baris.appendChild(wadahIkon);
+
+    const label = document.createElement('span');
+    label.className = 's2-bank-label';
+    label.textContent = data.text || '';
+    baris.appendChild(label);
+
+    return baris;
+};
+
 export const inisialisasiSelect2Element = (selectEl) => {
     if (!(selectEl instanceof HTMLSelectElement)) {
         return;
@@ -135,7 +197,7 @@ export const inisialisasiSelect2Element = (selectEl) => {
     const marginAtas = gayaAsli.marginTop;
     const marginBawah = gayaAsli.marginBottom;
 
-    $(selectEl).select2({
+    const opsiSelect2 = {
         theme: 'sesitemu',
         width: lebar,
         minimumResultsForSearch,
@@ -143,7 +205,14 @@ export const inisialisasiSelect2Element = (selectEl) => {
         selectionCssClass: kelasVarianSelection,
         dropdownCssClass: kelasVarianDropdown,
         language: BAHASA_INDONESIA,
-    });
+    };
+
+    if (selectEl.dataset.select2Bank === 'true') {
+        opsiSelect2.templateResult = renderOpsiBankSelect2;
+        opsiSelect2.templateSelection = renderOpsiBankSelect2;
+    }
+
+    $(selectEl).select2(opsiSelect2);
 
     const instanceS2 = $(selectEl).data('select2');
     const kontainerDom = instanceS2?.$container?.[0];
@@ -174,9 +243,26 @@ export const inisialisasiSelect2Element = (selectEl) => {
     });
 
     $(selectEl).on('select2:open.sesitemu', () => {
-        const kotakCari = dropdownParent[0]?.querySelector('.select2-container--open .select2-search__field');
-        if (kotakCari) {
-            window.setTimeout(() => kotakCari.focus(), 0);
+        const perbarui = () => {
+            sesuaikanPosisiDropdown(selectEl, dropdownParent);
+            const kotakCari = dropdownParent[0]?.querySelector('.select2-container--open .select2-search__field');
+            if (kotakCari) {
+                kotakCari.focus({ preventScroll: true });
+            }
+        };
+
+        if (typeof window.requestAnimationFrame === 'function') {
+            window.requestAnimationFrame(perbarui);
+        } else {
+            window.setTimeout(perbarui, 0);
+        }
+    });
+};
+
+export const tutupSemuaSelect2 = () => {
+    document.querySelectorAll('select.select2-hidden-accessible').forEach((selectEl) => {
+        if ($(selectEl).data('select2')) {
+            $(selectEl).select2('close');
         }
     });
 };

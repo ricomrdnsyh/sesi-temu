@@ -279,6 +279,7 @@
 </section>
 
 {{-- SEKSI 3: PRELUDE PRIANGAN, FOTO PEMBUKA, MONOGRAM BERTEMU & KUTIPAN AYAT --}}
+@if ($undangan->fiturAktif('ayat_pembuka'))
 <section
     data-section-pembuka="priangan"
     class="relative bg-gradient-to-b from-[#5A1E1E] via-[#4A1717] to-[#3B1414] shadow-[0_-2px_0_0_#5A1E1E] text-[#FAF4E8] px-5 pt-11 pb-14 overflow-hidden"
@@ -379,3 +380,4 @@
         @endif
     </div>
 </section>
+@endif

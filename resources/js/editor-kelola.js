@@ -37,13 +37,27 @@ export function editorKelolaUndangan(cfgMasuk = null) {
         url: item?.url || '',
         keterangan: item?.keterangan || '',
     });
+    let antreanSimpanFitur = Promise.resolve();
+    const buatFormAcaraKosong = () => ({
+        id: '',
+        nama_acara: '',
+        tanggal_acara: '',
+        waktu_mulai: '08:00',
+        waktu_selesai: '',
+        zona_waktu: 'WIB',
+        nama_tempat: '',
+        alamat_lengkap: '',
+        link_maps: '',
+    });
 
     return {
-        tab: cfg.tab,
-        urutanTab: ['tema', 'mempelai', 'acara', 'cerita', 'galeri', 'amplop', 'penutup', 'aktivasi'],
+        tab: cfg.tab === 'aktivasi' ? '' : cfg.tab,
+        urutanTab: ['tema', 'ayat', 'mempelai', 'hitung_mundur', 'acara', 'dress_code', 'live_streaming', 'cerita', 'galeri', 'amplop', 'buku_tamu', 'doa_pengantin', 'turut_mengundang', 'penutup'],
         urlPublikPreview: cfg.urlPublikPreview,
         urlPublikSalin: cfg.urlPublikSalin || '',
         urlSimpanFitur: cfg.urlSimpanFitur,
+        urlSimpanAcara: cfg.urlSimpanAcara || '',
+        urlSimpanAmplop: cfg.urlSimpanAmplop || '',
         urlPratinjauLangsung: cfg.urlPratinjauLangsung,
         csrfToken: cfg.csrfToken,
         adaPerubahanBelumDisimpan: false,
@@ -84,8 +98,31 @@ export function editorKelolaUndangan(cfgMasuk = null) {
         namaPriaLive: cfg.namaPriaLive,
         namaWanitaLive: cfg.namaWanitaLive,
         tanpaFotoAktif: cfg.tanpaFotoAktif,
-        sakelarFitur: cfg.sakelarFitur,
-        fiturMenyimpan: {},
+        sakelarFitur: {
+            ayat_pembuka: true,
+            hitung_mundur: true,
+            acara: true,
+            dress_code: true,
+            live_streaming: false,
+            cerita_cinta: true,
+            galeri: true,
+            amplop_digital: true,
+            doa_pengantin: true,
+            turut_mengundang: true,
+            ...(cfg.sakelarFitur || {}),
+        },
+        fiturMenyimpan: {
+            ayat_pembuka: false,
+            hitung_mundur: false,
+            acara: false,
+            dress_code: false,
+            live_streaming: false,
+            cerita_cinta: false,
+            galeri: false,
+            amplop_digital: false,
+            doa_pengantin: false,
+            turut_mengundang: false,
+        },
         musikDipilih: cfg.musikDipilih,
         modeMusik: cfg.modeMusik || 'katalog',
         musikKustomUrlAwal: cfg.musikKustomUrlAwal || '',
@@ -112,12 +149,32 @@ export function editorKelolaUndangan(cfgMasuk = null) {
         pesanGalatGaleri: '',
         daftarCerita: cfg.daftarCerita,
         liveAktifLive: cfg.liveAktifLive,
-        katalogBank: cfg.katalogBank,
+        daftarAmplop: Array.isArray(cfg.daftarAmplop) ? cfg.daftarAmplop : [],
+        formAmplop: {
+            nomor_rekening: '',
+            atas_nama: '',
+        },
+        sedangSimpanAmplop: false,
+        amplopHapusId: null,
+        bankPilihan: '',
+        bankKustom: '',
         bankBaru: '',
-        nomorBaru: '',
-        atasNamaBaru: '',
+        daftarAcara: Array.isArray(cfg.daftarAcara) ? cfg.daftarAcara : [],
+        formAcara: buatFormAcaraKosong(),
+        pickerAcaraAktif: '',
+        modePilihBulan: false,
+        kalenderTahun: new Date().getFullYear(),
+        kalenderBulan: new Date().getMonth(),
+        namaBulanKalender: [
+            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+        ],
+        namaHariKalender: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'],
         acaraEdit: null,
+        sedangSimpanAcara: false,
+        acaraHapusId: null,
         galeriLightbox: null,
+        modalAktivasiTerbuka: cfg.tab === 'aktivasi',
         drawerTemaTerbuka: false,
         kategoriDrawerTema: 'semua',
         cariDrawerTema: '',
@@ -159,10 +216,6 @@ export function editorKelolaUndangan(cfgMasuk = null) {
                 }
             });
             this.$watch('tanpaFotoAktif', () => {
-                this.tandaiPerubahan();
-                this.jadwalkanLivePreview(true);
-            });
-            this.$watch('liveAktifLive', () => {
                 this.tandaiPerubahan();
                 this.jadwalkanLivePreview(true);
             });
@@ -299,7 +352,7 @@ export function editorKelolaUndangan(cfgMasuk = null) {
             const tabAktif = fokusBagian || this.tab;
             const bukaSampul = fokusBagian === 'tema'
                 ? false
-                : (['mempelai', 'acara', 'cerita', 'galeri', 'amplop', 'penutup'].includes(tabAktif)
+                : (['ayat', 'mempelai', 'hitung_mundur', 'acara', 'dress_code', 'live_streaming', 'cerita', 'galeri', 'amplop', 'buku_tamu', 'doa_pengantin', 'turut_mengundang', 'penutup'].includes(tabAktif)
                     ? true
                     : sampulSudahTerbuka);
 
@@ -322,7 +375,7 @@ export function editorKelolaUndangan(cfgMasuk = null) {
                 doa_disertakan: true,
                 dress_code_catatan: nilai('dress_code_catatan'),
                 dress_code_warna: warnaDressCode,
-                live_aktif: this.liveAktifLive,
+                live_aktif: Boolean(this.sakelarFitur?.live_streaming),
                 live_platform: nilai('live_platform'),
                 live_link: nilai('live_link'),
                 alamat_kado_fisik: nilai('alamat_kado_fisik'),
@@ -392,41 +445,133 @@ export function editorKelolaUndangan(cfgMasuk = null) {
                 }
             }
         },
+        jumlahCeritaTerisi() {
+            return (Array.isArray(this.daftarCerita) ? this.daftarCerita : []).filter((item) => (
+                String(item?.judul || '').trim() !== ''
+                || String(item?.cerita || '').trim() !== ''
+                || String(item?.foto_url || item?.foto || '').trim() !== ''
+            )).length;
+        },
+        pesanCatatanFiturKosong(kunci) {
+            const root = this.$refs.panelKiri;
+            if (kunci === 'acara' && this.daftarAcara.length === 0) {
+                return 'Tambahkan jadwal acara agar tampil di undangan.';
+            }
+            if (kunci === 'dress_code') {
+                const catatan = (root?.querySelector('[name="dress_code_catatan"]')?.value || '').trim();
+                const jmlWarna = root?.querySelectorAll('[name^="dress_code_warna["]')?.length || 0;
+                if (!catatan && jmlWarna === 0) {
+                    return 'Isi catatan atau pilih warna agar Dress Code tampil di undangan.';
+                }
+            }
+            if (kunci === 'live_streaming') {
+                const link = (root?.querySelector('[name="live_link"]')?.value || '').trim();
+                if (!link) {
+                    return 'Isi Link Live agar tombol Live Streaming tampil di undangan.';
+                }
+            }
+            if (kunci === 'cerita_cinta' && this.jumlahCeritaTerisi() === 0) {
+                return 'Isi minimal satu momen cerita agar tampil di undangan.';
+            }
+            if (kunci === 'galeri') {
+                if (this.tanpaFotoAktif) {
+                    return 'Mode Tanpa Foto masih aktif sehingga galeri belum ditampilkan.';
+                }
+                if (this.daftarGaleri.length === 0) {
+                    return 'Unggah minimal satu foto agar Galeri tampil di undangan.';
+                }
+            }
+            if (kunci === 'amplop_digital') {
+                const alamat = (root?.querySelector('[name="alamat_kado_fisik"]')?.value || '').trim();
+                if (this.daftarAmplop.length === 0 && !alamat) {
+                    return 'Tambahkan rekening atau alamat kado agar Amplop Digital tampil.';
+                }
+            }
+            if (kunci === 'turut_mengundang') {
+                const wanita = (root?.querySelector('[name="turut_mengundang_wanita"]')?.value || '').trim();
+                const pria = (root?.querySelector('[name="turut_mengundang_pria"]')?.value || '').trim();
+                if (!wanita && !pria) {
+                    return 'Isi daftar nama pihak wanita atau pria agar Turut Mengundang tampil di undangan.';
+                }
+            }
+            return '';
+        },
         async toggleFitur(kunci) {
             if (this.fiturMenyimpan[kunci]) return;
             const nilaiLama = Boolean(this.sakelarFitur[kunci]);
             const nilaiBaru = !nilaiLama;
             this.sakelarFitur[kunci] = nilaiBaru;
+            if (kunci === 'live_streaming') {
+                this.liveAktifLive = nilaiBaru;
+            }
             this.fiturMenyimpan[kunci] = true;
 
             const petaFokus = {
-                hitung_mundur: 'acara',
+                ayat_pembuka: 'ayat',
+                hitung_mundur: 'hitung_mundur',
+                acara: 'acara',
+                dress_code: 'dress_code',
+                live_streaming: 'live_streaming',
                 cerita_cinta: 'cerita',
                 galeri: 'galeri',
                 amplop_digital: 'amplop',
-                buku_tamu: 'penutup',
-                doa_pengantin: 'penutup',
+                doa_pengantin: 'doa_pengantin',
+                turut_mengundang: 'turut_mengundang',
+            };
+            const labelFitur = {
+                ayat_pembuka: 'Ayat Pembuka',
+                hitung_mundur: 'Hitung Mundur',
+                acara: 'Rangkaian Acara',
+                dress_code: 'Dress Code',
+                live_streaming: 'Live Streaming',
+                cerita_cinta: 'Cerita Cinta',
+                galeri: 'Galeri Foto',
+                amplop_digital: 'Amplop & Kado',
+                doa_pengantin: 'Doa Untuk Pengantin',
+                turut_mengundang: 'Daftar Turut Mengundang',
             };
             const fokus = nilaiBaru ? (petaFokus[kunci] || '') : '';
             this.jadwalkanLivePreview(true, fokus);
 
-            try {
+            const simpanBerurutan = async () => {
                 const token = document.querySelector('meta[name=csrf-token]')?.content || this.csrfToken;
                 const respon = await fetch(this.urlSimpanFitur, {
-                    method: 'PUT',
+                    method: 'POST',
                     credentials: 'same-origin',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest',
+                        'X-HTTP-Method-Override': 'PUT',
                         'X-CSRF-TOKEN': token,
                     },
-                    body: JSON.stringify({ bagian: 'fitur', kunci, aktif: nilaiBaru }),
+                    body: JSON.stringify({ _method: 'PUT', bagian: 'fitur', kunci, aktif: nilaiBaru }),
                 });
                 if (!respon.ok) throw new Error('Gagal');
-                this.statusSimpanTeks = nilaiBaru ? 'Bagian diaktifkan' : 'Bagian disembunyikan';
+                return respon.json().catch(() => ({ ok: true }));
+            };
+
+            const tugas = antreanSimpanFitur.then(simpanBerurutan, simpanBerurutan);
+            antreanSimpanFitur = tugas.catch(() => {});
+
+            try {
+                await tugas;
+                const nama = labelFitur[kunci] || 'Bagian';
+                this.statusSimpanTeks = nilaiBaru ? `${nama} ditampilkan` : `${nama} disembunyikan`;
+                const catatanKosong = nilaiBaru ? this.pesanCatatanFiturKosong(kunci) : '';
+                if (catatanKosong) {
+                    this.tampilkanToast(catatanKosong, `${nama} Aktif`, 'info');
+                } else {
+                    this.tampilkanToast(
+                        nilaiBaru ? `${nama} kini ditampilkan di undangan.` : `${nama} disembunyikan dari undangan.`,
+                        nilaiBaru ? 'Bagian Diaktifkan' : 'Bagian Disembunyikan'
+                    );
+                }
             } catch (_) {
                 this.sakelarFitur[kunci] = nilaiLama;
+                if (kunci === 'live_streaming') {
+                    this.liveAktifLive = nilaiLama;
+                }
                 this.jadwalkanLivePreview(true);
                 window.Swal?.fire({
                     icon: 'error',
@@ -588,15 +733,10 @@ export function editorKelolaUndangan(cfgMasuk = null) {
                 window.dispatchEvent(new CustomEvent('editor-tersimpan', { detail: data }));
                 this.jadwalkanLivePreview(true);
 
-                window.Swal?.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'success',
-                    title: data?.pesan || 'Semua perubahan undangan berhasil disimpan.',
-                    showConfirmButton: false,
-                    timer: 2600,
-                    timerProgressBar: true,
-                });
+                this.tampilkanToast(
+                    data?.pesan || 'Semua perubahan undangan berhasil disimpan.',
+                    'Perubahan Tersimpan'
+                );
             } catch (_) {
                 window.Swal?.fire({
                     icon: 'error',
@@ -608,31 +748,357 @@ export function editorKelolaUndangan(cfgMasuk = null) {
                 this.sedangMenyimpanSemua = false;
             }
         },
+        tampilkanToast(pesan, judul = 'Berhasil', ikon = 'success') {
+            window.Swal?.fire({
+                toast: true,
+                position: 'top-end',
+                icon: ikon,
+                title: judul,
+                text: pesan,
+                showConfirmButton: false,
+                showCloseButton: true,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = window.Swal.stopTimer;
+                    toast.onmouseleave = window.Swal.resumeTimer;
+                },
+            });
+        },
+        sinkronSelect2El(selectEl, nilai) {
+            if (!selectEl) return;
+            // Alpine x-model toggles option.selected directly without triggering Select2 UI refresh.
+            selectEl.value = nilai != null ? String(nilai) : '';
+            if (window.jQuery && window.jQuery(selectEl).data('select2')) {
+                window.jQuery(selectEl).trigger('change.select2');
+            }
+        },
+        tutupPickerAcara() {
+            this.pickerAcaraAktif = '';
+            this.modePilihBulan = false;
+        },
+        togglePickerAcara(jenis) {
+            if (this.pickerAcaraAktif === jenis) {
+                this.tutupPickerAcara();
+                return;
+            }
+            this.modePilihBulan = false;
+            if (jenis === 'tanggal') {
+                const cocok = (this.formAcara.tanggal_acara || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+                if (cocok) {
+                    this.kalenderTahun = Number(cocok[1]);
+                    this.kalenderBulan = Number(cocok[2]) - 1;
+                } else {
+                    const kini = new Date();
+                    this.kalenderTahun = kini.getFullYear();
+                    this.kalenderBulan = kini.getMonth();
+                }
+            }
+            this.pickerAcaraAktif = jenis;
+            if (jenis === 'mulai' || jenis === 'selesai') {
+                const field = jenis === 'mulai' ? 'waktu_mulai' : 'waktu_selesai';
+                this.$nextTick(() => {
+                    const jamEl = this.$refs[`${jenis}JamList`];
+                    const menitEl = this.$refs[`${jenis}MenitList`];
+                    const jamAktif = this.bagianWaktuAcara(field, 'jam') || '08';
+                    const menitAktif = this.bagianWaktuAcara(field, 'menit') || '00';
+                    jamEl?.querySelector(`[data-jam="${jamAktif}"]`)?.scrollIntoView({ block: 'center' });
+                    menitEl?.querySelector(`[data-menit="${menitAktif}"]`)?.scrollIntoView({ block: 'center' });
+                });
+            }
+        },
+        geserBulanKalender(arah) {
+            let bulan = this.kalenderBulan + arah;
+            let tahun = this.kalenderTahun;
+            if (bulan < 0) {
+                bulan = 11;
+                tahun--;
+            } else if (bulan > 11) {
+                bulan = 0;
+                tahun++;
+            }
+            this.kalenderBulan = bulan;
+            this.kalenderTahun = tahun;
+        },
+        labelTanggalAcara() {
+            const cocok = (this.formAcara.tanggal_acara || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (!cocok) return 'Pilih tanggal acara...';
+            const tgl = new Date(Number(cocok[1]), Number(cocok[2]) - 1, Number(cocok[3]));
+            if (Number.isNaN(tgl.getTime())) return this.formAcara.tanggal_acara;
+            return `${this.namaHariKalender[tgl.getDay()]}, ${Number(cocok[3])} ${this.namaBulanKalender[tgl.getMonth()]} ${cocok[1]}`;
+        },
+        daftarSelKalender() {
+            const tahun = this.kalenderTahun;
+            const bulan = this.kalenderBulan;
+            const hariPertama = new Date(tahun, bulan, 1).getDay();
+            const jumlahHari = new Date(tahun, bulan + 1, 0).getDate();
+            const jumlahHariLalu = new Date(tahun, bulan, 0).getDate();
+            const kini = new Date();
+            const isoHariIni = `${kini.getFullYear()}-${String(kini.getMonth() + 1).padStart(2, '0')}-${String(kini.getDate()).padStart(2, '0')}`;
+            const isoTerpilih = this.formAcara.tanggal_acara || '';
+
+            const formatIso = (y, m, d) => {
+                const dt = new Date(y, m, d);
+                return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+            };
+
+            const sel = [];
+            for (let i = hariPertama - 1; i >= 0; i--) {
+                const angka = jumlahHariLalu - i;
+                const iso = formatIso(tahun, bulan - 1, angka);
+                sel.push({ kunci: `p-${iso}`, angka, iso, bulanAktif: false, hariIni: iso === isoHariIni, terpilih: iso === isoTerpilih });
+            }
+            for (let d = 1; d <= jumlahHari; d++) {
+                const iso = formatIso(tahun, bulan, d);
+                sel.push({ kunci: `c-${iso}`, angka: d, iso, bulanAktif: true, hariIni: iso === isoHariIni, terpilih: iso === isoTerpilih });
+            }
+            const sisa = (7 - (sel.length % 7)) % 7;
+            for (let n = 1; n <= sisa; n++) {
+                const iso = formatIso(tahun, bulan + 1, n);
+                sel.push({ kunci: `n-${iso}`, angka: n, iso, bulanAktif: false, hariIni: iso === isoHariIni, terpilih: iso === isoTerpilih });
+            }
+            return sel;
+        },
+        pilihTanggalKalender(iso) {
+            this.formAcara.tanggal_acara = iso;
+            this.tutupPickerAcara();
+        },
+        pilihHariIniAcara() {
+            const kini = new Date();
+            const iso = `${kini.getFullYear()}-${String(kini.getMonth() + 1).padStart(2, '0')}-${String(kini.getDate()).padStart(2, '0')}`;
+            this.pilihTanggalKalender(iso);
+        },
+        bagianWaktuAcara(field, bagian) {
+            const nilai = this.formAcara?.[field] || '';
+            const cocok = nilai.match(/^(\d{2}):(\d{2})$/);
+            if (!cocok) return '';
+            return bagian === 'jam' ? cocok[1] : cocok[2];
+        },
+        aturBagianWaktuAcara(field, bagian, nilai) {
+            const jamLama = this.bagianWaktuAcara(field, 'jam') || (field === 'waktu_mulai' ? '08' : (this.bagianWaktuAcara('waktu_mulai', 'jam') || '10'));
+            const menitLama = this.bagianWaktuAcara(field, 'menit') || '00';
+            const jamBaru = bagian === 'jam' ? nilai : jamLama;
+            const menitBaru = bagian === 'menit' ? nilai : menitLama;
+            this.formAcara[field] = `${jamBaru}:${menitBaru}`;
+        },
+        mulaiEditAcara(acara) {
+            if (!acara) return;
+            this.tutupPickerAcara();
+            this.acaraEdit = acara;
+            this.formAcara = {
+                id: acara.id || '',
+                nama_acara: acara.nama_acara || '',
+                tanggal_acara: acara.tanggal_acara || '',
+                waktu_mulai: acara.waktu_mulai || '08:00',
+                waktu_selesai: acara.waktu_selesai || '',
+                zona_waktu: acara.zona_waktu || 'WIB',
+                nama_tempat: acara.nama_tempat || '',
+                alamat_lengkap: acara.alamat_lengkap || '',
+                link_maps: acara.link_maps || '',
+            };
+            this.$nextTick(() => this.sinkronSelect2El(this.$refs.acaraZonaSelect, this.formAcara.zona_waktu || 'WIB'));
+            this.$refs.formAcaraPanel?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        },
+        batalEditAcara() {
+            this.tutupPickerAcara();
+            this.acaraEdit = null;
+            this.formAcara = buatFormAcaraKosong();
+            this.$nextTick(() => this.sinkronSelect2El(this.$refs.acaraZonaSelect, this.formAcara.zona_waktu || 'WIB'));
+        },
+        async simpanAcara(event) {
+            if (this.sedangSimpanAcara) return;
+            this.tutupPickerAcara();
+            const form = event?.target;
+            if (!this.formAcara.tanggal_acara) {
+                window.Swal?.fire({
+                    icon: 'warning',
+                    title: 'Tanggal Acara Belum Dipilih',
+                    text: 'Silakan pilih tanggal acara pada kalender terlebih dahulu.',
+                    confirmButtonColor: '#4B6358',
+                });
+                return;
+            }
+            if (form && typeof form.reportValidity === 'function' && !form.reportValidity()) {
+                return;
+            }
+
+            const url = this.urlSimpanAcara || form?.action;
+            if (!url) return;
+
+            this.sedangSimpanAcara = true;
+            try {
+                const token = document.querySelector('meta[name=csrf-token]')?.content || this.csrfToken;
+                const payload = {
+                    acara_id: this.formAcara.id || null,
+                    nama_acara: this.formAcara.nama_acara,
+                    tanggal_acara: this.formAcara.tanggal_acara,
+                    waktu_mulai: this.formAcara.waktu_mulai || '08:00',
+                    waktu_selesai: this.formAcara.waktu_selesai || '',
+                    zona_waktu: this.$refs.acaraZonaSelect?.value || this.formAcara.zona_waktu || 'WIB',
+                    nama_tempat: this.formAcara.nama_tempat,
+                    alamat_lengkap: this.formAcara.alamat_lengkap,
+                    link_maps: this.formAcara.link_maps,
+                };
+
+                const respon = await fetch(url, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': token,
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                const data = await respon.json().catch(() => ({}));
+                if (!respon.ok) {
+                    const daftarGalat = data?.errors ? Object.values(data.errors).flat() : [];
+                    const pesanError = daftarGalat.length > 0
+                        ? daftarGalat.join('\n')
+                        : (data?.message || 'Gagal menyimpan jadwal acara. Silakan periksa kembali isian Anda.');
+                    window.Swal?.fire({
+                        icon: 'error',
+                        title: 'Periksa Isian Acara',
+                        text: pesanError,
+                        confirmButtonColor: '#4B6358',
+                    });
+                    return;
+                }
+
+                const sedangEdit = Boolean(this.acaraEdit);
+                if (Array.isArray(data?.daftar_acara)) {
+                    this.daftarAcara = data.daftar_acara;
+                }
+                this.batalEditAcara();
+                this.jadwalkanLivePreview(true, 'acara');
+
+                this.tampilkanToast(
+                    data?.pesan || 'Jadwal acara berhasil disimpan.',
+                    sedangEdit ? 'Acara Diperbarui' : 'Acara Ditambahkan'
+                );
+            } catch (_) {
+                window.Swal?.fire({
+                    icon: 'error',
+                    title: 'Koneksi Terputus',
+                    text: 'Tidak dapat menghubungi server saat menyimpan acara. Silakan coba lagi.',
+                    confirmButtonColor: '#4B6358',
+                });
+            } finally {
+                this.sedangSimpanAcara = false;
+            }
+        },
+        async hapusAcara(acara) {
+            if (!acara?.id || !acara?.url_hapus || this.acaraHapusId) return;
+
+            if (window.Swal) {
+                const konfirmasi = await window.Swal.fire({
+                    title: 'Hapus Jadwal Acara?',
+                    text: `Yakin ingin menghapus acara ${acara.nama_acara}?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Hapus',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#DC2626',
+                    cancelButtonColor: '#6B7280',
+                    reverseButtons: true,
+                    focusCancel: true,
+                });
+                if (!konfirmasi?.isConfirmed) return;
+            }
+
+            this.acaraHapusId = acara.id;
+            try {
+                const token = document.querySelector('meta[name=csrf-token]')?.content || this.csrfToken;
+                const respon = await fetch(acara.url_hapus, {
+                    method: 'DELETE',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': token,
+                    },
+                });
+
+                const data = await respon.json().catch(() => ({}));
+                if (!respon.ok) {
+                    window.Swal?.fire({
+                        icon: 'error',
+                        title: 'Gagal Menghapus Acara',
+                        text: data?.message || 'Tidak dapat menghapus jadwal acara saat ini. Silakan coba lagi.',
+                        confirmButtonColor: '#4B6358',
+                    });
+                    return;
+                }
+
+                if (Array.isArray(data?.daftar_acara)) {
+                    this.daftarAcara = data.daftar_acara;
+                }
+                if (this.acaraEdit?.id === acara.id) {
+                    this.batalEditAcara();
+                }
+                this.jadwalkanLivePreview(true, 'acara');
+
+                this.tampilkanToast(
+                    data?.pesan || 'Jadwal acara berhasil dihapus.',
+                    'Acara Dihapus'
+                );
+            } catch (_) {
+                window.Swal?.fire({
+                    icon: 'error',
+                    title: 'Koneksi Terputus',
+                    text: 'Tidak dapat menghubungi server saat menghapus acara. Silakan coba lagi.',
+                    confirmButtonColor: '#4B6358',
+                });
+            } finally {
+                this.acaraHapusId = null;
+            }
+        },
         toggleBagian(kodeTab) {
             this.hentikanAudioPreview();
+            this.tutupPickerAcara();
+            window.SesiTemuSelect2?.close?.();
             if (this.tab === kodeTab) {
                 this.tab = '';
                 return;
             }
             this.tab = kodeTab;
             this.$nextTick(() => {
+                window.SesiTemuSelect2?.init?.(this.$refs.panelKiri);
                 const el = this.$el.querySelector(`[data-mobile-tab='${kodeTab}']`);
                 el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                if (['tema', 'mempelai', 'acara', 'cerita', 'galeri', 'amplop', 'penutup'].includes(kodeTab)) {
+                if (['tema', 'ayat', 'mempelai', 'hitung_mundur', 'acara', 'dress_code', 'live_streaming', 'cerita', 'galeri', 'amplop', 'buku_tamu', 'doa_pengantin', 'turut_mengundang', 'penutup'].includes(kodeTab)) {
                     this.jadwalkanLivePreview(true, kodeTab);
                 }
             });
         },
         bukaBagian(kodeTab) {
+            if (kodeTab === 'aktivasi') {
+                this.bukaModalAktivasi();
+                return;
+            }
             this.hentikanAudioPreview();
+            this.tutupPickerAcara();
+            window.SesiTemuSelect2?.close?.();
             this.tab = kodeTab;
             this.$nextTick(() => {
+                window.SesiTemuSelect2?.init?.(this.$refs.panelKiri);
                 const el = this.$el.querySelector(`[data-mobile-tab='${kodeTab}']`);
                 el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                if (['tema', 'mempelai', 'acara', 'cerita', 'galeri', 'amplop', 'penutup'].includes(kodeTab)) {
+                if (['tema', 'ayat', 'mempelai', 'hitung_mundur', 'acara', 'dress_code', 'live_streaming', 'cerita', 'galeri', 'amplop', 'buku_tamu', 'doa_pengantin', 'turut_mengundang', 'penutup'].includes(kodeTab)) {
                     this.jadwalkanLivePreview(true, kodeTab);
                 }
             });
+        },
+        bukaModalAktivasi() {
+            this.hentikanAudioPreview();
+            this.tutupPickerAcara();
+            window.SesiTemuSelect2?.close?.();
+            this.modalAktivasiTerbuka = true;
+        },
+        tutupModalAktivasi() {
+            this.modalAktivasiTerbuka = false;
         },
         pilihTab(kodeTab) {
             this.bukaBagian(kodeTab);
@@ -1606,29 +2072,161 @@ export function editorKelolaUndangan(cfgMasuk = null) {
                 this.jadwalkanLivePreview(true);
             }
         },
-        gayaKartuLive() {
-            const teks = (this.bankBaru || '').trim().toLowerCase();
-            if (teks) {
-                for (const item of this.katalogBank.items) {
-                    if (item.kata_kunci.some((kata) => teks.includes(kata))) {
-                        return item;
-                    }
-                }
+        saatPilihBank(event) {
+            const nilai = event?.target?.value ?? this.bankPilihan ?? '';
+            this.bankPilihan = nilai;
+            if (nilai === '__lainnya__') {
+                this.bankBaru = (this.bankKustom || '').trim();
+            } else {
+                this.bankKustom = '';
+                this.bankBaru = nilai;
             }
-            const namaBersih = (this.bankBaru || '').trim();
-            return {
-                ...this.katalogBank.fallback,
-                singkatan: namaBersih ? namaBersih.slice(0, 14).toUpperCase() : this.katalogBank.fallback.singkatan,
-                subjudul: namaBersih || this.katalogBank.fallback.subjudul,
-            };
         },
-        formatNomorLive(nomor) {
-            const bersih = (nomor || '').trim();
-            if (!bersih) return '1234 5678 90';
-            if (/^\d{6,}$/.test(bersih)) {
-                return bersih.replace(/(\d{4})(?=\d)/g, '$1 ');
+        async simpanAmplop(event) {
+            if (this.sedangSimpanAmplop) return;
+            const form = event?.target;
+            const pilihanAktif = this.$refs.bankSelect?.value || this.bankPilihan || '';
+            const namaBank = pilihanAktif === '__lainnya__'
+                ? (this.bankKustom || '').trim()
+                : (pilihanAktif || this.bankBaru || '').trim();
+
+            if (!namaBank) {
+                window.Swal?.fire({
+                    icon: 'warning',
+                    title: 'Bank / E-Wallet Belum Dipilih',
+                    text: 'Silakan pilih atau ketik nama bank / e-wallet terlebih dahulu.',
+                    confirmButtonColor: '#4B6358',
+                });
+                return;
             }
-            return bersih;
+            if (form && typeof form.reportValidity === 'function' && !form.reportValidity()) {
+                return;
+            }
+
+            const url = this.urlSimpanAmplop || form?.action;
+            if (!url) return;
+
+            this.sedangSimpanAmplop = true;
+            try {
+                const token = document.querySelector('meta[name=csrf-token]')?.content || this.csrfToken;
+                const respon = await fetch(url, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': token,
+                    },
+                    body: JSON.stringify({
+                        nama_bank: namaBank,
+                        nomor_rekening: (this.formAmplop.nomor_rekening || '').trim(),
+                        atas_nama: (this.formAmplop.atas_nama || '').trim(),
+                    }),
+                });
+
+                const data = await respon.json().catch(() => ({}));
+                if (!respon.ok) {
+                    const daftarGalat = data?.errors ? Object.values(data.errors).flat() : [];
+                    const pesanError = daftarGalat.length > 0
+                        ? daftarGalat.join('\n')
+                        : (data?.message || 'Gagal menambahkan rekening. Silakan periksa kembali isian Anda.');
+                    window.Swal?.fire({
+                        icon: 'error',
+                        title: 'Periksa Isian Rekening',
+                        text: pesanError,
+                        confirmButtonColor: '#4B6358',
+                    });
+                    return;
+                }
+
+                if (Array.isArray(data?.daftar_amplop)) {
+                    this.daftarAmplop = data.daftar_amplop;
+                }
+                this.bankPilihan = '';
+                this.bankKustom = '';
+                this.bankBaru = '';
+                this.formAmplop = { nomor_rekening: '', atas_nama: '' };
+                this.$nextTick(() => this.sinkronSelect2El(this.$refs.bankSelect, ''));
+                this.jadwalkanLivePreview(true, 'amplop');
+
+                this.tampilkanToast(
+                    data?.pesan || 'Rekening amplop digital berhasil ditambahkan.',
+                    'Rekening Ditambahkan'
+                );
+            } catch (_) {
+                window.Swal?.fire({
+                    icon: 'error',
+                    title: 'Koneksi Terputus',
+                    text: 'Tidak dapat menghubungi server saat menambahkan rekening. Silakan coba lagi.',
+                    confirmButtonColor: '#4B6358',
+                });
+            } finally {
+                this.sedangSimpanAmplop = false;
+            }
+        },
+        async hapusAmplop(amplop) {
+            if (!amplop?.id || !amplop?.url_hapus || this.amplopHapusId) return;
+
+            if (window.Swal) {
+                const konfirmasi = await window.Swal.fire({
+                    title: 'Hapus Rekening?',
+                    text: `Yakin ingin menghapus kartu ${amplop.nama_bank} (${amplop.nomor_rekening})?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Hapus',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#DC2626',
+                    cancelButtonColor: '#6B7280',
+                    reverseButtons: true,
+                    focusCancel: true,
+                });
+                if (!konfirmasi?.isConfirmed) return;
+            }
+
+            this.amplopHapusId = amplop.id;
+            try {
+                const token = document.querySelector('meta[name=csrf-token]')?.content || this.csrfToken;
+                const respon = await fetch(amplop.url_hapus, {
+                    method: 'DELETE',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': token,
+                    },
+                });
+
+                const data = await respon.json().catch(() => ({}));
+                if (!respon.ok) {
+                    window.Swal?.fire({
+                        icon: 'error',
+                        title: 'Gagal Menghapus Rekening',
+                        text: data?.message || 'Tidak dapat menghapus kartu rekening saat ini. Silakan coba lagi.',
+                        confirmButtonColor: '#4B6358',
+                    });
+                    return;
+                }
+
+                if (Array.isArray(data?.daftar_amplop)) {
+                    this.daftarAmplop = data.daftar_amplop;
+                }
+                this.jadwalkanLivePreview(true, 'amplop');
+
+                this.tampilkanToast(
+                    data?.pesan || 'Rekening amplop digital berhasil dihapus.',
+                    'Rekening Dihapus'
+                );
+            } catch (_) {
+                window.Swal?.fire({
+                    icon: 'error',
+                    title: 'Koneksi Terputus',
+                    text: 'Tidak dapat menghubungi server saat menghapus rekening. Silakan coba lagi.',
+                    confirmButtonColor: '#4B6358',
+                });
+            } finally {
+                this.amplopHapusId = null;
+            }
         },
     };
 }

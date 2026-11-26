@@ -93,12 +93,26 @@ class LogoBrandingTest extends TestCase
 
         $this->actingAs($client)
             ->get(route('dashboard.undangan.tamu', $undangan))
+            ->assertRedirect(route('dashboard.undangan.kelola', [$undangan, 'tab' => 'aktivasi']));
+
+        $undangan->update([
+            'status_publikasi' => true,
+            'berlaku_sampai' => now()->addMonths(3),
+        ]);
+
+        $this->actingAs($client)
+            ->get(route('dashboard.undangan.tamu', $undangan))
             ->assertOk()
             ->assertSee('favicon.png', false)
             ->assertSee('logo/logo-ikon-gelap.webp', false)
             ->assertSee('data-workspace-sidebar', false)
-            ->assertSee('font-sans text-xl sm:text-2xl font-bold text-charcoal tracking-tight', false)
-            ->assertSee('Tamu &amp; RSVP', false)
+            ->assertSee('font-sans text-xl sm:text-2xl font-bold text-white tracking-tight', false)
+            ->assertSee('Daftar Tamu');
+
+        $this->actingAs($client)
+            ->get(route('dashboard.undangan.rsvp', $undangan))
+            ->assertOk()
+            ->assertSee('RSVP &amp; Ucapan', false)
             ->assertSee('font-sans tabular-nums text-2xl font-bold text-sage', false);
 
         $this->actingAs($client)

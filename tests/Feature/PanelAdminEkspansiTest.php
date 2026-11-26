@@ -37,15 +37,17 @@ class PanelAdminEkspansiTest extends TestCase
     {
         $client = Pengguna::factory()->create(['peran' => 'client']);
 
-        foreach ([
-            '/admin/transaksi',
-            '/admin/buku-tamu',
-            '/admin/musik',
-            '/admin/promo',
-            '/admin/laporan',
-            '/admin/laporan/ekspor',
-            '/admin/pengaturan',
-        ] as $rute) {
+        foreach (
+            [
+                '/admin/transaksi',
+                '/admin/buku-tamu',
+                '/admin/musik',
+                '/admin/promo',
+                '/admin/laporan',
+                '/admin/laporan/ekspor',
+                '/admin/pengaturan',
+            ] as $rute
+        ) {
             $this->actingAs($client)->get($rute)->assertForbidden();
         }
     }
@@ -662,20 +664,51 @@ class PanelAdminEkspansiTest extends TestCase
             ->get('/dashboard/undangan')
             ->assertRedirect('/dashboard');
 
-        // Rute /dashboard/tamu otomatis mengarahkan ke ruang kerja Tamu & RSVP milik undangan client
+        // Saat undangan masih draft, menu Tamu & RSVP terkunci dan diarahkan ke pembayaran aktivasi
+        $this->actingAs($client)
+            ->get('/dashboard/tamu')
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/kelola?tab=aktivasi")
+            ->assertSessionHas('peringatan');
+
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/kelola")
+            ->assertOk()
+            ->assertSee('Dashboard')
+            ->assertSee('data-workspace-menu="undangan"', false)
+            ->assertSee('data-workspace-menu="tamu"', false)
+            ->assertSee('data-workspace-menu="rsvp"', false)
+            ->assertSee('data-workspace-locked="true"', false);
+
+        // Setelah undangan aktif berbayar, /dashboard/tamu & /dashboard/rsvp terbuka terpisah tanpa terkunci
+        $undangan->update([
+            'status_publikasi' => true,
+            'berlaku_sampai' => now()->addMonths(3),
+        ]);
+
         $this->actingAs($client)
             ->get('/dashboard/tamu')
             ->assertRedirect("/dashboard/undangan/{$undangan->id}/tamu");
 
-        // Menu Dashboard, Undangan & Tamu & RSVP tampil di dalam ruang kerja saat mengelola undangan (termasuk saat masih draft)
+        $this->actingAs($client)
+            ->get('/dashboard/rsvp')
+            ->assertRedirect("/dashboard/undangan/{$undangan->id}/rsvp");
+
         $this->actingAs($client)
             ->get("/dashboard/undangan/{$undangan->id}/tamu")
             ->assertOk()
             ->assertSee('Dashboard')
             ->assertSee('data-workspace-menu="undangan"', false)
             ->assertSee('data-workspace-menu="tamu"', false)
-            ->assertSee('Tamu &amp; RSVP', false)
-            ->assertSee('Daftar Tamu');
+            ->assertSee('Daftar Tamu')
+            ->assertDontSee('data-workspace-locked="true"', false)
+            ->assertDontSee('Ucapan &amp; RSVP', false);
+
+        $this->actingAs($client)
+            ->get("/dashboard/undangan/{$undangan->id}/rsvp")
+            ->assertOk()
+            ->assertSee('RSVP &amp; Ucapan', false)
+            ->assertDontSee('Import Banyak')
+            ->assertDontSee('Tambah Tamu');
 
         $clientKosong = Pengguna::factory()->create([
             'peran' => 'client',
@@ -709,7 +742,9 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSee('data-mobile-tab="galeri"', false)
             ->assertSee('data-mobile-tab="amplop"', false)
             ->assertDontSee('data-mobile-tab="tamu"', false)
-            ->assertSee('data-mobile-tab="aktivasi"', false);
+            ->assertDontSee('data-mobile-tab="aktivasi"', false)
+            ->assertSee('data-modal-aktivasi', false)
+            ->assertSee('data-buka-modal-aktivasi', false);
     }
 
     public function test_client_dapat_melihat_dan_memperbarui_profil_serta_kata_sandi(): void

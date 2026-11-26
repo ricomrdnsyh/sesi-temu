@@ -266,7 +266,7 @@
 @endif
 
 {{-- SEKSI 5: PAVILIUN LENGKUNG TAMAN & MEDALI TANGGAL RANGKAIAN ACARA --}}
-@if ($undangan->daftarAcara->isNotEmpty())
+@if ($undangan->fiturAktif('acara') && $undangan->daftarAcara->isNotEmpty())
 <section
     data-layout-acara="klasik"
     data-acara-paviliun-rustic

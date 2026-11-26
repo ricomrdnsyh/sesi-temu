@@ -134,10 +134,18 @@
                     if (livePreviewState.bukaSampul) {
                         const terapkanPosisiLive = () => {
                             let targetEl = null;
-                            if (livePreviewState.fokusBagian === 'mempelai') {
+                            if (livePreviewState.fokusBagian === 'ayat') {
+                                targetEl = document.querySelector('[data-section-pembuka], [data-layout-ayat]')
+                                    || document.querySelector('[data-layout-mempelai]')?.previousElementSibling;
+                            } else if (livePreviewState.fokusBagian === 'mempelai') {
                                 targetEl = document.querySelector('[data-layout-mempelai]');
-                            } else if (livePreviewState.fokusBagian === 'acara') {
+                            } else if (livePreviewState.fokusBagian === 'hitung_mundur') {
                                 targetEl = document.querySelector('[data-layout-countdown], [data-layout-acara]');
+                            } else if (livePreviewState.fokusBagian === 'acara') {
+                                targetEl = document.querySelector('[data-layout-acara], [data-layout-countdown]');
+                            } else if (livePreviewState.fokusBagian === 'dress_code' || livePreviewState.fokusBagian === 'live_streaming') {
+                                const acaraEl = document.querySelector('[data-layout-acara]');
+                                targetEl = document.querySelector('[data-section-dress-code], [data-layout-dress-code]') || acaraEl?.nextElementSibling || acaraEl;
                             } else if (livePreviewState.fokusBagian === 'cerita') {
                                 targetEl = document.querySelector('[data-layout-cerita]');
                             } else if (livePreviewState.fokusBagian === 'galeri') {
@@ -145,8 +153,14 @@
                             } else if (livePreviewState.fokusBagian === 'amplop') {
                                 const rsvpEl = document.querySelector('#buku-tamu');
                                 targetEl = document.querySelector('[data-layout-amplop]') || rsvpEl?.previousElementSibling || rsvpEl;
-                            } else if (livePreviewState.fokusBagian === 'penutup') {
+                            } else if (livePreviewState.fokusBagian === 'buku_tamu') {
                                 targetEl = document.querySelector('#buku-tamu, [data-layout-penutup]');
+                            } else if (livePreviewState.fokusBagian === 'doa_pengantin') {
+                                targetEl = document.querySelector('[data-section-doa-pengantin], #buku-tamu, [data-layout-penutup]');
+                            } else if (livePreviewState.fokusBagian === 'turut_mengundang') {
+                                targetEl = document.querySelector('[data-section-turut-mengundang], [data-section-doa-pengantin], [data-layout-penutup]');
+                            } else if (livePreviewState.fokusBagian === 'penutup') {
+                                targetEl = document.querySelector('[data-layout-penutup], #buku-tamu');
                             }
 
                             if (targetEl) {

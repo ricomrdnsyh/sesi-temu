@@ -216,6 +216,7 @@
 </section>
 
 {{-- SEKSI 2: PRELUDE BOTANICAL SCRAPBOOK — MONOGRAM, POTRET WASHI-TAPE & KUTIPAN AYAT --}}
+@if ($undangan->fiturAktif('ayat_pembuka'))
 <section
     data-section-pembuka="klasik"
     class="relative bg-gradient-to-b from-[#3E5349] via-[#34473E] to-[#2B3B33] shadow-[0_-2px_0_0_#3E5349] text-[#FDFBF7] px-5 pt-11 pb-14 overflow-hidden"
@@ -286,3 +287,4 @@
         @endif
     </div>
 </section>
+@endif

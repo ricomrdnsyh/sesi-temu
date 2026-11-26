@@ -1,4 +1,5 @@
 {{-- SEKSI 3: KUTIPAN / AYAT DI ATAS BLOK SOGAN BERBORDER BATIK KAWUNG --}}
+@if ($undangan->fiturAktif('ayat_pembuka'))
 <section data-section-pembuka="keraton" class="relative bg-[#472A1C] shadow-[0_0_0_2px_#472A1C] text-[#2B180F] overflow-hidden">
     {{-- Border Batik Kawung Atas --}}
     <img src="{{ $asetJawa['kawungAtas'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-gsap="turun" class="pointer-events-none w-full h-16 sm:h-20 object-cover object-bottom opacity-80">
@@ -53,6 +54,7 @@
     {{-- Border Batik Kawung Bawah --}}
     <img src="{{ $asetJawa['kawungBawah'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async" data-gsap="naik" class="pointer-events-none w-full h-16 sm:h-20 object-cover object-top opacity-80">
 </section>
+@endif
 
 {{-- SEKSI 4: PROFIL KEDUA MEMPELAI — KAPSUL KUBAH RAKSASA DI ATAS DIORAMA TERPIN --}}
 <section
@@ -329,16 +331,14 @@
 @endif
 
 {{-- SEKSI 6: RANGKAIAN ACARA — KARTU DOUBLE-FRAME BERBINGKAI ILUSTRASI JAWA --}}
-@if ($undangan->daftarAcara->isNotEmpty())
+@if ($undangan->fiturAktif('acara') && $undangan->daftarAcara->isNotEmpty())
 <section
     data-layout-acara="keraton"
     class="relative bg-[#472A1C] shadow-[0_0_0_2px_#472A1C] px-5 pt-2 pb-14 space-y-6"
 >
-    @if ($undangan->teksKustom('judul_acara') !== '')
-        <h2 data-gsap="naik" class="text-center font-kaligrafi text-[2.1rem] sm:text-[2.35rem] tracking-[0.02em] text-[#FFFBF4] leading-tight">
-            {{ $undangan->teksKustom('judul_acara') }}
-        </h2>
-    @endif
+    <h2 data-gsap="naik" class="text-center font-kaligrafi text-[2.1rem] sm:text-[2.35rem] tracking-[0.02em] text-[#FFFBF4] leading-tight">
+        {{ $undangan->teksKustom('judul_acara', 'Rangkaian Acara') }}
+    </h2>
     @foreach ($undangan->daftarAcara as $acara)
         <div class="relative rounded-[24px] p-3.5 overflow-hidden shadow-2xl kartu-3d">
             {{-- Mat Luar Ilustrasi Penuh (Hutan + Joglo + Mawar) --}}

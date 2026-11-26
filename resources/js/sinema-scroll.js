@@ -280,7 +280,8 @@ export function buatPengendaliSinemaScroll() {
 
         if (kurangiGerak() || adalahEmbed()) {
             semuaTarget.forEach((el) => {
-                gsap.set(el, { clearProps: 'all', opacity: 1 });
+                // Bersihkan properti gerak saja agar inline style (mis. warna dress code & font Amiri) tetap utuh
+                gsap.set(el, { clearProps: 'transform,transformOrigin', opacity: 1 });
             });
             return;
         }

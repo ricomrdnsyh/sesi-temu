@@ -84,17 +84,30 @@
 
         $tabSelesai = [
             'tema' => true,
+            'ayat' =>
+                trim((string) $undangan->kutipan_ayat) !== '' ||
+                filled($undangan->urlFotoPembukaKhususDashboard()),
             'mempelai' =>
                 trim((string) $undangan->nama_lengkap_pria) !== '' &&
                 trim((string) $undangan->nama_lengkap_wanita) !== '',
+            'hitung_mundur' => $undangan->fiturAktif('hitung_mundur'),
             'acara' => $undangan->daftarAcara->isNotEmpty(),
+            'dress_code' =>
+                trim((string) $undangan->dressCodeCatatan()) !== '' ||
+                !empty($undangan->dressCodeWarna()),
+            'live_streaming' => (bool) ($pengaturan['live_streaming']['aktif'] ?? false),
             'cerita' => !empty($pengaturan['cerita_cinta']),
             'galeri' => $undangan->modeTanpaFoto() || $undangan->daftarGaleri->isNotEmpty(),
             'amplop' =>
                 $undangan->daftarAmplop->isNotEmpty() || trim((string) ($pengaturan['alamat_kado_fisik'] ?? '')) !== '',
-            'penutup' =>
+            'buku_tamu' => true,
+            'doa_pengantin' => $undangan->fiturAktif('doa_pengantin'),
+            'turut_mengundang' =>
                 trim((string) data_get($pengaturan, 'turut_mengundang.pihak_wanita', '')) !== '' ||
                 trim((string) data_get($pengaturan, 'turut_mengundang.pihak_pria', '')) !== '',
+            'penutup' =>
+                filled($undangan->urlFotoPenutupKhususDashboard()) ||
+                trim((string) data_get($pengaturan, 'hashtag', '')) !== '',
             'aktivasi' => $undangan->sudahAktifPublik(),
         ];
 
@@ -103,12 +116,16 @@
             ->all();
 
         $sakelarFiturAwal = [
+            'ayat_pembuka' => $undangan->fiturAktif('ayat_pembuka'),
             'hitung_mundur' => $undangan->fiturAktif('hitung_mundur'),
+            'acara' => $undangan->fiturAktif('acara'),
+            'dress_code' => $undangan->fiturAktif('dress_code'),
+            'live_streaming' => $undangan->fiturAktif('live_streaming'),
             'cerita_cinta' => $undangan->fiturAktif('cerita_cinta'),
             'galeri' => $undangan->fiturAktif('galeri'),
             'amplop_digital' => $undangan->fiturAktif('amplop_digital'),
-            'buku_tamu' => $undangan->fiturAktif('buku_tamu'),
             'doa_pengantin' => $undangan->fiturAktif('doa_pengantin'),
+            'turut_mengundang' => $undangan->fiturAktif('turut_mengundang'),
         ];
         $teksKustom = (array) data_get($pengaturan, 'teks', []);
         $teksBawaanTema = $undangan->teksBawaanTema();
@@ -137,6 +154,8 @@
             'urlPublikPreview' => $urlPublikRelatif,
             'urlPublikSalin' => $urlPublik,
             'urlSimpanFitur' => route('dashboard.undangan.perbarui', $undangan, false),
+            'urlSimpanAcara' => route('dashboard.acara.simpan', $undangan, false),
+            'urlSimpanAmplop' => route('dashboard.amplop.simpan', $undangan, false),
             'urlPratinjauLangsung' => route('dashboard.undangan.pratinjau-langsung', $undangan, false),
             'csrfToken' => csrf_token(),
             'rasioFotoTema' => $rasioFotoTema,
@@ -149,11 +168,12 @@
             'musikKustomUrlAwal' => $undangan->urlMusikKustom() ?? '',
             'musikKustomNamaAwal' => (string) ($musikKustomAktif['nama'] ?? ''),
             'daftarUrlMusik' => $daftarUrlMusik,
+            'daftarAcara' => $daftarAcaraEditor ?? [],
+            'daftarAmplop' => $daftarAmplopEditor ?? [],
             'daftarFotoHitungMundur' => $undangan->daftarFotoHitungMundurKhususDashboard(),
             'daftarGaleri' => $galeriAwal,
             'daftarCerita' => $ceritaAwal,
             'liveAktifLive' => (bool) ($pengaturan['live_streaming']['aktif'] ?? false),
-            'katalogBank' => \App\Support\GayaKartuBank::katalogFrontend(),
             'temaAktifEditorId' => (int) $undangan->tema_id,
             'hargaTemaAktifEditor' => $hargaTemaEditor,
             'temaAwalStudio' => $temaAwalStudioPayload,
@@ -167,7 +187,7 @@
 
         {{-- 2. Panel Kiri: Studio Editor Accordion --}}
         <div
-            class="relative w-full lg:w-[44%] xl:w-[42%] lg:min-w-[440px] lg:max-w-[960px] shrink-0 bg-white lg:border-r lg:border-champagne/25 flex flex-col lg:h-screen min-h-0">
+            class="relative w-full lg:w-[44%] xl:w-[42%] lg:min-w-[440px] lg:max-w-[960px] shrink-0 bg-white lg:my-3 lg:ml-3 lg:rounded-3xl lg:border lg:border-champagne/25 lg:shadow-[0_14px_34px_-16px_rgba(20,32,26,0.14)] lg:overflow-hidden flex flex-col lg:h-[calc(100vh-1.5rem)] min-h-0">
             {{-- Header Sticky Panel Kiri --}}
             <div
                 class="px-4 sm:px-5 py-3.5 border-b border-champagne/20 bg-white flex items-center justify-between gap-3 shrink-0 sticky top-0 z-20 lg:static">
@@ -196,13 +216,13 @@
             </div>
 
             {{-- Body Scrollable Panel Kiri --}}
-            <div x-ref="panelKiri" data-select2-parent x-on:input="saatInputLive($event)"
+            <div x-ref="panelKiri" x-on:input="saatInputLive($event)"
                 x-on:change="saatInputLive($event)" x-on:foto-live-berubah="perbaruiFotoLive($event.detail)"
                 class="relative flex-1 min-h-0 lg:overflow-y-auto px-4 sm:px-5 py-4 pb-44 lg:pb-6 space-y-3.5">
                 {{-- Kartu Status / Aktivasi Ringkas --}}
                 @if ($statusKodeEditor === 'aktif')
                     <div
-                        class="rounded-2xl bg-emerald-50/80 px-4 py-3 ring-1 ring-emerald-200/80 flex items-center justify-between gap-3">
+                        class="rounded-2xl bg-emerald-50/80 px-4 py-3 ring-1 ring-emerald-200/80 flex items-center justify-between gap-2.5">
                         <div class="min-w-0">
                             <div class="flex items-center gap-1.5">
                                 <span class="h-2 w-2 rounded-full bg-emerald-500 shrink-0"></span>
@@ -216,11 +236,22 @@
                                 @endif
                             </p>
                         </div>
-                        <a href="{{ route('dashboard.undangan.tamu', $undangan) }}"
-                            class="inline-flex items-center gap-1 rounded-xl bg-sage px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#3b5047] transition shrink-0">
-                            <span>Sebar Tamu</span>
-                            <span aria-hidden="true">&rarr;</span>
-                        </a>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button
+                                type="button"
+                                @click="bukaModalAktivasi()"
+                                data-buka-modal-aktivasi
+                                class="inline-flex items-center gap-1 rounded-xl bg-white px-2.5 py-1.5 text-xs font-semibold text-emerald-800 ring-1 ring-emerald-200 hover:bg-emerald-100/70 transition cursor-pointer"
+                                title="Lihat status aktivasi &amp; riwayat invoice"
+                            >
+                                <span>Invoice</span>
+                            </button>
+                            <a href="{{ route('dashboard.undangan.tamu', $undangan) }}"
+                                class="inline-flex items-center gap-1 rounded-xl bg-sage px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#3b5047] transition">
+                                <span>Sebar Tamu</span>
+                                <span aria-hidden="true">&rarr;</span>
+                            </a>
+                        </div>
                     </div>
                 @else
                     <div class="rounded-2xl bg-ivory/75 p-4 ring-1 ring-champagne/30 space-y-3">
@@ -255,13 +286,13 @@
                         </div>
 
                         @if ($sedangVerifikasiEditor)
-                            <button type="button" @click="bukaBagian('aktivasi')"
+                            <button type="button" @click="bukaModalAktivasi()" data-buka-modal-aktivasi
                                 class="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-sky-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-sky-700 active:scale-[0.98] transition cursor-pointer">
                                 <span>Bukti Terkirim &bull; Lihat Status Verifikasi</span>
                             </button>
                         @else
                             <div class="grid grid-cols-2 gap-2">
-                                <button type="button" @click="bukaBagian('aktivasi')"
+                                <button type="button" @click="bukaModalAktivasi()" data-buka-modal-aktivasi
                                     class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-sage px-3.5 py-2.5 text-xs font-semibold text-white shadow-xs hover:bg-[#3b5047] active:scale-[0.98] transition cursor-pointer">
                                     <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none"
                                         stroke="currentColor" stroke-width="2.1" stroke-linecap="round"
@@ -327,14 +358,9 @@
                     @include('dashboard._kelola-acara-cerita-galeri')
                     @include('dashboard._kelola-amplop-penutup')
 
-                    <p class="px-1 pt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-charcoal/45">
-                        Langkah Akhir
-                    </p>
-
-                    @include('dashboard._kelola-aktivasi')
-
                     {{-- Aksi Hapus Draft (Khusus Undangan Belum Aktif / Belum Diverifikasi) --}}
                     @if ($undangan->bolehDihapusClient())
+                        <div class="pt-2">
                         <form action="{{ route('dashboard.undangan.hapus', $undangan) }}" method="POST"
                             data-swal-confirm="Yakin ingin menghapus draft undangan sesitemu.id/{{ $undangan->slug }}? Seluruh data, acara, dan foto draft ini akan dihapus permanen."
                             data-swal-title="Hapus Draft Undangan?" data-swal-icon="warning"
@@ -365,6 +391,7 @@
                                 <span class="text-[11px] font-medium text-red-500/80">Permanen</span>
                             </button>
                         </form>
+                        </div>
                     @endif
                 </div>
             </div>
@@ -411,7 +438,10 @@
         {{-- 3. Panel Kanan: Kanvas Live Preview Interaktif + Drawer Tema + Lightbox --}}
         @include('dashboard._kelola-panel-kanan')
 
-        {{-- 4. Modal Crop Foto Interaktif Sesuai Rasio Template --}}
+        {{-- 4. Modal Checkout Pembayaran & Aktivasi (2 Kolom Terpusat) --}}
+        @include('dashboard._kelola-aktivasi')
+
+        {{-- 5. Modal Crop Foto Interaktif Sesuai Rasio Template --}}
         @include('dashboard._modal-crop-foto')
     </div>
 @endsection
