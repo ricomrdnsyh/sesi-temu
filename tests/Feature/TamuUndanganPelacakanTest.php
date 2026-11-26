@@ -181,15 +181,17 @@ class TamuUndanganPelacakanTest extends TestCase
             ->get("/dashboard/tamu?undangan={$undangan->id}")
             ->assertRedirect($urlHalamanTamu);
 
-        // Halaman ruang kerja Daftar Tamu menampilkan DataTable + menu Undangan, Tamu & RSVP terpisah serta data tamu tersimpan
+        // Halaman ruang kerja Daftar Tamu menampilkan tampilan kartu (non-tabel) + menu Undangan, Tamu & RSVP terpisah
         $this->actingAs($pemilik)
             ->get($urlHalamanTamu)
             ->assertOk()
             ->assertSee('data-workspace-menu="undangan"', false)
             ->assertSee('data-workspace-menu="tamu"', false)
             ->assertSee('data-workspace-menu="rsvp"', false)
-            ->assertSee('id="tabel-daftar-tamu"', false)
-            ->assertSee('data-datatable', false)
+            ->assertSee('data-workspace-header', false)
+            ->assertSee('id="daftar-kartu-tamu"', false)
+            ->assertSee('data-tamu-cards', false)
+            ->assertDontSee('<table', false)
             ->assertSee(':href="tamu.waUrl"', false)
             ->assertSee('Daftar Tamu')
             ->assertSee('Budi Santoso')
@@ -200,12 +202,14 @@ class TamuUndanganPelacakanTest extends TestCase
             ->assertSee('Tambah Tamu')
             ->assertDontSee('Ucapan &amp; RSVP', false);
 
-        // Halaman RSVP & Ucapan memakai DataTable terpisah tanpa form tambah tamu
+        // Halaman RSVP & Ucapan menampilkan tampilan kartu (non-tabel) terpisah tanpa form tambah tamu
         $this->actingAs($pemilik)
             ->get(route('dashboard.undangan.rsvp', $undangan))
             ->assertOk()
-            ->assertSee('id="tabel-rsvp-ucapan"', false)
-            ->assertSee('data-datatable', false)
+            ->assertSee('data-workspace-header', false)
+            ->assertSee('id="daftar-kartu-rsvp"', false)
+            ->assertSee('data-rsvp-cards', false)
+            ->assertDontSee('<table', false)
             ->assertSee('RSVP &amp; Ucapan', false)
             ->assertSee('Konfirmasi Hadir')
             ->assertDontSee('Import Banyak')

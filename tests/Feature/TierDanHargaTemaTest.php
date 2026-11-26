@@ -561,14 +561,16 @@ class TierDanHargaTemaTest extends TestCase
             ->get("/dashboard/undangan/{$undangan->id}/tamu")
             ->assertOk()
             ->assertSee('Daftar Tamu')
-            ->assertSee('data-datatable', false)
+            ->assertSee('data-tamu-cards', false)
+            ->assertDontSee('<table', false)
             ->assertDontSee('Ucapan &amp; RSVP', false);
 
         $this->actingAs($client)
             ->get("/dashboard/undangan/{$undangan->id}/rsvp")
             ->assertOk()
             ->assertSee('RSVP &amp; Ucapan', false)
-            ->assertSee('data-datatable', false)
+            ->assertSee('data-rsvp-cards', false)
+            ->assertDontSee('<table', false)
             ->assertDontSee('Import Banyak')
             ->assertDontSee('Tambah Tamu');
 

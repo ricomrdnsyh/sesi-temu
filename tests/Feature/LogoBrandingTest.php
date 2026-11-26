@@ -106,7 +106,7 @@ class LogoBrandingTest extends TestCase
             ->assertSee('favicon.png', false)
             ->assertSee('logo/logo-ikon-gelap.webp', false)
             ->assertSee('data-workspace-sidebar', false)
-            ->assertSee('font-sans text-xl sm:text-2xl font-bold text-white tracking-tight', false)
+            ->assertSee('font-sans text-xl sm:text-2xl font-bold text-charcoal tracking-tight', false)
             ->assertSee('Daftar Tamu');
 
         $this->actingAs($client)
