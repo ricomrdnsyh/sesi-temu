@@ -1092,4 +1092,59 @@ class PanelAdminEkspansiTest extends TestCase
             ])
             ->assertSessionHasErrors('pembayaran');
     }
+
+    public function test_tombol_bayar_dan_aktifkan_di_dashboard_membuka_modal_langsung_di_halaman_yang_sama(): void
+    {
+        Storage::fake('public');
+
+        $client = Pengguna::factory()->create();
+        $tema = Tema::create([
+            'nama_tema' => 'Tema Modal Dashboard',
+            'slug' => 'tema-modal-dashboard-'.uniqid(),
+            'kategori' => 'adat',
+            'lokasi_view' => 'tema.adat-jawa.index',
+            'harga' => 75000,
+            'aktif' => true,
+        ]);
+
+        $undangan = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $tema->id,
+            'slug' => 'modal-dashboard-'.uniqid(),
+            'nama_panggilan_pria' => 'Dodi',
+            'nama_lengkap_pria' => 'Dodi Dwi',
+            'nama_panggilan_wanita' => 'Windy',
+            'nama_lengkap_wanita' => 'Windy Putri',
+            'status_publikasi' => false,
+        ]);
+
+        $this->actingAs($client)
+            ->get('/dashboard')
+            ->assertOk()
+            ->assertSee('Bayar &amp; Aktifkan', false)
+            ->assertSee("data-buka-modal-aktivasi=\"{$undangan->id}\"", false)
+            ->assertSee("data-aktivasi-undangan-id=\"{$undangan->id}\"", false)
+            ->assertSee('name="asal_halaman" value="dashboard"', false)
+            ->assertDontSee(route('dashboard.undangan.kelola', [$undangan, 'tab' => 'aktivasi']), false);
+
+        // Pengajuan pembayaran dari modal dashboard tetap kembali ke /dashboard (tidak melempar ke halaman kelola)
+        $this->actingAs($client)
+            ->from('/dashboard')
+            ->post("/dashboard/undangan/{$undangan->id}/transaksi", [
+                'asal_halaman' => 'dashboard',
+                'paket' => 'mandiri',
+                'bukti_pembayaran' => UploadedFile::fake()->create('bukti-dash.png', 100, 'image/png'),
+            ])
+            ->assertRedirect(route('dashboard.index'))
+            ->assertSessionHas('buka_aktivasi_undangan_id', $undangan->id)
+            ->assertSessionHas('sukses');
+
+        // Setelah bukti terkirim, tombol pada kartu berubah menjadi Status Bayar dan modal menampilkan ringkasan verifikasi
+        $this->actingAs($client)
+            ->get('/dashboard')
+            ->assertOk()
+            ->assertSee('Status Bayar')
+            ->assertSee('Bukti Pembayaran Sudah Dikirim')
+            ->assertSee('Lihat Bukti Terkirim');
+    }
 }

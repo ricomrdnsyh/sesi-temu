@@ -39,14 +39,28 @@
                 ],
             )
             ->values();
+        $bukaModalBuatAwal = request()->boolean('buat')
+            || $errors->hasAny(['tema_id', 'slug', 'nama_panggilan_pria', 'nama_lengkap_pria', 'nama_panggilan_wanita', 'nama_lengkap_wanita']);
+        $aktivasiUndanganAwal = (int) session('buka_aktivasi_undangan_id', request()->integer('aktivasi', 0));
+        if ($aktivasiUndanganAwal > 0 && ! $daftarUndangan->contains('id', $aktivasiUndanganAwal)) {
+            $aktivasiUndanganAwal = 0;
+        }
     @endphp
 
     <div x-data="{
-        modalBuatBaru: {{ request()->boolean('buat') || $errors->any() ? 'true' : 'false' }},
+        modalBuatBaru: {{ $bukaModalBuatAwal ? 'true' : 'false' }},
         temaTerpilihModal: @js($temaDefaultId),
+        aktivasiUndanganId: {{ $aktivasiUndanganAwal > 0 ? $aktivasiUndanganAwal : 'null' }},
+        galeriLightbox: null,
         statusFilter: 'semua',
         kataCari: '',
         daftarItem: @js($daftarFilterJson),
+        bukaModalAktivasiUndangan(id) {
+            this.aktivasiUndanganId = id;
+        },
+        tutupModalAktivasi() {
+            this.aktivasiUndanganId = null;
+        },
         cocok(status, teks) {
             const cocokStatus = this.statusFilter === 'semua' || this.statusFilter === status;
             const kata = this.kataCari.trim().toLowerCase();
@@ -495,16 +509,18 @@
                                         <span>Tamu &amp; RSVP</span>
                                     </a>
                                 @elseif (!auth()->user()->adalahAdmin())
-                                    <a href="{{ route('dashboard.undangan.kelola', [$undangan, 'tab' => 'aktivasi']) }}"
-                                        class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-champagne px-3.5 py-2.5 text-xs sm:text-sm font-bold text-charcoal whitespace-nowrap hover:bg-[#d1b26d] active:scale-[0.98] transition">
+                                    <button type="button"
+                                        @click="bukaModalAktivasiUndangan({{ $undangan->id }})"
+                                        data-buka-modal-aktivasi="{{ $undangan->id }}"
+                                        class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-champagne px-3.5 py-2.5 text-xs sm:text-sm font-bold text-charcoal whitespace-nowrap hover:bg-[#d1b26d] active:scale-[0.98] transition cursor-pointer">
                                         <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                             stroke-linejoin="round" aria-hidden="true">
                                             <rect width="20" height="14" x="2" y="5" rx="2" />
                                             <line x1="2" x2="22" y1="10" y2="10" />
                                         </svg>
-                                        <span>{{ $statusKode === 'kedaluwarsa' ? 'Perpanjang' : 'Bayar & Aktifkan' }}</span>
-                                    </a>
+                                        <span>{{ $statusKode === 'kedaluwarsa' ? 'Perpanjang' : ($sedangVerifikasi ? 'Status Bayar' : 'Bayar & Aktifkan') }}</span>
+                                    </button>
                                 @endif
                             </div>
                         </article>
@@ -575,5 +591,49 @@
         @include('dashboard._bottom-nav', ['halamanAktif' => 'dashboard', 'modalBuatOnPage' => true])
 
         @include('dashboard._modal-buat-draft')
+
+        @if (!auth()->user()->adalahAdmin())
+            @foreach ($daftarUndangan as $undanganModal)
+                @if (! $undanganModal->sudahAktifPublik())
+                    @include('dashboard._kelola-aktivasi', [
+                        'undangan' => $undanganModal,
+                        'ekspresiTerbuka' => 'aktivasiUndanganId === ' . $undanganModal->id,
+                        'idPrefix' => 'dash-akt-' . $undanganModal->id . '-',
+                        'asalHalaman' => 'dashboard',
+                        'urlPublik' => Route::has('undangan.tampil')
+                            ? route('undangan.tampil', $undanganModal->slug)
+                            : url('/' . $undanganModal->slug),
+                        'pesanWaAktivasi' => "Halo Admin SesiTemu, saya ingin mengaktifkan undangan sesitemu.id/{$undanganModal->slug}.",
+                    ])
+                @endif
+            @endforeach
+
+            {{-- Lightbox Pratinjau Bukti Pembayaran --}}
+            <div
+                x-show="galeriLightbox"
+                x-cloak
+                @keydown.escape.window="if (galeriLightbox) galeriLightbox = null"
+                @click="galeriLightbox = null"
+                class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-xs p-4 flex items-center justify-center"
+            >
+                <div @click.stop class="relative max-w-2xl w-full rounded-xl overflow-hidden bg-white shadow-2xl">
+                    <button
+                        type="button"
+                        @click="galeriLightbox = null"
+                        aria-label="Tutup pratinjau"
+                        class="absolute top-3 right-3 z-10 w-9 h-9 rounded-lg bg-black/60 text-white hover:bg-black/80 flex items-center justify-center cursor-pointer transition"
+                    >
+                        &times;
+                    </button>
+                    <img :src="galeriLightbox?.url" :alt="galeriLightbox?.caption" class="w-full max-h-[75vh] object-contain bg-charcoal">
+                    <div class="px-5 py-3.5 bg-white border-t border-champagne/20 flex items-center justify-between gap-3">
+                        <p class="text-sm font-semibold text-charcoal truncate" x-text="galeriLightbox?.caption"></p>
+                        <button type="button" @click="galeriLightbox = null" class="text-xs font-semibold text-sage hover:underline cursor-pointer shrink-0">
+                            Tutup
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 @endsection

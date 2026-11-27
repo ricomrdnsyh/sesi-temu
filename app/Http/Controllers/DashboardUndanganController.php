@@ -14,6 +14,7 @@ use App\Models\Transaksi;
 use App\Models\Undangan;
 use App\Services\LayananTransaksiService;
 use App\Services\PengolahGambarService;
+use App\Support\EksporSpreadsheetTamu;
 use App\Support\GayaKartuBank;
 use App\Support\MediaPublik;
 use App\Support\PengaturanSesiTemu;
@@ -21,6 +22,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
@@ -31,6 +33,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DashboardUndanganController extends Controller
 {
@@ -52,7 +55,7 @@ class DashboardUndanganController extends Controller
     {
         $daftarUndangan = $request->user()
             ->undangan()
-            ->with(['tema', 'bukuTamu', 'daftarTamu', 'daftarAcara', 'daftarGaleri', 'daftarAmplop', 'transaksi'])
+            ->with(['tema', 'bukuTamu', 'daftarTamu', 'daftarAcara', 'daftarGaleri', 'daftarAmplop', 'transaksi.tema', 'transaksi.promo'])
             ->latest()
             ->get();
 
@@ -61,6 +64,8 @@ class DashboardUndanganController extends Controller
         return view('dashboard.undangan', [
             'daftarUndangan' => $daftarUndangan,
             'daftarTema' => $daftarTema,
+            'infoRekening' => PengaturanSesiTemu::infoRekening(),
+            'biayaTerimaBeres' => PengaturanSesiTemu::biayaTerimaBeres(),
             'durasiAktifBulan' => PengaturanSesiTemu::masaAktifBulan(),
         ]);
     }
@@ -1819,6 +1824,52 @@ class DashboardUndanganController extends Controller
 
         $mode = (string) $request->input('mode', 'satuan');
 
+        if ($mode === 'csv') {
+            $request->validate([
+                'file_csv' => ['required', 'file', 'max:2048'],
+            ], [
+                'file_csv.required' => 'Silakan pilih file CSV yang ingin diimpor.',
+                'file_csv.file' => 'Berkas yang diunggah tidak valid.',
+                'file_csv.max' => 'Ukuran file CSV maksimal 2 MB.',
+            ]);
+
+            $fileCsv = $request->file('file_csv');
+            $ekstensi = Str::lower((string) $fileCsv?->getClientOriginalExtension());
+            if (! in_array($ekstensi, ['csv', 'txt'], true)) {
+                return redirect()
+                    ->route('dashboard.undangan.tamu', $undangan)
+                    ->withErrors(['file_csv' => 'Format file harus .csv (Comma Separated Values).'])
+                    ->withInput();
+            }
+
+            $kontenCsv = $fileCsv ? (string) file_get_contents($fileCsv->getRealPath()) : '';
+            $tamuDariCsv = EksporSpreadsheetTamu::bacaCsvTamu($kontenCsv, 500);
+
+            if ($tamuDariCsv === []) {
+                return redirect()
+                    ->route('dashboard.undangan.tamu', $undangan)
+                    ->withErrors(['file_csv' => 'Tidak ada data tamu yang valid di dalam file CSV. Pastikan kolom pertama berisi nama tamu.'])
+                    ->withInput();
+            }
+
+            DB::transaction(static function () use ($undangan, $tamuDariCsv): void {
+                foreach ($tamuDariCsv as $item) {
+                    TamuUndangan::create([
+                        'undangan_id' => $undangan->id,
+                        'kode_tamu' => TamuUndangan::buatKodeUnik(),
+                        'nama_tamu' => $item['nama_tamu'],
+                        'nomor_wa' => $item['nomor_wa'],
+                    ]);
+                }
+            });
+
+            $jumlah = count($tamuDariCsv);
+
+            return redirect()
+                ->route('dashboard.undangan.tamu', $undangan)
+                ->with('sukses', "{$jumlah} tamu berhasil diimpor dari file CSV.");
+        }
+
         if ($mode === 'massal') {
             $tervalidasi = $request->validate([
                 'daftar_bulk' => ['required', 'string', 'max:20000'],
@@ -1828,29 +1879,101 @@ class DashboardUndanganController extends Controller
 
             $barisDaftar = preg_split('/\r\n|\r|\n/', $tervalidasi['daftar_bulk']) ?: [];
             $tamuBaru = [];
+            $galatBaris = [];
+            $jumlahBarisTerisi = 0;
 
-            foreach ($barisDaftar as $baris) {
+            foreach ($barisDaftar as $indeks => $baris) {
                 $barisBersih = trim($baris);
                 if ($barisBersih === '') {
                     continue;
                 }
 
-                $bagian = preg_split('/\s*[,|;\t]\s*/', $barisBersih, 2);
-                $namaTamu = trim((string) ($bagian[0] ?? ''));
-                $nomorMentah = isset($bagian[1]) ? trim((string) $bagian[1]) : null;
+                $noBaris = $indeks + 1;
+                $jumlahBarisTerisi++;
 
-                if ($namaTamu === '') {
+                if ($jumlahBarisTerisi > 200) {
+                    $galatBaris[] = 'Maksimal 200 tamu per sekali simpan. Kurangi jumlah baris atau gunakan Import CSV (hingga 500 tamu).';
+                    break;
+                }
+
+                if (preg_match('/^(.*)\s*[,|;\t]\s*([^,|;\t]*)$/', $barisBersih, $cocokPemisah) === 1) {
+                    $namaTamu = trim($cocokPemisah[1]);
+                    $nomorMentah = trim($cocokPemisah[2]);
+
+                    if ($namaTamu === '') {
+                        $galatBaris[] = "Baris {$noBaris}: Nama tamu kosong sebelum tanda pemisah.";
+                        continue;
+                    }
+
+                    $nomorNormal = null;
+                    if ($nomorMentah !== '') {
+                        if (preg_match('/^[\d\s+\-().]+$/', $nomorMentah) !== 1) {
+                            $galatBaris[] = "Baris {$noBaris}: Format nomor WA \"{$nomorMentah}\" tidak valid. Pisahkan nama & nomor WA dengan koma (,).";
+                            continue;
+                        }
+
+                        $nomorNormal = TamuUndangan::normalisasiNomorWa($nomorMentah);
+                        if ($nomorNormal === null) {
+                            $galatBaris[] = "Baris {$noBaris}: Nomor WA \"{$nomorMentah}\" tidak valid (minimal 8–16 digit, contoh: 081234567890).";
+                            continue;
+                        }
+                    }
+
+                    $tamuBaru[] = [
+                        'nama_tamu' => Str::limit($namaTamu, 120, ''),
+                        'nomor_wa' => $nomorNormal,
+                    ];
+
+                    continue;
+                }
+
+                // Cek jika baris hanya berupa nomor WA tanpa nama tamu
+                if (preg_match('/^(?:\+?62|0|8)[\d\s\-().]{6,}$/', $barisBersih) === 1) {
+                    $galatBaris[] = "Baris {$noBaris}: Hanya berisi nomor WA tanpa nama tamu (\"{$barisBersih}\"). Tulis nama tamu lalu koma dan nomor WA.";
+                    continue;
+                }
+
+                // Cek salah ketik pemisah (titik, titik dua, garis miring, atau strip) sebelum nomor WA
+                if (preg_match('/^(.+?)\s*([.:\/\-])\s*((?:\+?62|0|8)[\d\s\-().]{6,})$/', $barisBersih, $cocokSalahPemisah) === 1) {
+                    $namaSaran = trim($cocokSalahPemisah[1]);
+                    $pemisahSalah = $cocokSalahPemisah[2];
+                    $nomorSaran = trim($cocokSalahPemisah[3]);
+                    $labelPemisah = match ($pemisahSalah) {
+                        '.' => 'titik (.)',
+                        ':' => 'titik dua (:)',
+                        '/' => 'garis miring (/)',
+                        '-' => 'tanda hubung (-)',
+                        default => "karakter ({$pemisahSalah})",
+                    };
+                    $galatBaris[] = "Baris {$noBaris}: Terdeteksi {$labelPemisah} sebelum nomor WA. Gunakan koma (,) → {$namaSaran}, {$nomorSaran}.";
+                    continue;
+                }
+
+                // Cek nomor WA yang menempel tanpa pemisah koma (hanya spasi)
+                if (preg_match('/^(.+?)\s+((?:\+?62|08)[\d\s\-().]{6,})$/', $barisBersih, $cocokTanpaKoma) === 1) {
+                    $namaSaran = trim($cocokTanpaKoma[1]);
+                    $nomorSaran = trim($cocokTanpaKoma[2]);
+                    $galatBaris[] = "Baris {$noBaris}: Nomor WA belum dipisahkan koma (,) → {$namaSaran}, {$nomorSaran}.";
                     continue;
                 }
 
                 $tamuBaru[] = [
-                    'nama_tamu' => Str::limit($namaTamu, 120, ''),
-                    'nomor_wa' => TamuUndangan::normalisasiNomorWa($nomorMentah),
+                    'nama_tamu' => Str::limit($barisBersih, 120, ''),
+                    'nomor_wa' => null,
                 ];
+            }
 
-                if (count($tamuBaru) >= 200) {
-                    break;
+            if ($galatBaris !== []) {
+                $ringkasGalat = array_slice($galatBaris, 0, 4);
+                if (count($galatBaris) > 4) {
+                    $sisa = count($galatBaris) - 4;
+                    $ringkasGalat[] = "...dan {$sisa} baris lainnya perlu diperbaiki.";
                 }
+
+                return redirect()
+                    ->route('dashboard.undangan.tamu', $undangan)
+                    ->withErrors(['daftar_bulk' => implode(' ', $ringkasGalat)])
+                    ->withInput();
             }
 
             if ($tamuBaru === []) {
@@ -1860,14 +1983,16 @@ class DashboardUndanganController extends Controller
                     ->withInput();
             }
 
-            foreach ($tamuBaru as $item) {
-                TamuUndangan::create([
-                    'undangan_id' => $undangan->id,
-                    'kode_tamu' => TamuUndangan::buatKodeUnik(),
-                    'nama_tamu' => $item['nama_tamu'],
-                    'nomor_wa' => $item['nomor_wa'],
-                ]);
-            }
+            DB::transaction(static function () use ($undangan, $tamuBaru): void {
+                foreach ($tamuBaru as $item) {
+                    TamuUndangan::create([
+                        'undangan_id' => $undangan->id,
+                        'kode_tamu' => TamuUndangan::buatKodeUnik(),
+                        'nama_tamu' => $item['nama_tamu'],
+                        'nomor_wa' => $item['nomor_wa'],
+                    ]);
+                }
+            });
 
             $jumlah = count($tamuBaru);
 
@@ -1960,6 +2085,165 @@ class DashboardUndanganController extends Controller
         return redirect()
             ->route('dashboard.undangan.tamu', $undangan)
             ->with('sukses', "Data tamu \"{$tamu->nama_tamu}\" berhasil diperbarui.");
+    }
+
+    public function simpanTemplatePesanTamu(Request $request, Undangan $undangan): RedirectResponse|JsonResponse
+    {
+        Gate::authorize('kelola', $undangan);
+
+        if ($terkunci = $this->responsJikaTamuRsvpTerkunci($request, $undangan)) {
+            return $terkunci;
+        }
+
+        $tervalidasi = $request->validate([
+            'template_pesan_wa' => ['required', 'string', 'max:2500'],
+        ], [
+            'template_pesan_wa.required' => 'Isi template pesan tidak boleh kosong.',
+            'template_pesan_wa.max' => 'Template pesan maksimal 2.500 karakter.',
+        ]);
+
+        $isiBersih = str_replace(["\r\n", "\r"], "\n", trim((string) $tervalidasi['template_pesan_wa']));
+
+        if (! str_contains($isiBersih, '{nama}') || ! str_contains($isiBersih, '{link}')) {
+            $pesanGalat = 'Template pesan wajib menyertakan kode {nama} dan {link}.';
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'ok' => false,
+                    'pesan' => $pesanGalat,
+                    'errors' => [
+                        'template_pesan_wa' => [$pesanGalat],
+                    ],
+                ], 422);
+            }
+
+            return redirect()
+                ->route('dashboard.undangan.tamu', $undangan)
+                ->withErrors(['template_pesan_wa' => $pesanGalat]);
+        }
+
+        $pengaturan = array_replace_recursive(Undangan::pengaturanBawaan(), $undangan->pengaturan ?? []);
+        $pengaturan['template_pesan_wa'] = $isiBersih;
+        $undangan->pengaturan = $pengaturan;
+        $undangan->save();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => true,
+                'pesan' => 'Template pesan WhatsApp berhasil disimpan.',
+                'template_pesan_wa' => $undangan->templatePesanWa(),
+            ]);
+        }
+
+        return redirect()
+            ->route('dashboard.undangan.tamu', $undangan)
+            ->with('sukses', 'Template pesan WhatsApp berhasil disimpan.');
+    }
+
+    public function unduhTemplateCsvTamu(Request $request, Undangan $undangan): Response|RedirectResponse|JsonResponse
+    {
+        Gate::authorize('kelola', $undangan);
+
+        if ($terkunci = $this->responsJikaTamuRsvpTerkunci($request, $undangan)) {
+            return $terkunci;
+        }
+
+        return response(EksporSpreadsheetTamu::contohCsv(), 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="template-import-tamu-sesitemu.csv"',
+        ]);
+    }
+
+    public function eksporTamu(Request $request, Undangan $undangan): Response|StreamedResponse|RedirectResponse|JsonResponse
+    {
+        Gate::authorize('kelola', $undangan);
+
+        if ($terkunci = $this->responsJikaTamuRsvpTerkunci($request, $undangan)) {
+            return $terkunci;
+        }
+
+        $format = Str::lower((string) $request->query('format', 'csv'));
+        if (! in_array($format, ['csv', 'xlsx'], true)) {
+            $format = 'csv';
+        }
+
+        $urlPublik = Route::has('undangan.tampil')
+            ? route('undangan.tampil', $undangan->slug)
+            : url('/'.$undangan->slug);
+
+        $daftarTamu = $undangan->daftarTamu()->get();
+
+        $headers = [
+            'No',
+            'Nama Tamu',
+            'Nomor WhatsApp',
+            'Status Kirim',
+            'Waktu Dikirim',
+            'Status Buka',
+            'Jumlah Dibuka',
+            'Terakhir Dibuka',
+            'Link Undangan Personal',
+        ];
+
+        $barisData = [];
+        foreach ($daftarTamu as $idx => $tamu) {
+            $urlPersonal = $urlPublik
+                .'?to='.rawurlencode((string) $tamu->nama_tamu)
+                .'&g='.rawurlencode((string) $tamu->kode_tamu);
+
+            $barisData[] = [
+                $idx + 1,
+                (string) $tamu->nama_tamu,
+                (string) ($tamu->nomor_wa ?? ''),
+                $tamu->sudahDikirim() ? 'Sudah Dikirim' : 'Belum Dikirim',
+                $tamu->dikirim_pada ? $tamu->dikirim_pada->locale('id')->translatedFormat('d M Y, H:i') : '-',
+                $tamu->sudahDibuka() ? 'Sudah Dibuka' : 'Belum Dibuka',
+                (int) $tamu->jumlah_dibuka,
+                $tamu->terakhir_dibuka_pada ? $tamu->terakhir_dibuka_pada->locale('id')->translatedFormat('d M Y, H:i') : '-',
+                $urlPersonal,
+            ];
+        }
+
+        $slugAman = preg_replace('/[^a-z0-9-]+/i', '-', (string) $undangan->slug) ?: 'undangan';
+        $tanggal = now()->format('Y-m-d');
+
+        if ($format === 'xlsx') {
+            $namaFile = "daftar-tamu-{$slugAman}-{$tanggal}.xlsx";
+            $binerXlsx = EksporSpreadsheetTamu::buatXlsx(
+                $headers,
+                $barisData,
+                [6, 28, 18, 16, 20, 16, 15, 20, 52],
+                [2],
+                'Daftar Tamu'
+            );
+
+            return response($binerXlsx, 200, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => "attachment; filename=\"{$namaFile}\"",
+                'Content-Length' => (string) strlen($binerXlsx),
+            ]);
+        }
+
+        $namaFile = "daftar-tamu-{$slugAman}-{$tanggal}.csv";
+
+        return response()->streamDownload(static function () use ($headers, $barisData): void {
+            $handle = fopen('php://output', 'w');
+            if ($handle === false) {
+                return;
+            }
+
+            fwrite($handle, "\xEF\xBB\xBF");
+            fputcsv($handle, $headers);
+            foreach ($barisData as $baris) {
+                fputcsv($handle, array_map(
+                    static fn ($sel): string => is_int($sel) ? (string) $sel : EksporSpreadsheetTamu::amankanSelCsv((string) $sel),
+                    $baris
+                ));
+            }
+            fclose($handle);
+        }, $namaFile, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 
     public function tandaiStatusKirimTamu(Request $request, Undangan $undangan, TamuUndangan $tamu): RedirectResponse|JsonResponse
@@ -2085,6 +2369,11 @@ class DashboardUndanganController extends Controller
     ): RedirectResponse {
         Gate::authorize('kelola', $undangan);
 
+        $dariDashboard = $request->input('asal_halaman') === 'dashboard';
+        if ($dariDashboard) {
+            $request->session()->flash('buka_aktivasi_undangan_id', $undangan->id);
+        }
+
         if ($undangan->sudahAktifPublik()) {
             return back()
                 ->withErrors(['pembayaran' => 'Undangan ini sudah aktif sehingga tidak perlu mengajukan pembayaran lagi.'])
@@ -2135,10 +2424,19 @@ class DashboardUndanganController extends Controller
             $request->file('bukti_pembayaran')
         );
 
+        $pesanSukses = "Order {$transaksi->kode_invoice} berhasil diajukan dengan total ".Tema::formatRupiah($transaksi->total_bayar).' dan menunggu verifikasi Admin.';
+
+        if ($dariDashboard) {
+            return redirect()
+                ->route('dashboard.index')
+                ->with('buka_aktivasi_undangan_id', $undangan->id)
+                ->with('sukses', $pesanSukses);
+        }
+
         return redirect()
             ->route('dashboard.undangan.kelola', $undangan)
             ->with('tab_aktif', 'aktivasi')
-            ->with('sukses', "Order {$transaksi->kode_invoice} berhasil diajukan dengan total ".Tema::formatRupiah($transaksi->total_bayar).' dan menunggu verifikasi Admin.');
+            ->with('sukses', $pesanSukses);
     }
 
     /**
@@ -2185,6 +2483,11 @@ class DashboardUndanganController extends Controller
     ): RedirectResponse {
         Gate::authorize('kelola', $transaksi->undangan);
 
+        $dariDashboard = $request->input('asal_halaman') === 'dashboard';
+        if ($dariDashboard) {
+            $request->session()->flash('buka_aktivasi_undangan_id', $transaksi->undangan_id);
+        }
+
         if ($transaksi->status !== 'menunggu_pembayaran' || $transaksi->bukti_pembayaran !== null) {
             return back()
                 ->withErrors([
@@ -2202,10 +2505,19 @@ class DashboardUndanganController extends Controller
 
         $layanan->unggahBukti($transaksi, $request->file('bukti_pembayaran'));
 
+        $pesanSukses = "Bukti pembayaran untuk invoice {$transaksi->kode_invoice} berhasil diunggah.";
+
+        if ($dariDashboard) {
+            return redirect()
+                ->route('dashboard.index')
+                ->with('buka_aktivasi_undangan_id', $transaksi->undangan_id)
+                ->with('sukses', $pesanSukses);
+        }
+
         return redirect()
             ->route('dashboard.undangan.kelola', $transaksi->undangan)
             ->with('tab_aktif', 'aktivasi')
-            ->with('sukses', "Bukti pembayaran untuk invoice {$transaksi->kode_invoice} berhasil diunggah.");
+            ->with('sukses', $pesanSukses);
     }
 
     /**

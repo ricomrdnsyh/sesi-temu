@@ -1,5 +1,10 @@
 {{-- Modal Checkout Terpusat: Pembayaran & Aktivasi (Ringkas Mobile & 2 Kolom Desktop) --}}
 @php
+    $ekspresiTerbuka = $ekspresiTerbuka ?? 'modalAktivasiTerbuka';
+    $idPrefix = $idPrefix ?? '';
+    $asalHalaman = $asalHalaman ?? 'kelola';
+    $pakaiOldIni = $asalHalaman !== 'dashboard'
+        || (int) session('buka_aktivasi_undangan_id', 0) === (int) $undangan->id;
     $biayaTerimaBeresNominal = (int) ($biayaTerimaBeres ?? \App\Support\PengaturanSesiTemu::biayaTerimaBeres());
     $hargaTemaNominal = (int) ($undangan->tema?->hargaNominal() ?? 0);
     $undanganSudahAktifBayar = $undangan->sudahAktifPublik();
@@ -12,18 +17,19 @@
         : $pesanWaAktivasi;
 @endphp
 <div
-    x-show="modalAktivasiTerbuka"
+    x-show="{{ $ekspresiTerbuka }}"
     x-cloak
     data-modal-aktivasi
-    @keydown.escape.window="if (modalAktivasiTerbuka && !galeriLightbox && !window.Swal?.isVisible()) { tutupModalAktivasi(); }"
-    class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-2 sm:p-4 lg:p-6"
+    data-aktivasi-undangan-id="{{ $undangan->id }}"
+    @keydown.escape.window="if (({{ $ekspresiTerbuka }}) && !galeriLightbox && !window.Swal?.isVisible()) { tutupModalAktivasi(); }"
+    class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 lg:p-6"
     role="dialog"
     aria-modal="true"
     aria-label="Pembayaran dan Aktivasi Undangan"
 >
     {{-- Backdrop Gelap Blur --}}
     <div
-        x-show="modalAktivasiTerbuka"
+        x-show="{{ $ekspresiTerbuka }}"
         x-transition:enter="transition ease-out duration-200"
         x-transition:enter-start="opacity-0"
         x-transition:enter-end="opacity-100"
@@ -36,7 +42,7 @@
 
     {{-- Panel Modal Checkout --}}
     <div
-        x-show="modalAktivasiTerbuka"
+        x-show="{{ $ekspresiTerbuka }}"
         x-transition:enter="transition ease-out duration-200"
         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-2 sm:scale-95"
         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
@@ -44,12 +50,12 @@
         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-2 sm:scale-95"
         @click.stop
-        class="relative z-10 w-full max-w-4xl max-h-[90dvh] rounded-3xl bg-[#FDFBF7] shadow-[0_30px_90px_-18px_rgba(20,32,26,0.48)] ring-1 ring-champagne/40 overflow-hidden flex flex-col"
+        class="relative z-10 w-full max-w-4xl max-h-[90dvh] rounded-xl bg-[#FDFBF7] shadow-[0_30px_90px_-18px_rgba(20,32,26,0.48)] ring-1 ring-champagne/40 overflow-hidden flex flex-col"
     >
         {{-- Header Modal Ringkas --}}
         <div class="bg-white border-b border-champagne/25 px-4 sm:px-5 py-3 flex items-center justify-between gap-2.5 shrink-0">
             <div class="flex items-center gap-2.5 min-w-0">
-                <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#3B4F45] text-[#F5E3B8] shadow-xs shrink-0">
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#3B4F45] text-[#F5E3B8] shadow-xs shrink-0">
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <rect width="20" height="14" x="2" y="5" rx="2"/>
                         <line x1="2" x2="22" y1="10" y2="10"/>
@@ -60,7 +66,7 @@
                         <h2 class="font-sans text-sm sm:text-base font-bold text-charcoal tracking-tight truncate">
                             Pembayaran &amp; Aktivasi
                         </h2>
-                        <span class="rounded-full px-2 py-0.5 text-[10px] font-bold shrink-0 {{ $undanganSudahAktifBayar ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200' : ($transaksiMenungguBayar ? 'bg-sky-50 text-sky-700 ring-1 ring-sky-200' : 'bg-amber-50 text-amber-800 ring-1 ring-amber-200') }}">
+                        <span class="rounded-md px-2 py-0.5 text-[10px] font-bold shrink-0 {{ $undanganSudahAktifBayar ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200' : ($transaksiMenungguBayar ? 'bg-sky-50 text-sky-700 ring-1 ring-sky-200' : 'bg-amber-50 text-amber-800 ring-1 ring-amber-200') }}">
                             {{ $undanganSudahAktifBayar ? 'Aktif' : ($transaksiMenungguBayar ? 'Verifikasi' : 'Belum Aktif') }}
                         </span>
                     </div>
@@ -74,7 +80,7 @@
                 type="button"
                 @click="tutupModalAktivasi()"
                 aria-label="Tutup modal pembayaran"
-                class="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-champagne/35 bg-ivory text-charcoal/70 hover:bg-champagne/15 hover:text-charcoal transition cursor-pointer shrink-0"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-champagne/35 bg-ivory text-charcoal/70 hover:bg-champagne/15 hover:text-charcoal transition cursor-pointer shrink-0"
             >
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M18 6 6 18"/>
@@ -88,7 +94,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-4 items-start">
                 @if ($undanganSudahAktifBayar)
                     <div
-                        id="form-aktivasi-pembayaran"
+                        id="{{ $idPrefix }}form-aktivasi-pembayaran"
                         class="lg:col-span-7 order-1 rounded-2xl bg-white p-4 sm:p-5 shadow-xs ring-1 ring-emerald-200/80 space-y-3.5"
                     >
                         <div class="flex items-start gap-3">
@@ -144,7 +150,7 @@
                     </div>
                 @elseif ($transaksiMenungguBayar)
                     <div
-                        id="form-aktivasi-pembayaran"
+                        id="{{ $idPrefix }}form-aktivasi-pembayaran"
                         class="lg:col-span-7 order-1 rounded-2xl bg-white p-4 sm:p-5 shadow-xs ring-1 ring-amber-200/80 space-y-3.5"
                     >
                         <div class="flex items-start gap-3">
@@ -207,12 +213,12 @@
                     </div>
                 @else
                     <div
-                        id="form-aktivasi-pembayaran"
+                        id="{{ $idPrefix }}form-aktivasi-pembayaran"
                         x-data="{
-                            paket: @js(old('paket', 'mandiri')),
+                            paket: @js($pakaiOldIni ? old('paket', 'mandiri') : 'mandiri'),
                             hargaTema: {{ $hargaTemaNominal }},
                             biayaTerimaBeres: {{ $biayaTerimaBeresNominal }},
-                            kodePromo: @js((string) old('kode_promo', '')),
+                            kodePromo: @js((string) ($pakaiOldIni ? old('kode_promo', '') : '')),
                             promoTerapan: null,
                             pesanPromo: '',
                             promoError: false,
@@ -398,6 +404,9 @@
                             :data-swal-loading-text="perluBukti() ? 'Mengunggah bukti transfer &amp; membuat invoice aktivasi...' : 'Memproses pengajuan voucher aktivasi Anda...'"
                         >
                             @csrf
+                            @if ($asalHalaman === 'dashboard')
+                                <input type="hidden" name="asal_halaman" value="dashboard">
+                            @endif
 
                             {{-- 1. Pilih Paket (Selalu 2 Kolom Rapi) --}}
                             <div>
@@ -437,10 +446,10 @@
 
                             {{-- 2. Kode Promo --}}
                             <div>
-                                <label for="kode_promo" class="block text-xs font-semibold text-charcoal/80">Kode Promo / Voucher <span class="font-normal text-charcoal/45">(Opsional)</span></label>
+                                <label for="{{ $idPrefix }}kode_promo" class="block text-xs font-semibold text-charcoal/80">Kode Promo / Voucher <span class="font-normal text-charcoal/45">(Opsional)</span></label>
                                 <div class="mt-1 flex items-stretch gap-2">
                                     <input
-                                        id="kode_promo"
+                                        id="{{ $idPrefix }}kode_promo"
                                         type="text"
                                         name="kode_promo"
                                         x-model="kodePromo"
@@ -475,9 +484,11 @@
                                     </button>
                                 </div>
 
-                                @error('kode_promo')
-                                    <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
-                                @enderror
+                                @if ($pakaiOldIni)
+                                    @error('kode_promo')
+                                        <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
+                                    @enderror
+                                @endif
                             </div>
 
                             {{-- 3. Ringkasan Total Ringkas --}}
@@ -509,7 +520,7 @@
                             {{-- 4. Unggah Bukti Transfer (Horizontal Compact) --}}
                             <div data-zona-bukti>
                                 <div class="flex items-center justify-between gap-2">
-                                    <label for="bukti_pembayaran" class="block text-xs font-semibold text-charcoal/80">
+                                    <label for="{{ $idPrefix }}bukti_pembayaran" class="block text-xs font-semibold text-charcoal/80">
                                         Unggah Bukti Transfer <span x-show="perluBukti()" class="text-rose-600">*</span>
                                     </label>
                                     <span
@@ -528,7 +539,7 @@
                                 </div>
 
                                 <input
-                                    id="bukti_pembayaran"
+                                    id="{{ $idPrefix }}bukti_pembayaran"
                                     x-ref="inputBukti"
                                     type="file"
                                     name="bukti_pembayaran"
@@ -540,7 +551,7 @@
 
                                 <div x-show="perluBukti()" class="mt-1.5">
                                     <label
-                                        for="bukti_pembayaran"
+                                        for="{{ $idPrefix }}bukti_pembayaran"
                                         x-show="!buktiPreviewUrl"
                                         @dragover.prevent="sedangTarikBukti = true"
                                         @dragleave.prevent="sedangTarikBukti = false"
@@ -584,7 +595,7 @@
                                             <p class="text-xs font-semibold text-charcoal truncate" x-text="buktiNama"></p>
                                             <p class="text-[10.5px] text-emerald-700 font-medium" x-text="'Siap dikirim • ' + buktiUkuran"></p>
                                             <div class="mt-1 flex items-center gap-1.5">
-                                                <label for="bukti_pembayaran" class="rounded-md border border-champagne bg-white px-2 py-0.5 text-[10.5px] font-semibold text-charcoal hover:bg-champagne/10 cursor-pointer transition">Ganti</label>
+                                                <label for="{{ $idPrefix }}bukti_pembayaran" class="rounded-md border border-champagne bg-white px-2 py-0.5 text-[10.5px] font-semibold text-charcoal hover:bg-champagne/10 cursor-pointer transition">Ganti</label>
                                                 <button type="button" @click="resetBukti()" class="rounded-md border border-rose-200 bg-rose-50 px-2 py-0.5 text-[10.5px] font-semibold text-rose-700 hover:bg-rose-100 cursor-pointer transition">Hapus</button>
                                             </div>
                                         </div>
@@ -600,9 +611,14 @@
                                 </div>
 
                                 <p x-show="buktiGalat" x-cloak x-text="buktiGalat" class="mt-1 text-xs font-medium text-rose-600"></p>
-                                @error('bukti_pembayaran')
-                                    <p class="mt-1 text-xs font-medium text-rose-600">{{ $message }}</p>
-                                @enderror
+                                @if ($pakaiOldIni)
+                                    @error('bukti_pembayaran')
+                                        <p class="mt-1 text-xs font-medium text-rose-600">{{ $message }}</p>
+                                    @enderror
+                                    @error('pembayaran')
+                                        <p class="mt-1 text-xs font-medium text-rose-600">{{ $message }}</p>
+                                    @enderror
+                                @endif
                             </div>
 
                             <button type="submit" class="w-full rounded-xl bg-sage px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-[0.99] cursor-pointer transition">
@@ -674,7 +690,7 @@
                     <div class="flex items-center gap-2 pt-0.5">
                         @if ($bolehAjukanBayar)
                             <a
-                                href="#form-aktivasi-pembayaran"
+                                href="#{{ $idPrefix }}form-aktivasi-pembayaran"
                                 class="lg:hidden flex-1 inline-flex items-center justify-center gap-1 rounded-xl bg-sage/10 px-3 py-2 text-xs font-semibold text-sage hover:bg-sage hover:text-white transition"
                             >
                                 <span>Lanjut Unggah Bukti &darr;</span>

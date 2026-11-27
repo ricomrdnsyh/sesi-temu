@@ -66,6 +66,9 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
     Route::delete('/undangan/{undangan}/amplop/{amplop}', [DashboardUndanganController::class, 'hapusAmplop'])->name('amplop.hapus');
 
     Route::post('/undangan/{undangan}/tamu', [DashboardUndanganController::class, 'simpanTamu'])->name('tamu.simpan');
+    Route::put('/undangan/{undangan}/tamu/template-pesan', [DashboardUndanganController::class, 'simpanTemplatePesanTamu'])->name('tamu.template-pesan');
+    Route::get('/undangan/{undangan}/tamu/template-csv', [DashboardUndanganController::class, 'unduhTemplateCsvTamu'])->name('tamu.template-csv');
+    Route::get('/undangan/{undangan}/tamu/ekspor', [DashboardUndanganController::class, 'eksporTamu'])->name('tamu.ekspor');
     Route::put('/undangan/{undangan}/tamu/{tamu}', [DashboardUndanganController::class, 'perbaruiTamu'])->name('tamu.perbarui');
     Route::patch('/undangan/{undangan}/tamu/{tamu}/status-kirim', [DashboardUndanganController::class, 'tandaiStatusKirimTamu'])->name('tamu.status-kirim');
     Route::delete('/undangan/{undangan}/tamu/{tamu}', [DashboardUndanganController::class, 'hapusTamu'])->name('tamu.hapus');

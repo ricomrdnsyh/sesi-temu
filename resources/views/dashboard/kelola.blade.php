@@ -188,31 +188,59 @@
         {{-- 2. Panel Kiri: Studio Editor Accordion --}}
         <div
             class="relative w-full lg:w-[44%] xl:w-[42%] lg:min-w-[440px] lg:max-w-[960px] shrink-0 bg-white lg:my-3 lg:ml-3 lg:rounded-3xl lg:border lg:border-champagne/25 lg:shadow-[0_14px_34px_-16px_rgba(20,32,26,0.14)] lg:overflow-hidden flex flex-col lg:h-[calc(100vh-1.5rem)] min-h-0">
-            {{-- Header Sticky Panel Kiri --}}
+            @php
+                $penggunaAktifKelola = auth()->user();
+            @endphp
+
+            {{-- Header Mobile & Tablet (< lg) — Seragam dengan Dashboard Awal --}}
+            <header class="lg:hidden bg-white/95 backdrop-blur-md border-b border-champagne/20 px-4 h-14 flex items-center justify-between gap-3 shrink-0 sticky top-0 z-30">
+                <a href="{{ route('beranda') }}" class="flex items-center text-charcoal shrink-0 group">
+                    <img
+                        src="{{ asset('logo/logo-horizontal.webp') }}"
+                        alt="Logo SesiTemu"
+                        class="h-8 sm:h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.03]"
+                    >
+                    <span class="sr-only">SesiTemu</span>
+                </a>
+
+                <div class="flex items-center gap-2 shrink-0">
+                    <a :href="urlPublikSalin || @js($urlPublik)" href="{{ $urlPublik }}" target="_blank"
+                        class="inline-flex items-center gap-1.5 rounded-xl bg-ivory px-3 py-1.5 text-xs font-semibold text-charcoal ring-1 ring-champagne/35 hover:bg-champagne/15 active:scale-95 transition shrink-0">
+                        <svg class="h-3.5 w-3.5 text-sage shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
+                        <span>Pratinjau</span>
+                    </a>
+
+                    <a
+                        href="{{ route('dashboard.profil.tampil') }}"
+                        title="Profil — {{ $penggunaAktifKelola->nama }}"
+                        aria-label="Buka profil {{ $penggunaAktifKelola->nama }}"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-sage text-white font-sans text-xs font-bold tracking-wide ring-2 ring-champagne/40 hover:bg-sage/90 hover:ring-champagne hover:scale-105 transition shrink-0 shadow-2xs"
+                    >
+                        <span>{{ $penggunaAktifKelola->inisialNama() }}</span>
+                        <span class="sr-only">{{ $penggunaAktifKelola->nama }}</span>
+                    </a>
+                </div>
+            </header>
+
+            {{-- Header Panel Kiri Desktop (lg+) --}}
             <div
-                class="px-4 sm:px-5 py-3.5 border-b border-champagne/20 bg-white flex items-center justify-between gap-3 shrink-0 sticky top-0 z-20 lg:static">
+                class="hidden lg:flex px-4 sm:px-5 py-3.5 border-b border-champagne/20 bg-white items-center justify-between gap-3 shrink-0">
                 <div class="min-w-0">
                     <h1 class="font-sans text-lg sm:text-xl font-bold text-charcoal tracking-tight leading-snug">
                         Edit Undangan
                     </h1>
                     <div class="mt-0.5 flex items-center gap-1.5 text-[11px] text-charcoal/55">
-                        <a href="{{ auth()->user()->adalahAdmin() ? route('admin.undangan.index') : route('dashboard.index') }}"
+                        <a href="{{ $penggunaAktifKelola->adalahAdmin() ? route('admin.undangan.index') : route('dashboard.index') }}"
                             class="hover:text-sage transition">Dashboard</a>
                         <span aria-hidden="true">&rsaquo;</span>
                         <span class="font-medium text-charcoal/80 truncate" x-text="(namaPriaLive || @js($undangan->nama_panggilan_pria)) + ' & ' + (namaWanitaLive || @js($undangan->nama_panggilan_wanita))">{{ $undangan->nama_panggilan_pria }} &amp;
                             {{ $undangan->nama_panggilan_wanita }}</span>
                     </div>
                 </div>
-
-                <a :href="urlPublikSalin || @js($urlPublik)" href="{{ $urlPublik }}" target="_blank"
-                    class="lg:hidden inline-flex items-center gap-1.5 rounded-xl bg-ivory px-3 py-2 text-xs font-semibold text-charcoal ring-1 ring-champagne/35 hover:bg-champagne/15 active:scale-95 transition shrink-0">
-                    <svg class="h-3.5 w-3.5 text-sage shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                        <circle cx="12" cy="12" r="3" />
-                    </svg>
-                    <span>Pratinjau</span>
-                </a>
             </div>
 
             {{-- Body Scrollable Panel Kiri --}}

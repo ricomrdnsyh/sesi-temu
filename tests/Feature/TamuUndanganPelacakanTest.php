@@ -87,13 +87,35 @@ class TamuUndanganPelacakanTest extends TestCase
             ->assertRedirect($urlHalamanTamu)
             ->assertSessionHasErrors('nomor_wa');
 
-        // 4. Tambah massal (dengan dan tanpa nomor WA)
+        // 4. Tambah massal (dengan dan tanpa nomor WA) + validasi salah pemisah titik / tanpa koma / nomor WA tidak valid
         $this->actingAs($pemilik)
             ->post("/dashboard/undangan/{$undangan->id}/tamu", [
                 'mode' => 'massal',
-                'daftar_bulk' => "Siti Aminah, 085612345678\nRina Putri | +62 813-9988-7766\nAndi Tanpa Nomor",
+                'daftar_bulk' => "tamam. 0873837483753\nBudi Santoso 081234567890",
             ])
-            ->assertRedirect($urlHalamanTamu);
+            ->assertRedirect($urlHalamanTamu)
+            ->assertSessionHasErrors('daftar_bulk');
+
+        $this->assertDatabaseMissing('tamu_undangan', [
+            'undangan_id' => $undangan->id,
+            'nama_tamu' => 'tamam. 0873837483753',
+        ]);
+
+        $this->actingAs($pemilik)
+            ->post("/dashboard/undangan/{$undangan->id}/tamu", [
+                'mode' => 'massal',
+                'daftar_bulk' => "Rina Salah Nomor, 12345",
+            ])
+            ->assertRedirect($urlHalamanTamu)
+            ->assertSessionHasErrors('daftar_bulk');
+
+        $this->actingAs($pemilik)
+            ->post("/dashboard/undangan/{$undangan->id}/tamu", [
+                'mode' => 'massal',
+                'daftar_bulk' => "Siti Aminah, 085612345678\nRina Putri | +62 813-9988-7766\nAndi Tanpa Nomor\nKeluarga Bpk. Hendra\nDr. Hendra, S.T., 081299988877",
+            ])
+            ->assertRedirect($urlHalamanTamu)
+            ->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('tamu_undangan', [
             'undangan_id' => $undangan->id,
@@ -109,6 +131,16 @@ class TamuUndanganPelacakanTest extends TestCase
             'undangan_id' => $undangan->id,
             'nama_tamu' => 'Andi Tanpa Nomor',
             'nomor_wa' => null,
+        ]);
+        $this->assertDatabaseHas('tamu_undangan', [
+            'undangan_id' => $undangan->id,
+            'nama_tamu' => 'Keluarga Bpk. Hendra',
+            'nomor_wa' => null,
+        ]);
+        $this->assertDatabaseHas('tamu_undangan', [
+            'undangan_id' => $undangan->id,
+            'nama_tamu' => 'Dr. Hendra, S.T.',
+            'nomor_wa' => '6281299988877',
         ]);
 
         // 5. Edit inline via JSON (tambahkan nomor WA ke tamu yang sebelumnya kosong)
@@ -189,6 +221,7 @@ class TamuUndanganPelacakanTest extends TestCase
             ->assertSee('data-workspace-menu="tamu"', false)
             ->assertSee('data-workspace-menu="rsvp"', false)
             ->assertSee('data-workspace-header', false)
+            ->assertDontSee('Pindah Cepat Ruang Kerja')
             ->assertSee('id="daftar-kartu-tamu"', false)
             ->assertSee('data-tamu-cards', false)
             ->assertDontSee('<table', false)
@@ -198,9 +231,123 @@ class TamuUndanganPelacakanTest extends TestCase
             ->assertSee('6281234567890')
             ->assertSee('Sudah Dibuka')
             ->assertSee('Belum Dikirim')
+            ->assertSee('Template Pesan')
+            ->assertSee('data-tombol-template-pesan', false)
+            ->assertSee('id="tamu-template-pesan-config"', false)
             ->assertSee('Import Banyak')
             ->assertSee('Tambah Tamu')
             ->assertDontSee('Ucapan &amp; RSVP', false);
+
+        // 8b. Pemilik dapat mengedit dan menyimpan template pesan WhatsApp sendiri (wajib ada {nama} dan {link})
+        $urlTemplatePesan = route('dashboard.tamu.template-pesan', $undangan);
+
+        $this->actingAs($pemilik)
+            ->putJson($urlTemplatePesan, [
+                'template_pesan_wa' => 'Halo {nama}, yuk datang ke acara kami!',
+            ])
+            ->assertStatus(422)
+            ->assertJson(['ok' => false]);
+
+        $templateBaru = "*Assalamualaikum*\nHalo *{nama}*,\nSilakan buka undangan kami di:\n{link}\n_Terima kasih._";
+        $this->actingAs($pemilik)
+            ->putJson($urlTemplatePesan, [
+                'template_pesan_wa' => $templateBaru,
+            ])
+            ->assertOk()
+            ->assertJson([
+                'ok' => true,
+                'template_pesan_wa' => $templateBaru,
+            ]);
+
+        $undangan->refresh();
+        $this->assertSame($templateBaru, $undangan->templatePesanWa());
+
+        $htmlTamuSetelahSimpan = $this->actingAs($pemilik)
+            ->get($urlHalamanTamu)
+            ->assertOk()
+            ->getContent();
+        $this->assertStringContainsString('Assalamualaikum', $htmlTamuSetelahSimpan);
+        $this->assertStringContainsString('Kristen / Protestan', $htmlTamuSetelahSimpan);
+        $this->assertStringContainsString('Preview WhatsApp', $htmlTamuSetelahSimpan);
+
+        // Pastikan tidak ada JS x-data bocor ke body teks halaman Daftar Tamu
+        $domTamu = new \DOMDocument();
+        @$domTamu->loadHTML('<?xml encoding="utf-8" ?>'.$htmlTamuSetelahSimpan);
+        $xpathTamu = new \DOMXPath($domTamu);
+        $teksBodyTamu = '';
+        foreach ($xpathTamu->query('//body//text()[not(ancestor::script) and not(ancestor::style)]') as $nodeTeks) {
+            $teksBodyTamu .= $nodeTeks->nodeValue;
+        }
+        $this->assertStringNotContainsString('renderPreviewWaHtml', $teksBodyTamu);
+        $this->assertStringNotContainsString('simpanTemplatePesan', $teksBodyTamu);
+        $this->assertStringContainsString('Export CSV', $htmlTamuSetelahSimpan);
+        $this->assertStringContainsString('Export Excel', $htmlTamuSetelahSimpan);
+        $this->assertStringContainsString('Import CSV', $htmlTamuSetelahSimpan);
+        $this->assertStringContainsString('name="file_csv"', $htmlTamuSetelahSimpan);
+        $this->assertStringContainsString('Unduh Contoh CSV', $htmlTamuSetelahSimpan);
+
+        // 8c. Pemilik dapat mengunduh contoh CSV, mengimpor file CSV (pemisah koma & titik koma Excel ID), serta ekspor CSV & Excel (.xlsx)
+        $resContohCsv = $this->actingAs($pemilik)
+            ->get(route('dashboard.tamu.template-csv', $undangan))
+            ->assertOk();
+        $this->assertStringContainsString('Nama Tamu', (string) $resContohCsv->getContent());
+        $this->assertStringContainsString('Nomor WhatsApp', (string) $resContohCsv->getContent());
+
+        $kontenCsvImport = "\xEF\xBB\xBFNama Tamu;Nomor WhatsApp\r\nRani Putri;081299887766\r\n\"Hendra, S.T.\";\r\n";
+        $fileCsv = \Illuminate\Http\UploadedFile::fake()->createWithContent('daftar-tamu.csv', $kontenCsvImport);
+
+        $this->actingAs($pemilik)
+            ->post("/dashboard/undangan/{$undangan->id}/tamu", [
+                'mode' => 'csv',
+                'file_csv' => $fileCsv,
+            ])
+            ->assertRedirect($urlHalamanTamu)
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('tamu_undangan', [
+            'undangan_id' => $undangan->id,
+            'nama_tamu' => 'Rani Putri',
+            'nomor_wa' => '6281299887766',
+        ]);
+        $this->assertDatabaseHas('tamu_undangan', [
+            'undangan_id' => $undangan->id,
+            'nama_tamu' => 'Hendra, S.T.',
+            'nomor_wa' => null,
+        ]);
+
+        // Ekspor CSV
+        $resEksporCsv = $this->actingAs($pemilik)
+            ->get(route('dashboard.tamu.ekspor', [$undangan, 'format' => 'csv']))
+            ->assertOk();
+        $isiEksporCsv = $resEksporCsv->streamedContent();
+        $this->assertStringStartsWith("\xEF\xBB\xBF", $isiEksporCsv);
+        $this->assertStringContainsString('Nama Tamu', $isiEksporCsv);
+        $this->assertStringContainsString('Rani Putri', $isiEksporCsv);
+        $this->assertStringContainsString('6281299887766', $isiEksporCsv);
+        $this->assertStringContainsString('Budi Santoso', $isiEksporCsv);
+
+        // Ekspor Excel (.xlsx) valid OOXML archive
+        $resEksporXlsx = $this->actingAs($pemilik)
+            ->get(route('dashboard.tamu.ekspor', [$undangan, 'format' => 'xlsx']))
+            ->assertOk();
+        $this->assertStringContainsString(
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            (string) $resEksporXlsx->headers->get('Content-Type')
+        );
+
+        $tmpXlsx = tempnam(sys_get_temp_dir(), 'uji_xlsx_');
+        file_put_contents($tmpXlsx, (string) $resEksporXlsx->getContent());
+        $zip = new \ZipArchive();
+        $this->assertTrue($zip->open($tmpXlsx) === true, 'File ekspor Excel wajib berupa arsip XLSX valid.');
+        $sheetXml = (string) $zip->getFromName('xl/worksheets/sheet1.xml');
+        $zip->close();
+        @unlink($tmpXlsx);
+
+        $this->assertStringContainsString('Nama Tamu', $sheetXml);
+        $this->assertStringContainsString('Rani Putri', $sheetXml);
+        $this->assertStringContainsString('6281299887766', $sheetXml);
+        $this->assertStringContainsString('Hendra, S.T.', $sheetXml);
+        $this->assertStringContainsString('Budi Santoso', $sheetXml);
 
         // Halaman RSVP & Ucapan menampilkan tampilan kartu (non-tabel) terpisah tanpa form tambah tamu
         $this->actingAs($pemilik)

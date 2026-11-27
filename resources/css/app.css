@@ -318,7 +318,7 @@ body:not(.swal2-toast-shown) .swal2-container.swal2-backdrop-show {
 }
 
 .swal2-popup:not(.swal2-toast) {
-    border-radius: 1.25rem !important;
+    border-radius: 0.75rem !important;
     border: 1px solid rgba(191, 161, 95, 0.34) !important;
     background: linear-gradient(180deg, #ffffff 0%, #fdfbf7 100%) !important;
     box-shadow:
@@ -347,7 +347,7 @@ body:not(.swal2-toast-shown) .swal2-container.swal2-backdrop-show {
 }
 
 .swal2-actions button {
-    border-radius: 0.75rem !important;
+    border-radius: 0.5rem !important;
     font-size: 0.8125rem !important;
     font-weight: 600 !important;
     padding: 0.58rem 1.2rem !important;
@@ -534,6 +534,10 @@ body.swal2-toast-shown .swal2-container {
 }
 
 /* SesiTemu Select2 Theme */
+select.select2-hidden-accessible {
+    pointer-events: none !important;
+}
+
 .select2-container--sesitemu {
     font-family: "Poppins", ui-sans-serif, system-ui, sans-serif;
     max-width: 100%;

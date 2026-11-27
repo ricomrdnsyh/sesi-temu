@@ -468,7 +468,7 @@
             class="fixed inset-0 z-50 flex items-center justify-center bg-charcoal/60 backdrop-blur-sm p-4"
             @keydown.escape.window="modalDemoTerbuka = false">
             <div @click.away="modalDemoTerbuka = false"
-                class="w-full max-w-md rounded-3xl sm:rounded-2xl bg-white p-5 sm:p-6 shadow-2xl ring-1 ring-champagne/30 max-h-[88dvh] overflow-y-auto">
+                class="w-full max-w-md rounded-xl bg-white p-5 sm:p-6 shadow-2xl ring-1 ring-champagne/30 max-h-[88dvh] overflow-y-auto">
                 <h3 class="font-logo text-xl sm:text-2xl font-bold text-charcoal tracking-tight">Pratinjau Tema</h3>
                 <p class="mt-1 text-xs sm:text-sm text-charcoal/70">
                     Uji tampilan tema <span class="font-semibold text-sage" x-text="temaDemoNama"></span><span
@@ -506,11 +506,11 @@
 
                 <div class="mt-6 flex items-center justify-end gap-2.5">
                     <button type="button" @click="modalDemoTerbuka = false"
-                        class="rounded-xl border border-charcoal/20 bg-white px-4 py-2 text-sm font-semibold text-charcoal/75 hover:bg-ivory hover:border-charcoal/30 active:scale-95 transition cursor-pointer">
+                        class="rounded-lg border border-charcoal/20 bg-charcoal/[0.06] px-4 py-2 text-sm font-semibold text-charcoal/85 hover:bg-charcoal/[0.11] hover:border-charcoal/30 active:scale-95 transition cursor-pointer">
                         Batal
                     </button>
                     <button type="button" @click="bukaUrlDemo()"
-                        class="rounded-xl bg-sage px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-95 transition cursor-pointer">
+                        class="rounded-lg bg-sage px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-95 transition cursor-pointer">
                         Buka Preview
                     </button>
                 </div>
@@ -522,7 +522,7 @@
             class="fixed inset-0 z-50 flex items-center justify-center bg-charcoal/60 backdrop-blur-sm p-4"
             @keydown.escape.window="if (!window.Swal?.isVisible()) modalPakaiTerbuka = false">
             <div @click.away="if (!window.Swal?.isVisible() && !$event.target?.closest('.swal2-container')) modalPakaiTerbuka = false"
-                class="w-full max-w-lg rounded-3xl sm:rounded-2xl bg-white p-5 sm:p-6 shadow-2xl ring-1 ring-champagne/30 max-h-[88dvh] overflow-y-auto space-y-5">
+                class="w-full max-w-lg rounded-xl bg-white p-5 sm:p-6 shadow-2xl ring-1 ring-champagne/30 max-h-[88dvh] overflow-y-auto space-y-5">
                 <div class="flex items-start justify-between gap-3">
                     <div>
                         <p class="text-[11px] font-bold uppercase tracking-wider text-sage">Langkah Berikutnya</p>
@@ -538,7 +538,7 @@
                 </div>
 
                 {{-- Kartu Ringkas Tema Terpilih --}}
-                <div class="flex items-center gap-3.5 rounded-2xl bg-ivory p-3.5 ring-1 ring-champagne/25">
+                <div class="flex items-center gap-3.5 rounded-lg bg-ivory p-3.5 ring-1 ring-champagne/25">
                     <template x-if="temaDipilih.gambar_url">
                         <img :src="temaDipilih.gambar_url" :alt="temaDipilih.nama_tema"
                             class="h-16 w-20 rounded-xl object-cover shrink-0 ring-1 ring-champagne/25">
@@ -629,12 +629,12 @@
 
                         <div class="pt-1 flex justify-end gap-2.5">
                             <button type="button" @click="modalPakaiTerbuka = false"
-                                class="rounded-xl border border-charcoal/20 bg-white px-4 py-2.5 text-sm font-semibold text-charcoal/75 hover:bg-ivory hover:border-charcoal/30 active:scale-95 transition cursor-pointer">
+                                class="rounded-lg border border-charcoal/20 bg-charcoal/[0.06] px-4 py-2.5 text-sm font-semibold text-charcoal/85 hover:bg-charcoal/[0.11] hover:border-charcoal/30 active:scale-95 transition cursor-pointer">
                                 Batal
                             </button>
                             <button type="submit"
                                 @disabled(! $adaUndanganBolehGanti)
-                                class="flex-1 sm:flex-none rounded-xl bg-sage px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-95 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                                class="flex-1 sm:flex-none rounded-lg bg-sage px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-95 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                                 Terapkan &amp; Lanjut Kelola →
                             </button>
                         </div>
@@ -696,7 +696,7 @@
 
                     <div class="pt-1 flex justify-end gap-2.5">
                         <button type="button" @click="modalPakaiTerbuka = false"
-                            class="rounded-xl border border-charcoal/20 bg-white px-4 py-2.5 text-sm font-semibold text-charcoal/75 hover:bg-ivory hover:border-charcoal/30 active:scale-95 transition cursor-pointer">
+                            class="rounded-lg border border-charcoal/20 bg-charcoal/[0.06] px-4 py-2.5 text-sm font-semibold text-charcoal/85 hover:bg-charcoal/[0.11] hover:border-charcoal/30 active:scale-95 transition cursor-pointer">
                             Batal
                         </button>
                         <button type="submit"

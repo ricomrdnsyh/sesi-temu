@@ -159,32 +159,35 @@
 <nav
     aria-label="Navigasi Ruang Kerja Mobile"
     data-client-bottom-nav
-    class="lg:hidden fixed bottom-0 inset-x-0 z-40 rounded-t-2xl bg-white/96 backdrop-blur-lg border-t border-champagne/30 shadow-[0_-12px_32px_-12px_rgba(31,41,55,0.16)] pb-[env(safe-area-inset-bottom)]"
+    class="lg:hidden fixed bottom-0 inset-x-0 z-40 rounded-t-2xl bg-white/96 backdrop-blur-lg border-t border-champagne/25 shadow-[0_-10px_30px_-12px_rgba(31,41,55,0.14)] pb-[env(safe-area-inset-bottom)]"
 >
-    <div class="max-w-lg mx-auto grid grid-cols-4 h-[64px] px-2 items-center">
+    <div class="max-w-lg mx-auto grid grid-cols-4 h-[66px] px-2 items-center">
         <a
             href="{{ $urlKembaliRail }}"
-            class="flex flex-col items-center justify-center gap-1 py-1 text-charcoal/60 hover:text-sage font-medium active:scale-95 transition"
+            class="group relative flex flex-col items-center justify-center gap-1 py-1 text-charcoal/55 hover:text-sage font-medium active:scale-95 transition-all duration-200"
         >
-            <span class="inline-flex items-center justify-center rounded-full px-3 py-1">
-                <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <span class="inline-flex items-center justify-center rounded-full px-4 py-1 transition-all duration-200 group-hover:bg-sage/10 group-hover:text-sage group-hover:-translate-y-0.5">
+                <svg class="h-[19px] w-[19px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="m15 18-6-6 6-6"/>
                 </svg>
             </span>
-            <span class="text-[10px] leading-none">{{ $labelKembaliRail }}</span>
+            <span class="text-[10px] leading-none transition-colors duration-200 group-hover:font-semibold">{{ $labelKembaliRail }}</span>
         </a>
 
         <a
             href="{{ route('dashboard.undangan.kelola', $undangan) }}"
-            class="relative flex flex-col items-center justify-center gap-1 py-1 active:scale-95 transition {{ $menuAktif === 'undangan' ? 'text-sage font-bold' : 'text-charcoal/60 hover:text-sage font-medium' }}"
+            class="group relative flex flex-col items-center justify-center gap-1 py-1 active:scale-95 transition-all duration-200 {{ $menuAktif === 'undangan' ? 'text-sage font-bold' : 'text-charcoal/55 hover:text-sage font-medium' }}"
         >
-            <span class="inline-flex items-center justify-center rounded-full px-3.5 py-1 transition {{ $menuAktif === 'undangan' ? 'bg-sage text-white shadow-xs' : '' }}">
-                <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $menuAktif === 'undangan' ? '2.2' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            @if ($menuAktif === 'undangan')
+                <span class="pointer-events-none absolute -top-1.5 h-1 w-6 rounded-b-full bg-sage"></span>
+            @endif
+            <span class="inline-flex items-center justify-center rounded-full px-4 py-1 transition-all duration-200 {{ $menuAktif === 'undangan' ? 'bg-sage/15 text-sage ring-1 ring-sage/20 shadow-2xs' : 'group-hover:bg-sage/10 group-hover:text-sage group-hover:-translate-y-0.5' }}">
+                <svg class="h-[19px] w-[19px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $menuAktif === 'undangan' ? '2.2' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <rect width="20" height="16" x="2" y="4" rx="2"/>
                     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
                 </svg>
             </span>
-            <span class="text-[10px] leading-none">Undangan</span>
+            <span class="text-[10px] leading-none transition-colors duration-200 group-hover:font-semibold">Undangan</span>
         </a>
 
         @foreach ($menuTamuRsvp as $itemRail)
@@ -197,18 +200,21 @@
                     @click="if (typeof bukaModalAktivasi === 'function') { $event.preventDefault(); bukaModalAktivasi(); }"
                 @endif
                 title="{{ $menuTamuRsvpTerkunci ? $itemRail['judul'] . ' terkunci — bayar & aktifkan terlebih dahulu' : $itemRail['judul'] }}"
-                class="relative flex flex-col items-center justify-center gap-1 py-1 active:scale-95 transition {{ $menuTamuRsvpTerkunci ? 'text-charcoal/40 hover:text-amber-700 font-medium' : ($sedangAktifMobile ? 'text-sage font-bold' : 'text-charcoal/60 hover:text-sage font-medium') }}"
+                class="group relative flex flex-col items-center justify-center gap-1 py-1 active:scale-95 transition-all duration-200 {{ $menuTamuRsvpTerkunci ? 'text-charcoal/40 hover:text-amber-700 font-medium' : ($sedangAktifMobile ? 'text-sage font-bold' : 'text-charcoal/55 hover:text-sage font-medium') }}"
             >
-                <span class="relative inline-flex items-center justify-center rounded-full px-3.5 py-1 transition {{ $menuTamuRsvpTerkunci ? 'bg-charcoal/5 text-charcoal/40' : ($sedangAktifMobile ? 'bg-sage text-white shadow-xs' : '') }}">
+                @if ($sedangAktifMobile)
+                    <span class="pointer-events-none absolute -top-1.5 h-1 w-6 rounded-b-full bg-sage"></span>
+                @endif
+                <span class="relative inline-flex items-center justify-center rounded-full px-4 py-1 transition-all duration-200 {{ $menuTamuRsvpTerkunci ? 'bg-charcoal/5 text-charcoal/40 group-hover:bg-amber-50 group-hover:text-amber-700 group-hover:-translate-y-0.5' : ($sedangAktifMobile ? 'bg-sage/15 text-sage ring-1 ring-sage/20 shadow-2xs' : 'group-hover:bg-sage/10 group-hover:text-sage group-hover:-translate-y-0.5') }}">
                     @if ($itemRail['kode'] === 'tamu')
-                        <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $sedangAktifMobile ? '2.2' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <svg class="h-[19px] w-[19px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $sedangAktifMobile ? '2.2' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
                             <circle cx="9" cy="7" r="4"/>
                             <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
                             <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                         </svg>
                     @else
-                        <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $sedangAktifMobile ? '2.2' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <svg class="h-[19px] w-[19px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $sedangAktifMobile ? '2.2' : '1.9' }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                         </svg>
                     @endif
@@ -225,7 +231,7 @@
                         </span>
                     @endif
                 </span>
-                <span class="text-[10px] leading-none">{{ $itemRail['label'] }}</span>
+                <span class="text-[10px] leading-none transition-colors duration-200 group-hover:font-semibold">{{ $itemRail['label'] }}</span>
             </a>
         @endforeach
     </div>

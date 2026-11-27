@@ -5,7 +5,7 @@
     class="fixed inset-0 z-50 flex items-center justify-center bg-charcoal/60 backdrop-blur-sm p-4"
     @keydown.escape.window="if (!window.Swal?.isVisible()) modalBuatBaru = false"
 >
-    <div @click.away="if (!window.Swal?.isVisible() && !$event.target?.closest('.swal2-container')) modalBuatBaru = false" class="w-full max-w-lg rounded-3xl sm:rounded-2xl bg-white p-5 sm:p-6 shadow-2xl ring-1 ring-champagne/30 max-h-[88dvh] overflow-y-auto">
+    <div @click.away="if (!window.Swal?.isVisible() && !$event.target?.closest('.swal2-container')) modalBuatBaru = false" class="w-full max-w-lg rounded-xl bg-white p-5 sm:p-6 shadow-2xl ring-1 ring-champagne/30 max-h-[88dvh] overflow-y-auto">
         <div class="flex items-start justify-between gap-3">
             <div>
                 <p class="text-[11px] font-bold uppercase tracking-wider text-sage">Draft Gratis</p>
@@ -70,10 +70,10 @@
             </div>
 
             <div class="pt-2 flex justify-end gap-2.5">
-                <button type="button" @click="modalBuatBaru = false" class="rounded-xl border border-charcoal/20 bg-white px-4 py-2 text-sm font-semibold text-charcoal/75 hover:bg-ivory hover:border-charcoal/30 active:scale-95 transition cursor-pointer">
+                <button type="button" @click="modalBuatBaru = false" class="rounded-lg border border-charcoal/20 bg-charcoal/[0.06] px-4 py-2 text-sm font-semibold text-charcoal/85 hover:bg-charcoal/[0.11] hover:border-charcoal/30 active:scale-95 transition cursor-pointer">
                     Batal
                 </button>
-                <button type="submit" class="inline-flex items-center gap-1.5 rounded-xl bg-sage px-5 py-2 text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-95 transition cursor-pointer">
+                <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-sage px-5 py-2 text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-95 transition cursor-pointer">
                     <svg class="h-4 w-4 text-champagne shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
                         <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" />

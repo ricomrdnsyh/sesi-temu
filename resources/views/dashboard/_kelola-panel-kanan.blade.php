@@ -165,12 +165,12 @@
     @click="galeriLightbox = null"
     class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-xs p-4 flex items-center justify-center"
 >
-    <div @click.stop class="relative max-w-2xl w-full rounded-3xl overflow-hidden bg-white shadow-2xl">
+    <div @click.stop class="relative max-w-2xl w-full rounded-xl overflow-hidden bg-white shadow-2xl">
         <button
             type="button"
             @click="galeriLightbox = null"
             aria-label="Tutup pratinjau"
-            class="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-black/60 text-white hover:bg-black/80 flex items-center justify-center cursor-pointer transition"
+            class="absolute top-3 right-3 z-10 w-9 h-9 rounded-lg bg-black/60 text-white hover:bg-black/80 flex items-center justify-center cursor-pointer transition"
         >
             &times;
         </button>

@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import { amatiSelect2Baru, inisialisasiSemuaSelect2, tutupSemuaSelect2 } from './select2-init';
 import { buatPengendaliSinemaScroll } from './sinema-scroll';
 import { editorKelolaUndangan } from './editor-kelola';
+import { halamanTamuUndangan } from './tamu-dashboard';
 
 window.Alpine = Alpine;
 window.DataTable = DataTable;
@@ -14,8 +15,10 @@ window.SesiTemuSelect2 = {
     close: tutupSemuaSelect2,
 };
 window.editorKelolaUndangan = editorKelolaUndangan;
+window.halamanTamuUndangan = halamanTamuUndangan;
 
 Alpine.data('editorKelolaUndangan', editorKelolaUndangan);
+Alpine.data('halamanTamuUndangan', halamanTamuUndangan);
 Alpine.start();
 
 const escapeHtml = (teks) => String(teks)

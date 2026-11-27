@@ -253,10 +253,11 @@ export function editorKelolaUndangan(cfgMasuk = null) {
         hitungSkalaPreviewStudio() {
             const stage = this.$el.querySelector('[data-stage-preview-studio]');
             if (!stage || stage.clientWidth === 0 || stage.clientHeight === 0) return;
-            const tersediaW = Math.max(160, stage.clientWidth - 28);
-            const tersediaH = Math.max(220, stage.clientHeight - 24);
+            const bezelPad = 12;
+            const tersediaW = Math.max(80, stage.clientWidth - 20 - bezelPad);
+            const tersediaH = Math.max(120, stage.clientHeight - 16 - bezelPad);
             const skala = Math.min(tersediaW / 390, tersediaH / 780, 1.0);
-            this.previewStudioScale = Math.max(0.28, Number(skala.toFixed(4)));
+            this.previewStudioScale = Math.max(0.18, Number(skala.toFixed(4)));
         },
         ubahModePreview(mode) {
             this.modePreview = mode;
@@ -1110,7 +1111,13 @@ export function editorKelolaUndangan(cfgMasuk = null) {
             this.previewStudioMemuat = true;
             this.drawerTemaTerbuka = true;
             this.temaKonfirmasi = null;
-            this.$nextTick(() => this.hitungSkalaPreviewStudio());
+            this.$nextTick(() => {
+                this.hitungSkalaPreviewStudio();
+                if (typeof requestAnimationFrame === 'function') {
+                    requestAnimationFrame(() => this.hitungSkalaPreviewStudio());
+                }
+            });
+            setTimeout(() => this.hitungSkalaPreviewStudio(), 230);
             setTimeout(() => {
                 this.previewStudioMemuat = false;
             }, 2500);

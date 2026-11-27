@@ -194,6 +194,7 @@ class Undangan extends Model
             'foto_hitung_mundur' => [],
             'foto_penutup' => null,
             'musik_kustom' => null,
+            'template_pesan_wa' => '',
             'hashtag' => '',
             'sosial_media' => [
                 'instagram_pria' => '',
@@ -1032,6 +1033,84 @@ class Undangan extends Model
         }
 
         return $bersih;
+    }
+
+    /**
+     * Daftar preset pesan undangan WhatsApp per gaya / agama dengan kode {nama} dan {link}.
+     *
+     * @return list<array{kode: string, label: string, isi: string}>
+     */
+    public function daftarPresetPesanWa(): array
+    {
+        $pria = trim((string) $this->nama_panggilan_pria) ?: 'Mempelai Pria';
+        $wanita = trim((string) $this->nama_panggilan_wanita) ?: 'Mempelai Wanita';
+        $mempelai = "{$pria} & {$wanita}";
+
+        return [
+            [
+                'kode' => 'islam',
+                'label' => 'Islam',
+                'isi' => "*Assalamualaikum Warahmatullahi Wabarakatuh*\n\nKepada Yth. Bapak/Ibu/Saudara/i\n*{nama}*\n\nTanpa mengurangi rasa hormat, kami bermaksud mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami:\n\n*{$mempelai}*\n\nDetail acara dapat dilihat pada tautan berikut:\n\n{link}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.\n\n_Jazakumullah Khairan Katsiran._\n*Wassalamualaikum Warahmatullahi Wabarakatuh.*",
+            ],
+            [
+                'kode' => 'kristen',
+                'label' => 'Kristen / Protestan',
+                'isi' => "*Shalom, Salam Sejahtera*\n\nKepada Yth. Bapak/Ibu/Saudara/i\n*{nama}*\n\nDengan penuh sukacita dan syukur kepada Tuhan, kami bermaksud mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami:\n\n*{$mempelai}*\n\nInformasi lengkap acara dapat diakses melalui tautan berikut:\n\n{link}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.\n\n_Tuhan Yesus Memberkati._",
+            ],
+            [
+                'kode' => 'katolik',
+                'label' => 'Katolik',
+                'isi' => "*Salam Damai Sejahtera dalam Kasih Kristus*\n\nKepada Yth. Bapak/Ibu/Saudara/i\n*{nama}*\n\nDengan mengucap syukur atas kasih karunia Tuhan, kami bermaksud mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami:\n\n*{$mempelai}*\n\nInformasi lengkap acara dapat diakses melalui tautan berikut:\n\n{link}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu.\n\n_Terima kasih. Berkah Dalem._",
+            ],
+            [
+                'kode' => 'hindu',
+                'label' => 'Hindu',
+                'isi' => "*Om Swastyastu*\n\nKepada Yth. Bapak/Ibu/Saudara/i\n*{nama}*\n\nAtas Asung Kertha Wara Nugraha Ida Sang Hyang Widhi Wasa / Tuhan Yang Maha Esa, kami bermaksud mengundang Bapak/Ibu/Saudara/i pada upacara pernikahan kami:\n\n*{$mempelai}*\n\nInformasi lengkap acara dapat diakses melalui tautan berikut:\n\n{link}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.\n\n*Om Shanti, Shanti, Shanti Om*",
+            ],
+            [
+                'kode' => 'buddha',
+                'label' => 'Buddha',
+                'isi' => "*Namo Buddhaya*\n\nKepada Yth. Bapak/Ibu/Saudara/i\n*{nama}*\n\nDengan penuh rasa syukur dan kebahagiaan, kami bermaksud mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami:\n\n*{$mempelai}*\n\nInformasi lengkap acara dapat diakses melalui tautan berikut:\n\n{link}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu.\n\n_Semoga semua makhluk berbahagia. Sadhu, Sadhu, Sadhu._",
+            ],
+            [
+                'kode' => 'english',
+                'label' => 'English',
+                'isi' => "Dear *{nama}*,\n\nWith joyful hearts, we warmly invite you to celebrate our wedding day:\n\n*{$mempelai}*\n\nPlease find the full event details and RSVP through your personal invitation link below:\n\n{link}\n\nYour presence and warm blessings would mean the world to us. We look forward to celebrating this special moment with you.\n\n_With love,_\n*{$mempelai}*",
+            ],
+            [
+                'kode' => 'formal',
+                'label' => 'Formal',
+                'isi' => "Kepada Yth. *{nama}*,\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami:\n\n*{$mempelai}*\n\nInformasi lengkap acara dapat diakses melalui tautan berikut:\n\n{link}\n\nMerupakan suatu kehormatan apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.",
+            ],
+        ];
+    }
+
+    public function kodePresetPesanWaBawaan(): string
+    {
+        $slugTema = $this->tema?->slug ?? '';
+
+        return in_array($slugTema, ['islami-syari', 'islamic-heavenly'], true)
+            ? 'islam'
+            : 'formal';
+    }
+
+    public function templatePesanWaBawaan(): string
+    {
+        $kodeDefault = $this->kodePresetPesanWaBawaan();
+        foreach ($this->daftarPresetPesanWa() as $preset) {
+            if ($preset['kode'] === $kodeDefault) {
+                return $preset['isi'];
+            }
+        }
+
+        return $this->daftarPresetPesanWa()[0]['isi'];
+    }
+
+    public function templatePesanWa(): string
+    {
+        $kustom = trim((string) data_get($this->pengaturan, 'template_pesan_wa', ''));
+
+        return $kustom !== '' ? $kustom : $this->templatePesanWaBawaan();
     }
 
     /**

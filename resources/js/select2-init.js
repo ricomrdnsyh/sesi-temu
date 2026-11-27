@@ -166,7 +166,62 @@ const renderOpsiBankSelect2 = (data) => {
     return baris;
 };
 
+let pelindungLabelTerpasang = false;
+let labelSelect2TerbukaSaatMousedown = null;
+
+const pasangPelindungLabelSelect2 = () => {
+    if (pelindungLabelTerpasang || typeof document === 'undefined') {
+        return;
+    }
+    pelindungLabelTerpasang = true;
+
+    const cariSelect2DariLabel = (target) => {
+        if (!(target instanceof Element)) {
+            return null;
+        }
+        const labelEl = target.closest('label');
+        if (!labelEl) {
+            return null;
+        }
+        const kontrol = labelEl.control;
+        if (kontrol instanceof HTMLSelectElement && kontrol.classList.contains('select2-hidden-accessible') && $(kontrol).data('select2')) {
+            return kontrol;
+        }
+        return null;
+    };
+
+    document.addEventListener('mousedown', (event) => {
+        const selectEl = cariSelect2DariLabel(event.target);
+        if (!selectEl) {
+            labelSelect2TerbukaSaatMousedown = null;
+            return;
+        }
+        const instance = $(selectEl).data('select2');
+        labelSelect2TerbukaSaatMousedown = instance?.isOpen?.() ? selectEl : null;
+    }, true);
+
+    document.addEventListener('click', (event) => {
+        const selectEl = cariSelect2DariLabel(event.target);
+        if (!selectEl) {
+            return;
+        }
+
+        // Cegah <label> mengaktifkan <select> asli tersembunyi (yang memunculkan dropdown native ganda).
+        event.preventDefault();
+
+        const klikDiDalamSelect2 = event.target instanceof Element && Boolean(event.target.closest('.select2-container'));
+        const baruDitutup = labelSelect2TerbukaSaatMousedown === selectEl;
+        labelSelect2TerbukaSaatMousedown = null;
+
+        if (!klikDiDalamSelect2 && !baruDitutup && !selectEl.disabled) {
+            $(selectEl).select2('open');
+        }
+    });
+};
+
 export const inisialisasiSelect2Element = (selectEl) => {
+    pasangPelindungLabelSelect2();
+
     if (!(selectEl instanceof HTMLSelectElement)) {
         return;
     }

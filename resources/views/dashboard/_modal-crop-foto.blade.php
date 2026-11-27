@@ -11,7 +11,7 @@
 >
     <div
         @click.stop
-        class="w-full max-w-lg rounded-2xl bg-white shadow-2xl ring-1 ring-champagne/30 overflow-hidden flex flex-col max-h-[92vh]"
+        class="w-full max-w-lg rounded-xl bg-white shadow-2xl ring-1 ring-champagne/30 overflow-hidden flex flex-col max-h-[92vh]"
     >
         {{-- Header Modal --}}
         <div class="px-4 py-3 border-b border-champagne/25 flex items-center justify-between gap-3 bg-ivory/60 shrink-0">
@@ -25,7 +25,7 @@
             <button
                 type="button"
                 @click="tutupCropperFoto(true)"
-                class="h-8 w-8 rounded-xl bg-white ring-1 ring-champagne/35 text-charcoal/65 hover:text-charcoal hover:bg-ivory inline-flex items-center justify-center transition cursor-pointer shrink-0"
+                class="h-8 w-8 rounded-lg bg-white ring-1 ring-champagne/35 text-charcoal/65 hover:text-charcoal hover:bg-ivory inline-flex items-center justify-center transition cursor-pointer shrink-0"
                 aria-label="Tutup editor potong foto"
             >
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -39,7 +39,7 @@
         <div class="px-4 pt-3.5 pb-3 space-y-3 overflow-y-auto">
             <div
                 x-ref="wadahKanvasCrop"
-                class="relative w-full h-[300px] sm:h-[340px] rounded-2xl overflow-hidden bg-[#111315] select-none touch-none ring-1 ring-charcoal/15"
+                class="relative w-full h-[300px] sm:h-[340px] rounded-xl overflow-hidden bg-[#111315] select-none touch-none ring-1 ring-charcoal/15"
             >
                 <canvas
                     x-ref="kanvasCrop"
@@ -61,16 +61,16 @@
 
                 <div
                     x-show="!cropMemuat && !cropGalat"
-                    class="pointer-events-none absolute bottom-2.5 left-1/2 -translate-x-1/2 rounded-full bg-black/55 backdrop-blur-xs px-3 py-1 text-[10px] font-medium text-white/90 whitespace-nowrap"
+                    class="pointer-events-none absolute bottom-2.5 left-1/2 -translate-x-1/2 rounded-lg bg-black/55 backdrop-blur-xs px-3 py-1 text-[10px] font-medium text-white/90 whitespace-nowrap"
                 >
                     Geser foto untuk atur posisi &bull; Scroll / cubit untuk zoom
                 </div>
             </div>
 
-            <p x-show="cropGalat" x-cloak x-text="cropGalat" class="rounded-xl bg-rose-50 border border-rose-200 px-3 py-2 text-xs font-medium text-rose-700"></p>
+            <p x-show="cropGalat" x-cloak x-text="cropGalat" class="rounded-lg bg-rose-50 border border-rose-200 px-3 py-2 text-xs font-medium text-rose-700"></p>
 
             {{-- Kontrol Zoom & Rotasi --}}
-            <div class="rounded-xl bg-ivory/75 p-3 ring-1 ring-champagne/25 space-y-2.5">
+            <div class="rounded-lg bg-ivory/75 p-3 ring-1 ring-champagne/25 space-y-2.5">
                 <div class="flex items-center gap-2.5">
                     <button
                         type="button"
@@ -137,7 +137,7 @@
             <button
                 type="button"
                 @click="tutupCropperFoto(true)"
-                class="rounded-xl border border-champagne/45 bg-white px-3.5 py-2 text-xs font-semibold text-charcoal hover:bg-ivory transition cursor-pointer"
+                class="rounded-lg border border-charcoal/20 bg-charcoal/[0.06] px-3.5 py-2 text-xs font-semibold text-charcoal/85 hover:bg-charcoal/[0.11] hover:border-charcoal/30 transition cursor-pointer"
             >
                 Batal
             </button>
@@ -145,7 +145,7 @@
                 type="button"
                 :disabled="cropMemuat || cropMenyimpan || Boolean(cropGalat)"
                 @click="terapkanPotonganFoto()"
-                class="inline-flex items-center gap-1.5 rounded-xl bg-sage px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#3b5047] disabled:opacity-55 transition cursor-pointer"
+                class="inline-flex items-center gap-1.5 rounded-lg bg-sage px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#3b5047] disabled:opacity-55 transition cursor-pointer"
             >
                 <span x-text="cropMenyimpan ? 'Memproses...' : 'Terapkan Potongan'"></span>
             </button>

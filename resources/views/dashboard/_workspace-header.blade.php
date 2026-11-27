@@ -8,30 +8,23 @@
 <header
     aria-label="Header Ruang Kerja Undangan"
     data-workspace-header
-    class="sticky top-0 z-30 lg:static lg:px-8 xl:px-10 lg:pt-3"
+    class="sticky top-0 z-30 lg:px-8 xl:px-10 lg:pt-3 lg:pb-1 lg:bg-gradient-to-b lg:from-ivory lg:via-ivory/90 lg:to-transparent"
 >
-    {{-- Header Mobile & Tablet (< lg) --}}
-    <div class="lg:hidden bg-white/95 backdrop-blur-md border-b border-champagne/25 px-4 h-14 flex items-center justify-between gap-3 shadow-[0_6px_18px_-14px_rgba(20,32,26,0.22)]">
-        <div class="flex items-center gap-2.5 min-w-0">
-            <a href="{{ route('beranda') }}" class="flex items-center shrink-0 group">
-                <img
-                    src="{{ asset('logo/logo-ikon.webp') }}"
-                    alt="Logo SesiTemu"
-                    class="h-8 w-8 object-contain transition-transform duration-200 group-hover:scale-105"
-                >
-                <span class="sr-only">SesiTemu</span>
-            </a>
+    {{-- Header Mobile & Tablet (< lg) — Seragam dengan Dashboard Awal --}}
+    <div class="lg:hidden bg-white/95 backdrop-blur-md border-b border-champagne/20 px-4 h-14 flex items-center justify-between gap-3">
+        <a href="{{ route('beranda') }}" class="flex items-center text-charcoal shrink-0 group">
+            <img
+                src="{{ asset('logo/logo-horizontal.webp') }}"
+                alt="Logo SesiTemu"
+                class="h-8 sm:h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.03]"
+            >
+            <span class="sr-only">SesiTemu</span>
+        </a>
 
-            <div class="min-w-0 leading-tight">
-                <p class="font-sans text-sm font-bold text-charcoal tracking-tight truncate">{{ $judulHalaman }}</p>
-                <p class="text-[11px] font-medium text-charcoal/55 truncate">{{ $namaMempelaiHeader }}</p>
-            </div>
-        </div>
-
-        <div class="flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-2.5 text-xs shrink-0">
             @if ($penggunaAktif->adalahAdmin())
-                <a href="{{ route('admin.ringkasan') }}" class="rounded-lg bg-champagne/15 px-2.5 py-1 text-[11px] font-semibold text-[#8A6D33] hover:bg-champagne/25 transition shrink-0">
-                    Admin
+                <a href="{{ route('admin.ringkasan') }}" class="font-semibold text-champagne hover:underline shrink-0">
+                    Panel Admin
                 </a>
             @endif
 
@@ -71,27 +64,6 @@
         </div>
 
         <div class="flex items-center gap-3 shrink-0">
-            <nav aria-label="Pindah Cepat Ruang Kerja" class="inline-flex items-center gap-1 rounded-xl bg-ivory p-1 ring-1 ring-champagne/25">
-                <a
-                    href="{{ route('dashboard.undangan.kelola', $undangan) }}"
-                    class="rounded-lg px-3 py-1.5 text-xs font-semibold transition {{ $menuAktif === 'undangan' ? 'bg-sage text-white shadow-2xs' : 'text-charcoal/70 hover:text-charcoal' }}"
-                >
-                    Edit Undangan
-                </a>
-                <a
-                    href="{{ route('dashboard.undangan.tamu', $undangan) }}"
-                    class="rounded-lg px-3 py-1.5 text-xs font-semibold transition {{ $menuAktif === 'tamu' ? 'bg-sage text-white shadow-2xs' : 'text-charcoal/70 hover:text-charcoal' }}"
-                >
-                    Tamu
-                </a>
-                <a
-                    href="{{ route('dashboard.undangan.rsvp', $undangan) }}"
-                    class="rounded-lg px-3 py-1.5 text-xs font-semibold transition {{ $menuAktif === 'rsvp' ? 'bg-sage text-white shadow-2xs' : 'text-charcoal/70 hover:text-charcoal' }}"
-                >
-                    RSVP
-                </a>
-            </nav>
-
             @if ($penggunaAktif->adalahAdmin())
                 <a href="{{ route('admin.ringkasan') }}" class="text-xs font-semibold text-[#8A6D33] hover:underline shrink-0">
                     Panel Admin
