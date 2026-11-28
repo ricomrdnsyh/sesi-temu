@@ -34,6 +34,8 @@
     {{-- Logo --}}
     <a href="{{ route('beranda') }}" title="Beranda SesiTemu"
         class="flex items-center justify-center w-full px-2 py-0.5 hover:scale-105 transition">
+        <img src="{{ asset('logo/logo-gelap.webp') }}" alt="Logo SesiTemu"
+            class="w-14 max-h-14 object-contain drop-shadow-xs" />
     </a>
 
     {{-- Menu Utama --}}
