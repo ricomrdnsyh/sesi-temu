@@ -1,6 +1,85 @@
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script>
     window.__SESITEMU_LIVE_PREVIEW__ = @js($livePreviewState ?? null);
+    window.__SESITEMU_PRATINJAU_NON_SIMPAN__ = @js(
+        empty($modeDemo) && (
+            ! empty($modePratinjauIframe)
+            || ! empty($livePreviewState)
+            || request()->boolean('embed')
+            || request()->has('_preview')
+        )
+    );
+
+    (function lindungiFormRsvpPratinjau() {
+        const cekModePratinjau = () => {
+            if (window.__SESITEMU_PRATINJAU_NON_SIMPAN__) return true;
+            try {
+                const params = new URLSearchParams(window.location.search);
+                return (params.get('embed') === '1' || params.has('_preview') || Boolean(window.__SESITEMU_LIVE_PREVIEW__))
+                    && !window.location.pathname.startsWith('/demo/');
+            } catch {
+                return Boolean(window.__SESITEMU_LIVE_PREVIEW__);
+            }
+        };
+
+        if (!cekModePratinjau()) {
+            return;
+        }
+
+        const adalahFormRsvp = (form) => Boolean(
+            form instanceof HTMLFormElement
+            && (form.dataset.pratinjauRsvp === '1' || String(form.getAttribute('action') || '').includes('/buku-tamu'))
+        );
+
+        const tampilkanInfoPratinjau = (form) => {
+            let info = form.querySelector('[data-info-pratinjau-rsvp]');
+            if (!info) {
+                info = document.createElement('p');
+                info.setAttribute('data-info-pratinjau-rsvp', '1');
+                info.setAttribute('role', 'status');
+                info.className = 'mt-2.5 rounded-lg border border-current/20 bg-current/[0.06] px-3 py-2 text-center text-[11px] font-medium opacity-85';
+                form.appendChild(info);
+            }
+            info.textContent = 'Mode pratinjau — konfirmasi & ucapan tidak disimpan.';
+        };
+
+        const tandaiSemuaFormRsvp = () => {
+            document.querySelectorAll('form[action*="/buku-tamu"]').forEach((form) => {
+                form.dataset.pratinjauRsvp = '1';
+                form.noValidate = true;
+                form.removeAttribute('action');
+            });
+        };
+
+        document.addEventListener('click', (event) => {
+            const tombol = event.target instanceof Element
+                ? event.target.closest('button[type="submit"], button:not([type]), input[type="submit"]')
+                : null;
+            const form = tombol?.closest('form');
+            if (!adalahFormRsvp(form)) {
+                return;
+            }
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            tampilkanInfoPratinjau(form);
+        }, true);
+
+        document.addEventListener('submit', (event) => {
+            const form = event.target;
+            if (!adalahFormRsvp(form)) {
+                return;
+            }
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            tampilkanInfoPratinjau(form);
+        }, true);
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', tandaiSemuaFormRsvp);
+        } else {
+            tandaiSemuaFormRsvp();
+        }
+    })();
 
     function temaUndangan() {
         const livePreviewState = window.__SESITEMU_LIVE_PREVIEW__ || null;

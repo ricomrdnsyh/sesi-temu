@@ -53,7 +53,9 @@ class UndanganPublikController extends Controller
             $namaTamu = 'Tamu Undangan';
         }
 
-        if ($tamuTerdeteksi !== null && $undangan->sudahAktifPublik() && ! $this->adalahBotPratinjau($request->userAgent())) {
+        $adalahPratinjauEmbed = $request->boolean('embed') || $request->has('_preview');
+
+        if (! $adalahPratinjauEmbed && $tamuTerdeteksi !== null && $undangan->sudahAktifPublik() && ! $this->adalahBotPratinjau($request->userAgent())) {
             $tamuTerdeteksi->catatkanDibuka();
         }
 
@@ -64,6 +66,7 @@ class UndanganPublikController extends Controller
             'namaTamu' => $namaTamu,
             'modeDemo' => false,
             'modePratinjau' => ! $undangan->status_publikasi,
+            'modePratinjauIframe' => $adalahPratinjauEmbed,
         ]);
     }
 

@@ -261,6 +261,7 @@ class DashboardUndanganController extends Controller
             'namaTamu' => 'Tamu Undangan',
             'modeDemo' => false,
             'modePratinjau' => false,
+            'modePratinjauIframe' => true,
         ]);
     }
 
@@ -556,6 +557,7 @@ class DashboardUndanganController extends Controller
             'namaTamu' => 'Tamu Undangan',
             'modeDemo' => false,
             'modePratinjau' => ! $pratinjau->status_publikasi,
+            'modePratinjauIframe' => true,
             'livePreviewState' => [
                 'bukaSampul' => $request->boolean('buka_sampul'),
                 'scrollY' => max(0, (int) $request->input('scroll_y', 0)),
