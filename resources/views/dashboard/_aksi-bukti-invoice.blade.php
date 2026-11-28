@@ -9,7 +9,7 @@
         target="_blank"
         rel="noopener"
         @click.prevent="galeriLightbox = { url: @js($urlBukti), caption: @js('Bukti Pembayaran — '.$trx->kode_invoice) }"
-        class="{{ $adalahMobile ? 'w-full justify-center py-2' : 'px-3 py-1.5' }} inline-flex items-center gap-1.5 rounded-xl border border-sage/30 bg-sage/10 text-xs font-semibold text-sage hover:bg-sage hover:text-white transition"
+        class="{{ $adalahMobile ? 'w-full justify-center px-3 py-2' : 'px-3 py-1.5 shrink-0' }} inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl border border-sage/30 bg-sage/10 text-xs font-semibold text-sage hover:bg-sage hover:text-white transition"
     >
         <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>

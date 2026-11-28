@@ -188,24 +188,56 @@ export function halamanTamuUndangan(cfgMasuk = null) {
             const start = ta.selectionStart ?? teks.length;
             const end = ta.selectionEnd ?? teks.length;
             const terpilih = teks.slice(start, end);
+            const spasiAwal = terpilih.match(/^\s*/)[0];
+            const spasiAkhir = terpilih.match(/\s*$/)[0];
+            const intiStart = start + spasiAwal.length;
+            const intiEnd = Math.max(intiStart, end - spasiAkhir.length);
+            const inti = teks.slice(intiStart, intiEnd);
             let hasil;
             let selStart;
             let selEnd;
-            if (terpilih.length > 0) {
-                if (terpilih.startsWith(simbol) && terpilih.endsWith(simbol) && terpilih.length >= simbol.length * 2) {
-                    const isi = terpilih.slice(simbol.length, -simbol.length);
-                    hasil = teks.slice(0, start) + isi + teks.slice(end);
-                    selStart = start;
-                    selEnd = start + isi.length;
+            if (inti.length > 0) {
+                if (inti.includes('\n')) {
+                    const baris = inti.split('\n');
+                    const terbungkusSemua = baris.every((b) => {
+                        const t = b.trim();
+                        return !t || (t.startsWith(simbol) && t.endsWith(simbol) && t.length > simbol.length * 2);
+                    });
+                    const diubah = baris.map((b) => {
+                        const t = b.trim();
+                        if (!t) return b;
+                        const aw = b.match(/^\s*/)[0];
+                        const ak = b.match(/\s*$/)[0];
+                        const baru = terbungkusSemua
+                            ? t.slice(simbol.length, -simbol.length)
+                            : `${simbol}${t}${simbol}`;
+                        return aw + baru + ak;
+                    }).join('\n');
+                    hasil = teks.slice(0, intiStart) + diubah + teks.slice(intiEnd);
+                    selStart = intiStart;
+                    selEnd = intiStart + diubah.length;
+                } else if (inti.startsWith(simbol) && inti.endsWith(simbol) && inti.length > simbol.length * 2) {
+                    const isi = inti.slice(simbol.length, -simbol.length);
+                    hasil = teks.slice(0, intiStart) + isi + teks.slice(intiEnd);
+                    selStart = intiStart;
+                    selEnd = intiStart + isi.length;
+                } else if (
+                    intiStart >= simbol.length
+                    && teks.slice(intiStart - simbol.length, intiStart) === simbol
+                    && teks.slice(intiEnd, intiEnd + simbol.length) === simbol
+                ) {
+                    hasil = teks.slice(0, intiStart - simbol.length) + inti + teks.slice(intiEnd + simbol.length);
+                    selStart = intiStart - simbol.length;
+                    selEnd = selStart + inti.length;
                 } else {
-                    hasil = teks.slice(0, start) + simbol + terpilih + simbol + teks.slice(end);
-                    selStart = start + simbol.length;
-                    selEnd = selStart + terpilih.length;
+                    hasil = teks.slice(0, intiStart) + simbol + inti + simbol + teks.slice(intiEnd);
+                    selStart = intiStart + simbol.length;
+                    selEnd = selStart + inti.length;
                 }
             } else {
                 const contoh = 'teks';
-                hasil = teks.slice(0, start) + simbol + contoh + simbol + teks.slice(end);
-                selStart = start + simbol.length;
+                hasil = teks.slice(0, start) + spasiAwal + simbol + contoh + simbol + teks.slice(end);
+                selStart = start + spasiAwal.length + simbol.length;
                 selEnd = selStart + contoh.length;
             }
             this.draftTemplatePesan = hasil;
@@ -262,9 +294,9 @@ export function halamanTamuUndangan(cfgMasuk = null) {
             });
 
             let aman = escapeHtml(teksTanpaUrl)
-                .replace(/\*([^*\n]+)\*/g, '<strong>$1</strong>')
-                .replace(/(^|[\s(])_([^_\n]+)_(?=[\s).,!?:;]|$)/gm, '$1<em>$2</em>')
-                .replace(/~([^~\n]+)~/g, '<s>$1</s>')
+                .replace(/\*(\S(?:[^*\n]*\S)?)\*/g, '<strong>$1</strong>')
+                .replace(/(^|[^\p{L}\p{N}_])_(\S(?:[^_\n]*\S)?)_(?![\p{L}\p{N}_])/gmu, '$1<em>$2</em>')
+                .replace(/~(\S(?:[^~\n]*\S)?)~/g, '<s>$1</s>')
                 .replace(/\n/g, '<br>');
 
             aman = aman.replace(/\u0000URL(\d+)\u0000/g, (_, idx) => {

@@ -21,7 +21,13 @@
         <div data-swal-warning="{{ session('saran_link') }}" data-swal-warning-title="Link Sudah Digunakan" hidden aria-hidden="true"></div>
     @endif
     @if (session('peringatan'))
-        <div data-swal-warning="{{ session('peringatan') }}" hidden aria-hidden="true"></div>
+        <div
+            data-swal-warning="{{ session('peringatan') }}"
+            @if (session('peringatan_judul')) data-swal-warning-title="{{ session('peringatan_judul') }}" @endif
+            @if (session('peringatan_detail')) data-swal-warning-items="{{ json_encode(session('peringatan_detail'), JSON_UNESCAPED_UNICODE) }}" @endif
+            hidden
+            aria-hidden="true"
+        ></div>
     @endif
     @if (session('error'))
         <div data-swal-errors="{{ json_encode([session('error')], JSON_UNESCAPED_UNICODE) }}" hidden aria-hidden="true"></div>

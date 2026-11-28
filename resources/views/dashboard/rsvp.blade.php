@@ -488,7 +488,7 @@
                         {{-- Footer Paginasi Kartu --}}
                         <div
                             x-show="daftarTersaring().length > 0"
-                            class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1"
+                            class="flex flex-col items-center sm:flex-row sm:justify-between gap-2.5 sm:gap-3 pt-1 text-center sm:text-left"
                         >
                             <p class="text-xs text-charcoal/55 tabular-nums" x-text="ringkasanRentang()"></p>
 

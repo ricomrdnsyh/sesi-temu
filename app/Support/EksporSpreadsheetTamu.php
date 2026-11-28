@@ -15,15 +15,35 @@ class EksporSpreadsheetTamu
      * Mem-parsing file CSV daftar tamu dengan deteksi otomatis pemisah (koma, titik koma, tab),
      * dukungan UTF-8 BOM, dan deteksi otomatis baris header.
      *
-     * @return list<array{nama_tamu: string, nomor_wa: ?string}>
+     * @return list<array{nama_tamu: string, nomor_wa: string}>
      */
     public static function bacaCsvTamu(string $kontenMentah, int $maksBaris = 500): array
+    {
+        return array_map(
+            static fn (array $item): array => [
+                'nama_tamu' => $item['nama_tamu'],
+                'nomor_wa' => $item['nomor_wa'],
+            ],
+            self::bacaCsvTamuDenganLaporan($kontenMentah, $maksBaris)['valid']
+        );
+    }
+
+    /**
+     * Mem-parsing file CSV daftar tamu sekaligus memisahkan baris valid dan baris gagal
+     * (Nama Tamu & Nomor WhatsApp keduanya wajib terisi dan format WA harus valid).
+     *
+     * @return array{
+     *     valid: list<array{baris: int, nama_tamu: string, nomor_wa: string}>,
+     *     gagal: list<array{baris: int, alasan: string}>
+     * }
+     */
+    public static function bacaCsvTamuDenganLaporan(string $kontenMentah, int $maksBaris = 500): array
     {
         $konten = preg_replace('/^\xEF\xBB\xBF/', '', $kontenMentah) ?? $kontenMentah;
         $konten = str_replace(["\r\n", "\r"], "\n", $konten);
 
         if (trim($konten) === '') {
-            return [];
+            return ['valid' => [], 'gagal' => []];
         }
 
         $barisContoh = '';
@@ -38,72 +58,114 @@ class EksporSpreadsheetTamu
 
         $stream = fopen('php://temp', 'r+');
         if ($stream === false) {
-            return [];
+            return ['valid' => [], 'gagal' => []];
         }
 
         fwrite($stream, $konten);
         rewind($stream);
 
-        $barisMentah = [];
+        $barisAktif = [];
+        $nomorBaris = 0;
         while (($kolom = fgetcsv($stream, 0, $pemisah, '"', '\\')) !== false) {
-            if ($kolom === [null] || $kolom === []) {
+            $nomorBaris++;
+            $kosongMurni = $kolom === [null]
+                || $kolom === []
+                || (count($kolom) === 1 && trim((string) $kolom[0]) === '');
+            if ($kosongMurni) {
                 continue;
             }
 
-            $semuaKosong = true;
-            foreach ($kolom as $sel) {
-                if (trim((string) $sel) !== '') {
-                    $semuaKosong = false;
-                    break;
-                }
-            }
-            if (! $semuaKosong) {
-                $barisMentah[] = array_map(static fn ($sel): string => trim((string) $sel), $kolom);
-            }
+            $barisAktif[] = [
+                'baris' => $nomorBaris,
+                'kolom' => array_map(static fn ($sel): string => trim((string) $sel), $kolom),
+            ];
         }
 
         fclose($stream);
 
-        if ($barisMentah === []) {
-            return [];
+        if ($barisAktif === []) {
+            return ['valid' => [], 'gagal' => []];
         }
 
         $indeksNama = 0;
         $indeksWa = 1;
         $mulaiBaris = 0;
 
-        $headerInfo = self::analisisHeaderCsv($barisMentah[0]);
+        $headerInfo = self::analisisHeaderCsv($barisAktif[0]['kolom']);
         if ($headerInfo['adalah_header']) {
             $indeksNama = $headerInfo['indeks_nama'];
             $indeksWa = $headerInfo['indeks_wa'];
             $mulaiBaris = 1;
         }
 
-        $hasil = [];
-        $total = count($barisMentah);
+        $valid = [];
+        $gagal = [];
+        $total = count($barisAktif);
         for ($i = $mulaiBaris; $i < $total; $i++) {
-            $row = $barisMentah[$i];
+            $noBaris = $barisAktif[$i]['baris'];
+            $row = $barisAktif[$i]['kolom'];
             $nama = trim((string) ($row[$indeksNama] ?? ''));
-            if ($nama === '') {
-                continue;
-            }
-
             $nomorMentah = $indeksWa !== null ? trim((string) ($row[$indeksWa] ?? '')) : '';
             if ($nomorMentah === '-' || $nomorMentah === '—') {
                 $nomorMentah = '';
             }
 
-            $hasil[] = [
-                'nama_tamu' => Str::limit($nama, 120, ''),
-                'nomor_wa' => $nomorMentah !== '' ? TamuUndangan::normalisasiNomorWa($nomorMentah) : null,
-            ];
-
-            if (count($hasil) >= $maksBaris) {
-                break;
+            if ($nama === '' && $nomorMentah === '') {
+                $gagal[] = [
+                    'baris' => $noBaris,
+                    'alasan' => "Baris {$noBaris}: Nama tamu dan Nomor WhatsApp kosong.",
+                ];
+                continue;
             }
+
+            if ($nama === '') {
+                $gagal[] = [
+                    'baris' => $noBaris,
+                    'alasan' => "Baris {$noBaris}: Nama tamu kosong.",
+                ];
+                continue;
+            }
+
+            if ($nomorMentah === '') {
+                $gagal[] = [
+                    'baris' => $noBaris,
+                    'alasan' => "Baris {$noBaris}: Nomor WhatsApp kosong (\"{$nama}\").",
+                ];
+                continue;
+            }
+
+            $nomorCek = ltrim($nomorMentah, "'");
+            $nomorNormal = preg_match('/^[\d\s+\-().]+$/', $nomorCek) === 1
+                ? TamuUndangan::normalisasiNomorWa($nomorCek)
+                : null;
+
+            if ($nomorNormal === null) {
+                $gagal[] = [
+                    'baris' => $noBaris,
+                    'alasan' => "Baris {$noBaris}: Format Nomor WhatsApp \"{$nomorMentah}\" tidak valid (\"{$nama}\").",
+                ];
+                continue;
+            }
+
+            if (count($valid) >= $maksBaris) {
+                $gagal[] = [
+                    'baris' => $noBaris,
+                    'alasan' => "Baris {$noBaris}: Melebihi batas maksimal {$maksBaris} tamu per impor CSV (\"{$nama}\").",
+                ];
+                continue;
+            }
+
+            $valid[] = [
+                'baris' => $noBaris,
+                'nama_tamu' => Str::limit($nama, 120, ''),
+                'nomor_wa' => $nomorNormal,
+            ];
         }
 
-        return $hasil;
+        return [
+            'valid' => $valid,
+            'gagal' => $gagal,
+        ];
     }
 
     /**
@@ -120,7 +182,7 @@ class EksporSpreadsheetTamu
         fputcsv($stream, ['Nama Tamu', 'Nomor WhatsApp']);
         fputcsv($stream, ['Budi Santoso', '081234567890']);
         fputcsv($stream, ['Siti Aminah & Partner', '085612345678']);
-        fputcsv($stream, ['Keluarga Bpk. Hendra', '']);
+        fputcsv($stream, ['Keluarga Bpk. Hendra', '081398765432']);
         rewind($stream);
 
         $isi = stream_get_contents($stream) ?: '';

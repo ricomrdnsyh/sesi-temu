@@ -1843,31 +1843,126 @@ class DashboardUndanganController extends Controller
             }
 
             $kontenCsv = $fileCsv ? (string) file_get_contents($fileCsv->getRealPath()) : '';
-            $tamuDariCsv = EksporSpreadsheetTamu::bacaCsvTamu($kontenCsv, 500);
+            $laporanCsv = EksporSpreadsheetTamu::bacaCsvTamuDenganLaporan($kontenCsv, 500);
+            $tamuDariCsv = $laporanCsv['valid'];
+            $barisGagalCsv = $laporanCsv['gagal'];
+            $jumlahBerhasil = count($tamuDariCsv);
+            $jumlahGagal = count($barisGagalCsv);
 
-            if ($tamuDariCsv === []) {
+            if ($jumlahBerhasil === 0 && $jumlahGagal === 0) {
                 return redirect()
                     ->route('dashboard.undangan.tamu', $undangan)
-                    ->withErrors(['file_csv' => 'Tidak ada data tamu yang valid di dalam file CSV. Pastikan kolom pertama berisi nama tamu.'])
+                    ->withErrors(['file_csv' => 'File CSV kosong atau belum memiliki baris data tamu.'])
                     ->withInput();
             }
 
-            DB::transaction(static function () use ($undangan, $tamuDariCsv): void {
+            $ringkasGagal = array_map(
+                static fn (array $item): string => $item['alasan'],
+                array_slice($barisGagalCsv, 0, 5)
+            );
+            if ($jumlahGagal > 5) {
+                $sisaGagal = $jumlahGagal - 5;
+                $ringkasGagal[] = "...dan {$sisaGagal} data gagal lainnya.";
+            }
+
+            if ($jumlahBerhasil === 0) {
+                return redirect()
+                    ->route('dashboard.undangan.tamu', $undangan)
+                    ->withErrors([
+                        'file_csv' => array_merge(
+                            ["Impor CSV gagal: 0 data berhasil, {$jumlahGagal} data gagal."],
+                            $ringkasGagal
+                        ),
+                    ])
+                    ->withInput();
+            }
+
+            $idTamuBaru = [];
+            $idTamuDiperbarui = [];
+
+            DB::transaction(static function () use ($undangan, $tamuDariCsv, &$idTamuBaru, &$idTamuDiperbarui): void {
+                $tamuEksisting = TamuUndangan::where('undangan_id', $undangan->id)->get();
+                $petaByWa = [];
+                $petaByNama = [];
+
+                foreach ($tamuEksisting as $tamuLama) {
+                    if ($tamuLama->nomor_wa !== null && $tamuLama->nomor_wa !== '') {
+                        $petaByWa[$tamuLama->nomor_wa] ??= $tamuLama;
+                    }
+                    $kunciNama = Str::lower(trim((string) $tamuLama->nama_tamu));
+                    if ($kunciNama !== '') {
+                        $petaByNama[$kunciNama] ??= $tamuLama;
+                    }
+                }
+
                 foreach ($tamuDariCsv as $item) {
-                    TamuUndangan::create([
+                    $waBaru = $item['nomor_wa'];
+                    $namaBaru = $item['nama_tamu'];
+                    $kunciNamaBaru = Str::lower(trim($namaBaru));
+
+                    $tamuCocok = $petaByWa[$waBaru] ?? ($petaByNama[$kunciNamaBaru] ?? null);
+
+                    if ($tamuCocok !== null) {
+                        $waLama = $tamuCocok->nomor_wa;
+                        $kunciNamaLama = Str::lower(trim((string) $tamuCocok->nama_tamu));
+
+                        if ($waLama !== null && ($petaByWa[$waLama] ?? null)?->id === $tamuCocok->id) {
+                            unset($petaByWa[$waLama]);
+                        }
+                        if (($petaByNama[$kunciNamaLama] ?? null)?->id === $tamuCocok->id) {
+                            unset($petaByNama[$kunciNamaLama]);
+                        }
+
+                        $tamuCocok->nama_tamu = $namaBaru;
+                        $tamuCocok->nomor_wa = $waBaru;
+                        if ($tamuCocok->isDirty()) {
+                            $tamuCocok->save();
+                        }
+
+                        $petaByWa[$waBaru] = $tamuCocok;
+                        $petaByNama[$kunciNamaBaru] = $tamuCocok;
+
+                        if (! isset($idTamuBaru[$tamuCocok->id])) {
+                            $idTamuDiperbarui[$tamuCocok->id] = true;
+                        }
+
+                        continue;
+                    }
+
+                    $tamuBaru = TamuUndangan::create([
                         'undangan_id' => $undangan->id,
                         'kode_tamu' => TamuUndangan::buatKodeUnik(),
-                        'nama_tamu' => $item['nama_tamu'],
-                        'nomor_wa' => $item['nomor_wa'],
+                        'nama_tamu' => $namaBaru,
+                        'nomor_wa' => $waBaru,
                     ]);
+
+                    $petaByWa[$waBaru] = $tamuBaru;
+                    $petaByNama[$kunciNamaBaru] = $tamuBaru;
+                    $idTamuBaru[$tamuBaru->id] = true;
                 }
             });
 
-            $jumlah = count($tamuDariCsv);
+            $jumlahBaru = count($idTamuBaru);
+            $jumlahDiperbarui = count($idTamuDiperbarui);
+            $jumlahDiproses = $jumlahBaru + $jumlahDiperbarui;
+
+            $ringkasBerhasil = match (true) {
+                $jumlahBaru > 0 && $jumlahDiperbarui > 0 => "{$jumlahDiproses} data berhasil ({$jumlahBaru} baru, {$jumlahDiperbarui} diperbarui)",
+                $jumlahDiperbarui > 0 => "{$jumlahDiperbarui} data berhasil diperbarui",
+                default => "{$jumlahBaru} data baru berhasil diimpor",
+            };
+
+            if ($jumlahGagal > 0) {
+                return redirect()
+                    ->route('dashboard.undangan.tamu', $undangan)
+                    ->with('peringatan_judul', 'Impor CSV Selesai Sebagian')
+                    ->with('peringatan', "{$ringkasBerhasil}, {$jumlahGagal} data gagal dilewati.")
+                    ->with('peringatan_detail', $ringkasGagal);
+            }
 
             return redirect()
                 ->route('dashboard.undangan.tamu', $undangan)
-                ->with('sukses', "{$jumlah} tamu berhasil diimpor dari file CSV.");
+                ->with('sukses', "{$ringkasBerhasil}, 0 data gagal.");
         }
 
         if ($mode === 'massal') {

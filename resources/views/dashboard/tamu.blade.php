@@ -625,7 +625,7 @@
                 {{-- Footer Paginasi Kartu --}}
                 <div
                     x-show="daftarTersaring().length > 0"
-                    class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1"
+                    class="flex flex-col items-center sm:flex-row sm:justify-between gap-2.5 sm:gap-3 pt-1 text-center sm:text-left"
                 >
                     <p class="text-xs text-charcoal/55 tabular-nums" x-text="ringkasanRentang()"></p>
 
@@ -712,9 +712,9 @@
             >
                 <div
                     @click.away="if (!window.Swal?.isVisible() && !$event.target?.closest('.swal2-container')) modalTambah = false"
-                    class="w-full max-w-lg max-h-[90dvh] overflow-y-auto rounded-xl bg-white p-5 sm:p-6 shadow-2xl ring-1 ring-champagne/30 space-y-4"
+                    class="w-full max-w-lg max-h-[90dvh] overflow-y-auto rounded-xl bg-white p-5 sm:p-6 shadow-2xl ring-1 ring-champagne/30"
                 >
-                    <div class="flex items-center justify-between gap-3">
+                    <div class="mb-4 flex items-center justify-between gap-3">
                         <div>
                             <h2 class="font-sans text-lg font-bold text-charcoal tracking-tight">Tambah Tamu Undangan</h2>
                             <p class="text-xs text-charcoal/60">Tamu otomatis mendapat link personal &amp; pelacakan buka.</p>
@@ -729,7 +729,7 @@
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-3 rounded-lg bg-ivory p-1 ring-1 ring-champagne/25 gap-1">
+                    <div class="mb-4 grid grid-cols-3 rounded-lg bg-ivory p-1 ring-1 ring-champagne/25 gap-1">
                         <button
                             type="button"
                             @click="modeTambah = 'satuan'"
@@ -805,8 +805,13 @@
                             <button type="button" @click="modalTambah = false" class="rounded-lg border border-charcoal/20 bg-charcoal/[0.06] px-4 py-2.5 text-xs sm:text-sm font-semibold text-charcoal/85 hover:bg-charcoal/[0.11] hover:border-charcoal/30 active:scale-[0.98] transition cursor-pointer">
                                 Batal
                             </button>
-                            <button type="submit" class="rounded-lg bg-sage px-5 py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-[0.98] transition cursor-pointer">
-                                Simpan Tamu
+                            <button type="submit" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-sage px-5 py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-[0.98] transition cursor-pointer">
+                                <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+                                    <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/>
+                                    <path d="M7 3v4a1 1 0 0 0 1 1h7"/>
+                                </svg>
+                                <span>Simpan Tamu</span>
                             </button>
                         </div>
                     </form>
@@ -912,9 +917,14 @@
                             <button
                                 type="submit"
                                 :disabled="analisisDaftarBulk().galat.length > 0"
-                                class="rounded-lg bg-sage px-5 py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
+                                class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-sage px-5 py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
                             >
-                                Simpan Daftar Tamu
+                                <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+                                    <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/>
+                                    <path d="M7 3v4a1 1 0 0 0 1 1h7"/>
+                                </svg>
+                                <span>Simpan Daftar Tamu</span>
                             </button>
                         </div>
                     </form>
@@ -1013,12 +1023,16 @@
                             </label>
 
                             <p x-show="pesanGalatCsv" x-cloak x-text="pesanGalatCsv" class="text-xs font-medium text-rose-600"></p>
-                            @error('file_csv')
-                                <p class="text-xs font-medium text-rose-600">{{ $message }}</p>
-                            @enderror
+                            @if ($errors->has('file_csv'))
+                                <div class="rounded-lg border border-rose-200 bg-rose-50/85 px-3 py-2 text-xs text-rose-700 space-y-1">
+                                    @foreach ($errors->get('file_csv') as $idxErrCsv => $pesanErrCsv)
+                                        <p class="{{ $idxErrCsv === 0 ? 'font-semibold' : 'text-[11.5px] leading-snug text-rose-800' }}">{{ $pesanErrCsv }}</p>
+                                    @endforeach
+                                </div>
+                            @endif
 
                             <div class="rounded-xl bg-ivory/80 px-3 py-2.5 ring-1 ring-champagne/25 text-[11px] leading-relaxed text-charcoal/65">
-                                Kolom CSV: <strong class="text-charcoal">Nama Tamu, Nomor WhatsApp</strong> (nomor WA opsional). Mendukung pemisah koma (<code>,</code>) maupun titik koma (<code>;</code>) dari Microsoft Excel atau Google Sheets.
+                                Kolom CSV: <strong class="text-charcoal">Nama Tamu, Nomor WhatsApp</strong> (keduanya wajib diisi). Data yang sudah ada otomatis diperbarui tanpa duplikat, sedangkan baris kosong atau format nomor WA tidak valid dilewati. Mendukung pemisah koma (<code>,</code>) maupun titik koma (<code>;</code>).
                             </div>
                         </div>
 
@@ -1026,8 +1040,13 @@
                             <button type="button" @click="modalTambah = false" class="rounded-lg border border-charcoal/20 bg-charcoal/[0.06] px-4 py-2.5 text-xs sm:text-sm font-semibold text-charcoal/85 hover:bg-charcoal/[0.11] hover:border-charcoal/30 active:scale-[0.98] transition cursor-pointer">
                                 Batal
                             </button>
-                            <button type="submit" class="rounded-lg bg-sage px-5 py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-[0.98] transition cursor-pointer">
-                                Impor CSV
+                            <button type="submit" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-sage px-5 py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-[0.98] transition cursor-pointer">
+                                <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" x2="12" y1="3" y2="15"/>
+                                </svg>
+                                <span>Impor CSV</span>
                             </button>
                         </div>
                     </form>

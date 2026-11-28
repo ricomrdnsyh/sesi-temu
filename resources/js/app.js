@@ -72,13 +72,34 @@ const inisialisasiHalaman = () => {
             confirmButtonColor: '#4B6358',
         });
     } else if (pesanPeringatan) {
-        Swal.fire({
+        let detailPeringatan = [];
+        if (flashWarning?.dataset.swalWarningItems) {
+            try {
+                const parsed = JSON.parse(flashWarning.dataset.swalWarningItems);
+                if (Array.isArray(parsed)) {
+                    detailPeringatan = parsed
+                        .map((item) => String(item ?? '').trim())
+                        .filter((item) => item.length > 0);
+                }
+            } catch {
+                detailPeringatan = [];
+            }
+        }
+
+        const opsiWarning = {
             icon: 'warning',
             title: flashWarning?.dataset.swalWarningTitle?.trim() || 'Perhatian',
-            text: pesanPeringatan,
             confirmButtonText: 'Mengerti',
             confirmButtonColor: '#4B6358',
-        });
+        };
+
+        if (detailPeringatan.length > 0) {
+            opsiWarning.html = `<p class="font-medium text-charcoal">${escapeHtml(pesanPeringatan)}</p><ul class="mt-2.5 text-left list-disc list-inside space-y-1 text-xs max-h-44 overflow-y-auto">${detailPeringatan.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+        } else {
+            opsiWarning.text = pesanPeringatan;
+        }
+
+        Swal.fire(opsiWarning);
     } else if (pesanSukses) {
         Swal.fire({
             icon: 'success',

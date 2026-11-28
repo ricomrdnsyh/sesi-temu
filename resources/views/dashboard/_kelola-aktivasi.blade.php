@@ -718,22 +718,22 @@
                     <h3 class="font-sans text-xs font-bold uppercase tracking-wider text-charcoal/60 mb-2.5">Riwayat Invoice</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                         @foreach ($undangan->transaksi as $trx)
-                            <div class="rounded-xl bg-ivory/75 p-3 ring-1 ring-champagne/25 space-y-1.5">
-                                <div class="flex items-start justify-between gap-2">
-                                    <div class="min-w-0">
-                                        <p class="font-mono font-bold text-xs text-charcoal">{{ $trx->kode_invoice }}</p>
-                                        <p class="text-[11px] text-charcoal/60 truncate">{{ $trx->labelPaket() }} &bull; {{ $trx->tema?->nama_tema }}</p>
+                            <div class="rounded-xl bg-ivory/75 p-3 ring-1 ring-champagne/25 space-y-2">
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <p class="font-mono font-bold text-xs text-charcoal truncate">{{ $trx->kode_invoice }}</p>
+                                        <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold shrink-0 whitespace-nowrap {{ $trx->status === 'lunas' ? 'bg-sage/15 text-sage' : ($trx->status === 'ditolak' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-800') }}">
+                                            {{ $trx->labelStatus() }}
+                                        </span>
                                     </div>
-                                    <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold shrink-0 {{ $trx->status === 'lunas' ? 'bg-sage/15 text-sage' : ($trx->status === 'ditolak' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-800') }}">
-                                        {{ $trx->labelStatus() }}
-                                    </span>
+                                    <p class="text-[11px] text-charcoal/60 leading-snug">{{ $trx->labelPaket() }} &bull; {{ $trx->tema?->nama_tema }}</p>
                                 </div>
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="font-sans tabular-nums text-xs font-bold text-charcoal">{{ \App\Models\Tema::formatRupiah($trx->total_bayar) }}</p>
-                                    @include('dashboard._aksi-bukti-invoice', ['trx' => $trx, 'mode' => 'mobile'])
+                                <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-champagne/20">
+                                    <p class="font-sans tabular-nums text-xs sm:text-[13px] font-bold text-charcoal whitespace-nowrap">{{ \App\Models\Tema::formatRupiah($trx->total_bayar) }}</p>
+                                    @include('dashboard._aksi-bukti-invoice', ['trx' => $trx, 'mode' => 'desktop'])
                                 </div>
                                 @if ($trx->catatan_admin)
-                                    <p class="text-[11px] text-charcoal/65">{{ $trx->catatan_admin }}</p>
+                                    <p class="text-[11px] leading-relaxed {{ $trx->status === 'ditolak' ? 'text-rose-700/85' : 'text-charcoal/65' }}">{{ $trx->catatan_admin }}</p>
                                 @endif
                             </div>
                         @endforeach

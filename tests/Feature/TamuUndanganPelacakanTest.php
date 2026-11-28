@@ -293,7 +293,14 @@ class TamuUndanganPelacakanTest extends TestCase
         $this->assertStringContainsString('Nama Tamu', (string) $resContohCsv->getContent());
         $this->assertStringContainsString('Nomor WhatsApp', (string) $resContohCsv->getContent());
 
-        $kontenCsvImport = "\xEF\xBB\xBFNama Tamu;Nomor WhatsApp\r\nRani Putri;081299887766\r\n\"Hendra, S.T.\";\r\n";
+        // Import CSV campuran: baris valid masuk, baris dengan isian kosong / WA tidak valid dilewati dengan laporan jumlah berhasil & gagal
+        $kontenCsvImport = "\xEF\xBB\xBFNama Tamu;Nomor WhatsApp\r\n"
+            ."Rani Putri;081299887766\r\n"
+            ."\"Hendra, S.T.\";081355556666\r\n"
+            ."Kosong Nomor;\r\n"
+            .";081277778888\r\n"
+            ."Format Salah;12345\r\n"
+            .";\r\n";
         $fileCsv = \Illuminate\Http\UploadedFile::fake()->createWithContent('daftar-tamu.csv', $kontenCsvImport);
 
         $this->actingAs($pemilik)
@@ -302,17 +309,75 @@ class TamuUndanganPelacakanTest extends TestCase
                 'file_csv' => $fileCsv,
             ])
             ->assertRedirect($urlHalamanTamu)
-            ->assertSessionHasNoErrors();
+            ->assertSessionHasNoErrors()
+            ->assertSessionHas('peringatan', '2 data baru berhasil diimpor, 4 data gagal dilewati.')
+            ->assertSessionHas('peringatan_detail');
 
-        $this->assertDatabaseHas('tamu_undangan', [
+        $tamuRani = TamuUndangan::where('undangan_id', $undangan->id)
+            ->where('nama_tamu', 'Rani Putri')
+            ->firstOrFail();
+        $tamuHendraCsv = TamuUndangan::where('undangan_id', $undangan->id)
+            ->where('nama_tamu', 'Hendra, S.T.')
+            ->firstOrFail();
+
+        $this->assertSame('6281299887766', $tamuRani->nomor_wa);
+        $this->assertSame('6281355556666', $tamuHendraCsv->nomor_wa);
+        $this->assertDatabaseMissing('tamu_undangan', [
             'undangan_id' => $undangan->id,
-            'nama_tamu' => 'Rani Putri',
-            'nomor_wa' => '6281299887766',
+            'nama_tamu' => 'Kosong Nomor',
         ]);
+        $this->assertDatabaseMissing('tamu_undangan', [
+            'undangan_id' => $undangan->id,
+            'nama_tamu' => 'Format Salah',
+        ]);
+
+        // Re-import CSV: data yang sudah ada di-update (tidak create duplikat, kode_tamu tetap), data baru di-create
+        $jumlahTamuSebelumReimport = TamuUndangan::where('undangan_id', $undangan->id)->count();
+        $fileCsvReimport = \Illuminate\Http\UploadedFile::fake()->createWithContent(
+            'reimport-tamu.csv',
+            "Nama Tamu;Nomor WhatsApp\r\n"
+            ."Rani Putri Wijaya;081299887766\r\n"
+            ."\"Hendra, S.T.\";081377778888\r\n"
+            ."Dewi Lestari;081200001111\r\n"
+        );
+
+        $this->actingAs($pemilik)
+            ->post("/dashboard/undangan/{$undangan->id}/tamu", [
+                'mode' => 'csv',
+                'file_csv' => $fileCsvReimport,
+            ])
+            ->assertRedirect($urlHalamanTamu)
+            ->assertSessionHasNoErrors()
+            ->assertSessionHas('sukses', '3 data berhasil (1 baru, 2 diperbarui), 0 data gagal.');
+
+        $this->assertSame($jumlahTamuSebelumReimport + 1, TamuUndangan::where('undangan_id', $undangan->id)->count());
+        $this->assertSame('Rani Putri Wijaya', $tamuRani->fresh()->nama_tamu);
+        $this->assertSame($tamuRani->kode_tamu, $tamuRani->fresh()->kode_tamu);
+        $this->assertSame('628137778888', $tamuHendraCsv->fresh()->nomor_wa);
+        $this->assertSame($tamuHendraCsv->kode_tamu, $tamuHendraCsv->fresh()->kode_tamu);
         $this->assertDatabaseHas('tamu_undangan', [
             'undangan_id' => $undangan->id,
-            'nama_tamu' => 'Hendra, S.T.',
-            'nomor_wa' => null,
+            'nama_tamu' => 'Dewi Lestari',
+            'nomor_wa' => '628120001111',
+        ]);
+
+        // Import CSV yang seluruh barisnya gagal ditolak dengan info 0 berhasil & jumlah gagal
+        $fileCsvGagalSemua = \Illuminate\Http\UploadedFile::fake()->createWithContent(
+            'gagal-semua.csv',
+            "Nama Tamu,Nomor WhatsApp\r\nTanpa WA,\r\n,081234567890\r\n"
+        );
+
+        $this->actingAs($pemilik)
+            ->post("/dashboard/undangan/{$undangan->id}/tamu", [
+                'mode' => 'csv',
+                'file_csv' => $fileCsvGagalSemua,
+            ])
+            ->assertRedirect($urlHalamanTamu)
+            ->assertSessionHasErrors('file_csv');
+
+        $this->assertDatabaseMissing('tamu_undangan', [
+            'undangan_id' => $undangan->id,
+            'nama_tamu' => 'Tanpa WA',
         ]);
 
         // Ekspor CSV
