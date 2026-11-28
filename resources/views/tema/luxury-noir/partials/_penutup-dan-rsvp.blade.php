@@ -58,52 +58,7 @@
                     aria-hidden="true"></div>
 
                 @foreach ($undangan->daftarAmplop as $amplop)
-                    @php
-                        $gayaBank = \App\Support\GayaKartuBank::untukNamaBank($amplop->nama_bank);
-                        $nomorTerformat = \App\Support\GayaKartuBank::formatNomor($amplop->nomor_rekening);
-                        $idKartuAmplop = $amplop->id ?? $loop->iteration;
-                    @endphp
-                    <div class="relative rounded-2xl p-5 text-white overflow-hidden border border-[#F3E5AB]/40 shadow-[0_18px_38px_-12px_rgba(0,0,0,0.78)] kartu-3d"
-                        style="background: {{ $gayaBank['gradient_css'] }};">
-                        <div aria-hidden="true"
-                            class="pointer-events-none absolute -top-12 -right-12 h-36 w-36 rounded-full bg-white/12 blur-xl">
-                        </div>
-                        <div aria-hidden="true"
-                            class="pointer-events-none absolute -bottom-12 -left-10 h-32 w-32 rounded-full opacity-22 blur-xl"
-                            style="background-color: {{ $gayaBank['aksen_hex'] }};"></div>
-
-                        <div class="relative z-10 flex items-start justify-between gap-3">
-                            <div>
-                                <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/75">
-                                    {{ $gayaBank['label_jenis'] }}
-                                </p>
-                                <p class="mt-0.5 font-sans text-base font-extrabold tracking-wide text-white">
-                                    {{ $gayaBank['singkatan'] }}
-                                </p>
-                            </div>
-                            <div aria-hidden="true"
-                                class="h-7 w-10 rounded-md border border-white/35 shadow-inner {{ $gayaBank['chip_gaya'] === 'perak' ? 'bg-gradient-to-br from-slate-100 via-slate-300 to-slate-400' : 'bg-gradient-to-br from-[#F9E7A8] via-[#D4AF37] to-[#9A7422]' }}">
-                            </div>
-                        </div>
-
-                        <div class="relative z-10 mt-5">
-                            <p class="font-mono text-lg sm:text-xl font-bold tracking-[0.14em] text-white">
-                                {{ $nomorTerformat }}
-                            </p>
-                            <p class="mt-1 text-xs text-white/85">a.n. {{ $amplop->atas_nama }}</p>
-                        </div>
-
-                        <div
-                            class="relative z-10 mt-4 pt-3 border-t border-white/15 flex items-center justify-between gap-2">
-                            <span class="text-[10px] font-medium text-white/75 truncate">{{ $amplop->nama_bank }}</span>
-                            <button type="button"
-                                @click="salinRekening(@js($amplop->nomor_rekening), {{ $idKartuAmplop }})"
-                                class="inline-flex items-center gap-1.5 rounded-full bg-black/45 hover:bg-[#D4AF37] border border-[#F3E5AB]/45 hover:text-[#0B0B0F] px-3.5 py-1.5 text-[11px] font-semibold text-white transition cursor-pointer shrink-0">
-                                <span
-                                    x-text="rekeningTersalin === {{ $idKartuAmplop }} ? 'Berhasil Disalin!' : 'Salin Nomor Rekening'"></span>
-                            </button>
-                        </div>
-                    </div>
+                    @include('komponen-undangan.kartu-bank-amplop', ['amplop' => $amplop])
                 @endforeach
 
                 @if ($alamatKado !== '')

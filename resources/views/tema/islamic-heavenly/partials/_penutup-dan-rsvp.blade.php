@@ -66,83 +66,7 @@
                         aria-hidden="true"></div>
 
                     @foreach ($undangan->daftarAmplop as $amplop)
-                        @php
-                            $gayaBank = \App\Support\GayaKartuBank::untukNamaBank($amplop->nama_bank);
-                            $nomorTerformat = \App\Support\GayaKartuBank::formatNomor($amplop->nomor_rekening);
-                            $idKartuAmplop = $amplop->id ?? $loop->iteration;
-                        @endphp
-                        <div class="relative rounded-2xl p-5 text-white overflow-hidden border border-[#F3E5AB]/40 shadow-[0_18px_38px_-12px_rgba(0,0,0,0.72)] kartu-3d"
-                            style="background: {{ $gayaBank['gradient_css'] }};">
-                            <div aria-hidden="true"
-                                class="pointer-events-none absolute -top-12 -right-12 h-36 w-36 rounded-full bg-white/12 blur-xl">
-                            </div>
-                            <div aria-hidden="true"
-                                class="pointer-events-none absolute -bottom-12 -left-10 h-32 w-32 rounded-full opacity-22 blur-xl"
-                                style="background-color: {{ $gayaBank['aksen_hex'] }};"></div>
-                            <span aria-hidden="true"
-                                class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F3E5AB]/55 to-transparent"></span>
-
-                            <div class="relative z-10 flex items-start justify-between gap-3">
-                                <div>
-                                    <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/75">
-                                        {{ $gayaBank['label_jenis'] }}
-                                    </p>
-                                    <p
-                                        class="mt-0.5 font-sans text-base font-extrabold tracking-wide text-white drop-shadow-xs">
-                                        {{ $gayaBank['singkatan'] }}
-                                    </p>
-                                </div>
-
-                                @if ($gayaBank['chip_gaya'] === 'wallet')
-                                    <div aria-hidden="true"
-                                        class="h-8 w-10 rounded-lg border border-white/30 bg-white/15 backdrop-blur-xs flex items-center justify-center shadow-inner">
-                                        <svg class="w-4 h-4 text-[#F3E5AB]" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round">
-                                            <path
-                                                d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
-                                            <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
-                                        </svg>
-                                    </div>
-                                @else
-                                    <div aria-hidden="true"
-                                        class="h-7 w-10 rounded-md border border-white/35 shadow-inner {{ $gayaBank['chip_gaya'] === 'perak' ? 'bg-gradient-to-br from-slate-100 via-slate-300 to-slate-400' : 'bg-gradient-to-br from-[#F9E7A8] via-[#D4AF37] to-[#9A7422]' }}">
-                                    </div>
-                                @endif
-                            </div>
-
-                            <div class="relative z-10 mt-5">
-                                <p
-                                    class="font-mono text-lg sm:text-xl font-bold tracking-[0.14em] text-white drop-shadow-xs">
-                                    {{ $nomorTerformat }}
-                                </p>
-                                <p class="mt-1 text-xs text-white/85">a.n. {{ $amplop->atas_nama }}</p>
-                            </div>
-
-                            <div
-                                class="relative z-10 mt-4 pt-3 border-t border-white/15 flex items-center justify-between gap-2">
-                                <span
-                                    class="text-[10px] font-medium text-white/75 truncate">{{ $amplop->nama_bank }}</span>
-                                <button type="button"
-                                    @click="salinRekening(@js($amplop->nomor_rekening), {{ $idKartuAmplop }})"
-                                    class="inline-flex items-center gap-1.5 rounded-full bg-[#091322]/55 hover:bg-[#D9B664] border border-[#F3E5AB]/45 hover:border-[#F3E5AB] hover:text-[#091322] px-3.5 py-1.5 text-[11px] font-semibold text-[#FFFDF8] transition cursor-pointer shrink-0">
-                                    <svg x-show="rekeningTersalin !== {{ $idKartuAmplop }}" class="w-3 h-3"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
-                                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        <rect width="14" height="14" x="8" y="8" rx="2"
-                                            ry="2" />
-                                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-                                    </svg>
-                                    <svg x-show="rekeningTersalin === {{ $idKartuAmplop }}" x-cloak class="w-3 h-3"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-                                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        <path d="M20 6 9 17l-5-5" />
-                                    </svg>
-                                    <span
-                                        x-text="rekeningTersalin === {{ $idKartuAmplop }} ? 'Berhasil Disalin!' : 'Salin Nomor'"></span>
-                                </button>
-                            </div>
-                        </div>
+                        @include('komponen-undangan.kartu-bank-amplop', ['amplop' => $amplop])
                     @endforeach
 
                     @if ($alamatKado !== '')
@@ -167,212 +91,209 @@
 @endif
 
 {{-- SEKSI 10: RSVP & WISHES (PANEL BUKU TAMU MALAM BERSIH) --}}
-    <section id="buku-tamu"
-        class="relative bg-gradient-to-b from-[#08101E] via-[#0A1628] to-[#08101E] py-14 px-5 overflow-hidden">
-        <div class="max-w-md mx-auto">
-            <div class="text-center space-y-2">
-                <div data-gsap="turun" class="inline-flex items-center justify-center gap-2.5">
-                    <span aria-hidden="true"
-                        class="h-px w-8 bg-gradient-to-r from-transparent to-[#D9B664]/70"></span>
-                    <svg aria-hidden="true" viewBox="0 0 24 24" class="w-4 h-4 text-[#F3E5AB]" fill="currentColor">
-                        <path d="M14.7 3.2a8.4 8.4 0 1 0 6.1 14.1 7.1 7.1 0 0 1-9.3-9.3 8.3 8.3 0 0 1 3.2-4.8Z" />
-                    </svg>
-                    <span aria-hidden="true"
-                        class="h-px w-8 bg-gradient-to-l from-transparent to-[#D9B664]/70"></span>
-                </div>
-                <p data-gsap="turun" class="text-[9.5px] font-bold uppercase tracking-[0.36em] text-[#D9B664]">Untaian
-                    Doa</p>
-                <h2 data-gsap="mekar"
-                    class="font-serif text-[2.15rem] sm:text-[2.45rem] font-semibold tracking-[0.06em] text-white leading-tight">
-                    {{ $undangan->teksKustom('judul_buku_tamu', 'RSVP & Wishes') }}
-                </h2>
-                <p data-gsap="teks" data-gsap-delay="0.06"
-                    class="text-xs text-[#E6EEF8]/74 max-w-xs mx-auto leading-relaxed">
-                    Kami mempersilakan Bapak/Ibu/Saudara/i menyampaikan ucapan, doa terbaik, serta konfirmasi kehadiran.
-                </p>
+<section id="buku-tamu"
+    class="relative bg-gradient-to-b from-[#08101E] via-[#0A1628] to-[#08101E] py-14 px-5 overflow-hidden">
+    <div class="max-w-md mx-auto">
+        <div class="text-center space-y-2">
+            <div data-gsap="turun" class="inline-flex items-center justify-center gap-2.5">
+                <span aria-hidden="true" class="h-px w-8 bg-gradient-to-r from-transparent to-[#D9B664]/70"></span>
+                <svg aria-hidden="true" viewBox="0 0 24 24" class="w-4 h-4 text-[#F3E5AB]" fill="currentColor">
+                    <path d="M14.7 3.2a8.4 8.4 0 1 0 6.1 14.1 7.1 7.1 0 0 1-9.3-9.3 8.3 8.3 0 0 1 3.2-4.8Z" />
+                </svg>
+                <span aria-hidden="true" class="h-px w-8 bg-gradient-to-l from-transparent to-[#D9B664]/70"></span>
             </div>
+            <p data-gsap="turun" class="text-[9.5px] font-bold uppercase tracking-[0.36em] text-[#D9B664]">Untaian
+                Doa</p>
+            <h2 data-gsap="mekar"
+                class="font-serif text-[2.15rem] sm:text-[2.45rem] font-semibold tracking-[0.06em] text-white leading-tight">
+                {{ $undangan->teksKustom('judul_buku_tamu', 'RSVP & Wishes') }}
+            </h2>
+            <p data-gsap="teks" data-gsap-delay="0.06"
+                class="text-xs text-[#E6EEF8]/74 max-w-xs mx-auto leading-relaxed">
+                Kami mempersilakan Bapak/Ibu/Saudara/i menyampaikan ucapan, doa terbaik, serta konfirmasi kehadiran.
+            </p>
+        </div>
 
-            <div data-gsap="naik"
-                class="mt-7 rounded-2xl bg-[#0D1B2E]/92 border border-[#D9B664]/40 p-5 sm:p-6 shadow-[0_24px_52px_-18px_rgba(0,0,0,0.85)] space-y-5 kartu-3d">
-                @if (session('sukses_ucapan'))
-                    <div data-swal-success="{{ session('sukses_ucapan') }}" hidden aria-hidden="true"></div>
-                @endif
+        <div data-gsap="naik"
+            class="mt-7 rounded-2xl bg-[#0D1B2E]/92 border border-[#D9B664]/40 p-5 sm:p-6 shadow-[0_24px_52px_-18px_rgba(0,0,0,0.85)] space-y-5 kartu-3d">
+            @if (session('sukses_ucapan'))
+                <div data-swal-success="{{ session('sukses_ucapan') }}" hidden aria-hidden="true"></div>
+            @endif
 
-                @if ($errors->any())
-                    <div data-swal-errors="{{ json_encode($errors->all(), JSON_UNESCAPED_UNICODE) }}" hidden
-                        aria-hidden="true"></div>
-                @endif
+            @if ($errors->any())
+                <div data-swal-errors="{{ json_encode($errors->all(), JSON_UNESCAPED_UNICODE) }}" hidden
+                    aria-hidden="true"></div>
+            @endif
 
-                @if (!empty($modeDemo))
-                    <div x-data="bukuTamuDemo(@js($daftarUcapanAwal), @js($namaTamu))" class="space-y-5">
-                        <form @submit.prevent="kirimUcapanDemo()" class="space-y-3.5 text-left">
-                            <div>
-                                <label
-                                    class="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D9B664]">Nama
-                                    Tamu</label>
-                                <input type="text" x-model="namaTamu" required placeholder="Masukkan nama Anda"
-                                    class="mt-1.5 w-full rounded-xl border border-[#D9B664]/35 bg-[#07101E] px-3.5 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#F3E5AB] focus:outline-none">
-                            </div>
-                            <div class="grid gap-3"
-                                :class="statusKehadiran === 'hadir' ? 'grid-cols-2' : 'grid-cols-1'">
-                                <div>
-                                    <label
-                                        class="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D9B664]">Kehadiran</label>
-                                    <select x-ref="selectKehadiran" x-model="statusKehadiran"
-                                        @change="statusKehadiran = $event.target.value"
-                                        class="mt-1.5 w-full rounded-xl border border-[#D9B664]/35 bg-[#07101E] px-3.5 py-2.5 text-sm text-white">
-                                        <option value="hadir">InsyaAllah Hadir</option>
-                                        <option value="ragu">Masih Ragu</option>
-                                        <option value="tidak_hadir">Berhalangan</option>
-                                    </select>
-                                </div>
-                                <div x-show="statusKehadiran === 'hadir'" x-cloak>
-                                    <label
-                                        class="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D9B664]">Jumlah</label>
-                                    <input type="number" x-model.number="jumlahTamu" min="1" max="20"
-                                        :required="statusKehadiran === 'hadir'"
-                                        :disabled="statusKehadiran !== 'hadir'"
-                                        class="mt-1.5 w-full rounded-xl border border-[#D9B664]/35 bg-[#07101E] px-3.5 py-2.5 text-sm text-white">
-                                </div>
-                            </div>
-                            <div>
-                                <label
-                                    class="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D9B664]">Ucapan
-                                    &amp; Doa</label>
-                                <textarea x-model="ucapanDoa" rows="3" required placeholder="Tuliskan doa terbaik untuk mempelai..."
-                                    class="mt-1.5 w-full rounded-xl border border-[#D9B664]/35 bg-[#07101E] px-3.5 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#F3E5AB] focus:outline-none"></textarea>
-                            </div>
-                            <button type="submit"
-                                class="celestial-tombol-emas w-full rounded-xl py-3 text-xs font-bold uppercase tracking-[0.16em] transition active:scale-[0.98] cursor-pointer">
-                                Kirim Konfirmasi &amp; Doa
-                            </button>
-                            <p x-show="pesanGalat" x-cloak x-text="pesanGalat"
-                                class="text-xs font-semibold text-rose-300 text-center"></p>
-                            <p x-show="pesanSukses" x-cloak x-text="pesanSukses"
-                                class="rounded-xl bg-emerald-950/70 border border-emerald-400/40 px-3 py-2 text-[11px] font-semibold text-emerald-200 text-center">
-                            </p>
-                        </form>
-
-                        <div class="pt-4 border-t border-[#D9B664]/20 space-y-3">
-                            <div class="flex items-center justify-between gap-2">
-                                <h3 class="font-serif text-base font-semibold text-[#F3E5AB]">
-                                    Doa &amp; Ucapan (<span
-                                        x-text="daftarUcapan.length">{{ count($daftarUcapanAwal) }}</span>)
-                                </h3>
-                                <span class="text-[9.5px] uppercase tracking-wider text-[#D9B664]/75">Gulir untuk
-                                    lainnya</span>
-                            </div>
-                            <div x-ref="daftarUcapanScroll" data-lenis-prevent
-                                class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
-                                <template x-for="ucapan in daftarUcapan" :key="ucapan.id">
-                                    <div class="rounded-xl bg-[#07101E]/85 border p-3.5 space-y-1.5 transition"
-                                        :class="ucapan.baru ? 'border-[#F3E5AB]/70 ring-1 ring-[#D9B664]/45' :
-                                            'border-[#D9B664]/20'">
-                                        <div class="flex items-center justify-between gap-2">
-                                            <p class="font-semibold text-xs text-[#F3E5AB] flex items-center gap-1.5">
-                                                <span class="h-1.5 w-1.5 rounded-full bg-[#D9B664]"
-                                                    aria-hidden="true"></span>
-                                                <span x-text="ucapan.nama_tamu"></span>
-                                            </p>
-                                            <span class="shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-semibold"
-                                                :class="kelasStatus(ucapan.status_kehadiran, true,
-                                                    'bg-[#D9B664]/15 text-[#D9B664]')"
-                                                x-text="labelStatus(ucapan.status_kehadiran)"></span>
-                                        </div>
-                                        <p class="text-xs text-[#E6EEF8]/82 leading-relaxed pl-3"
-                                            x-text="ucapan.ucapan_doa"></p>
-                                        <p class="text-[10px] text-[#D9B664]/65 pl-3" x-text="ucapan.waktu"></p>
-                                    </div>
-                                </template>
-                            </div>
+            @if (!empty($modeDemo))
+                <div x-data="bukuTamuDemo(@js($daftarUcapanAwal), @js($namaTamu))" class="space-y-5">
+                    <form @submit.prevent="kirimUcapanDemo()" class="space-y-3.5 text-left">
+                        <div>
+                            <label
+                                class="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D9B664]">Nama
+                                Tamu</label>
+                            <input type="text" x-model="namaTamu" required placeholder="Masukkan nama Anda"
+                                class="mt-1.5 w-full rounded-xl border border-[#D9B664]/35 bg-[#07101E] px-3.5 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#F3E5AB] focus:outline-none">
                         </div>
-                    </div>
-                @else
-                    @if (!empty($modePratinjau) || !$undangan->sudahAktifPublik())
-                        <div
-                            class="rounded-xl bg-[#07101E]/85 border border-[#D9B664]/30 px-4 py-3 text-center text-xs font-semibold text-[#F3E5AB]">
-                            Mode Pratinjau — Buku Tamu &amp; RSVP Dikunci
-                        </div>
-                    @else
-                        <form x-data="{ statusKehadiran: @js(old('status_kehadiran', 'hadir')) }" method="POST"
-                            action="{{ route('undangan.ucapan', $undangan->slug) }}" class="space-y-3.5 text-left">
-                            @csrf
+                        <div class="grid gap-3"
+                            :class="statusKehadiran === 'hadir' ? 'grid-cols-2' : 'grid-cols-1'">
                             <div>
                                 <label
-                                    class="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D9B664]">Nama
-                                    Tamu</label>
-                                <input type="text" name="nama_tamu"
-                                    value="{{ old('nama_tamu', $namaTamu !== 'Tamu Undangan' ? $namaTamu : '') }}"
-                                    required
+                                    class="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D9B664]">Kehadiran</label>
+                                <select x-ref="selectKehadiran" x-model="statusKehadiran"
+                                    @change="statusKehadiran = $event.target.value"
+                                    class="mt-1.5 w-full rounded-xl border border-[#D9B664]/35 bg-[#07101E] px-3.5 py-2.5 text-sm text-white">
+                                    <option value="hadir">InsyaAllah Hadir</option>
+                                    <option value="ragu">Masih Ragu</option>
+                                    <option value="tidak_hadir">Berhalangan</option>
+                                </select>
+                            </div>
+                            <div x-show="statusKehadiran === 'hadir'" x-cloak>
+                                <label
+                                    class="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D9B664]">Jumlah</label>
+                                <input type="number" x-model.number="jumlahTamu" min="1" max="20"
+                                    :required="statusKehadiran === 'hadir'"
+                                    :disabled="statusKehadiran !== 'hadir'"
                                     class="mt-1.5 w-full rounded-xl border border-[#D9B664]/35 bg-[#07101E] px-3.5 py-2.5 text-sm text-white">
                             </div>
-                            <div class="grid gap-3"
-                                :class="statusKehadiran === 'hadir' ? 'grid-cols-2' : 'grid-cols-1'">
-                                <div>
-                                    <label
-                                        class="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D9B664]">Kehadiran</label>
-                                    <select name="status_kehadiran" x-model="statusKehadiran"
-                                        @change="statusKehadiran = $event.target.value"
-                                        class="mt-1.5 w-full rounded-xl border border-[#D9B664]/35 bg-[#07101E] px-3.5 py-2.5 text-sm text-white">
-                                        <option value="hadir" @selected(old('status_kehadiran', 'hadir') === 'hadir')>InsyaAllah Hadir</option>
-                                        <option value="ragu" @selected(old('status_kehadiran') === 'ragu')>Masih Ragu</option>
-                                        <option value="tidak_hadir" @selected(old('status_kehadiran') === 'tidak_hadir')>Berhalangan</option>
-                                    </select>
-                                </div>
-                                <div x-show="statusKehadiran === 'hadir'" x-cloak>
-                                    <label
-                                        class="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D9B664]">Jumlah</label>
-                                    <input type="number" name="jumlah_tamu" value="{{ old('jumlah_tamu', 1) }}"
-                                        min="1" max="20" :required="statusKehadiran === 'hadir'"
-                                        :disabled="statusKehadiran !== 'hadir'"
-                                        class="mt-1.5 w-full rounded-xl border border-[#D9B664]/35 bg-[#07101E] px-3.5 py-2.5 text-sm text-white">
-                                </div>
-                            </div>
-                            <div>
-                                <label
-                                    class="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D9B664]">Ucapan
-                                    &amp; Doa</label>
-                                <textarea name="ucapan_doa" rows="3" required placeholder="Tuliskan doa terbaik untuk mempelai..."
-                                    class="mt-1.5 w-full rounded-xl border border-[#D9B664]/35 bg-[#07101E] px-3.5 py-2.5 text-sm text-white">{{ old('ucapan_doa') }}</textarea>
-                            </div>
-                            <button type="submit"
-                                class="celestial-tombol-emas w-full rounded-xl py-3 text-xs font-bold uppercase tracking-[0.16em] transition active:scale-[0.98] cursor-pointer">
-                                Kirim Konfirmasi &amp; Doa
-                            </button>
-                        </form>
-                    @endif
+                        </div>
+                        <div>
+                            <label
+                                class="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D9B664]">Ucapan
+                                &amp; Doa</label>
+                            <textarea x-model="ucapanDoa" rows="3" required placeholder="Tuliskan doa terbaik untuk mempelai..."
+                                class="mt-1.5 w-full rounded-xl border border-[#D9B664]/35 bg-[#07101E] px-3.5 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#F3E5AB] focus:outline-none"></textarea>
+                        </div>
+                        <button type="submit"
+                            class="celestial-tombol-emas w-full rounded-xl py-3 text-xs font-bold uppercase tracking-[0.16em] transition active:scale-[0.98] cursor-pointer">
+                            Kirim Konfirmasi &amp; Doa
+                        </button>
+                        <p x-show="pesanGalat" x-cloak x-text="pesanGalat"
+                            class="text-xs font-semibold text-rose-300 text-center"></p>
+                        <p x-show="pesanSukses" x-cloak x-text="pesanSukses"
+                            class="rounded-xl bg-emerald-950/70 border border-emerald-400/40 px-3 py-2 text-[11px] font-semibold text-emerald-200 text-center">
+                        </p>
+                    </form>
 
                     <div class="pt-4 border-t border-[#D9B664]/20 space-y-3">
-                        <h3 class="font-serif text-base font-semibold text-[#F3E5AB]">
-                            Doa &amp; Ucapan ({{ $undangan->bukuTamu->count() }})
-                        </h3>
-                        <div data-lenis-prevent class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
-                            @forelse ($undangan->bukuTamu as $ucapan)
-                                <div class="rounded-xl bg-[#07101E]/85 border border-[#D9B664]/20 p-3.5 space-y-1">
+                        <div class="flex items-center justify-between gap-2">
+                            <h3 class="font-serif text-base font-semibold text-[#F3E5AB]">
+                                Doa &amp; Ucapan (<span
+                                    x-text="daftarUcapan.length">{{ count($daftarUcapanAwal) }}</span>)
+                            </h3>
+                            <span class="text-[9.5px] uppercase tracking-wider text-[#D9B664]/75">Gulir untuk
+                                lainnya</span>
+                        </div>
+                        <div x-ref="daftarUcapanScroll" data-lenis-prevent
+                            class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
+                            <template x-for="ucapan in daftarUcapan" :key="ucapan.id">
+                                <div class="rounded-xl bg-[#07101E]/85 border p-3.5 space-y-1.5 transition"
+                                    :class="ucapan.baru ? 'border-[#F3E5AB]/70 ring-1 ring-[#D9B664]/45' :
+                                        'border-[#D9B664]/20'">
                                     <div class="flex items-center justify-between gap-2">
                                         <p class="font-semibold text-xs text-[#F3E5AB] flex items-center gap-1.5">
                                             <span class="h-1.5 w-1.5 rounded-full bg-[#D9B664]"
                                                 aria-hidden="true"></span>
-                                            <span>{{ $ucapan->nama_tamu }}</span>
+                                            <span x-text="ucapan.nama_tamu"></span>
                                         </p>
-                                        <span
-                                            class="rounded-full bg-[#D9B664]/15 px-2.5 py-0.5 text-[10px] font-semibold text-[#D9B664]">
-                                            {{ str_replace('_', ' ', ucfirst($ucapan->status_kehadiran)) }}
-                                        </span>
+                                        <span class="shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-semibold"
+                                            :class="kelasStatus(ucapan.status_kehadiran, true,
+                                                'bg-[#D9B664]/15 text-[#D9B664]')"
+                                            x-text="labelStatus(ucapan.status_kehadiran)"></span>
                                     </div>
-                                    <p class="text-xs text-[#E6EEF8]/82 leading-relaxed pl-3">
-                                        {{ $ucapan->ucapan_doa }}</p>
+                                    <p class="text-xs text-[#E6EEF8]/82 leading-relaxed pl-3"
+                                        x-text="ucapan.ucapan_doa"></p>
+                                    <p class="text-[10px] text-[#D9B664]/65 pl-3" x-text="ucapan.waktu"></p>
                                 </div>
-                            @empty
-                                <p class="text-xs text-[#E6EEF8]/60 text-center">Jadilah yang pertama menuliskan doa
-                                    restu.</p>
-                            @endforelse
+                            </template>
                         </div>
                     </div>
+                </div>
+            @else
+                @if (!empty($modePratinjau) || !$undangan->sudahAktifPublik())
+                    <div
+                        class="rounded-xl bg-[#07101E]/85 border border-[#D9B664]/30 px-4 py-3 text-center text-xs font-semibold text-[#F3E5AB]">
+                        Mode Pratinjau — Buku Tamu &amp; RSVP Dikunci
+                    </div>
+                @else
+                    <form x-data="{ statusKehadiran: @js(old('status_kehadiran', 'hadir')) }" method="POST"
+                        action="{{ route('undangan.ucapan', $undangan->slug) }}" class="space-y-3.5 text-left">
+                        @csrf
+                        <div>
+                            <label
+                                class="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D9B664]">Nama
+                                Tamu</label>
+                            <input type="text" name="nama_tamu"
+                                value="{{ old('nama_tamu', $namaTamu !== 'Tamu Undangan' ? $namaTamu : '') }}"
+                                required
+                                class="mt-1.5 w-full rounded-xl border border-[#D9B664]/35 bg-[#07101E] px-3.5 py-2.5 text-sm text-white">
+                        </div>
+                        <div class="grid gap-3"
+                            :class="statusKehadiran === 'hadir' ? 'grid-cols-2' : 'grid-cols-1'">
+                            <div>
+                                <label
+                                    class="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D9B664]">Kehadiran</label>
+                                <select name="status_kehadiran" x-model="statusKehadiran"
+                                    @change="statusKehadiran = $event.target.value"
+                                    class="mt-1.5 w-full rounded-xl border border-[#D9B664]/35 bg-[#07101E] px-3.5 py-2.5 text-sm text-white">
+                                    <option value="hadir" @selected(old('status_kehadiran', 'hadir') === 'hadir')>InsyaAllah Hadir</option>
+                                    <option value="ragu" @selected(old('status_kehadiran') === 'ragu')>Masih Ragu</option>
+                                    <option value="tidak_hadir" @selected(old('status_kehadiran') === 'tidak_hadir')>Berhalangan</option>
+                                </select>
+                            </div>
+                            <div x-show="statusKehadiran === 'hadir'" x-cloak>
+                                <label
+                                    class="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D9B664]">Jumlah</label>
+                                <input type="number" name="jumlah_tamu" value="{{ old('jumlah_tamu', 1) }}"
+                                    min="1" max="20" :required="statusKehadiran === 'hadir'"
+                                    :disabled="statusKehadiran !== 'hadir'"
+                                    class="mt-1.5 w-full rounded-xl border border-[#D9B664]/35 bg-[#07101E] px-3.5 py-2.5 text-sm text-white">
+                            </div>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-[10px] font-semibold uppercase tracking-[0.2em] text-[#D9B664]">Ucapan
+                                &amp; Doa</label>
+                            <textarea name="ucapan_doa" rows="3" required placeholder="Tuliskan doa terbaik untuk mempelai..."
+                                class="mt-1.5 w-full rounded-xl border border-[#D9B664]/35 bg-[#07101E] px-3.5 py-2.5 text-sm text-white">{{ old('ucapan_doa') }}</textarea>
+                        </div>
+                        <button type="submit"
+                            class="celestial-tombol-emas w-full rounded-xl py-3 text-xs font-bold uppercase tracking-[0.16em] transition active:scale-[0.98] cursor-pointer">
+                            Kirim Konfirmasi &amp; Doa
+                        </button>
+                    </form>
                 @endif
-            </div>
+
+                <div class="pt-4 border-t border-[#D9B664]/20 space-y-3">
+                    <h3 class="font-serif text-base font-semibold text-[#F3E5AB]">
+                        Doa &amp; Ucapan ({{ $undangan->bukuTamu->count() }})
+                    </h3>
+                    <div data-lenis-prevent class="buku-tamu-scroll max-h-80 overflow-y-auto pr-1.5 space-y-2.5">
+                        @forelse ($undangan->bukuTamu as $ucapan)
+                            <div class="rounded-xl bg-[#07101E]/85 border border-[#D9B664]/20 p-3.5 space-y-1">
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="font-semibold text-xs text-[#F3E5AB] flex items-center gap-1.5">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-[#D9B664]" aria-hidden="true"></span>
+                                        <span>{{ $ucapan->nama_tamu }}</span>
+                                    </p>
+                                    <span
+                                        class="rounded-full bg-[#D9B664]/15 px-2.5 py-0.5 text-[10px] font-semibold text-[#D9B664]">
+                                        {{ str_replace('_', ' ', ucfirst($ucapan->status_kehadiran)) }}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-[#E6EEF8]/82 leading-relaxed pl-3">
+                                    {{ $ucapan->ucapan_doa }}</p>
+                            </div>
+                        @empty
+                            <p class="text-xs text-[#E6EEF8]/60 text-center">Jadilah yang pertama menuliskan doa
+                                restu.</p>
+                        @endforelse
+                    </div>
+                </div>
+            @endif
         </div>
-    </section>
+    </div>
+</section>
 
 {{-- SEKSI 11: DOA UNTUK PENGANTIN (PITA EDITORIAL TERBUKA) & TURUT MENGUNDANG --}}
 @if ($undangan->fiturAktif('doa_pengantin') || $adaTurutMengundang)

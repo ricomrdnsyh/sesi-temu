@@ -45,39 +45,7 @@
                     x-transition:enter-start="opacity-0 -translate-y-2"
                     x-transition:enter-end="opacity-100 translate-y-0" class="space-y-3.5 pt-1">
                     @foreach ($undangan->daftarAmplop as $amplop)
-                        <div
-                            class="relative bg-[#111114] text-white border border-[#18181B] p-5 space-y-4 overflow-hidden">
-                            <div aria-hidden="true"
-                                class="pointer-events-none absolute inset-0 ed-film-grain opacity-30"></div>
-
-                            <div class="relative z-10 flex items-center justify-between">
-                                <span
-                                    class="ed-mono text-[10px] font-bold uppercase tracking-[0.26em] text-white">{{ $amplop->nama_bank }}</span>
-                                {{-- Ornamen Chip Kartu Titanium Minimalis --}}
-                                <span aria-hidden="true"
-                                    class="inline-grid grid-cols-2 gap-[2px] w-7 h-5 border border-white/45 p-[2px]">
-                                    <span class="border border-white/25"></span>
-                                    <span class="border border-white/25"></span>
-                                    <span class="border border-white/25"></span>
-                                    <span class="border border-white/25"></span>
-                                </span>
-                            </div>
-
-                            <div class="relative z-10 space-y-0.5">
-                                <p class="ed-mono text-base sm:text-lg font-bold tracking-[0.16em] text-white">
-                                    {{ $amplop->nomor_rekening }}</p>
-                                <p class="ed-mono text-[10px] uppercase tracking-[0.18em] text-white/70">A/N
-                                    {{ $amplop->atas_nama }}</p>
-                            </div>
-
-                            <button type="button"
-                                @click="salinRekening(@js($amplop->nomor_rekening), {{ $amplop->id ?? $loop->iteration }})"
-                                class="relative z-10 w-full bg-[#FAF9F6] text-[#18181B] py-2.5 text-[10.5px] font-bold uppercase tracking-[0.22em] hover:bg-white transition cursor-pointer">
-                                <span
-                                    x-text="rekeningTersalin === {{ $amplop->id ?? $loop->iteration }} ? 'Berhasil Disalin!' : 'Salin Nomor Rekening'">Salin
-                                    Nomor Rekening</span>
-                            </button>
-                        </div>
+                        @include('komponen-undangan.kartu-bank-amplop', ['amplop' => $amplop])
                     @endforeach
 
                     @if ($alamatKado !== '')

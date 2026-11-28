@@ -47,35 +47,7 @@
                 class="space-y-3.5 text-left pt-1"
             >
                 @foreach ($undangan->daftarAmplop as $amplop)
-                    @php
-                        $gayaBank = \App\Support\GayaKartuBank::untukNamaBank($amplop->nama_bank);
-                        $nomorTerformat = \App\Support\GayaKartuBank::formatNomor($amplop->nomor_rekening);
-                    @endphp
-                    <div
-                        class="relative rounded-2xl p-5 text-[#FDFBF7] border border-[#C8A464]/55 shadow-lg overflow-hidden space-y-3"
-                        style="background: {{ $gayaBank['gradient_css'] }};"
-                    >
-                        <div aria-hidden="true" class="pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full bg-white/10 blur-xl"></div>
-                        <div class="relative z-10 flex items-start justify-between gap-2">
-                            <div>
-                                <p class="text-[10px] uppercase tracking-[0.22em] text-white/75">{{ $gayaBank['label_jenis'] }}</p>
-                                <span class="font-sans text-base font-extrabold tracking-wide text-white">{{ $gayaBank['singkatan'] }}</span>
-                            </div>
-                            <div aria-hidden="true" class="h-6 w-9 rounded-md border border-white/30 shadow-inner {{ $gayaBank['chip_gaya'] === 'perak' ? 'bg-gradient-to-br from-slate-100 via-slate-300 to-slate-400' : 'bg-gradient-to-br from-[#F9E7A8] via-[#D4AF37] to-[#9A7422]' }}"></div>
-                        </div>
-                        <div class="relative z-10">
-                            <p class="font-mono text-lg font-bold tracking-[0.14em] text-white">
-                                {{ $nomorTerformat }}
-                            </p>
-                            <p class="text-xs text-white/85 mt-0.5">a.n. {{ $amplop->atas_nama }}</p>
-                        </div>
-                        <button type="button"
-                            @click="salinRekening(@js($amplop->nomor_rekening), {{ $amplop->id ?? $loop->iteration }})"
-                            class="relative z-10 garden-tombol-emas w-full rounded-full py-2 text-xs font-bold uppercase tracking-wider transition cursor-pointer">
-                            <span
-                                x-text="rekeningTersalin === {{ $amplop->id ?? $loop->iteration }} ? 'Berhasil Disalin!' : 'Salin Nomor Rekening'">Salin Nomor Rekening</span>
-                        </button>
-                    </div>
+                    @include('komponen-undangan.kartu-bank-amplop', ['amplop' => $amplop])
                 @endforeach
 
                 @if ($alamatKado !== '')

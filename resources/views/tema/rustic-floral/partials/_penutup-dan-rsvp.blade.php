@@ -31,24 +31,7 @@
 
             <div x-show="amplopTerbuka" x-cloak x-transition.opacity.duration.300ms class="space-y-3 text-left pt-1">
                 @foreach ($undangan->daftarAmplop as $amplop)
-                    <div
-                        class="rounded-2xl bg-gradient-to-br from-[#4B6358] via-[#3A4E45] to-[#2B3B33] border border-[#E5D5C0]/35 p-5 text-[#FDFBF7] space-y-2.5 shadow-md">
-                        <div class="flex items-center justify-between">
-                            <span class="font-serif text-base font-bold text-[#E5D5C0]">{{ $amplop->nama_bank }}</span>
-                            <span class="text-[10px] uppercase tracking-widest text-white/75">Transfer</span>
-                        </div>
-                        <div>
-                            <p class="font-mono text-lg font-bold tracking-[0.14em] text-white">
-                                {{ $amplop->nomor_rekening }}</p>
-                            <p class="text-xs text-white/80">a.n. {{ $amplop->atas_nama }}</p>
-                        </div>
-                        <button type="button"
-                            @click="salinRekening(@js($amplop->nomor_rekening), {{ $amplop->id ?? $loop->iteration }})"
-                            class="w-full rounded-full bg-[#FDFBF7] py-2 text-xs font-bold uppercase tracking-wider text-[#2F4037] hover:bg-white transition cursor-pointer">
-                            <span
-                                x-text="rekeningTersalin === {{ $amplop->id ?? $loop->iteration }} ? 'Berhasil Disalin!' : 'Salin Nomor Rekening'"></span>
-                        </button>
-                    </div>
+                    @include('komponen-undangan.kartu-bank-amplop', ['amplop' => $amplop])
                 @endforeach
 
                 @if ($alamatKado !== '')
@@ -284,12 +267,37 @@
                 class="max-w-md mx-auto rounded-3xl bg-gradient-to-b from-[#3E5349] to-[#2C3D35] border border-[#E5D5C0]/35 p-6 text-center text-[#FDFBF7] shadow-lg kartu-3d space-y-4">
                 <div class="space-y-1">
                     <img src="{{ $asetRustic['garland'] }}" alt="" aria-hidden="true" loading="lazy"
-                        decoding="async" data-gsap="turun" class="w-32 mx-auto pb-0.5 drop-shadow">
+                        decoding="async" data-gsap="turun" class="w-32 mx-auto pb-0.5 drop-shadow" />
                     <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#E5D5C0]">
                         Keluarga Besar</p>
                     <h2 data-gsap="naik" class="font-serif text-2xl font-bold text-white">
                         {{ $undangan->teksKustom('judul_turut_mengundang', 'Turut Mengundang') }}</h2>
                 </div>
+                <div class="grid grid-cols-1 {{ !empty($turutPria) && !empty($turutWanita) ? 'sm:grid-cols-2' : '' }} gap-3 text-xs">
+                    @if (!empty($turutPria))
+                        <div data-gsap="kiri"
+                            class="rounded-2xl bg-[#FDFBF7]/10 border border-[#E5D5C0]/25 p-3.5 space-y-1">
+                            <p class="font-bold uppercase tracking-wider text-[#E5D5C0] text-[10px] pb-1 border-b border-[#E5D5C0]/20">
+                                Pihak {{ $undangan->nama_panggilan_pria }}
+                            </p>
+                            @foreach ($turutPria as $baris)
+                                <p class="text-[#FDFBF7]/90 leading-relaxed">{{ $baris }}</p>
+                            @endforeach
+                        </div>
+                    @endif
+                    @if (!empty($turutWanita))
+                        <div data-gsap="kanan" data-gsap-delay="0.06"
+                            class="rounded-2xl bg-[#FDFBF7]/10 border border-[#E5D5C0]/25 p-3.5 space-y-1">
+                            <p class="font-bold uppercase tracking-wider text-[#E5D5C0] text-[10px] pb-1 border-b border-[#E5D5C0]/20">
+                                Pihak {{ $undangan->nama_panggilan_wanita }}
+                            </p>
+                            @foreach ($turutWanita as $baris)
+                                <p class="text-[#FDFBF7]/90 leading-relaxed">{{ $baris }}</p>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
         @endif
     </section>
 @endif

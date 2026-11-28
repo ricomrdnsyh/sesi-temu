@@ -76,50 +76,7 @@
 
             <div x-show="amplopTerbuka" x-transition class="mt-6 space-y-4 text-left panggung-3d">
                 @foreach ($undangan->daftarAmplop as $amplop)
-                    @php
-                        $gayaBank = \App\Support\GayaKartuBank::untukNamaBank($amplop->nama_bank);
-                        $nomorTerformat = \App\Support\GayaKartuBank::formatNomor($amplop->nomor_rekening);
-                    @endphp
-                    <div
-                        x-data="{ tersalin: false }"
-                        class="fx-flip-in relative {{ $sudutTajam ? 'rounded-none' : 'rounded-2xl' }} p-5 text-white overflow-hidden shadow-xl kartu-3d"
-                        style="background: {{ $gayaBank['gradient_css'] }};"
-                    >
-                        {{-- Efek Kilau Metalik Kartu ATM --}}
-                        <div aria-hidden="true" class="pointer-events-none absolute -top-12 -right-12 h-36 w-36 rounded-full bg-white/10 blur-xl"></div>
-                        <div aria-hidden="true" class="pointer-events-none absolute -bottom-12 -left-10 h-32 w-32 rounded-full opacity-20 blur-xl" style="background-color: {{ $gayaBank['aksen_hex'] }};"></div>
-
-                        <div class="relative z-10 flex items-start justify-between gap-3">
-                            <div>
-                                <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/75">{{ $gayaBank['label_jenis'] }}</p>
-                                <p class="mt-0.5 font-sans text-base font-extrabold tracking-wide text-white">{{ $gayaBank['singkatan'] }}</p>
-                            </div>
-                            {{-- Chip EMV Emas / Perak --}}
-                            <div
-                                aria-hidden="true"
-                                class="h-7 w-10 rounded-md border border-white/30 shadow-inner {{ $gayaBank['chip_gaya'] === 'perak' ? 'bg-gradient-to-br from-slate-100 via-slate-300 to-slate-400' : 'bg-gradient-to-br from-[#F9E7A8] via-[#D4AF37] to-[#9A7422]' }}"
-                            ></div>
-                        </div>
-
-                        <div class="relative z-10 mt-5">
-                            <p class="font-mono text-lg sm:text-xl font-bold tracking-[0.14em] text-white drop-shadow-xs">
-                                {{ $nomorTerformat }}
-                            </p>
-                            <p class="mt-1 text-xs text-white/85">a.n. {{ $amplop->atas_nama }}</p>
-                        </div>
-
-                        <div class="relative z-10 mt-4 pt-3 border-t border-white/15 flex items-center justify-between gap-2">
-                            <span class="text-[10px] font-medium text-white/70 truncate">{{ $amplop->nama_bank }}</span>
-                            <button
-                                type="button"
-                                @click="navigator.clipboard?.writeText(@js($amplop->nomor_rekening)); tersalin = true; setTimeout(() => tersalin = false, 2500)"
-                                class="inline-flex items-center gap-1.5 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-xs px-3.5 py-1.5 text-[11px] font-semibold text-white transition cursor-pointer shrink-0"
-                            >
-                                <span x-show="!tersalin">Salin Nomor Rekening</span>
-                                <span x-show="tersalin" x-cloak>Berhasil Disalin!</span>
-                            </button>
-                        </div>
-                    </div>
+                    @include('komponen-undangan.kartu-bank-amplop', ['amplop' => $amplop, 'kelasTambahan' => 'fx-flip-in'])
                 @endforeach
 
                 @if ($alamatKado !== '')

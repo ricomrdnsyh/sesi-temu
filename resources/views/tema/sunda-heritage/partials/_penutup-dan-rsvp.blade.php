@@ -61,86 +61,7 @@
                     </div>
 
                     @foreach ($undangan->daftarAmplop as $amplop)
-                        @php
-                            $gayaBank = \App\Support\GayaKartuBank::untukNamaBank($amplop->nama_bank);
-                            $nomorTerformat = \App\Support\GayaKartuBank::formatNomor($amplop->nomor_rekening);
-                            $idKartuAmplop = $amplop->id ?? $loop->iteration;
-                        @endphp
-                        <div class="relative rounded-2xl p-5 text-white overflow-hidden border border-[#E7C87D]/45 shadow-[0_16px_34px_-12px_rgba(43,14,14,0.55)] kartu-3d"
-                            style="background: {{ $gayaBank['gradient_css'] }};">
-                            {{-- Pendar Glossy Kartu Bank --}}
-                            <div aria-hidden="true"
-                                class="pointer-events-none absolute -top-12 -right-12 h-36 w-36 rounded-full bg-white/12 blur-xl">
-                            </div>
-                            <div aria-hidden="true"
-                                class="pointer-events-none absolute -bottom-12 -left-10 h-32 w-32 rounded-full opacity-22 blur-xl"
-                                style="background-color: {{ $gayaBank['aksen_hex'] }};"></div>
-                            <span aria-hidden="true"
-                                class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F3E5AB]/55 to-transparent"></span>
-
-                            {{-- Baris Atas: Jenis & Nama Bank + Chip EMV / Dompet Digital --}}
-                            <div class="relative z-10 flex items-start justify-between gap-3">
-                                <div>
-                                    <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/75">
-                                        {{ $gayaBank['label_jenis'] }}
-                                    </p>
-                                    <p
-                                        class="mt-0.5 font-sans text-base font-extrabold tracking-wide text-white drop-shadow-xs">
-                                        {{ $gayaBank['singkatan'] }}
-                                    </p>
-                                </div>
-
-                                @if ($gayaBank['chip_gaya'] === 'wallet')
-                                    <div aria-hidden="true"
-                                        class="h-8 w-10 rounded-lg border border-white/30 bg-white/15 backdrop-blur-xs flex items-center justify-center shadow-inner">
-                                        <svg class="w-4 h-4 text-[#F3E5AB]" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round">
-                                            <path
-                                                d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
-                                            <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
-                                        </svg>
-                                    </div>
-                                @else
-                                    <div aria-hidden="true"
-                                        class="h-7 w-10 rounded-md border border-white/35 shadow-inner {{ $gayaBank['chip_gaya'] === 'perak' ? 'bg-gradient-to-br from-slate-100 via-slate-300 to-slate-400' : 'bg-gradient-to-br from-[#F9E7A8] via-[#D4AF37] to-[#9A7422]' }}">
-                                    </div>
-                                @endif
-                            </div>
-
-                            {{-- Nomor Rekening Timbul & Nama Pemilik --}}
-                            <div class="relative z-10 mt-5">
-                                <p
-                                    class="font-mono text-lg sm:text-xl font-bold tracking-[0.14em] text-white drop-shadow-xs">
-                                    {{ $nomorTerformat }}
-                                </p>
-                                <p class="mt-1 text-xs text-white/85">a.n. {{ $amplop->atas_nama }}</p>
-                            </div>
-
-                            {{-- Footer Kartu: Label Bank + Tombol Salin --}}
-                            <div
-                                class="relative z-10 mt-4 pt-3 border-t border-white/15 flex items-center justify-between gap-2">
-                                <span
-                                    class="text-[10px] font-medium text-white/75 truncate">{{ $amplop->nama_bank }}</span>
-                                <button type="button"
-                                    @click="salinRekening(@js($amplop->nomor_rekening), {{ $idKartuAmplop }})"
-                                    class="inline-flex items-center gap-1.5 rounded-full bg-[#3B1414]/45 hover:bg-[#C59B43] border border-[#F3E5AB]/45 hover:border-[#F3E5AB] hover:text-[#3B1414] px-3.5 py-1.5 text-[11px] font-semibold text-[#FFFDF8] transition cursor-pointer shrink-0">
-                                    <svg x-show="rekeningTersalin !== {{ $idKartuAmplop }}" class="w-3 h-3"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
-                                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-                                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-                                    </svg>
-                                    <svg x-show="rekeningTersalin === {{ $idKartuAmplop }}" x-cloak class="w-3 h-3"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-                                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        <path d="M20 6 9 17l-5-5" />
-                                    </svg>
-                                    <span
-                                        x-text="rekeningTersalin === {{ $idKartuAmplop }} ? 'Berhasil Disalin!' : 'Salin Nomor'"></span>
-                                </button>
-                            </div>
-                        </div>
+                        @include('komponen-undangan.kartu-bank-amplop', ['amplop' => $amplop])
                     @endforeach
 
                     @if ($alamatKado !== '')
@@ -401,37 +322,7 @@
                     Besar</p>
                 <h2 data-gsap="naik" class="font-serif text-2xl font-bold text-white">
                     {{ $undangan->teksKustom('judul_turut_mengundang', 'Turut Mengundang') }}</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                    @if (!empty($turutWanita))
-                        <div data-gsap="kiri"
-                            class="rounded-2xl bg-[#3B1414]/75 border border-[#C59B43]/40 p-3.5 space-y-1">
-                            <p class="font-bold uppercase tracking-wider text-[#E7C87D] text-[10px]">Pihak
-                                {{ $undangan->nama_panggilan_wanita }}</p>
-                            @foreach ($turutWanita as $baris)
-                                <p class="text-[#FAF4E8]/90">{{ $baris }}</p>
-                            @endforeach
-                        </div>
-                    @endif
-                    @if ($doaPengantin['latin'] !== '')
-                        <p data-gsap="teks" data-gsap-delay="0.08" class="text-xs italic text-[#8E6620]">
-                            &ldquo;{{ $doaPengantin['latin'] }}&rdquo;
-                        </p>
-                    @endif
-                    <p data-gsap="teks" data-gsap-delay="0.10"
-                        class="text-xs sm:text-sm text-[#4A2020]/85 leading-relaxed">
-                        {{ $doaPengantin['isi'] }}
-                    </p>
-                </div>
-        @endif
-
-        {{-- Kartu Turut Mengundang (Opsional) --}}
-        @if ($adaTurutMengundang)
-            <div data-section-turut-mengundang="priangan"
-                class="max-w-md mx-auto rounded-[1.75rem] bg-[#5A1E1E] text-[#FAF4E8] border-2 border-[#C59B43]/65 p-6 text-center shadow-xl space-y-4 kartu-3d">
-                <p data-gsap="turun" class="text-[10px] font-bold uppercase tracking-[0.34em] text-[#E7C87D]">Keluarga
-                    Besar</p>
-                <h2 data-gsap="naik" class="font-serif text-2xl font-bold text-white">Turut Mengundang</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div class="grid grid-cols-1 {{ !empty($turutWanita) && !empty($turutPria) ? 'sm:grid-cols-2' : '' }} gap-4 text-xs">
                     @if (!empty($turutWanita))
                         <div data-gsap="kiri"
                             class="rounded-2xl bg-[#3B1414]/75 border border-[#C59B43]/40 p-3.5 space-y-1">

@@ -140,7 +140,8 @@ class Tahap5UndanganPublikTemaTest extends TestCase
             ->assertSee('data-aos')
             ->assertSee('calendar.google.com/calendar/render?action=TEMPLATE', false)
             ->assertSee('1234567890')
-            ->assertSee('Berhasil Disalin!')
+            ->assertSee('data-kartu-bank-amplop="true"', false)
+            ->assertSee('Tersalin!')
             ->assertDontSee('MODE PRATINJAU SESITEMU.ID');
     }
 
