@@ -50,22 +50,30 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
     Route::get('/undangan/{undangan}/tamu', [DashboardUndanganController::class, 'tamuUndangan'])->name('undangan.tamu');
     Route::get('/undangan/{undangan}/rsvp', [DashboardUndanganController::class, 'rsvpUndangan'])->name('undangan.rsvp');
     Route::get('/undangan/{undangan}/pratinjau-tema/{tema}', [DashboardUndanganController::class, 'pratinjauTema'])->name('undangan.pratinjau-tema');
-    Route::post('/undangan/{undangan}/pratinjau-langsung', [DashboardUndanganController::class, 'pratinjauLangsung'])->name('undangan.pratinjau-langsung');
+    Route::post('/undangan/{undangan}/pratinjau-langsung', [DashboardUndanganController::class, 'pratinjauLangsung'])
+        ->middleware('throttle:60,1')
+        ->name('undangan.pratinjau-langsung');
     Route::patch('/undangan/{undangan}/tema', [DashboardUndanganController::class, 'gantiTema'])->name('undangan.ganti-tema');
-    Route::put('/undangan/{undangan}', [DashboardUndanganController::class, 'perbaruiDataUtama'])->name('undangan.perbarui');
+    Route::put('/undangan/{undangan}', [DashboardUndanganController::class, 'perbaruiDataUtama'])
+        ->middleware('throttle:30,1')
+        ->name('undangan.perbarui');
     Route::delete('/undangan/{undangan}', [DashboardUndanganController::class, 'hapusUndangan'])->name('undangan.hapus');
 
     // Sub-fitur di dalam pengelolaan undangan
     Route::post('/undangan/{undangan}/acara', [DashboardUndanganController::class, 'simpanAcara'])->name('acara.simpan');
     Route::delete('/undangan/{undangan}/acara/{acara}', [DashboardUndanganController::class, 'hapusAcara'])->name('acara.hapus');
 
-    Route::post('/undangan/{undangan}/galeri', [DashboardUndanganController::class, 'unggahGaleri'])->name('galeri.unggah');
+    Route::post('/undangan/{undangan}/galeri', [DashboardUndanganController::class, 'unggahGaleri'])
+        ->middleware('throttle:20,1')
+        ->name('galeri.unggah');
     Route::delete('/undangan/{undangan}/galeri/{galeri}', [DashboardUndanganController::class, 'hapusGaleri'])->name('galeri.hapus');
 
     Route::post('/undangan/{undangan}/amplop', [DashboardUndanganController::class, 'simpanAmplop'])->name('amplop.simpan');
     Route::delete('/undangan/{undangan}/amplop/{amplop}', [DashboardUndanganController::class, 'hapusAmplop'])->name('amplop.hapus');
 
-    Route::post('/undangan/{undangan}/tamu', [DashboardUndanganController::class, 'simpanTamu'])->name('tamu.simpan');
+    Route::post('/undangan/{undangan}/tamu', [DashboardUndanganController::class, 'simpanTamu'])
+        ->middleware('throttle:20,1')
+        ->name('tamu.simpan');
     Route::post('/undangan/{undangan}/tamu/kategori', [DashboardUndanganController::class, 'simpanKategoriTamu'])->name('tamu.kategori.simpan');
     Route::delete('/undangan/{undangan}/tamu/kategori/{kategori}', [DashboardUndanganController::class, 'hapusKategoriTamu'])->name('tamu.kategori.hapus');
     Route::put('/undangan/{undangan}/tamu/template-pesan', [DashboardUndanganController::class, 'simpanTemplatePesanTamu'])->name('tamu.template-pesan');
@@ -78,8 +86,12 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
     Route::delete('/undangan/{undangan}/buku-tamu/{ucapan}', [DashboardUndanganController::class, 'hapusUcapan'])->name('ucapan.hapus');
 
     Route::post('/undangan/{undangan}/promo/cek', [DashboardUndanganController::class, 'cekPromo'])->name('transaksi.cek-promo');
-    Route::post('/undangan/{undangan}/transaksi', [DashboardUndanganController::class, 'ajukanTransaksi'])->name('transaksi.ajukan');
-    Route::post('/transaksi/{transaksi}/unggah-bukti', [DashboardUndanganController::class, 'unggahBuktiTransaksi'])->name('transaksi.unggah');
+    Route::post('/undangan/{undangan}/transaksi', [DashboardUndanganController::class, 'ajukanTransaksi'])
+        ->middleware('throttle:10,1')
+        ->name('transaksi.ajukan');
+    Route::post('/transaksi/{transaksi}/unggah-bukti', [DashboardUndanganController::class, 'unggahBuktiTransaksi'])
+        ->middleware('throttle:10,1')
+        ->name('transaksi.unggah');
 });
 
 // 4. Area Panel Admin

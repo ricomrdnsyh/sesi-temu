@@ -5,11 +5,16 @@ import { amatiSelect2Baru, inisialisasiSemuaSelect2, segarkanSelect2Element, tut
 import { buatPengendaliSinemaScroll } from './sinema-scroll';
 import { editorKelolaUndangan } from './editor-kelola';
 import { halamanTamuUndangan } from './tamu-dashboard';
+import { validasiBerkasKetat, validasiNamaEkstensi } from './validasi-berkas';
 
 window.Alpine = Alpine;
 window.DataTable = DataTable;
 window.Swal = Swal;
 window.SesiTemuSinema = buatPengendaliSinemaScroll();
+window.SesiTemuValidasiBerkas = {
+    validasi: validasiBerkasKetat,
+    validasiNama: validasiNamaEkstensi,
+};
 window.SesiTemuSelect2 = {
     init: inisialisasiSemuaSelect2,
     refresh: segarkanSelect2Element,

@@ -810,20 +810,34 @@ export function halamanTamuUndangan(cfgMasuk = null) {
             this.prosesFileCsv(file);
         },
 
-        prosesFileCsv(file) {
+        async prosesFileCsv(file) {
             this.pesanGalatCsv = '';
-            const nama = String(file.name || '');
-            if (!/\.(csv|txt)$/i.test(nama)) {
-                this.hapusFileCsv();
-                this.pesanGalatCsv = 'Format file harus .csv (Comma Separated Values).';
-                return;
-            }
-            if (file.size > 2 * 1024 * 1024) {
-                this.hapusFileCsv();
-                this.pesanGalatCsv = 'Ukuran file CSV maksimal 2 MB.';
-                return;
+            const validator = typeof window !== 'undefined' ? window.SesiTemuValidasiBerkas : null;
+            if (validator?.validasi) {
+                const cek = await validator.validasi(file, 'csv', {
+                    maksMb: 2,
+                    pesanUkuran: 'Ukuran file CSV maksimal 2 MB.',
+                });
+                if (!cek.valid) {
+                    this.hapusFileCsv();
+                    this.pesanGalatCsv = cek.pesan;
+                    return;
+                }
+            } else {
+                const nama = String(file.name || '');
+                if (!/\.csv$/i.test(nama)) {
+                    this.hapusFileCsv();
+                    this.pesanGalatCsv = 'Format file harus .csv (Comma Separated Values).';
+                    return;
+                }
+                if (file.size > 2 * 1024 * 1024) {
+                    this.hapusFileCsv();
+                    this.pesanGalatCsv = 'Ukuran file CSV maksimal 2 MB.';
+                    return;
+                }
             }
 
+            const nama = String(file.name || '');
             this.namaFileCsv = nama;
             this.ukuranFileCsv = file.size < 1024 * 1024
                 ? Math.max(1, Math.round(file.size / 1024)) + ' KB'

@@ -108,20 +108,32 @@
             }
             this.$dispatch('foto-live-berubah', { nama: @js($name), url: this.pratinjauUrl });
         },
-        mulaiPilihAtauCrop(file) {
+        async mulaiPilihAtauCrop(file) {
             this.pesanGalat = '';
             if (!file) return;
 
-            if (!file.type || !file.type.startsWith('image/')) {
-                this.pesanGalat = 'Format berkas harus berupa gambar (JPG, PNG, atau WebP).';
-                this.setBerkasInput(this.$el._fileHasilTerakhir || null);
-                return;
-            }
-
-            if (file.size > 15 * 1024 * 1024) {
-                this.pesanGalat = 'Ukuran foto terlalu besar (maks. 15 MB sebelum dipotong).';
-                this.setBerkasInput(this.$el._fileHasilTerakhir || null);
-                return;
+            const validator = window.SesiTemuValidasiBerkas;
+            if (validator?.validasi) {
+                const cek = await validator.validasi(file, 'gambar', {
+                    maksMb: 15,
+                    pesanUkuran: 'Ukuran foto terlalu besar (maks. 15 MB sebelum dipotong).',
+                });
+                if (!cek.valid) {
+                    this.pesanGalat = cek.pesan;
+                    this.setBerkasInput(this.$el._fileHasilTerakhir || null);
+                    return;
+                }
+            } else {
+                if (!file.type || !['image/jpeg', 'image/png', 'image/webp'].includes(file.type.toLowerCase())) {
+                    this.pesanGalat = 'Format berkas harus berupa gambar (JPG, PNG, atau WebP).';
+                    this.setBerkasInput(this.$el._fileHasilTerakhir || null);
+                    return;
+                }
+                if (file.size > 15 * 1024 * 1024) {
+                    this.pesanGalat = 'Ukuran foto terlalu besar (maks. 15 MB sebelum dipotong).';
+                    this.setBerkasInput(this.$el._fileHasilTerakhir || null);
+                    return;
+                }
             }
 
             this.$dispatch('buka-cropper-foto', {
@@ -226,7 +238,7 @@
         x-ref="berkas"
         type="file"
         name="{{ $name }}"
-        accept="image/jpeg,image/png,image/webp,image/*"
+        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
         @change="saatPilih($event)"
         class="sr-only"
     >

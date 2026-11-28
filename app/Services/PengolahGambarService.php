@@ -14,10 +14,22 @@ class PengolahGambarService
 
     private const KUALITAS_WEBP = 80;
 
+    private const MAKS_DIMENSI_SUMBER = 8000;
+
+    private const MAKS_TOTAL_PIKSEL_SUMBER = 25_000_000;
+
     public function simpanGambarUndangan(UploadedFile $berkas, int $undanganId, string $awalan = 'foto'): string
     {
         $namaBerkas = Str::slug($awalan).'-'.Str::lower(Str::random(10)).'.webp';
         $jalurTujuan = "undangan/{$undanganId}/{$namaBerkas}";
+
+        return $this->prosesDanSimpanWebp($berkas, $jalurTujuan);
+    }
+
+    public function simpanBuktiPembayaran(UploadedFile $berkas): string
+    {
+        $namaBerkas = 'bukti-'.Str::lower(Str::random(16)).'.webp';
+        $jalurTujuan = "bukti-pembayaran/{$namaBerkas}";
 
         return $this->prosesDanSimpanWebp($berkas, $jalurTujuan);
     }
@@ -103,14 +115,30 @@ class PengolahGambarService
             throw new RuntimeException('Berkas gambar yang diunggah tidak ditemukan.');
         }
 
-        $info = getimagesize($path);
-        $mime = $info['mime'] ?? $berkas->getMimeType();
+        $info = @getimagesize($path);
+        if (! is_array($info)) {
+            throw new RuntimeException('Berkas gambar rusak atau tidak valid. Gunakan JPG, PNG, atau WebP.');
+        }
+
+        $lebarSumber = (int) ($info[0] ?? 0);
+        $tinggiSumber = (int) ($info[1] ?? 0);
+        if (
+            $lebarSumber < 1
+            || $tinggiSumber < 1
+            || $lebarSumber > self::MAKS_DIMENSI_SUMBER
+            || $tinggiSumber > self::MAKS_DIMENSI_SUMBER
+            || ($lebarSumber * $tinggiSumber) > self::MAKS_TOTAL_PIKSEL_SUMBER
+        ) {
+            throw new RuntimeException('Resolusi gambar melebihi batas aman server (maks. 8000×8000 px / 25 MP).');
+        }
+
+        $mime = strtolower((string) ($info['mime'] ?? ''));
 
         $gambar = match ($mime) {
             'image/jpeg', 'image/jpg' => $this->muatJpegDenganOrientasi($path),
-            'image/png' => imagecreatefrompng($path),
-            'image/webp' => imagecreatefromwebp($path),
-            default => imagecreatefromstring((string) file_get_contents($path)),
+            'image/png' => @imagecreatefrompng($path),
+            'image/webp' => @imagecreatefromwebp($path),
+            default => false,
         };
 
         if (! $gambar instanceof GdImage) {

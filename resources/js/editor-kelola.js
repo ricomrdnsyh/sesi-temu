@@ -1203,22 +1203,35 @@ export function editorKelolaUndangan(cfgMasuk = null) {
             }
             return this.musikKustomNamaAwal || '';
         },
-        saatPilihMusikKustom(event) {
+        async saatPilihMusikKustom(event) {
             this.pesanGalatMusik = '';
-            const file = event?.target?.files?.[0];
+            const inputEl = event?.target;
+            const file = inputEl?.files?.[0];
             if (!file) return;
 
-            const ekstensiValid = /\.(mp3|wav|ogg|m4a)$/i.test(file.name || '');
-            const tipeAudio = (file.type || '').startsWith('audio/');
-            if (!ekstensiValid && !tipeAudio) {
-                this.pesanGalatMusik = 'Format audio harus MP3, WAV, OGG, atau M4A.';
-                event.target.value = '';
-                return;
-            }
-            if (file.size > 15 * 1024 * 1024) {
-                this.pesanGalatMusik = 'Ukuran file musik melebihi batas maksimal 15 MB.';
-                event.target.value = '';
-                return;
+            const validator = typeof window !== 'undefined' ? window.SesiTemuValidasiBerkas : null;
+            if (validator?.validasi) {
+                const cek = await validator.validasi(file, 'musik', {
+                    maksMb: 15,
+                    pesanUkuran: 'Ukuran file musik melebihi batas maksimal 15 MB.',
+                });
+                if (!cek.valid) {
+                    this.pesanGalatMusik = cek.pesan;
+                    if (inputEl) inputEl.value = '';
+                    return;
+                }
+            } else {
+                const ekstensiValid = /\.(mp3|wav|ogg|m4a)$/i.test(file.name || '');
+                if (!ekstensiValid) {
+                    this.pesanGalatMusik = 'Format audio harus MP3, WAV, OGG, atau M4A.';
+                    if (inputEl) inputEl.value = '';
+                    return;
+                }
+                if (file.size > 15 * 1024 * 1024) {
+                    this.pesanGalatMusik = 'Ukuran file musik melebihi batas maksimal 15 MB.';
+                    if (inputEl) inputEl.value = '';
+                    return;
+                }
             }
 
             this.hentikanAudioPreview();
@@ -1321,7 +1334,7 @@ export function editorKelolaUndangan(cfgMasuk = null) {
                 this.prosesAntreanFotoHitungMundur(berkasDipilih);
             }
         },
-        prosesAntreanFotoHitungMundur(daftarBerkas) {
+        async prosesAntreanFotoHitungMundur(daftarBerkas) {
             this.pesanGalatHitungMundur = '';
             const sisaSlot = Math.max(0, this.maksFotoHitungMundur - this.daftarFotoHitungMundur.length);
             if (sisaSlot <= 0) {
@@ -1329,33 +1342,42 @@ export function editorKelolaUndangan(cfgMasuk = null) {
                 return;
             }
 
+            const validator = typeof window !== 'undefined' ? window.SesiTemuValidasiBerkas : null;
             const berkasValid = [];
-            let adaTidakValid = false;
-            let adaTerlaluBesar = false;
+            let pesanGalatPertama = '';
             for (const file of daftarBerkas) {
-                if (!file.type || !file.type.startsWith('image/')) {
-                    adaTidakValid = true;
-                    continue;
-                }
-                if (file.size > 15 * 1024 * 1024) {
-                    adaTerlaluBesar = true;
-                    continue;
+                if (validator?.validasi) {
+                    const cek = await validator.validasi(file, 'gambar', {
+                        maksMb: 15,
+                        pesanUkuran: 'Ukuran foto melebihi batas maksimal 15 MB sebelum dipotong.',
+                    });
+                    if (!cek.valid) {
+                        if (!pesanGalatPertama) pesanGalatPertama = cek.pesan;
+                        continue;
+                    }
+                } else {
+                    if (!file.type || !['image/jpeg', 'image/png', 'image/webp'].includes(file.type.toLowerCase())) {
+                        if (!pesanGalatPertama) pesanGalatPertama = 'Format berkas harus berupa gambar (JPG, PNG, atau WebP).';
+                        continue;
+                    }
+                    if (file.size > 15 * 1024 * 1024) {
+                        if (!pesanGalatPertama) pesanGalatPertama = 'Ukuran foto melebihi batas maksimal 15 MB sebelum dipotong.';
+                        continue;
+                    }
                 }
                 berkasValid.push(file);
             }
 
             if (berkasValid.length === 0) {
-                this.pesanGalatHitungMundur = adaTerlaluBesar
-                    ? 'Ukuran foto melebihi batas maksimal 15 MB sebelum dipotong.'
-                    : 'Format berkas harus berupa gambar (JPG, PNG, atau WebP).';
+                this.pesanGalatHitungMundur = pesanGalatPertama || 'Format berkas harus berupa gambar (JPG, PNG, atau WebP).';
                 return;
             }
 
             const antrean = berkasValid.slice(0, sisaSlot);
             if (berkasValid.length > sisaSlot) {
                 this.pesanGalatHitungMundur = `Hanya ${sisaSlot} foto pertama yang diproses (maksimal ${this.maksFotoHitungMundur} foto).`;
-            } else if (adaTidakValid || adaTerlaluBesar) {
-                this.pesanGalatHitungMundur = 'Sebagian berkas dilewati karena bukan gambar atau melebihi 15 MB.';
+            } else if (pesanGalatPertama) {
+                this.pesanGalatHitungMundur = `Sebagian berkas ditolak: ${pesanGalatPertama}`;
             }
 
             const total = antrean.length;
@@ -1470,7 +1492,7 @@ export function editorKelolaUndangan(cfgMasuk = null) {
                 this.prosesAntreanFotoGaleri(berkasDipilih);
             }
         },
-        prosesAntreanFotoGaleri(daftarBerkas) {
+        async prosesAntreanFotoGaleri(daftarBerkas) {
             this.pesanGalatGaleri = '';
             const sisaSlot = Math.max(0, this.maksGaleri - this.daftarGaleri.length);
             if (sisaSlot <= 0) {
@@ -1478,33 +1500,42 @@ export function editorKelolaUndangan(cfgMasuk = null) {
                 return;
             }
 
+            const validator = typeof window !== 'undefined' ? window.SesiTemuValidasiBerkas : null;
             const berkasValid = [];
-            let adaTidakValid = false;
-            let adaTerlaluBesar = false;
+            let pesanGalatPertama = '';
             for (const file of daftarBerkas) {
-                if (!file.type || !file.type.startsWith('image/')) {
-                    adaTidakValid = true;
-                    continue;
-                }
-                if (file.size > 15 * 1024 * 1024) {
-                    adaTerlaluBesar = true;
-                    continue;
+                if (validator?.validasi) {
+                    const cek = await validator.validasi(file, 'gambar', {
+                        maksMb: 15,
+                        pesanUkuran: 'Ukuran foto melebihi batas maksimal 15 MB sebelum dipotong.',
+                    });
+                    if (!cek.valid) {
+                        if (!pesanGalatPertama) pesanGalatPertama = cek.pesan;
+                        continue;
+                    }
+                } else {
+                    if (!file.type || !['image/jpeg', 'image/png', 'image/webp'].includes(file.type.toLowerCase())) {
+                        if (!pesanGalatPertama) pesanGalatPertama = 'Format berkas harus berupa gambar (JPG, PNG, atau WebP).';
+                        continue;
+                    }
+                    if (file.size > 15 * 1024 * 1024) {
+                        if (!pesanGalatPertama) pesanGalatPertama = 'Ukuran foto melebihi batas maksimal 15 MB sebelum dipotong.';
+                        continue;
+                    }
                 }
                 berkasValid.push(file);
             }
 
             if (berkasValid.length === 0) {
-                this.pesanGalatGaleri = adaTerlaluBesar
-                    ? 'Ukuran foto melebihi batas maksimal 15 MB sebelum dipotong.'
-                    : 'Format berkas harus berupa gambar (JPG, PNG, atau WebP).';
+                this.pesanGalatGaleri = pesanGalatPertama || 'Format berkas harus berupa gambar (JPG, PNG, atau WebP).';
                 return;
             }
 
             const antrean = berkasValid.slice(0, sisaSlot);
             if (berkasValid.length > sisaSlot) {
                 this.pesanGalatGaleri = `Hanya ${sisaSlot} foto pertama yang diproses (kuota maksimal ${this.maksGaleri} foto).`;
-            } else if (adaTidakValid || adaTerlaluBesar) {
-                this.pesanGalatGaleri = 'Sebagian berkas dilewati karena bukan gambar atau melebihi 15 MB.';
+            } else if (pesanGalatPertama) {
+                this.pesanGalatGaleri = `Sebagian berkas ditolak: ${pesanGalatPertama}`;
             }
 
             const total = antrean.length;
@@ -1611,26 +1642,45 @@ export function editorKelolaUndangan(cfgMasuk = null) {
             this.tandaiPerubahan();
             this.jadwalkanLivePreview(false);
         },
-        pilihFotoCerita(index, acara) {
+        async pilihFotoCerita(index, acara) {
             const inputEl = acara?.target;
             const file = inputEl?.files?.[0];
             const item = this.daftarCerita[index];
             if (!file || !item) {
                 return;
             }
-            if (!file.type || !file.type.startsWith('image/')) {
-                inputEl.value = '';
-                return;
-            }
-            if (file.size > 15 * 1024 * 1024) {
-                inputEl.value = '';
-                window.Swal?.fire({
-                    icon: 'warning',
-                    title: 'Ukuran Foto Terlalu Besar',
-                    text: 'Ukuran foto maksimal 15 MB sebelum dipotong.',
-                    confirmButtonColor: '#4B6358',
+
+            const validator = typeof window !== 'undefined' ? window.SesiTemuValidasiBerkas : null;
+            if (validator?.validasi) {
+                const cek = await validator.validasi(file, 'gambar', {
+                    maksMb: 15,
+                    pesanUkuran: 'Ukuran foto maksimal 15 MB sebelum dipotong.',
                 });
-                return;
+                if (!cek.valid) {
+                    inputEl.value = '';
+                    window.Swal?.fire({
+                        icon: 'warning',
+                        title: 'Berkas Foto Ditolak',
+                        text: cek.pesan,
+                        confirmButtonColor: '#4B6358',
+                    });
+                    return;
+                }
+            } else {
+                if (!file.type || !['image/jpeg', 'image/png', 'image/webp'].includes(file.type.toLowerCase())) {
+                    inputEl.value = '';
+                    return;
+                }
+                if (file.size > 15 * 1024 * 1024) {
+                    inputEl.value = '';
+                    window.Swal?.fire({
+                        icon: 'warning',
+                        title: 'Ukuran Foto Terlalu Besar',
+                        text: 'Ukuran foto maksimal 15 MB sebelum dipotong.',
+                        confirmButtonColor: '#4B6358',
+                    });
+                    return;
+                }
             }
 
             const meta = this.rasioFotoTema?.foto_cerita || { rasio: 1.6, label: '16:10 Cerita', bentuk: 'rect' };

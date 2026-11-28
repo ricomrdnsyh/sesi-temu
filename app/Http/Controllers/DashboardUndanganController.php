@@ -13,6 +13,7 @@ use App\Models\TamuUndangan;
 use App\Models\Tema;
 use App\Models\Transaksi;
 use App\Models\Undangan;
+use App\Rules\BerkasUnggahanAman;
 use App\Services\LayananTransaksiService;
 use App\Services\PengolahGambarService;
 use App\Support\EksporSpreadsheetTamu;
@@ -954,7 +955,7 @@ class DashboardUndanganController extends Controller
                 'slug' => ['nullable', 'string', 'max:100'],
                 'musik_latar' => ['nullable', 'string', 'max:255'],
                 'sumber_musik' => ['nullable', Rule::in(['katalog', 'kustom'])],
-                'file_musik_kustom' => ['nullable', 'file', 'mimes:mp3,wav,ogg,m4a', 'max:15360'],
+                'file_musik_kustom' => ['nullable', 'file', 'mimes:mp3,wav,ogg,m4a', 'max:15360', BerkasUnggahanAman::musik(15360)],
                 'hapus_musik_kustom' => ['nullable', 'boolean'],
                 'gaya_font' => ['nullable', Rule::in(array_keys(Undangan::GAYA_FONT_TERSEDIA))],
             ], [
@@ -1055,7 +1056,12 @@ class DashboardUndanganController extends Controller
                 }
 
                 $fileMusik = $request->file('file_musik_kustom');
-                $pathRelatif = $fileMusik->store("undangan/{$undangan->id}/musik", 'public');
+                $extMusikAman = strtolower((string) $fileMusik->getClientOriginalExtension());
+                if (! in_array($extMusikAman, ['mp3', 'wav', 'ogg', 'm4a'], true)) {
+                    $extMusikAman = 'mp3';
+                }
+                $namaAcakMusik = 'musik-'.Str::lower(Str::random(16)).'.'.$extMusikAman;
+                $pathRelatif = $fileMusik->storeAs("undangan/{$undangan->id}/musik", $namaAcakMusik, 'public');
                 $pathPublik = 'storage/'.$pathRelatif;
                 $namaAsli = Str::limit(trim((string) $fileMusik->getClientOriginalName()), 120, '');
 
@@ -1098,12 +1104,12 @@ class DashboardUndanganController extends Controller
                 'nama_lengkap_pria' => ['required', 'string', 'max:150'],
                 'nama_ayah_pria' => ['nullable', 'string', 'max:150'],
                 'nama_ibu_pria' => ['nullable', 'string', 'max:150'],
-                'foto_pria' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'foto_pria' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120', BerkasUnggahanAman::gambar(5120)],
                 'nama_panggilan_wanita' => ['required', 'string', 'max:80'],
                 'nama_lengkap_wanita' => ['required', 'string', 'max:150'],
                 'nama_ayah_wanita' => ['nullable', 'string', 'max:150'],
                 'nama_ibu_wanita' => ['nullable', 'string', 'max:150'],
-                'foto_wanita' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'foto_wanita' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120', BerkasUnggahanAman::gambar(5120)],
                 'instagram_pria' => ['nullable', 'string', 'max:120'],
                 'instagram_wanita' => ['nullable', 'string', 'max:120'],
                 'kutipan_ayat' => ['nullable', 'string', 'max:2000'],
@@ -1148,17 +1154,18 @@ class DashboardUndanganController extends Controller
         }
 
         if (in_array($bagian, ['tema', 'mempelai', 'acara_teks', 'acara_tambahan', 'penutup', 'semua'], true)) {
+            $aturanGambar = ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120', BerkasUnggahanAman::gambar(5120)];
             $aturanFotoTambahan = [
-                'foto_sampul' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'foto_sampul' => $aturanGambar,
                 'hapus_foto_sampul' => ['nullable', 'boolean'],
-                'foto_pembuka' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'foto_pembuka' => $aturanGambar,
                 'hapus_foto_pembuka' => ['nullable', 'boolean'],
                 'foto_hitung_mundur_disertakan' => ['nullable', 'boolean'],
                 'foto_hitung_mundur_items' => ['nullable', 'array', 'max:'.Undangan::MAKS_FOTO_HITUNG_MUNDUR],
                 'foto_hitung_mundur_items.*.path' => ['nullable', 'string', 'max:255'],
-                'foto_hitung_mundur_items.*.file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'foto_hitung_mundur_items.*.file' => $aturanGambar,
                 'hapus_foto_hitung_mundur' => ['nullable', 'boolean'],
-                'foto_penutup' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'foto_penutup' => $aturanGambar,
                 'hapus_foto_penutup' => ['nullable', 'boolean'],
                 'hashtag' => ['nullable', 'string', 'max:80'],
             ];
@@ -1166,9 +1173,9 @@ class DashboardUndanganController extends Controller
             if ($request->hasFile('foto_hitung_mundur')) {
                 if (is_array($request->file('foto_hitung_mundur'))) {
                     $aturanFotoTambahan['foto_hitung_mundur'] = ['array', 'max:'.Undangan::MAKS_FOTO_HITUNG_MUNDUR];
-                    $aturanFotoTambahan['foto_hitung_mundur.*'] = ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'];
+                    $aturanFotoTambahan['foto_hitung_mundur.*'] = ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120', BerkasUnggahanAman::gambar(5120)];
                 } else {
-                    $aturanFotoTambahan['foto_hitung_mundur'] = ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'];
+                    $aturanFotoTambahan['foto_hitung_mundur'] = ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120', BerkasUnggahanAman::gambar(5120)];
                 }
             }
 
@@ -1280,7 +1287,7 @@ class DashboardUndanganController extends Controller
                 'cerita_cinta.*.cerita' => ['nullable', 'string', 'max:1000'],
                 'cerita_cinta.*.foto' => ['nullable', 'string', 'max:255'],
                 'cerita_cinta.*.hapus_foto' => ['nullable', 'boolean'],
-                'cerita_cinta.*.foto_file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'cerita_cinta.*.foto_file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120', BerkasUnggahanAman::gambar(5120)],
                 'live_platform' => ['nullable', 'string', 'max:100'],
                 'live_link' => ['nullable', 'string', 'max:500'],
                 'dress_code_catatan' => ['nullable', 'string', 'max:300'],
@@ -1403,7 +1410,7 @@ class DashboardUndanganController extends Controller
                 'galeri_items' => ['nullable', 'array', 'max:10'],
                 'galeri_items.*.id' => ['nullable', 'integer'],
                 'galeri_items.*.keterangan' => ['nullable', 'string', 'max:255'],
-                'galeri_items.*.file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+                'galeri_items.*.file' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120', BerkasUnggahanAman::gambar(5120)],
             ]);
 
             $galeriLama = $undangan->daftarGaleri()->get()->keyBy('id');
@@ -1694,7 +1701,7 @@ class DashboardUndanganController extends Controller
         }
 
         $tervalidasi = $request->validate([
-            'foto' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'foto' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120', BerkasUnggahanAman::gambar(5120)],
             'keterangan' => ['nullable', 'string', 'max:255'],
         ], [
             'foto.required' => 'Silakan pilih file foto untuk diunggah.',
@@ -1830,7 +1837,7 @@ class DashboardUndanganController extends Controller
 
         if ($mode === 'csv') {
             $request->validate([
-                'file_csv' => ['required', 'file', 'max:2048'],
+                'file_csv' => ['required', 'file', 'max:2048', BerkasUnggahanAman::csv(2048)],
             ], [
                 'file_csv.required' => 'Silakan pilih file CSV yang ingin diimpor.',
                 'file_csv.file' => 'Berkas yang diunggah tidak valid.',
@@ -1839,7 +1846,7 @@ class DashboardUndanganController extends Controller
 
             $fileCsv = $request->file('file_csv');
             $ekstensi = Str::lower((string) $fileCsv?->getClientOriginalExtension());
-            if (! in_array($ekstensi, ['csv', 'txt'], true)) {
+            if ($ekstensi !== 'csv') {
                 return redirect()
                     ->route('dashboard.undangan.tamu', $undangan)
                     ->withErrors(['file_csv' => 'Format file harus .csv (Comma Separated Values).'])
@@ -2663,7 +2670,7 @@ class DashboardUndanganController extends Controller
             'paket' => ['required', Rule::in(['mandiri', 'terima_beres'])],
             'tema_id' => ['nullable', 'exists:tema,id'],
             'kode_promo' => ['nullable', 'string', 'max:40'],
-            'bukti_pembayaran' => ['nullable', 'image', 'max:4096'],
+            'bukti_pembayaran' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096', BerkasUnggahanAman::gambar(4096)],
         ], [
             'paket.required' => 'Silakan pilih paket aktivasi undangan.',
             'bukti_pembayaran.image' => 'Bukti pembayaran harus berupa file gambar (JPG/PNG/WebP).',
@@ -2767,7 +2774,7 @@ class DashboardUndanganController extends Controller
         }
 
         $request->validate([
-            'bukti_pembayaran' => ['required', 'image', 'max:4096'],
+            'bukti_pembayaran' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096', BerkasUnggahanAman::gambar(4096)],
         ], [
             'bukti_pembayaran.required' => 'Pilih file gambar bukti pembayaran terlebih dahulu.',
             'bukti_pembayaran.image' => 'Bukti pembayaran harus berupa gambar.',

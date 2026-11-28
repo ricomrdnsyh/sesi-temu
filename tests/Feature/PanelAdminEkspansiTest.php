@@ -210,7 +210,7 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSessionHas('sukses');
 
         $promo = Promo::where('kode', 'HEMAT20')->firstOrFail();
-        $bukti = UploadedFile::fake()->create('bukti.png', 120, 'image/png');
+        $bukti = UploadedFile::fake()->image('bukti.png', 400, 600);
 
         // Total: harga tema 129.000 + Terima Beres 50.000 = 179.000; 20% = 35.800 dibatasi maks 30.000 => 149.000
         $this->actingAs($client)
@@ -521,7 +521,7 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSee('Rp 103.200');
 
         // Checkout client otomatis memakai harga tema terdiskon (103.200 + biaya Terima Beres 50.000 = 153.200)
-        $bukti = UploadedFile::fake()->create('bukti-diskon.png', 100, 'image/png');
+        $bukti = UploadedFile::fake()->image('bukti-diskon.png', 400, 600);
         $this->actingAs($client)
             ->post("/dashboard/undangan/{$undangan->id}/transaksi", [
                 'paket' => 'terima_beres',
@@ -1010,7 +1010,7 @@ class PanelAdminEkspansiTest extends TestCase
 
         // Saat sudah ada pengajuan menunggu verifikasi, form unggah dikunci dan pengajuan ganda ditolak
         Storage::fake('public');
-        $bukti = UploadedFile::fake()->create('bukti-bayar.png', 100, 'image/png');
+        $bukti = UploadedFile::fake()->image('bukti-bayar.png', 400, 600);
         $this->actingAs($client)
             ->from("/dashboard/undangan/{$undangan->id}/kelola?tab=aktivasi")
             ->post("/dashboard/undangan/{$undangan->id}/transaksi", [
@@ -1132,7 +1132,7 @@ class PanelAdminEkspansiTest extends TestCase
             ->post("/dashboard/undangan/{$undangan->id}/transaksi", [
                 'asal_halaman' => 'dashboard',
                 'paket' => 'mandiri',
-                'bukti_pembayaran' => UploadedFile::fake()->create('bukti-dash.png', 100, 'image/png'),
+                'bukti_pembayaran' => UploadedFile::fake()->image('bukti-dash.png', 400, 600),
             ])
             ->assertRedirect(route('dashboard.index'))
             ->assertSessionHas('buka_aktivasi_undangan_id', $undangan->id)

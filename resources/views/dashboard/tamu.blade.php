@@ -1143,7 +1143,7 @@
                                 x-ref="inputFileCsv"
                                 type="file"
                                 name="file_csv"
-                                accept=".csv,.txt,text/csv"
+                                accept=".csv,text/csv"
                                 @change="pilihFileCsv($event)"
                                 class="sr-only"
                             >

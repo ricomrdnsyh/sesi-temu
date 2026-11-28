@@ -321,23 +321,36 @@
                                 this.pesanPromo = '';
                                 this.promoError = false;
                             },
-                            terimaFileBukti(file) {
+                            async terimaFileBukti(file) {
                                 this.buktiGalat = '';
                                 if (!file) {
                                     this.resetBukti();
                                     return false;
                                 }
 
-                                if (!file.type || !file.type.startsWith('image/')) {
-                                    this.resetBukti();
-                                    this.buktiGalat = 'Format file harus berupa gambar (JPG, PNG, atau WebP).';
-                                    return false;
-                                }
+                                const validator = window.SesiTemuValidasiBerkas;
+                                if (validator?.validasi) {
+                                    const cek = await validator.validasi(file, 'gambar', {
+                                        maksMb: 4,
+                                        pesanUkuran: 'Ukuran foto bukti melebihi batas maksimal 4 MB.',
+                                    });
+                                    if (!cek.valid) {
+                                        this.resetBukti();
+                                        this.buktiGalat = cek.pesan;
+                                        return false;
+                                    }
+                                } else {
+                                    if (!file.type || !['image/jpeg', 'image/png', 'image/webp'].includes(file.type.toLowerCase())) {
+                                        this.resetBukti();
+                                        this.buktiGalat = 'Format file harus berupa gambar (JPG, PNG, atau WebP).';
+                                        return false;
+                                    }
 
-                                if (file.size > 4 * 1024 * 1024) {
-                                    this.resetBukti();
-                                    this.buktiGalat = 'Ukuran foto bukti melebihi batas maksimal 4 MB.';
-                                    return false;
+                                    if (file.size > 4 * 1024 * 1024) {
+                                        this.resetBukti();
+                                        this.buktiGalat = 'Ukuran foto bukti melebihi batas maksimal 4 MB.';
+                                        return false;
+                                    }
                                 }
 
                                 if (this.buktiPreviewUrl) {
@@ -351,18 +364,21 @@
                                 this.buktiPreviewUrl = URL.createObjectURL(file);
                                 return true;
                             },
-                            pilihBukti(event) {
-                                const file = event.target.files?.[0];
-                                if (!this.terimaFileBukti(file) && event.target) {
-                                    event.target.value = '';
+                            async pilihBukti(event) {
+                                const inputEl = event.target;
+                                const file = inputEl?.files?.[0];
+                                const ok = await this.terimaFileBukti(file);
+                                if (!ok && inputEl) {
+                                    inputEl.value = '';
                                 }
                             },
-                            saatJatuhBukti(event) {
+                            async saatJatuhBukti(event) {
                                 this.sedangTarikBukti = false;
                                 const file = event.dataTransfer?.files?.[0];
                                 if (!file || !this.$refs.inputBukti) return;
 
-                                if (!this.terimaFileBukti(file)) {
+                                const ok = await this.terimaFileBukti(file);
+                                if (!ok) {
                                     return;
                                 }
 
@@ -543,7 +559,7 @@
                                     x-ref="inputBukti"
                                     type="file"
                                     name="bukti_pembayaran"
-                                    accept="image/jpeg,image/png,image/webp,image/*"
+                                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                                     :disabled="!perluBukti()"
                                     @change="pilihBukti($event)"
                                     class="sr-only"

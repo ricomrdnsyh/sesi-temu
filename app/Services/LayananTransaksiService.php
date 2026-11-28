@@ -77,7 +77,7 @@ class LayananTransaksiService
         ?string $catatanAdmin = null
     ): Transaksi {
         $rincian = $this->hitungRincian($tema, $paket, $promo);
-        $pathBukti = $bukti ? $bukti->store('bukti-pembayaran', 'public') : null;
+        $pathBukti = $bukti ? app(PengolahGambarService::class)->simpanBuktiPembayaran($bukti) : null;
 
         return DB::transaction(function () use (
             $undangan,
@@ -125,7 +125,7 @@ class LayananTransaksiService
             Storage::disk('public')->delete($transaksi->bukti_pembayaran);
         }
 
-        $pathBaru = $bukti->store('bukti-pembayaran', 'public');
+        $pathBaru = app(PengolahGambarService::class)->simpanBuktiPembayaran($bukti);
 
         $transaksi->update([
             'bukti_pembayaran' => $pathBaru,

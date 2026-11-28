@@ -80,7 +80,7 @@
                 id="input-foto-hitung-mundur"
                 type="file"
                 name="foto_hitung_mundur[]"
-                accept="image/jpeg,image/png,image/webp,image/*"
+                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                 multiple
                 @change="pilihFotoHitungMundur($event)"
                 class="sr-only"
@@ -1070,7 +1070,7 @@
                                 <input
                                     :id="`cerita-foto-${idx}`"
                                     type="file"
-                                    accept="image/jpeg,image/png,image/webp,image/*"
+                                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                                     :name="`cerita_cinta[${idx}][foto_file]`"
                                     @change="pilihFotoCerita(idx, $event)"
                                     class="sr-only"
@@ -1299,7 +1299,7 @@
                 id="input-galeri-foto"
                 type="file"
                 name="galeri_foto[]"
-                accept="image/jpeg,image/png,image/webp,image/*"
+                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                 multiple
                 @change="pilihFotoGaleri($event)"
                 class="sr-only"
