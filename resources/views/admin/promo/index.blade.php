@@ -21,37 +21,37 @@
         @csrf
         <div>
             <label class="block text-xs font-semibold text-charcoal/75 mb-1">Kode Voucher</label>
-            <input type="text" name="kode" required placeholder="Contoh: NIKAHBERKAH" class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2 text-sm uppercase font-mono">
+            <input type="text" name="kode" required placeholder="Contoh: NIKAHBERKAH" class="w-full rounded-xl px-3.5 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 uppercase font-mono">
         </div>
         <div>
             <label class="block text-xs font-semibold text-charcoal/75 mb-1">Nama Promo</label>
-            <input type="text" name="nama_promo" required placeholder="Contoh: Promo Akhir Tahun" class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2 text-sm">
+            <input type="text" name="nama_promo" required placeholder="Contoh: Promo Akhir Tahun" class="w-full rounded-xl px-3.5 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60">
         </div>
         <div>
             <label class="block text-xs font-semibold text-charcoal/75 mb-1">Tipe Diskon</label>
-            <select name="tipe_diskon" class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2 text-sm">
+            <select name="tipe_diskon" class="w-full rounded-xl px-3.5 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60">
                 <option value="nominal">Nominal (Rp)</option>
                 <option value="persen">Persentase (%)</option>
             </select>
         </div>
         <div>
             <label class="block text-xs font-semibold text-charcoal/75 mb-1">Nilai Diskon</label>
-            <input type="number" name="nilai_diskon" min="1" required placeholder="Contoh: 15000 atau 20" class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2 text-sm">
+            <input type="number" name="nilai_diskon" min="1" required placeholder="Contoh: 15000 atau 20" class="w-full rounded-xl px-3.5 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60">
         </div>
         <div>
             <label class="block text-xs font-semibold text-charcoal/75 mb-1">Maksimal Potongan Rp (Jika Persen)</label>
-            <input type="number" name="maksimal_diskon" min="1000" placeholder="Opsional" class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2 text-sm">
+            <input type="number" name="maksimal_diskon" min="1000" placeholder="Opsional" class="w-full rounded-xl px-3.5 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60">
         </div>
         <div>
             <label class="block text-xs font-semibold text-charcoal/75 mb-1">Kuota Pemakaian</label>
-            <input type="number" name="kuota" min="1" placeholder="Kosong = Tanpa batas" class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2 text-sm">
+            <input type="number" name="kuota" min="1" placeholder="Kosong = Tanpa batas" class="w-full rounded-xl px-3.5 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60">
         </div>
         <div>
             <label class="block text-xs font-semibold text-charcoal/75 mb-1">Berlaku Sampai (Opsional)</label>
-            <input type="date" name="berlaku_sampai" class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2 text-sm">
+            <input type="date" name="berlaku_sampai" class="w-full rounded-xl px-3.5 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60">
         </div>
         <div>
-            <button type="submit" class="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-sage px-4 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer">
+            <button type="submit" class="w-full inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs bg-sage font-semibold text-white hover:bg-sage/90 cursor-pointer">
                 <span>+ Buat Kode Promo</span>
             </button>
         </div>
@@ -87,7 +87,7 @@
                             >
                                 @csrf
                                 @method('PATCH')
-                                <button type="submit" class="inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs font-semibold cursor-pointer transition {{ $promo->aktif ? 'border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100' : 'border-sage bg-sage text-white hover:bg-sage/90' }}">
+                                <button type="submit" class="inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs font-semibold cursor-pointer transition {{ $promo->aktif ? 'border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100' : 'border-sage bg-sage text-white hover:bg-sage/90' }}">
                                     <span>{{ $promo->aktif ? 'Nonaktifkan' : 'Aktifkan' }}</span>
                                 </button>
                             </form>
@@ -104,7 +104,7 @@
                             >
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 cursor-pointer transition">
+                                <button type="submit" class="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs font-semibold text-red-700 hover:bg-red-100 cursor-pointer transition">
                                     <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M3 6h18"/>
                                         <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>

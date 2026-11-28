@@ -217,7 +217,7 @@
                     data-swal-loading-text="Sedang mengembalikan seluruh harga tema ke harga normal..."
                 >
                     @csrf
-                    <button type="submit" class="inline-flex items-center gap-1.5 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-800 hover:bg-amber-100 cursor-pointer transition">
+                    <button type="submit" class="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-amber-300 bg-amber-50 font-semibold text-amber-800 hover:bg-amber-100 cursor-pointer transition">
                         <span>Reset Diskon ({{ $jumlahTemaDiskon }})</span>
                     </button>
                 </form>
@@ -227,9 +227,9 @@
                 type="button"
                 @click="bukaModalDiskonMassal()"
                 data-buka-modal-diskon-massal
-                class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-champagne bg-champagne/15 px-4 py-2.5 text-sm font-semibold text-charcoal hover:bg-champagne/25 cursor-pointer transition"
+                class="inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-champagne bg-champagne/15 font-semibold text-charcoal hover:bg-champagne/25 cursor-pointer transition"
             >
-                <svg class="h-4 w-4 text-amber-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5 text-amber-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M19 5 5 19"/>
                     <circle cx="6.5" cy="6.5" r="2.5"/>
                     <circle cx="17.5" cy="17.5" r="2.5"/>
@@ -241,7 +241,7 @@
                 type="button"
                 @click="bukaModalTambah()"
                 data-buka-modal-tambah-tema
-                class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-sage px-5 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer transition text-center"
+                class="inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3.5 sm:py-1.5 sm:text-xs bg-sage font-semibold text-white hover:bg-sage/90 cursor-pointer transition text-center"
             >
                 <span>+ Tambah Tema Baru</span>
             </button>
@@ -311,7 +311,7 @@
                             type="button"
                             data-buka-modal-edit-tema
                             data-tema="{{ $payloadTema }}"
-                            class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-champagne px-3.5 py-2 text-xs font-semibold text-charcoal hover:bg-champagne/10 cursor-pointer transition"
+                            class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 sm:rounded-lg sm:px-2.5 sm:py-1.5 border border-champagne text-xs font-semibold text-charcoal hover:bg-champagne/10 cursor-pointer transition"
                         >
                             <svg class="h-3.5 w-3.5 text-amber-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -332,7 +332,7 @@
                         >
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="rounded-xl border border-red-200 px-3.5 py-2 text-xs font-semibold text-red-700 hover:bg-red-50 cursor-pointer">
+                            <button type="submit" class="rounded-xl px-3.5 py-2 sm:rounded-lg sm:px-2.5 sm:py-1.5 border border-red-200 text-xs font-semibold text-red-700 hover:bg-red-50 cursor-pointer">
                                 Hapus
                             </button>
                         </form>
@@ -353,7 +353,7 @@
         aria-labelledby="judul-modal-tema"
         class="fixed inset-0 z-50 flex items-center justify-center bg-charcoal/60 backdrop-blur-xs p-4 overflow-y-auto"
     >
-        <div class="w-full max-w-3xl lg:max-w-4xl rounded-2xl bg-white p-6 sm:p-8 shadow-2xl ring-1 ring-champagne/25 my-8">
+        <div class="w-full max-w-3xl lg:max-w-4xl rounded-2xl bg-white px-5 pt-5 pb-4 sm:px-6 sm:pt-5 sm:pb-4 shadow-2xl ring-1 ring-champagne/25 my-8">
             <div class="flex items-start justify-between gap-4 pb-5 border-b border-champagne/20">
                 <div>
                     <h2 id="judul-modal-tema" class="font-serif text-2xl sm:text-3xl font-bold text-charcoal" x-text="modeEdit ? 'Edit Tema Katalog' : 'Tambah Tema Baru'"></h2>
@@ -495,7 +495,7 @@
                                     x-model="form.nama_tema"
                                     required
                                     placeholder="Contoh: Royal Ivory"
-                                    class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none"
+                                    class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 focus:border-champagne focus:bg-white focus:outline-none"
                                 >
                             </div>
 
@@ -507,7 +507,7 @@
                                     type="text"
                                     x-model="form.slug"
                                     placeholder="Kosongkan agar otomatis dari nama"
-                                    class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm font-mono focus:border-champagne focus:bg-white focus:outline-none"
+                                    class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 font-mono focus:border-champagne focus:bg-white focus:outline-none"
                                 >
                             </div>
 
@@ -517,7 +517,7 @@
                                     id="modal_kategori"
                                     name="kategori"
                                     x-model="form.kategori"
-                                    class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none"
+                                    class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 focus:border-champagne focus:bg-white focus:outline-none"
                                 >
                                     @foreach (\App\Models\Tema::KATEGORI_TERSEDIA as $val => $label)
                                         <option value="{{ $val }}">{{ $label }}</option>
@@ -535,7 +535,7 @@
                                     step="1000"
                                     x-model="form.harga"
                                     required
-                                    class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm font-semibold focus:border-champagne focus:bg-white focus:outline-none"
+                                    class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 font-semibold focus:border-champagne focus:bg-white focus:outline-none"
                                 >
                             </div>
 
@@ -546,7 +546,7 @@
                                     name="lokasi_view"
                                     x-model="form.lokasi_view"
                                     required
-                                    class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none"
+                                    class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 focus:border-champagne focus:bg-white focus:outline-none"
                                 >
                                     @foreach ($daftarLokasiView as $viewDot => $viewLabel)
                                         <option value="{{ $viewDot }}">{{ $viewLabel }}</option>
@@ -566,7 +566,7 @@
                                         id="modal_diskon_tipe"
                                         name="diskon_tipe"
                                         x-model="form.diskon_tipe"
-                                        class="w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm focus:border-champagne focus:outline-none"
+                                        class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-white focus:border-champagne focus:outline-none"
                                     >
                                         <option value="">Tanpa Diskon</option>
                                         <option value="persen">Persentase (%)</option>
@@ -583,13 +583,13 @@
                                         x-model="form.diskon_nilai"
                                         :disabled="!form.diskon_tipe"
                                         placeholder="0"
-                                        class="w-full rounded-xl border border-charcoal/15 bg-white px-3 py-2 text-sm disabled:opacity-50 focus:border-champagne focus:outline-none"
+                                        class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-white disabled:opacity-50 focus:border-champagne focus:outline-none"
                                     >
                                 </div>
                             </div>
                         </div>
 
-                        <label class="flex items-center gap-2.5 rounded-xl border border-champagne/25 bg-ivory/50 px-4 py-3 text-sm font-medium text-charcoal cursor-pointer">
+                        <label class="flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-2 sm:text-xs border border-champagne/25 bg-ivory/50 font-medium text-charcoal cursor-pointer">
                             <input
                                 type="checkbox"
                                 name="aktif"
@@ -602,19 +602,29 @@
                     </div>
                 </div>
 
-                <div class="pt-6 mt-6 border-t border-champagne/20 flex items-center justify-end gap-3">
+                <div class="pt-3.5 mt-5 border-t border-champagne/20 flex items-center justify-end gap-2">
                     <button
                         type="button"
                         @click="tutupModal()"
-                        class="rounded-xl border border-charcoal/15 px-5 py-2.5 text-sm font-semibold text-charcoal hover:bg-ivory cursor-pointer transition"
+                        class="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 font-semibold text-charcoal hover:bg-ivory cursor-pointer transition"
                     >
-                        Batal
+                        <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M18 6 6 18" />
+                            <path d="m6 6 12 12" />
+                        </svg>
+                        <span>Batal</span>
                     </button>
                     <button
                         type="submit"
-                        class="rounded-xl bg-sage px-6 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer transition"
-                        x-text="modeEdit ? 'Simpan Perubahan' : 'Simpan Tema'"
-                    ></button>
+                        class="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3.5 sm:py-1.5 sm:text-xs bg-sage font-semibold text-white hover:bg-sage/90 cursor-pointer transition"
+                    >
+                        <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+                            <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" />
+                            <path d="M7 3v4a1 1 0 0 0 1 1h7" />
+                        </svg>
+                        <span x-text="modeEdit ? 'Simpan Perubahan' : 'Simpan Tema'"></span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -631,7 +641,7 @@
         aria-labelledby="judul-modal-diskon-massal"
         class="fixed inset-0 z-50 flex items-center justify-center bg-charcoal/60 backdrop-blur-xs p-4 overflow-y-auto"
     >
-        <div class="w-full max-w-xl rounded-2xl bg-white p-6 sm:p-8 shadow-2xl ring-1 ring-champagne/25 my-8">
+        <div class="w-full max-w-xl rounded-2xl bg-white px-5 pt-5 pb-4 sm:px-6 sm:pt-5 sm:pb-4 shadow-2xl ring-1 ring-champagne/25 my-8">
             <div class="flex items-start justify-between gap-4 pb-4 border-b border-champagne/20">
                 <div>
                     <h2 id="judul-modal-diskon-massal" class="font-serif text-2xl font-bold text-charcoal">Terapkan Diskon Massal</h2>
@@ -665,7 +675,7 @@
                     <select
                         id="massal_target_kategori"
                         name="target_kategori"
-                        class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:outline-none"
+                        class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 focus:border-champagne focus:outline-none"
                     >
                         <option value="semua" @selected(old('target_kategori') === 'semua')>Semua Tema Katalog ({{ $daftarTema->count() }} tema)</option>
                         @foreach (\App\Models\Tema::KATEGORI_TERSEDIA as $val => $label)
@@ -680,7 +690,7 @@
                         <select
                             id="massal_diskon_tipe"
                             name="diskon_tipe"
-                            class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:outline-none"
+                            class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 focus:border-champagne focus:outline-none"
                         >
                             <option value="persen" @selected(old('diskon_tipe', 'persen') === 'persen')>Persentase (%)</option>
                             <option value="nominal" @selected(old('diskon_tipe') === 'nominal')>Potongan Nominal (Rp)</option>
@@ -697,7 +707,7 @@
                             required
                             value="{{ old('diskon_nilai', 20) }}"
                             placeholder="Contoh: 20 atau 25000"
-                            class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:outline-none"
+                            class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 focus:border-champagne focus:outline-none"
                         >
                     </div>
                 </div>
@@ -706,16 +716,23 @@
                     Harga setelah diskon otomatis ditampilkan sebagai harga coret di Beranda, Dashboard Client, serta dihitung ke order/transaksi baru.
                 </p>
 
-                <div class="pt-3 flex items-center justify-end gap-2.5">
+                <div class="pt-3.5 border-t border-champagne/20 flex items-center justify-end gap-2">
                     <button
                         type="button"
                         @click="tutupModal()"
-                        class="rounded-xl border border-charcoal/15 px-4 py-2 text-sm font-semibold text-charcoal hover:bg-ivory cursor-pointer transition"
+                        class="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 font-semibold text-charcoal hover:bg-ivory cursor-pointer transition"
                     >
-                        Batal
+                        <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M18 6 6 18" />
+                            <path d="m6 6 12 12" />
+                        </svg>
+                        <span>Batal</span>
                     </button>
-                    <button type="submit" class="rounded-xl bg-sage px-5 py-2 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer transition">
-                        Terapkan Diskon
+                    <button type="submit" class="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3.5 sm:py-1.5 sm:text-xs bg-sage font-semibold text-white hover:bg-sage/90 cursor-pointer transition">
+                        <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M20 6 9 17l-5-5" />
+                        </svg>
+                        <span>Terapkan Diskon</span>
                     </button>
                 </div>
             </form>

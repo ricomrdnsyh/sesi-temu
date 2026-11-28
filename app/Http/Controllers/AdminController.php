@@ -11,10 +11,25 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class AdminController extends Controller
 {
+    /**
+     * @var list<string>
+     */
+    private const SLUG_TERCADANG = [
+        'masuk',
+        'daftar',
+        'keluar',
+        'dashboard',
+        'admin',
+        'demo',
+        'cek-link',
+        'up',
+    ];
     public function ringkasan(): View
     {
         $totalClient = Pengguna::where('peran', 'client')->count();
@@ -37,7 +52,7 @@ class AdminController extends Controller
 
         $undanganTerbaru = Undangan::with(['pengguna', 'tema'])
             ->latest()
-            ->limit(25)
+            ->limit(5)
             ->get();
 
         return view('admin.ringkasan', [
@@ -84,12 +99,65 @@ class AdminController extends Controller
         }
 
         $daftarUndangan = $query->get();
+        $daftarClient = Pengguna::where('peran', 'client')->orderBy('nama')->get(['id', 'nama', 'email']);
+        $daftarTema = Tema::where('aktif', true)->orderBy('id')->get();
 
         return view('admin.undangan.index', [
             'daftarUndangan' => $daftarUndangan,
+            'daftarClient' => $daftarClient,
+            'daftarTema' => $daftarTema,
             'pencarian' => $pencarian,
             'status' => $status,
         ]);
+    }
+
+    public function simpanUndangan(Request $request): RedirectResponse
+    {
+        $tervalidasi = $request->validate([
+            'pengguna_id' => ['required', 'integer', Rule::exists('pengguna', 'id')->where('peran', 'client')],
+            'tema_id' => ['required', 'integer', Rule::exists('tema', 'id')->where('aktif', true)],
+            'slug' => ['required', 'string', 'max:100'],
+            'nama_panggilan_pria' => ['required', 'string', 'max:80'],
+            'nama_lengkap_pria' => ['required', 'string', 'max:150'],
+            'nama_panggilan_wanita' => ['required', 'string', 'max:80'],
+            'nama_lengkap_wanita' => ['required', 'string', 'max:150'],
+        ], [
+            'pengguna_id.required' => 'Client pemilik undangan wajib dipilih.',
+            'pengguna_id.exists' => 'Akun client tidak ditemukan atau bukan akun client.',
+            'tema_id.required' => 'Tema undangan wajib dipilih.',
+            'tema_id.exists' => 'Tema tidak valid atau sedang tidak aktif.',
+            'slug.required' => 'Slug link undangan wajib diisi.',
+        ]);
+
+        $slug = Str::slug($tervalidasi['slug']);
+
+        if ($slug === '' || in_array($slug, self::SLUG_TERCADANG, true)) {
+            return back()->withErrors(['slug' => 'Nama link tidak valid atau merupakan kata yang dicadangkan sistem.'])->withInput();
+        }
+
+        if (Undangan::where('slug', $slug)->exists()) {
+            return back()->withErrors(['slug' => "Link sesitemu.id/{$slug} sudah dipakai. Gunakan nama link lain."])->withInput();
+        }
+
+        $client = Pengguna::findOrFail((int) $tervalidasi['pengguna_id']);
+        $temaDipilih = Tema::findOrFail((int) $tervalidasi['tema_id']);
+
+        $undangan = Undangan::create([
+            'pengguna_id' => $client->id,
+            'tema_id' => $temaDipilih->id,
+            'slug' => $slug,
+            'nama_panggilan_pria' => $tervalidasi['nama_panggilan_pria'],
+            'nama_lengkap_pria' => $tervalidasi['nama_lengkap_pria'],
+            'nama_panggilan_wanita' => $tervalidasi['nama_panggilan_wanita'],
+            'nama_lengkap_wanita' => $tervalidasi['nama_lengkap_wanita'],
+            'musik_latar' => Tema::musikBawaanUntukSlug($temaDipilih->slug),
+            'pengaturan' => Undangan::pengaturanBawaan(),
+            'status_publikasi' => false,
+        ]);
+
+        return redirect()
+            ->route('dashboard.undangan.kelola', $undangan)
+            ->with('sukses', "Draft undangan untuk {$client->nama} berhasil dibuat! Silakan lengkapi isian undangan.");
     }
 
     public function aktifkanUndangan(Undangan $undangan): RedirectResponse

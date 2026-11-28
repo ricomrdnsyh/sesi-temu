@@ -266,8 +266,11 @@ export const inisialisasiSelect2Element = (selectEl) => {
     }
 
     const lebar = selectEl.dataset.select2Width || (varian === 'dt-length' ? '76px' : '100%');
+    const dalamAdmin = Boolean(selectEl.closest('[data-admin-panel]'));
     const kelasVarianSelection = `s2-variant-${varian}`;
-    const kelasVarianDropdown = `s2-dropdown-${varian}`;
+    const kelasVarianDropdown = dalamAdmin
+        ? `s2-dropdown-${varian} s2-dropdown-admin-sm`
+        : `s2-dropdown-${varian}`;
     const dropdownParent = tentukanDropdownParent(selectEl, varian);
 
     const gayaAsli = getComputedStyle(selectEl);

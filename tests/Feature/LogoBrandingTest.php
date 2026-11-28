@@ -271,9 +271,13 @@ class LogoBrandingTest extends TestCase
             'status_publikasi' => true,
         ]);
 
+        $this->actingAs($admin)
+            ->get('/admin')
+            ->assertOk()
+            ->assertDontSee('data-datatable', false);
+
         foreach (
             [
-                '/admin' => 'data-page-length="5"',
                 '/admin/undangan' => 'data-page-length="10"',
                 '/admin/pengguna' => 'data-page-length="10"',
             ] as $rute => $pageLengthAttr

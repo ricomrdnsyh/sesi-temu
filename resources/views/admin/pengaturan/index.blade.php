@@ -32,7 +32,7 @@
                     required
                     value="{{ old('nomor_wa_admin', $pengaturan['nomor_wa_admin']) }}"
                     placeholder="6281234567890"
-                    class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm font-mono focus:border-champagne focus:outline-none"
+                    class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 font-mono focus:border-champagne focus:outline-none"
                 >
                 <p class="mt-1 text-[11px] text-charcoal/55">Format 628... (otomatis terhubung ke Beranda &amp; Dashboard Client).</p>
             </div>
@@ -47,7 +47,7 @@
                     max="36"
                     required
                     value="{{ old('masa_aktif_bulan', $pengaturan['masa_aktif_bulan']) }}"
-                    class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:outline-none"
+                    class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 focus:border-champagne focus:outline-none"
                 >
                 <p class="mt-1 text-[11px] text-charcoal/55">Dipakai saat aktivasi manual &amp; verifikasi transaksi lunas.</p>
             </div>
@@ -61,7 +61,7 @@
                     min="0"
                     required
                     value="{{ old('biaya_terima_beres', $pengaturan['biaya_terima_beres']) }}"
-                    class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:outline-none"
+                    class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 focus:border-champagne focus:outline-none"
                 >
                 <p class="mt-1 text-[11px] text-charcoal/55">Ditambahkan ke harga tema jika client memilih Paket Terima Beres.</p>
             </div>
@@ -80,7 +80,7 @@
                     name="nama_bank_pembayaran"
                     required
                     value="{{ old('nama_bank_pembayaran', $pengaturan['nama_bank_pembayaran']) }}"
-                    class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:outline-none"
+                    class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 focus:border-champagne focus:outline-none"
                 >
             </div>
 
@@ -92,7 +92,7 @@
                     name="nomor_rekening_pembayaran"
                     required
                     value="{{ old('nomor_rekening_pembayaran', $pengaturan['nomor_rekening_pembayaran']) }}"
-                    class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm font-mono focus:border-champagne focus:outline-none"
+                    class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 font-mono focus:border-champagne focus:outline-none"
                 >
             </div>
 
@@ -104,7 +104,7 @@
                     name="atas_nama_rekening"
                     required
                     value="{{ old('atas_nama_rekening', $pengaturan['atas_nama_rekening']) }}"
-                    class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:outline-none"
+                    class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 focus:border-champagne focus:outline-none"
                 >
             </div>
         </div>
@@ -115,12 +115,12 @@
                 id="catatan_pembayaran"
                 name="catatan_pembayaran"
                 rows="3"
-                class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:outline-none"
+                class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 focus:border-champagne focus:outline-none"
             >{{ old('catatan_pembayaran', $pengaturan['catatan_pembayaran']) }}</textarea>
         </div>
 
         <div class="pt-2 flex justify-end">
-            <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-sage px-6 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer transition">
+            <button type="submit" class="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3.5 sm:py-1.5 sm:text-xs bg-sage font-semibold text-white hover:bg-sage/90 cursor-pointer transition">
                 <span>Simpan Pengaturan</span>
             </button>
         </div>

@@ -1146,4 +1146,93 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSee('Bukti Pembayaran Sudah Dikirim')
             ->assertSee('Lihat Bukti Terkirim');
     }
+
+    public function test_admin_dapat_membuatkan_undangan_untuk_client_yang_sudah_ada(): void
+    {
+        $admin = Pengguna::factory()->admin()->create();
+        $client = Pengguna::factory()->create(['peran' => 'client', 'nama' => 'Dodi Client']);
+        $tema = $this->buatTemaContoh();
+
+        $this->actingAs($admin)
+            ->get('/admin/undangan')
+            ->assertOk()
+            ->assertSee('data-buka-modal-buat-undangan', false)
+            ->assertSee($client->nama)
+            ->assertSee($client->email);
+
+        // Client tidak boleh membuat undangan lewat endpoint admin
+        $this->actingAs($client)
+            ->post('/admin/undangan', [
+                'pengguna_id' => $client->id,
+                'tema_id' => $tema->id,
+                'slug' => 'dilarang-client',
+                'nama_panggilan_pria' => 'Dodi',
+                'nama_lengkap_pria' => 'Dodi Putra',
+                'nama_panggilan_wanita' => 'Windy',
+                'nama_lengkap_wanita' => 'Windy Sari',
+            ])
+            ->assertForbidden();
+
+        // Tidak boleh memilih akun admin sebagai pemilik undangan client
+        $this->actingAs($admin)
+            ->from('/admin/undangan')
+            ->post('/admin/undangan', [
+                'pengguna_id' => $admin->id,
+                'tema_id' => $tema->id,
+                'slug' => 'pemilik-admin',
+                'nama_panggilan_pria' => 'Dodi',
+                'nama_lengkap_pria' => 'Dodi Putra',
+                'nama_panggilan_wanita' => 'Windy',
+                'nama_lengkap_wanita' => 'Windy Sari',
+            ])
+            ->assertSessionHasErrors('pengguna_id');
+
+        // Slug tercadang ditolak
+        $this->actingAs($admin)
+            ->from('/admin/undangan')
+            ->post('/admin/undangan', [
+                'pengguna_id' => $client->id,
+                'tema_id' => $tema->id,
+                'slug' => 'admin',
+                'nama_panggilan_pria' => 'Dodi',
+                'nama_lengkap_pria' => 'Dodi Putra',
+                'nama_panggilan_wanita' => 'Windy',
+                'nama_lengkap_wanita' => 'Windy Sari',
+            ])
+            ->assertSessionHasErrors('slug');
+
+        // Admin berhasil membuatkan undangan draft atas nama client dan diarahkan ke editor isian
+        $respon = $this->actingAs($admin)
+            ->post('/admin/undangan', [
+                'pengguna_id' => $client->id,
+                'tema_id' => $tema->id,
+                'slug' => 'Dodi & Windy',
+                'nama_panggilan_pria' => 'Dodi',
+                'nama_lengkap_pria' => 'Dodi Putra',
+                'nama_panggilan_wanita' => 'Windy',
+                'nama_lengkap_wanita' => 'Windy Sari',
+            ]);
+
+        $undangan = Undangan::where('slug', 'dodi-windy')->firstOrFail();
+        $this->assertSame($client->id, $undangan->pengguna_id);
+        $this->assertSame($tema->id, $undangan->tema_id);
+        $this->assertFalse((bool) $undangan->status_publikasi);
+
+        $respon->assertRedirect(route('dashboard.undangan.kelola', $undangan))
+            ->assertSessionHas('sukses');
+
+        // Slug duplikat ditolak
+        $this->actingAs($admin)
+            ->from('/admin/undangan')
+            ->post('/admin/undangan', [
+                'pengguna_id' => $client->id,
+                'tema_id' => $tema->id,
+                'slug' => 'dodi-windy',
+                'nama_panggilan_pria' => 'Dodi',
+                'nama_lengkap_pria' => 'Dodi Putra',
+                'nama_panggilan_wanita' => 'Windy',
+                'nama_lengkap_wanita' => 'Windy Sari',
+            ])
+            ->assertSessionHasErrors('slug');
+    }
 }

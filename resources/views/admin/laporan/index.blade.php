@@ -11,9 +11,9 @@
 
     <a
         href="{{ route('admin.laporan.ekspor') }}"
-        class="inline-flex items-center justify-center gap-2 rounded-xl bg-charcoal px-4 py-2.5 text-sm font-semibold text-champagne hover:bg-charcoal/90 transition shrink-0"
+        class="inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs bg-charcoal font-semibold text-champagne hover:bg-charcoal/90 transition shrink-0"
     >
-        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
             <polyline points="7 10 12 15 17 10"/>
             <line x1="12" x2="12" y1="15" y2="3"/>
@@ -134,7 +134,7 @@
             @foreach ($undanganAkanKedaluwarsa as $item)
                 <tr>
                     <td class="py-3 dt-center text-center whitespace-nowrap">
-                        <a href="{{ route('admin.undangan.index', ['q' => $item->slug]) }}" class="inline-flex items-center gap-1 rounded-lg border border-champagne/50 bg-champagne/10 px-2.5 py-1.5 text-xs font-semibold text-charcoal hover:bg-champagne/25">
+                        <a href="{{ route('admin.undangan.index', ['q' => $item->slug]) }}" class="inline-flex items-center gap-1 rounded-lg border border-champagne/50 bg-champagne/10 px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs font-semibold text-charcoal hover:bg-champagne/25">
                             <span>Kelola</span>
                         </a>
                     </td>

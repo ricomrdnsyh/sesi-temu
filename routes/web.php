@@ -98,6 +98,7 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
 Route::middleware(['auth', PastikanAdmin::class])->prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/', [AdminController::class, 'ringkasan'])->name('ringkasan');
     Route::get('/undangan', [AdminController::class, 'daftarUndangan'])->name('undangan.index');
+    Route::post('/undangan', [AdminController::class, 'simpanUndangan'])->name('undangan.store');
     Route::patch('/undangan/{undangan}/aktifkan', [AdminController::class, 'aktifkanUndangan'])->name('undangan.aktifkan');
     Route::patch('/undangan/{undangan}/nonaktifkan', [AdminController::class, 'nonaktifkanUndangan'])->name('undangan.nonaktifkan');
     Route::post('/bersihkan-kedaluwarsa', [AdminController::class, 'bersihkanKedaluwarsa'])->name('undangan.bersihkan');

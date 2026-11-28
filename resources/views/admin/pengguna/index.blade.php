@@ -85,50 +85,6 @@
 >
     <script type="application/json" id="pengguna-modal-init">{!! json_encode($modalInit, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}</script>
 
-    <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-        <div>
-            <h1 class="font-serif text-2xl sm:text-3xl font-bold text-charcoal">Manajemen Pengguna</h1>
-            <p class="text-sm text-charcoal/70 mt-1">Kelola akun Admin &amp; Client, tambah atau edit data beserta reset kata sandi langsung via modal, dan lihat detail tiap pengguna.</p>
-        </div>
-
-        <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 w-full xl:w-auto">
-            <form action="{{ route('admin.pengguna.index') }}" method="GET" class="flex flex-col sm:flex-row flex-wrap gap-2">
-                <input
-                    type="text"
-                    name="q"
-                    value="{{ $pencarian }}"
-                    placeholder="Cari nama, email, atau WA..."
-                    class="w-full sm:w-56 rounded-xl border border-charcoal/15 bg-white px-4 py-2 text-sm focus:border-champagne focus:outline-none"
-                >
-                <div class="w-full sm:w-44">
-                    <select name="peran" class="w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm">
-                        <option value="semua" @selected($peran === 'semua')>Semua Peran</option>
-                        <option value="admin" @selected($peran === 'admin')>Admin</option>
-                        <option value="client" @selected($peran === 'client')>Client</option>
-                    </select>
-                </div>
-                <button type="submit" class="rounded-xl border border-charcoal/15 bg-white px-4 py-2 text-sm font-semibold text-charcoal hover:bg-ivory cursor-pointer shrink-0">
-                    Filter
-                </button>
-            </form>
-
-            <button
-                type="button"
-                @click="bukaModalTambah()"
-                data-buka-modal-tambah
-                class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-sage px-4 py-2 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer transition shrink-0"
-            >
-                <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <line x1="19" x2="19" y1="8" y2="14"/>
-                    <line x1="22" x2="16" y1="11" y2="11"/>
-                </svg>
-                <span>+ Tambah Pengguna</span>
-            </button>
-        </div>
-    </div>
-
     {{-- 3 KPI Ringkas Pengguna --}}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-champagne/20">
@@ -145,7 +101,53 @@
         </div>
     </div>
 
-    <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-champagne/20">
+    <div class="rounded-2xl bg-white p-5 sm:p-6 shadow-sm ring-1 ring-champagne/20">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-5 border-b border-champagne/20">
+            <div>
+                <h1 class="text-base sm:text-lg font-bold text-charcoal">Manajemen Pengguna</h1>
+                <p class="text-xs text-charcoal/60 mt-0.5">Kelola akun Admin &amp; Client, tambah atau edit data beserta reset kata sandi langsung via modal.</p>
+            </div>
+
+            <button
+                type="button"
+                @click="bukaModalTambah()"
+                data-buka-modal-tambah
+                class="inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs bg-sage font-semibold text-white hover:bg-sage/90 cursor-pointer transition shrink-0"
+            >
+                <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <line x1="19" x2="19" y1="8" y2="14"/>
+                    <line x1="22" x2="16" y1="11" y2="11"/>
+                </svg>
+                <span>+ Tambah Pengguna</span>
+            </button>
+        </div>
+
+        {{-- Kotak Filter Data --}}
+        <form action="{{ route('admin.pengguna.index') }}" method="GET" class="rounded-xl border border-dashed border-sage/50 bg-ivory/50 p-4 mb-5">
+            <div class="flex items-center gap-1.5 text-xs font-bold text-sage mb-3">
+                <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 .78 1.625L15 11.85V19a1 1 0 0 1-1.447.894l-4-2A1 1 0 0 1 9 17v-5.15L3.22 4.625A1 1 0 0 1 3 4Z" />
+                </svg>
+                <span>Filter Data</span>
+            </div>
+
+            <div>
+                <label for="filter_peran_pengguna" class="block text-xs font-medium text-charcoal/75 mb-1.5">Peran:</label>
+                <select
+                    id="filter_peran_pengguna"
+                    name="peran"
+                    data-auto-submit
+                    class="w-full rounded-xl px-3.5 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-white"
+                >
+                    <option value="semua" @selected($peran === 'semua')>Semua Peran</option>
+                    <option value="admin" @selected($peran === 'admin')>Admin</option>
+                    <option value="client" @selected($peran === 'client')>Client</option>
+                </select>
+            </div>
+        </form>
+
         <table data-datatable data-page-length="10" data-empty-message="Belum ada pengguna yang cocok dengan filter." class="w-full text-sm">
             <thead>
                 <tr class="border-b border-champagne/20 text-left text-xs uppercase text-charcoal/60">
@@ -179,9 +181,9 @@
                                     href="{{ route('admin.pengguna.show', $pengguna) }}"
                                     title="Lihat Detail Pengguna"
                                     aria-label="Lihat Detail Pengguna"
-                                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-charcoal/15 bg-white text-charcoal/75 hover:border-sage/40 hover:bg-sage/5 hover:text-sage transition"
+                                    class="inline-flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center rounded-lg border border-charcoal/15 bg-white text-charcoal/75 hover:border-sage/40 hover:bg-sage/5 hover:text-sage transition"
                                 >
-                                    <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/>
                                         <circle cx="12" cy="12" r="3"/>
                                     </svg>
@@ -193,9 +195,9 @@
                                     data-pengguna="{{ $payloadEdit }}"
                                     title="Edit Data &amp; Reset Kata Sandi"
                                     aria-label="Edit Data &amp; Reset Kata Sandi"
-                                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-champagne/50 bg-champagne/10 text-amber-700 hover:bg-champagne/25 cursor-pointer transition"
+                                    class="inline-flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center rounded-lg border border-champagne/50 bg-champagne/10 text-amber-700 hover:bg-champagne/25 cursor-pointer transition"
                                 >
-                                    <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                                         <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>
                                     </svg>
@@ -219,9 +221,9 @@
                                             type="submit"
                                             title="Hapus Pengguna"
                                             aria-label="Hapus Pengguna"
-                                            class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 cursor-pointer transition"
+                                            class="inline-flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 cursor-pointer transition"
                                         >
-                                            <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                                 <path d="M3 6h18"/>
                                                 <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
                                                 <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
@@ -253,7 +255,7 @@
                                     href="https://wa.me/{{ $waBersih }}?text={{ urlencode('Halo Kak '.$pengguna->nama.', kami dari tim SesiTemu siap membantu Anda.') }}"
                                     target="_blank"
                                     rel="noopener"
-                                    class="inline-flex items-center gap-1.5 rounded-lg bg-sage/10 px-3 py-1 text-xs font-semibold text-sage hover:bg-sage/20 transition"
+                                    class="inline-flex items-center gap-1 rounded-lg bg-sage/10 px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs font-semibold text-sage hover:bg-sage/20 transition"
                                 >
                                     <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
@@ -282,7 +284,7 @@
         aria-labelledby="judul-modal-pengguna"
         class="fixed inset-0 z-50 flex items-center justify-center bg-charcoal/60 backdrop-blur-xs p-4 overflow-y-auto"
     >
-        <div class="w-full max-w-2xl lg:max-w-3xl rounded-2xl bg-white p-6 sm:p-8 shadow-2xl ring-1 ring-champagne/25 my-8">
+        <div class="w-full max-w-2xl lg:max-w-3xl rounded-2xl bg-white px-5 pt-5 pb-4 sm:px-6 sm:pt-5 sm:pb-4 shadow-2xl ring-1 ring-champagne/25 my-8">
             <div class="flex items-start justify-between gap-4 pb-5 border-b border-champagne/20">
                 <div>
                     <h2 id="judul-modal-pengguna" class="font-serif text-2xl sm:text-3xl font-bold text-charcoal" x-text="modeEdit ? 'Edit Data Pengguna' : 'Tambah Pengguna Baru'"></h2>
@@ -326,7 +328,7 @@
                             required
                             x-model="form.nama"
                             placeholder="Contoh: Admin Tim / Dimas &amp; Rani"
-                            class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none"
+                            class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 focus:border-champagne focus:bg-white focus:outline-none"
                         >
                     </div>
 
@@ -339,7 +341,7 @@
                             required
                             x-model="form.email"
                             placeholder="nama@domain.com"
-                            class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none"
+                            class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 focus:border-champagne focus:bg-white focus:outline-none"
                         >
                     </div>
 
@@ -351,7 +353,7 @@
                             name="nomor_wa"
                             x-model="form.nomor_wa"
                             placeholder="Contoh: 081234567890"
-                            class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm font-mono focus:border-champagne focus:bg-white focus:outline-none"
+                            class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 font-mono focus:border-champagne focus:bg-white focus:outline-none"
                         >
                     </div>
 
@@ -361,7 +363,7 @@
                             id="modal_peran"
                             name="peran"
                             x-model="form.peran"
-                            class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none"
+                            class="w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 focus:border-champagne focus:bg-white focus:outline-none"
                         >
                             <option value="client">Client (Pembuat Undangan)</option>
                             <option value="admin">Administrator (Pengelola Panel)</option>
@@ -382,7 +384,7 @@
                         minlength="8"
                         :required="!modeEdit"
                         :placeholder="modeEdit ? 'Kosongkan jika tidak mengubah kata sandi (min 8)' : 'Minimal 8 karakter'"
-                        class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2.5 text-sm focus:border-champagne focus:outline-none"
+                        class="mt-1.5 w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-white focus:border-champagne focus:outline-none"
                     >
                     <p
                         class="mt-1 text-[11px] text-charcoal/60"
@@ -390,19 +392,29 @@
                     ></p>
                 </div>
 
-                <div class="pt-2 flex items-center justify-end gap-2.5">
+                <div class="pt-3.5 border-t border-champagne/20 flex items-center justify-end gap-2">
                     <button
                         type="button"
                         @click="tutupModal()"
-                        class="rounded-xl border border-charcoal/15 px-4 py-2 text-sm font-semibold text-charcoal hover:bg-ivory cursor-pointer transition"
+                        class="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 font-semibold text-charcoal hover:bg-ivory cursor-pointer transition"
                     >
-                        Batal
+                        <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M18 6 6 18" />
+                            <path d="m6 6 12 12" />
+                        </svg>
+                        <span>Batal</span>
                     </button>
                     <button
                         type="submit"
-                        class="rounded-xl bg-sage px-5 py-2 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer transition"
-                        x-text="modeEdit ? 'Simpan Perubahan' : 'Simpan Pengguna'"
-                    ></button>
+                        class="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3.5 sm:py-1.5 sm:text-xs bg-sage font-semibold text-white hover:bg-sage/90 cursor-pointer transition"
+                    >
+                        <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+                            <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" />
+                            <path d="M7 3v4a1 1 0 0 0 1 1h7" />
+                        </svg>
+                        <span x-text="modeEdit ? 'Simpan Perubahan' : 'Simpan Pengguna'"></span>
+                    </button>
                 </div>
             </form>
         </div>

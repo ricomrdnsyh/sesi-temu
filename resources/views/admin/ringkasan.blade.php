@@ -17,7 +17,7 @@
 @endphp
 
 {{-- Welcome Banner --}}
-<div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#1A2433] via-charcoal to-[#283548] p-6 sm:p-8 text-white shadow-sm border border-champagne/25">
+<div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#23362E] via-[#344C41] to-[#435D51] p-6 sm:p-8 text-white shadow-sm border border-champagne/25">
     <div aria-hidden="true" class="pointer-events-none absolute -right-12 -top-12 w-56 h-56 rounded-full bg-champagne/10 blur-3xl"></div>
 
     <div class="relative flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -50,8 +50,8 @@
                 data-swal-loading-text="Sedang menghapus foto undangan yang kedaluwarsa..."
             >
                 @csrf
-                <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-champagne px-4 py-2.5 text-xs sm:text-sm font-semibold text-charcoal hover:brightness-105 transition shadow-sm cursor-pointer">
-                    <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <button type="submit" class="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs bg-champagne font-semibold text-[#203029] hover:brightness-105 transition shadow-sm cursor-pointer">
+                    <svg class="w-4 h-4 sm:w-3.5 sm:h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                     <span>Bersihkan Storage Kedaluwarsa ({{ $totalKedaluwarsa }})</span>
@@ -211,11 +211,11 @@
         <a href="{{ route('admin.undangan.index') }}" class="text-xs sm:text-sm font-semibold text-sage hover:underline">Lihat Semua →</a>
     </div>
 
-    <div>
-        <table data-datatable data-page-length="5" data-empty-message="Belum ada data undangan." class="w-full text-sm">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
             <thead>
                 <tr class="border-b border-champagne/20 text-left text-xs uppercase text-charcoal/60">
-                    <th data-no-sort class="py-3 dt-center text-center">Aksi</th>
+                    <th class="py-3 pr-4 text-center">Aksi</th>
                     <th class="py-3 pr-4">Pasangan &amp; Link</th>
                     <th class="py-3 pr-4">Client</th>
                     <th class="py-3 pr-4">Tema</th>
@@ -223,19 +223,19 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-champagne/15">
-                @foreach ($undanganTerbaru as $item)
+                @forelse ($undanganTerbaru as $item)
                     @php
                         $urlPublik = Route::has('undangan.tampil') ? route('undangan.tampil', $item->slug) : url('/'.$item->slug);
                     @endphp
-                    <tr>
-                        <td class="py-3 dt-center text-center whitespace-nowrap">
+                    <tr class="hover:bg-champagne/5 transition">
+                        <td class="py-3 pr-4 text-center whitespace-nowrap">
                             <div class="inline-flex items-center justify-center gap-1.5">
                                 <a
                                     href="{{ $urlPublik }}"
                                     target="_blank"
                                     rel="noopener"
                                     title="Preview Undangan"
-                                    class="inline-flex items-center gap-1.5 rounded-lg border border-charcoal/15 bg-white px-2.5 py-1.5 text-xs font-semibold text-charcoal hover:border-sage/40 hover:bg-sage/5 hover:text-sage transition"
+                                    class="inline-flex items-center gap-1 rounded-lg border border-charcoal/15 bg-white px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs font-semibold text-charcoal hover:border-sage/40 hover:bg-sage/5 hover:text-sage transition"
                                 >
                                     <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/>
@@ -246,7 +246,7 @@
                                 <a
                                     href="{{ route('dashboard.undangan.kelola', $item) }}"
                                     title="Edit Isian Client"
-                                    class="inline-flex items-center gap-1.5 rounded-lg border border-champagne/50 bg-champagne/10 px-2.5 py-1.5 text-xs font-semibold text-charcoal hover:bg-champagne/25 transition"
+                                    class="inline-flex items-center gap-1 rounded-lg border border-champagne/50 bg-champagne/10 px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs font-semibold text-charcoal hover:bg-champagne/25 transition"
                                 >
                                     <svg class="h-3.5 w-3.5 text-amber-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -272,7 +272,13 @@
                             @endif
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="5" class="py-8 text-center text-sm text-charcoal/55">
+                            Belum ada data undangan.
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

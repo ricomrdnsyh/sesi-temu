@@ -4,41 +4,6 @@
 
 @section('isi_admin')
 <div x-data="{ modalOrderTerbuka: false }" class="space-y-6">
-    <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-        <div>
-            <h1 class="font-serif text-2xl sm:text-3xl font-bold text-charcoal">Transaksi &amp; Pembayaran</h1>
-            <p class="text-sm text-charcoal/70 mt-1">Verifikasi bukti transfer client, catat order manual, dan aktifkan undangan otomatis saat lunas.</p>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-2">
-            <form action="{{ route('admin.transaksi.index') }}" method="GET" class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 w-full sm:w-auto">
-                <div class="w-full sm:w-48">
-                    <select name="status" class="w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm">
-                        <option value="semua" @selected($status === 'semua')>Semua Status</option>
-                        @foreach (\App\Models\Transaksi::STATUS_TERSEDIA as $kode => $label)
-                            <option value="{{ $kode }}" @selected($status === $kode)>{{ $label }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <button type="submit" class="rounded-xl border border-charcoal/15 bg-white px-4 py-2 text-sm font-semibold text-charcoal hover:bg-ivory cursor-pointer shrink-0">
-                    Filter
-                </button>
-            </form>
-
-            <button
-                type="button"
-                @click="modalOrderTerbuka = !modalOrderTerbuka"
-                class="inline-flex items-center gap-1.5 rounded-xl bg-sage px-4 py-2 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer transition"
-            >
-                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" x2="12" y1="5" y2="19"/>
-                    <line x1="5" x2="19" y1="12" y2="12"/>
-                </svg>
-                <span>Catat Order Manual</span>
-            </button>
-        </div>
-    </div>
-
     {{-- 4 KPI Transaksi --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-champagne/20">
@@ -77,7 +42,7 @@
             @csrf
             <div>
                 <label class="block text-xs font-semibold text-charcoal/75 mb-1">Undangan Client</label>
-                <select name="undangan_id" required class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2 text-sm">
+                <select name="undangan_id" required class="w-full rounded-xl px-3.5 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60">
                     @foreach ($daftarUndangan as $itemUndangan)
                         <option value="{{ $itemUndangan->id }}">
                             {{ $itemUndangan->nama_panggilan_pria }} &amp; {{ $itemUndangan->nama_panggilan_wanita }} (sesitemu.id/{{ $itemUndangan->slug }}) — {{ $itemUndangan->pengguna?->nama }}
@@ -88,7 +53,7 @@
 
             <div>
                 <label class="block text-xs font-semibold text-charcoal/75 mb-1">Tema Dipilih</label>
-                <select name="tema_id" required class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2 text-sm">
+                <select name="tema_id" required class="w-full rounded-xl px-3.5 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60">
                     @foreach ($daftarTema as $temaItem)
                         <option value="{{ $temaItem->id }}">
                             {{ $temaItem->nama_tema }} ({{ $temaItem->kategoriLabel() }} — {{ $temaItem->hargaFormatted() }})
@@ -99,7 +64,7 @@
 
             <div>
                 <label class="block text-xs font-semibold text-charcoal/75 mb-1">Paket Layanan</label>
-                <select name="paket" required class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2 text-sm">
+                <select name="paket" required class="w-full rounded-xl px-3.5 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60">
                     <option value="mandiri">Paket Mandiri (Harga Tema)</option>
                     <option value="terima_beres">Paket Terima Beres (+{{ \App\Models\Tema::formatRupiah(\App\Support\PengaturanSesiTemu::biayaTerimaBeres()) }})</option>
                 </select>
@@ -107,7 +72,7 @@
 
             <div>
                 <label class="block text-xs font-semibold text-charcoal/75 mb-1">Kode Promo (Opsional)</label>
-                <select name="kode_promo" class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2 text-sm">
+                <select name="kode_promo" class="w-full rounded-xl px-3.5 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60">
                     <option value="">-- Tanpa Promo --</option>
                     @foreach ($daftarPromo as $promoItem)
                         <option value="{{ $promoItem->kode }}">{{ $promoItem->kode }} — {{ $promoItem->labelDiskon() }}</option>
@@ -117,7 +82,7 @@
 
             <div>
                 <label class="block text-xs font-semibold text-charcoal/75 mb-1">Catatan Admin (Opsional)</label>
-                <input type="text" name="catatan_admin" placeholder="Contoh: Transfer BCA terkonfirmasi via WA" class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2 text-sm">
+                <input type="text" name="catatan_admin" placeholder="Contoh: Transfer BCA terkonfirmasi via WA" class="w-full rounded-xl px-3.5 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60">
             </div>
 
             <div class="flex items-end justify-between gap-3">
@@ -126,7 +91,7 @@
                     <span>Langsung Lunas &amp; Aktifkan</span>
                 </label>
 
-                <button type="submit" class="rounded-xl bg-charcoal px-5 py-2 text-sm font-semibold text-champagne hover:bg-charcoal/90 cursor-pointer shrink-0">
+                <button type="submit" class="rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3.5 sm:py-1.5 sm:text-xs bg-charcoal font-semibold text-champagne hover:bg-charcoal/90 cursor-pointer shrink-0">
                     Simpan Order
                 </button>
             </div>
@@ -134,7 +99,51 @@
     </div>
 
     {{-- DataTables Daftar Transaksi --}}
-    <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-champagne/20">
+    <div class="rounded-2xl bg-white p-5 sm:p-6 shadow-sm ring-1 ring-champagne/20">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-5 border-b border-champagne/20">
+            <div>
+                <h1 class="text-base sm:text-lg font-bold text-charcoal">Daftar Transaksi &amp; Pembayaran</h1>
+                <p class="text-xs text-charcoal/60 mt-0.5">Verifikasi bukti transfer client, catat order manual, dan aktifkan undangan otomatis saat lunas.</p>
+            </div>
+
+            <button
+                type="button"
+                @click="modalOrderTerbuka = !modalOrderTerbuka"
+                class="inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs bg-sage font-semibold text-white hover:bg-sage/90 cursor-pointer transition shrink-0"
+            >
+                <svg class="h-4 w-4 sm:h-3.5 sm:w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" x2="12" y1="5" y2="19"/>
+                    <line x1="5" x2="19" y1="12" y2="12"/>
+                </svg>
+                <span>Catat Order Manual</span>
+            </button>
+        </div>
+
+        {{-- Kotak Filter Data --}}
+        <form action="{{ route('admin.transaksi.index') }}" method="GET" class="rounded-xl border border-dashed border-sage/50 bg-ivory/50 p-4 mb-5">
+            <div class="flex items-center gap-1.5 text-xs font-bold text-sage mb-3">
+                <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 .78 1.625L15 11.85V19a1 1 0 0 1-1.447.894l-4-2A1 1 0 0 1 9 17v-5.15L3.22 4.625A1 1 0 0 1 3 4Z" />
+                </svg>
+                <span>Filter Data</span>
+            </div>
+
+            <div>
+                <label for="filter_status_transaksi" class="block text-xs font-medium text-charcoal/75 mb-1.5">Status Pembayaran:</label>
+                <select
+                    id="filter_status_transaksi"
+                    name="status"
+                    data-auto-submit
+                    class="w-full rounded-xl px-3.5 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-white"
+                >
+                    <option value="semua" @selected($status === 'semua')>Semua Status</option>
+                    @foreach (\App\Models\Transaksi::STATUS_TERSEDIA as $kode => $label)
+                        <option value="{{ $kode }}" @selected($status === $kode)>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </form>
+
         <table data-datatable data-page-length="10" data-empty-message="Belum ada data transaksi tercatat." class="w-full text-sm">
             <thead>
                 <tr class="border-b border-champagne/20 text-left text-xs uppercase text-charcoal/60">
@@ -157,7 +166,7 @@
                                         target="_blank"
                                         rel="noopener"
                                         title="Lihat Bukti Pembayaran"
-                                        class="inline-flex items-center gap-1 rounded-lg border border-charcoal/15 bg-white px-2.5 py-1.5 text-xs font-semibold text-charcoal hover:border-sage/40 hover:text-sage transition"
+                                        class="inline-flex items-center gap-1 rounded-lg border border-charcoal/15 bg-white px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs font-semibold text-charcoal hover:border-sage/40 hover:text-sage transition"
                                     >
                                         <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                             <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/>
@@ -181,7 +190,7 @@
                                     >
                                         @csrf
                                         @method('PATCH')
-                                        <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg bg-sage px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-sage/90 cursor-pointer transition">
+                                        <button type="submit" class="inline-flex items-center gap-1 rounded-lg bg-sage px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs font-semibold text-white hover:bg-sage/90 cursor-pointer transition">
                                             <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                                 <path d="M21.801 10A10 10 0 1 1 17 3.335"/>
                                                 <path d="m9 11 3 3L22 4"/>
@@ -205,7 +214,7 @@
                                     >
                                         @csrf
                                         @method('PATCH')
-                                        <button type="submit" class="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 cursor-pointer transition">
+                                        <button type="submit" class="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs font-semibold text-red-700 hover:bg-red-100 cursor-pointer transition">
                                             <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                                 <circle cx="12" cy="12" r="10"/>
                                                 <path d="m15 9-6 6"/>

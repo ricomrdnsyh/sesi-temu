@@ -154,6 +154,13 @@ const inisialisasiHalaman = () => {
             order: [],
             autoWidth: false,
             columnDefs,
+            layout: {
+                bottomEnd: {
+                    paging: {
+                        firstLast: false,
+                    },
+                },
+            },
             language: {
                 search: 'Cari:',
                 searchPlaceholder: 'Ketik kata kunci...',
@@ -164,10 +171,8 @@ const inisialisasiHalaman = () => {
                 zeroRecords: 'Tidak ada data yang cocok dengan pencarian.',
                 emptyTable: emptyMessage,
                 paginate: {
-                    first: 'Awal',
                     previous: 'Sebelumnya',
                     next: 'Berikutnya',
-                    last: 'Akhir',
                 },
             },
         });
@@ -199,6 +204,20 @@ const tampilkanSwalProses = (form) => {
 window.addEventListener('pageshow', (event) => {
     if (event.persisted && Swal.isVisible() && Swal.isLoading()) {
         Swal.close();
+    }
+});
+
+document.addEventListener('change', (event) => {
+    const select = event.target?.closest?.('select[data-auto-submit]');
+    if (!select?.form || select.form.dataset.autoSubmitting === '1') {
+        return;
+    }
+
+    select.form.dataset.autoSubmitting = '1';
+    if (typeof select.form.requestSubmit === 'function') {
+        select.form.requestSubmit();
+    } else {
+        select.form.submit();
     }
 });
 

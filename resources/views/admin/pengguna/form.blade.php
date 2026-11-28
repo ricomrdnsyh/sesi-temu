@@ -40,7 +40,7 @@
                     required
                     value="{{ old('nama', $pengguna->nama) }}"
                     placeholder="Contoh: Admin Tim / Dimas &amp; Rani"
-                    class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none"
+                    class="mt-1.5 w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 focus:border-champagne focus:bg-white focus:outline-none"
                 >
             </div>
 
@@ -53,7 +53,7 @@
                     required
                     value="{{ old('email', $pengguna->email) }}"
                     placeholder="nama@domain.com"
-                    class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none"
+                    class="mt-1.5 w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 focus:border-champagne focus:bg-white focus:outline-none"
                 >
             </div>
 
@@ -65,7 +65,7 @@
                     name="nomor_wa"
                     value="{{ old('nomor_wa', $pengguna->nomor_wa) }}"
                     placeholder="Contoh: 081234567890"
-                    class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm font-mono focus:border-champagne focus:bg-white focus:outline-none"
+                    class="mt-1.5 w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 font-mono focus:border-champagne focus:bg-white focus:outline-none"
                 >
                 <p class="mt-1 text-xs text-charcoal/55">Opsional untuk Admin; awalan 0 otomatis dinormalisasi ke 62.</p>
             </div>
@@ -75,7 +75,7 @@
                 <select
                     id="peran"
                     name="peran"
-                    class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-4 py-2.5 text-sm focus:border-champagne focus:bg-white focus:outline-none"
+                    class="mt-1.5 w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-ivory/60 focus:border-champagne focus:bg-white focus:outline-none"
                 >
                     <option value="client" @selected(old('peran', $pengguna->peran) === 'client')>Client (Pembuat Undangan)</option>
                     <option value="admin" @selected(old('peran', $pengguna->peran) === 'admin')>Administrator (Pengelola Panel)</option>
@@ -94,18 +94,18 @@
                 minlength="8"
                 @if (! $modeEdit) required @endif
                 placeholder="{{ $modeEdit ? 'Kosongkan jika tidak ingin mengubah kata sandi (min 8 karakter)' : 'Minimal 8 karakter' }}"
-                class="mt-1.5 w-full rounded-xl border border-charcoal/15 bg-white px-4 py-2.5 text-sm focus:border-champagne focus:outline-none"
+                class="mt-1.5 w-full rounded-xl px-3.5 py-2.5 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-white focus:border-champagne focus:outline-none"
             >
             <p class="mt-1 text-xs text-charcoal/60">
                 {{ $modeEdit ? 'Isi kolom ini hanya jika Anda ingin mengganti atau mereset kata sandi akun ini.' : 'Minimal 8 karakter untuk login akun baru.' }}
             </p>
         </div>
 
-        <div class="pt-2 flex items-center justify-end gap-3">
-            <a href="{{ route('admin.pengguna.index') }}" class="rounded-xl border border-charcoal/15 px-5 py-2.5 text-sm font-semibold text-charcoal hover:bg-ivory transition">
+        <div class="pt-2 flex items-center justify-end gap-2">
+            <a href="{{ route('admin.pengguna.index') }}" class="rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 font-semibold text-charcoal hover:bg-ivory transition">
                 Batal
             </a>
-            <button type="submit" class="rounded-xl bg-sage px-6 py-2.5 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer transition">
+            <button type="submit" class="rounded-xl px-4 py-2 text-sm sm:rounded-lg sm:px-3.5 sm:py-1.5 sm:text-xs bg-sage font-semibold text-white hover:bg-sage/90 cursor-pointer transition">
                 {{ $modeEdit ? 'Simpan Perubahan' : 'Simpan Pengguna' }}
             </button>
         </div>

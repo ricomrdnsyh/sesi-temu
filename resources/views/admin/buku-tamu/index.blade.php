@@ -3,39 +3,6 @@
 @section('judul', 'Buku Tamu & RSVP — Admin SesiTemu')
 
 @section('isi_admin')
-<div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-    <div>
-        <h1 class="font-serif text-2xl sm:text-3xl font-bold text-charcoal">Moderasi Buku Tamu &amp; RSVP</h1>
-        <p class="text-sm text-charcoal/70 mt-1">Pantau ucapan tamu dari seluruh undangan dan bersihkan komentar spam atau tidak pantas.</p>
-    </div>
-
-    <form action="{{ route('admin.buku-tamu.index') }}" method="GET" class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 w-full xl:w-auto">
-        <div class="w-full sm:w-64">
-            <select name="undangan_id" class="w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm">
-                <option value="0">Semua Undangan</option>
-                @foreach ($daftarUndangan as $undanganItem)
-                    <option value="{{ $undanganItem->id }}" @selected($undanganId === $undanganItem->id)>
-                        {{ $undanganItem->nama_panggilan_pria }} &amp; {{ $undanganItem->nama_panggilan_wanita }} ({{ $undanganItem->slug }})
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="w-full sm:w-44">
-            <select name="status" class="w-full rounded-xl border border-charcoal/15 bg-white px-3.5 py-2 text-sm">
-                <option value="semua" @selected($statusKehadiran === 'semua')>Semua Kehadiran</option>
-                <option value="hadir" @selected($statusKehadiran === 'hadir')>Hadir</option>
-                <option value="ragu" @selected($statusKehadiran === 'ragu')>Ragu-Ragu</option>
-                <option value="tidak_hadir" @selected($statusKehadiran === 'tidak_hadir')>Tidak Hadir</option>
-            </select>
-        </div>
-
-        <button type="submit" class="rounded-xl bg-sage px-4 py-2 text-sm font-semibold text-white hover:bg-sage/90 cursor-pointer shrink-0">
-            Filter
-        </button>
-    </form>
-</div>
-
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
     <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-champagne/20">
         <p class="text-xs font-medium text-charcoal/60">Total Ucapan</p>
@@ -55,7 +22,56 @@
     </div>
 </div>
 
-<div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-champagne/20">
+<div class="rounded-2xl bg-white p-5 sm:p-6 shadow-sm ring-1 ring-champagne/20">
+    <div class="pb-4 mb-5 border-b border-champagne/20">
+        <h1 class="text-base sm:text-lg font-bold text-charcoal">Moderasi Buku Tamu &amp; RSVP</h1>
+        <p class="text-xs text-charcoal/60 mt-0.5">Pantau ucapan tamu dari seluruh undangan dan bersihkan komentar spam atau tidak pantas.</p>
+    </div>
+
+    {{-- Kotak Filter Data --}}
+    <form action="{{ route('admin.buku-tamu.index') }}" method="GET" class="rounded-xl border border-dashed border-sage/50 bg-ivory/50 p-4 mb-5">
+        <div class="flex items-center gap-1.5 text-xs font-bold text-sage mb-3">
+            <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M3 4a1 1 0 0 1 1-1h16a1 1 0 0 1 .78 1.625L15 11.85V19a1 1 0 0 1-1.447.894l-4-2A1 1 0 0 1 9 17v-5.15L3.22 4.625A1 1 0 0 1 3 4Z" />
+            </svg>
+            <span>Filter Data</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+                <label for="filter_undangan_buku_tamu" class="block text-xs font-medium text-charcoal/75 mb-1.5">Undangan:</label>
+                <select
+                    id="filter_undangan_buku_tamu"
+                    name="undangan_id"
+                    data-auto-submit
+                    class="w-full rounded-xl px-3.5 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-white"
+                >
+                    <option value="0">Semua Undangan</option>
+                    @foreach ($daftarUndangan as $undanganItem)
+                        <option value="{{ $undanganItem->id }}" @selected($undanganId === $undanganItem->id)>
+                            {{ $undanganItem->nama_panggilan_pria }} &amp; {{ $undanganItem->nama_panggilan_wanita }} ({{ $undanganItem->slug }})
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
+                <label for="filter_status_kehadiran" class="block text-xs font-medium text-charcoal/75 mb-1.5">Status Kehadiran:</label>
+                <select
+                    id="filter_status_kehadiran"
+                    name="status"
+                    data-auto-submit
+                    class="w-full rounded-xl px-3.5 py-2 text-sm sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-xs border border-charcoal/15 bg-white"
+                >
+                    <option value="semua" @selected($statusKehadiran === 'semua')>Semua Kehadiran</option>
+                    <option value="hadir" @selected($statusKehadiran === 'hadir')>Hadir</option>
+                    <option value="ragu" @selected($statusKehadiran === 'ragu')>Ragu-Ragu</option>
+                    <option value="tidak_hadir" @selected($statusKehadiran === 'tidak_hadir')>Tidak Hadir</option>
+                </select>
+            </div>
+        </div>
+    </form>
+
     <table data-datatable data-page-length="10" data-empty-message="Belum ada ucapan tamu atau RSVP yang cocok dengan filter." class="w-full text-sm">
         <thead>
             <tr class="border-b border-champagne/20 text-left text-xs uppercase text-charcoal/60">
@@ -81,7 +97,7 @@
                                     target="_blank"
                                     rel="noopener"
                                     title="Preview Undangan"
-                                    class="inline-flex items-center gap-1.5 rounded-lg border border-charcoal/15 bg-white px-2.5 py-1.5 text-xs font-semibold text-charcoal hover:border-sage/40 hover:text-sage transition"
+                                    class="inline-flex items-center gap-1 rounded-lg border border-charcoal/15 bg-white px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs font-semibold text-charcoal hover:border-sage/40 hover:text-sage transition"
                                 >
                                     <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/>
@@ -104,7 +120,7 @@
                             >
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 cursor-pointer transition">
+                                <button type="submit" class="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs font-semibold text-red-700 hover:bg-red-100 cursor-pointer transition">
                                     <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M3 6h18"/>
                                         <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
