@@ -27,6 +27,15 @@
     display: none !important;
 }
 
+input[type="search"]:not(.dt-input)::-webkit-search-cancel-button,
+input[type="search"]:not(.dt-input)::-webkit-search-decoration,
+input[type="search"]:not(.dt-input)::-webkit-search-results-button,
+input[type="search"]:not(.dt-input)::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+    display: none;
+}
+
 .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -851,6 +860,34 @@ select.select2-hidden-accessible {
 }
 
 .select2-container--sesitemu .s2-bank-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.select2-container--sesitemu .s2-kategori-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    max-width: 100%;
+    vertical-align: middle;
+}
+
+.select2-container--sesitemu .s2-kategori-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    flex-shrink: 0;
+}
+
+.select2-container--sesitemu
+    .select2-results__option--selected
+    .s2-kategori-dot {
+    box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.85);
+}
+
+.select2-container--sesitemu .s2-kategori-label {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

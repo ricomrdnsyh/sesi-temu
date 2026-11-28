@@ -105,7 +105,7 @@
         <div class="flex-1 min-w-0 flex flex-col">
             @include('dashboard._top-nav', ['halamanAktif' => 'katalog'])
 
-            <main class="flex-1 w-full px-4 sm:px-6 lg:px-8 xl:px-10 pt-4 sm:pt-6 pb-28 md:py-8 space-y-5 md:space-y-6">
+            <main class="flex-1 w-full px-4 sm:px-6 lg:px-8 xl:px-10 pt-4 sm:pt-6 pb-28 md:py-8 md:pt-4 space-y-5 md:space-y-6">
             {{-- Header & Filter Katalog Terpadu (Light Surface Command Bar + Filter Kategori Gaya) --}}
             <section class="rounded-[1.5rem] bg-white p-4 sm:p-5 shadow-xs ring-1 ring-champagne/25 space-y-4">
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5">

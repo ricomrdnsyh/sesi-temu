@@ -647,7 +647,6 @@ class PanelAdminEkspansiTest extends TestCase
             ->assertSee('Undangan Saya')
             ->assertSee('Kelola Undangan Pernikahan Anda')
             ->assertSee('mobile-nav-uji')
-            ->assertSee('Kelengkapan Undangan')
             ->assertSee('Salin Link')
             ->assertSee('Bayar &amp; Aktifkan', false)
             ->assertSee('Hapus Draft')

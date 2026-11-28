@@ -83,7 +83,6 @@ class LogoBrandingTest extends TestCase
             ->assertSee('data-client-sidebar', false)
             ->assertSee('font-sans text-[1.35rem] sm:text-[1.85rem] font-bold text-white leading-snug tracking-tight', false)
             ->assertSee('Kelola Undangan Pernikahan Anda')
-            ->assertSee('Kelengkapan Undangan')
             ->assertSee('Salin Link')
             ->assertSee('font-sans tabular-nums text-lg sm:text-2xl font-bold text-charcoal', false);
 

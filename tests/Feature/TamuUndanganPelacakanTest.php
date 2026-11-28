@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\KategoriTamu;
 use App\Models\Pengguna;
 use App\Models\TamuUndangan;
 use App\Models\Tema;
@@ -293,11 +294,11 @@ class TamuUndanganPelacakanTest extends TestCase
         $this->assertStringContainsString('Nama Tamu', (string) $resContohCsv->getContent());
         $this->assertStringContainsString('Nomor WhatsApp', (string) $resContohCsv->getContent());
 
-        // Import CSV campuran: baris valid masuk, baris dengan isian kosong / WA tidak valid dilewati dengan laporan jumlah berhasil & gagal
+        // Import CSV campuran: Nama Tamu wajib, Nomor WA opsional; baris tanpa nama / WA tidak valid dilewati dengan laporan jumlah berhasil & gagal
         $kontenCsvImport = "\xEF\xBB\xBFNama Tamu;Nomor WhatsApp\r\n"
             ."Rani Putri;081299887766\r\n"
             ."\"Hendra, S.T.\";081355556666\r\n"
-            ."Kosong Nomor;\r\n"
+            ."Tamu Tanpa WA;\r\n"
             .";081277778888\r\n"
             ."Format Salah;12345\r\n"
             .";\r\n";
@@ -310,7 +311,7 @@ class TamuUndanganPelacakanTest extends TestCase
             ])
             ->assertRedirect($urlHalamanTamu)
             ->assertSessionHasNoErrors()
-            ->assertSessionHas('peringatan', '2 data baru berhasil diimpor, 4 data gagal dilewati.')
+            ->assertSessionHas('peringatan', '3 data baru berhasil diimpor, 3 data gagal dilewati.')
             ->assertSessionHas('peringatan_detail');
 
         $tamuRani = TamuUndangan::where('undangan_id', $undangan->id)
@@ -319,13 +320,13 @@ class TamuUndanganPelacakanTest extends TestCase
         $tamuHendraCsv = TamuUndangan::where('undangan_id', $undangan->id)
             ->where('nama_tamu', 'Hendra, S.T.')
             ->firstOrFail();
+        $tamuTanpaWaCsv = TamuUndangan::where('undangan_id', $undangan->id)
+            ->where('nama_tamu', 'Tamu Tanpa WA')
+            ->firstOrFail();
 
         $this->assertSame('6281299887766', $tamuRani->nomor_wa);
         $this->assertSame('6281355556666', $tamuHendraCsv->nomor_wa);
-        $this->assertDatabaseMissing('tamu_undangan', [
-            'undangan_id' => $undangan->id,
-            'nama_tamu' => 'Kosong Nomor',
-        ]);
+        $this->assertNull($tamuTanpaWaCsv->nomor_wa);
         $this->assertDatabaseMissing('tamu_undangan', [
             'undangan_id' => $undangan->id,
             'nama_tamu' => 'Format Salah',
@@ -338,7 +339,7 @@ class TamuUndanganPelacakanTest extends TestCase
             "Nama Tamu;Nomor WhatsApp\r\n"
             ."Rani Putri Wijaya;081299887766\r\n"
             ."\"Hendra, S.T.\";081377778888\r\n"
-            ."Dewi Lestari;081200001111\r\n"
+            ."Dewi Lestari;\r\n"
         );
 
         $this->actingAs($pemilik)
@@ -358,13 +359,13 @@ class TamuUndanganPelacakanTest extends TestCase
         $this->assertDatabaseHas('tamu_undangan', [
             'undangan_id' => $undangan->id,
             'nama_tamu' => 'Dewi Lestari',
-            'nomor_wa' => '628120001111',
+            'nomor_wa' => null,
         ]);
 
         // Import CSV yang seluruh barisnya gagal ditolak dengan info 0 berhasil & jumlah gagal
         $fileCsvGagalSemua = \Illuminate\Http\UploadedFile::fake()->createWithContent(
             'gagal-semua.csv',
-            "Nama Tamu,Nomor WhatsApp\r\nTanpa WA,\r\n,081234567890\r\n"
+            "Nama Tamu,Nomor WhatsApp\r\nWA Salah,123\r\n,081234567890\r\n"
         );
 
         $this->actingAs($pemilik)
@@ -377,7 +378,7 @@ class TamuUndanganPelacakanTest extends TestCase
 
         $this->assertDatabaseMissing('tamu_undangan', [
             'undangan_id' => $undangan->id,
-            'nama_tamu' => 'Tanpa WA',
+            'nama_tamu' => 'WA Salah',
         ]);
 
         // Ekspor CSV
@@ -497,5 +498,142 @@ class TamuUndanganPelacakanTest extends TestCase
             ->assertOk();
 
         $this->assertSame(2, $tamu->fresh()->jumlah_dibuka);
+    }
+
+    public function test_client_dapat_mengelola_kategori_tamu_kustom_dan_sinkron_dengan_tamu_serta_csv_ekspor(): void
+    {
+        $pemilik = Pengguna::factory()->create();
+        $clientLain = Pengguna::factory()->create();
+        $undangan = $this->buatUndangan($pemilik, true);
+        $urlHalamanTamu = route('dashboard.undangan.tamu', $undangan);
+
+        // 1. Kunjungan pertama ke halaman Daftar Tamu otomatis mengisi 5 kategori bawaan
+        $this->actingAs($pemilik)
+            ->get($urlHalamanTamu)
+            ->assertOk()
+            ->assertSee('Kelola Kategori')
+            ->assertSee('data-tombol-kelola-kategori', false)
+            ->assertSee('Keluarga Pria');
+
+        $this->assertSame(5, $undangan->daftarKategoriTamu()->count());
+        $kategoriKeluargaPria = $undangan->daftarKategoriTamu()->where('nama', 'Keluarga Pria')->firstOrFail();
+
+        // 2. Tambah kategori kustom via JSON + tolak duplikat
+        $resKat = $this->actingAs($pemilik)
+            ->postJson(route('dashboard.tamu.kategori.simpan', $undangan), [
+                'nama' => 'VIP Kampus',
+                'warna' => '#7C3AED',
+            ])
+            ->assertCreated()
+            ->assertJson([
+                'ok' => true,
+                'kategori' => [
+                    'nama' => 'VIP Kampus',
+                    'warna' => '#7C3AED',
+                ],
+            ]);
+
+        $kategoriVipId = (int) $resKat->json('kategori.id');
+
+        $this->actingAs($pemilik)
+            ->postJson(route('dashboard.tamu.kategori.simpan', $undangan), [
+                'nama' => 'vip kampus',
+                'warna' => '#2563EB',
+            ])
+            ->assertStatus(422)
+            ->assertJson(['ok' => false]);
+
+        // 3. Tambah tamu satuan dengan kategori kustom + edit kategori tamu
+        $this->actingAs($pemilik)
+            ->post("/dashboard/undangan/{$undangan->id}/tamu", [
+                'mode' => 'satuan',
+                'nama_tamu' => 'Nadia Rahma',
+                'nomor_wa' => '081234567891',
+                'kategori_tamu_id' => $kategoriVipId,
+            ])
+            ->assertRedirect($urlHalamanTamu)
+            ->assertSessionHasNoErrors();
+
+        $tamuNadia = TamuUndangan::where('undangan_id', $undangan->id)
+            ->where('nama_tamu', 'Nadia Rahma')
+            ->firstOrFail();
+        $this->assertSame($kategoriVipId, $tamuNadia->kategori_tamu_id);
+
+        $this->actingAs($pemilik)
+            ->putJson("/dashboard/undangan/{$undangan->id}/tamu/{$tamuNadia->id}", [
+                'nama_tamu' => 'Nadia Rahma',
+                'nomor_wa' => '081234567891',
+                'kategori_tamu_id' => $kategoriKeluargaPria->id,
+            ])
+            ->assertOk()
+            ->assertJson([
+                'ok' => true,
+                'tamu' => [
+                    'kategori_tamu_id' => $kategoriKeluargaPria->id,
+                ],
+            ]);
+
+        // 4. Import CSV mendukung kolom Kategori (cocokkan eksisting + auto-buat kategori baru + fallback kategori modal)
+        $fileCsvKat = \Illuminate\Http\UploadedFile::fake()->createWithContent(
+            'tamu-kategori.csv',
+            "Nama Tamu,Nomor WhatsApp,Kategori\r\n"
+            ."Arif Setiawan,081211112222,Teman\r\n"
+            ."Sinta Dewi,081233334444,Komunitas Sepeda\r\n"
+            ."Bambang Eko,081255556666,\r\n"
+        );
+
+        $this->actingAs($pemilik)
+            ->post("/dashboard/undangan/{$undangan->id}/tamu", [
+                'mode' => 'csv',
+                'file_csv' => $fileCsvKat,
+                'kategori_tamu_id' => $kategoriVipId,
+            ])
+            ->assertRedirect($urlHalamanTamu)
+            ->assertSessionHasNoErrors();
+
+        $katTeman = KategoriTamu::where('undangan_id', $undangan->id)->where('nama', 'Teman')->firstOrFail();
+        $katKomunitas = KategoriTamu::where('undangan_id', $undangan->id)->where('nama', 'Komunitas Sepeda')->firstOrFail();
+
+        $this->assertDatabaseHas('tamu_undangan', [
+            'undangan_id' => $undangan->id,
+            'nama_tamu' => 'Arif Setiawan',
+            'kategori_tamu_id' => $katTeman->id,
+        ]);
+        $this->assertDatabaseHas('tamu_undangan', [
+            'undangan_id' => $undangan->id,
+            'nama_tamu' => 'Sinta Dewi',
+            'kategori_tamu_id' => $katKomunitas->id,
+        ]);
+        $this->assertDatabaseHas('tamu_undangan', [
+            'undangan_id' => $undangan->id,
+            'nama_tamu' => 'Bambang Eko',
+            'kategori_tamu_id' => $kategoriVipId,
+        ]);
+
+        // 5. Ekspor CSV menyertakan kolom Kategori beserta nilainya
+        $resCsv = $this->actingAs($pemilik)
+            ->get(route('dashboard.tamu.ekspor', [$undangan, 'format' => 'csv']))
+            ->assertOk();
+        $isiCsv = $resCsv->streamedContent();
+        $this->assertStringContainsString('Kategori', $isiCsv);
+        $this->assertStringContainsString('Komunitas Sepeda', $isiCsv);
+        $this->assertStringContainsString('VIP Kampus', $isiCsv);
+
+        // 6. Client lain ditolak hapus kategori; pemilik hapus kategori -> tamu tetap tersimpan dengan kategori null
+        $this->actingAs($clientLain)
+            ->deleteJson(route('dashboard.tamu.kategori.hapus', [$undangan, $kategoriVipId]))
+            ->assertForbidden();
+
+        $this->actingAs($pemilik)
+            ->deleteJson(route('dashboard.tamu.kategori.hapus', [$undangan, $kategoriVipId]))
+            ->assertOk()
+            ->assertJson(['ok' => true, 'id' => $kategoriVipId]);
+
+        $this->assertDatabaseMissing('kategori_tamu', ['id' => $kategoriVipId]);
+        $this->assertDatabaseHas('tamu_undangan', [
+            'undangan_id' => $undangan->id,
+            'nama_tamu' => 'Bambang Eko',
+            'kategori_tamu_id' => null,
+        ]);
     }
 }

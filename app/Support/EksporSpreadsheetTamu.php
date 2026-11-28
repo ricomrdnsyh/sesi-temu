@@ -15,7 +15,7 @@ class EksporSpreadsheetTamu
      * Mem-parsing file CSV daftar tamu dengan deteksi otomatis pemisah (koma, titik koma, tab),
      * dukungan UTF-8 BOM, dan deteksi otomatis baris header.
      *
-     * @return list<array{nama_tamu: string, nomor_wa: string}>
+     * @return list<array{nama_tamu: string, nomor_wa: ?string}>
      */
     public static function bacaCsvTamu(string $kontenMentah, int $maksBaris = 500): array
     {
@@ -30,10 +30,10 @@ class EksporSpreadsheetTamu
 
     /**
      * Mem-parsing file CSV daftar tamu sekaligus memisahkan baris valid dan baris gagal
-     * (Nama Tamu & Nomor WhatsApp keduanya wajib terisi dan format WA harus valid).
+     * (Nama Tamu wajib terisi; Nomor WhatsApp & Kategori opsional, namun jika Nomor WhatsApp diisi formatnya harus valid).
      *
      * @return array{
-     *     valid: list<array{baris: int, nama_tamu: string, nomor_wa: string}>,
+     *     valid: list<array{baris: int, nama_tamu: string, nomor_wa: ?string, kategori: ?string}>,
      *     gagal: list<array{baris: int, alasan: string}>
      * }
      */
@@ -89,12 +89,14 @@ class EksporSpreadsheetTamu
 
         $indeksNama = 0;
         $indeksWa = 1;
+        $indeksKategori = 2;
         $mulaiBaris = 0;
 
         $headerInfo = self::analisisHeaderCsv($barisAktif[0]['kolom']);
         if ($headerInfo['adalah_header']) {
             $indeksNama = $headerInfo['indeks_nama'];
             $indeksWa = $headerInfo['indeks_wa'];
+            $indeksKategori = $headerInfo['indeks_kategori'];
             $mulaiBaris = 1;
         }
 
@@ -109,13 +111,9 @@ class EksporSpreadsheetTamu
             if ($nomorMentah === '-' || $nomorMentah === '—') {
                 $nomorMentah = '';
             }
-
-            if ($nama === '' && $nomorMentah === '') {
-                $gagal[] = [
-                    'baris' => $noBaris,
-                    'alasan' => "Baris {$noBaris}: Nama tamu dan Nomor WhatsApp kosong.",
-                ];
-                continue;
+            $kategoriMentah = $indeksKategori !== null ? trim((string) ($row[$indeksKategori] ?? '')) : '';
+            if ($kategoriMentah === '-' || $kategoriMentah === '—') {
+                $kategoriMentah = '';
             }
 
             if ($nama === '') {
@@ -126,25 +124,20 @@ class EksporSpreadsheetTamu
                 continue;
             }
 
-            if ($nomorMentah === '') {
-                $gagal[] = [
-                    'baris' => $noBaris,
-                    'alasan' => "Baris {$noBaris}: Nomor WhatsApp kosong (\"{$nama}\").",
-                ];
-                continue;
-            }
+            $nomorNormal = null;
+            if ($nomorMentah !== '') {
+                $nomorCek = ltrim($nomorMentah, "'");
+                $nomorNormal = preg_match('/^[\d\s+\-().]+$/', $nomorCek) === 1
+                    ? TamuUndangan::normalisasiNomorWa($nomorCek)
+                    : null;
 
-            $nomorCek = ltrim($nomorMentah, "'");
-            $nomorNormal = preg_match('/^[\d\s+\-().]+$/', $nomorCek) === 1
-                ? TamuUndangan::normalisasiNomorWa($nomorCek)
-                : null;
-
-            if ($nomorNormal === null) {
-                $gagal[] = [
-                    'baris' => $noBaris,
-                    'alasan' => "Baris {$noBaris}: Format Nomor WhatsApp \"{$nomorMentah}\" tidak valid (\"{$nama}\").",
-                ];
-                continue;
+                if ($nomorNormal === null) {
+                    $gagal[] = [
+                        'baris' => $noBaris,
+                        'alasan' => "Baris {$noBaris}: Format Nomor WhatsApp \"{$nomorMentah}\" tidak valid (\"{$nama}\").",
+                    ];
+                    continue;
+                }
             }
 
             if (count($valid) >= $maksBaris) {
@@ -159,6 +152,7 @@ class EksporSpreadsheetTamu
                 'baris' => $noBaris,
                 'nama_tamu' => Str::limit($nama, 120, ''),
                 'nomor_wa' => $nomorNormal,
+                'kategori' => $kategoriMentah !== '' ? Str::limit($kategoriMentah, 60, '') : null,
             ];
         }
 
@@ -175,14 +169,14 @@ class EksporSpreadsheetTamu
     {
         $stream = fopen('php://temp', 'r+');
         if ($stream === false) {
-            return "\xEF\xBB\xBFNama Tamu,Nomor WhatsApp\n";
+            return "\xEF\xBB\xBFNama Tamu,Nomor WhatsApp,Kategori\n";
         }
 
         fwrite($stream, "\xEF\xBB\xBF");
-        fputcsv($stream, ['Nama Tamu', 'Nomor WhatsApp']);
-        fputcsv($stream, ['Budi Santoso', '081234567890']);
-        fputcsv($stream, ['Siti Aminah & Partner', '085612345678']);
-        fputcsv($stream, ['Keluarga Bpk. Hendra', '081398765432']);
+        fputcsv($stream, ['Nama Tamu', 'Nomor WhatsApp', 'Kategori']);
+        fputcsv($stream, ['Budi Santoso', '081234567890', 'Keluarga Pria']);
+        fputcsv($stream, ['Siti Aminah & Partner', '085612345678', 'Teman']);
+        fputcsv($stream, ['Keluarga Bpk. Hendra', '', 'Kantor']);
         rewind($stream);
 
         $isi = stream_get_contents($stream) ?: '';
@@ -279,12 +273,13 @@ class EksporSpreadsheetTamu
 
     /**
      * @param  list<string>  $barisPertama
-     * @return array{adalah_header: bool, indeks_nama: int, indeks_wa: ?int}
+     * @return array{adalah_header: bool, indeks_nama: int, indeks_wa: ?int, indeks_kategori: ?int}
      */
     private static function analisisHeaderCsv(array $barisPertama): array
     {
         $indeksNama = null;
         $indeksWa = null;
+        $indeksKategori = null;
         $jumlahCocokHeader = 0;
 
         foreach ($barisPertama as $idx => $judul) {
@@ -297,16 +292,24 @@ class EksporSpreadsheetTamu
             } elseif (in_array($norm, ['wa', 'no wa', 'nomor wa', 'nomor whatsapp', 'whatsapp', 'no hp', 'hp', 'telepon', 'telp', 'phone', 'phone number', 'mobile'], true)) {
                 $indeksWa ??= $idx;
                 $jumlahCocokHeader++;
+            } elseif (in_array($norm, ['kategori', 'kategori tamu', 'category', 'grup', 'group', 'kelompok'], true)) {
+                $indeksKategori ??= $idx;
+                $jumlahCocokHeader++;
             } elseif (in_array($norm, ['no', 'nomor', 'status', 'status kirim', 'status buka', 'link', 'link undangan', 'link undangan personal'], true)) {
                 $jumlahCocokHeader++;
             }
         }
 
         if ($jumlahCocokHeader > 0 && $indeksNama !== null) {
+            if ($indeksWa === null && $indeksKategori !== ($indeksNama + 1) && array_key_exists($indeksNama + 1, $barisPertama)) {
+                $indeksWa = $indeksNama + 1;
+            }
+
             return [
                 'adalah_header' => true,
                 'indeks_nama' => $indeksNama,
-                'indeks_wa' => $indeksWa ?? ($indeksNama + 1),
+                'indeks_wa' => $indeksWa,
+                'indeks_kategori' => $indeksKategori,
             ];
         }
 
@@ -314,6 +317,7 @@ class EksporSpreadsheetTamu
             'adalah_header' => false,
             'indeks_nama' => 0,
             'indeks_wa' => 1,
+            'indeks_kategori' => 2,
         ];
     }
 

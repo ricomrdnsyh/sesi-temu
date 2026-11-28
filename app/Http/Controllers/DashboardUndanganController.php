@@ -6,6 +6,7 @@ use App\Models\AcaraUndangan;
 use App\Models\AmplopDigital;
 use App\Models\BukuTamu;
 use App\Models\GaleriUndangan;
+use App\Models\KategoriTamu;
 use App\Models\MusikLatar;
 use App\Models\Pengguna;
 use App\Models\TamuUndangan;
@@ -133,7 +134,8 @@ class DashboardUndanganController extends Controller
             return redirect()->route('dashboard.undangan.rsvp', $undangan);
         }
 
-        $undangan->load(['tema', 'daftarTamu', 'bukuTamu', 'transaksi']);
+        $undangan->pastikanKategoriTamuBawaan();
+        $undangan->load(['tema', 'daftarTamu.kategori', 'daftarKategoriTamu', 'bukuTamu', 'transaksi']);
 
         return view('dashboard.tamu', [
             'undangan' => $undangan,
@@ -1879,8 +1881,9 @@ class DashboardUndanganController extends Controller
 
             $idTamuBaru = [];
             $idTamuDiperbarui = [];
+            $kategoriDefaultId = $this->ambilKategoriTamuValidId($undangan, $request->input('kategori_tamu_id'));
 
-            DB::transaction(static function () use ($undangan, $tamuDariCsv, &$idTamuBaru, &$idTamuDiperbarui): void {
+            DB::transaction(static function () use ($undangan, $tamuDariCsv, $kategoriDefaultId, &$idTamuBaru, &$idTamuDiperbarui): void {
                 $tamuEksisting = TamuUndangan::where('undangan_id', $undangan->id)->get();
                 $petaByWa = [];
                 $petaByNama = [];
@@ -1895,18 +1898,49 @@ class DashboardUndanganController extends Controller
                     }
                 }
 
+                $petaKategoriByNama = [];
+                $urutanKategori = 0;
+                foreach ($undangan->daftarKategoriTamu()->get() as $katEksisting) {
+                    $kunciKat = Str::lower(trim((string) $katEksisting->nama));
+                    if ($kunciKat !== '') {
+                        $petaKategoriByNama[$kunciKat] ??= (int) $katEksisting->id;
+                    }
+                    $urutanKategori = max($urutanKategori, (int) $katEksisting->urutan);
+                }
+
                 foreach ($tamuDariCsv as $item) {
                     $waBaru = $item['nomor_wa'];
                     $namaBaru = $item['nama_tamu'];
                     $kunciNamaBaru = Str::lower(trim($namaBaru));
 
-                    $tamuCocok = $petaByWa[$waBaru] ?? ($petaByNama[$kunciNamaBaru] ?? null);
+                    $kategoriBarisId = $kategoriDefaultId;
+                    $namaKatCsv = trim(Str::limit(trim((string) ($item['kategori'] ?? '')), 60, ''));
+                    if ($namaKatCsv !== '') {
+                        $kunciKatCsv = Str::lower($namaKatCsv);
+                        if (isset($petaKategoriByNama[$kunciKatCsv])) {
+                            $kategoriBarisId = $petaKategoriByNama[$kunciKatCsv];
+                        } elseif (count($petaKategoriByNama) < 30) {
+                            $urutanKategori++;
+                            $warnaBaru = KategoriTamu::WARNA_BAWAAN[count($petaKategoriByNama) % count(KategoriTamu::WARNA_BAWAAN)];
+                            $katBaru = KategoriTamu::create([
+                                'undangan_id' => $undangan->id,
+                                'nama' => $namaKatCsv,
+                                'warna' => $warnaBaru,
+                                'urutan' => $urutanKategori,
+                            ]);
+                            $petaKategoriByNama[$kunciKatCsv] = (int) $katBaru->id;
+                            $kategoriBarisId = (int) $katBaru->id;
+                        }
+                    }
+
+                    $tamuCocok = ($waBaru !== null ? ($petaByWa[$waBaru] ?? null) : null)
+                        ?? ($petaByNama[$kunciNamaBaru] ?? null);
 
                     if ($tamuCocok !== null) {
                         $waLama = $tamuCocok->nomor_wa;
                         $kunciNamaLama = Str::lower(trim((string) $tamuCocok->nama_tamu));
 
-                        if ($waLama !== null && ($petaByWa[$waLama] ?? null)?->id === $tamuCocok->id) {
+                        if ($waBaru !== null && $waLama !== null && ($petaByWa[$waLama] ?? null)?->id === $tamuCocok->id) {
                             unset($petaByWa[$waLama]);
                         }
                         if (($petaByNama[$kunciNamaLama] ?? null)?->id === $tamuCocok->id) {
@@ -1914,12 +1948,19 @@ class DashboardUndanganController extends Controller
                         }
 
                         $tamuCocok->nama_tamu = $namaBaru;
-                        $tamuCocok->nomor_wa = $waBaru;
+                        if ($waBaru !== null) {
+                            $tamuCocok->nomor_wa = $waBaru;
+                        }
+                        if ($kategoriBarisId !== null) {
+                            $tamuCocok->kategori_tamu_id = $kategoriBarisId;
+                        }
                         if ($tamuCocok->isDirty()) {
                             $tamuCocok->save();
                         }
 
-                        $petaByWa[$waBaru] = $tamuCocok;
+                        if ($tamuCocok->nomor_wa !== null && $tamuCocok->nomor_wa !== '') {
+                            $petaByWa[$tamuCocok->nomor_wa] = $tamuCocok;
+                        }
                         $petaByNama[$kunciNamaBaru] = $tamuCocok;
 
                         if (! isset($idTamuBaru[$tamuCocok->id])) {
@@ -1934,9 +1975,12 @@ class DashboardUndanganController extends Controller
                         'kode_tamu' => TamuUndangan::buatKodeUnik(),
                         'nama_tamu' => $namaBaru,
                         'nomor_wa' => $waBaru,
+                        'kategori_tamu_id' => $kategoriBarisId,
                     ]);
 
-                    $petaByWa[$waBaru] = $tamuBaru;
+                    if ($waBaru !== null) {
+                        $petaByWa[$waBaru] = $tamuBaru;
+                    }
                     $petaByNama[$kunciNamaBaru] = $tamuBaru;
                     $idTamuBaru[$tamuBaru->id] = true;
                 }
@@ -2078,13 +2122,16 @@ class DashboardUndanganController extends Controller
                     ->withInput();
             }
 
-            DB::transaction(static function () use ($undangan, $tamuBaru): void {
+            $kategoriMassalId = $this->ambilKategoriTamuValidId($undangan, $request->input('kategori_tamu_id'));
+
+            DB::transaction(static function () use ($undangan, $tamuBaru, $kategoriMassalId): void {
                 foreach ($tamuBaru as $item) {
                     TamuUndangan::create([
                         'undangan_id' => $undangan->id,
                         'kode_tamu' => TamuUndangan::buatKodeUnik(),
                         'nama_tamu' => $item['nama_tamu'],
                         'nomor_wa' => $item['nomor_wa'],
+                        'kategori_tamu_id' => $kategoriMassalId,
                     ]);
                 }
             });
@@ -2099,6 +2146,7 @@ class DashboardUndanganController extends Controller
         $tervalidasi = $request->validate([
             'nama_tamu' => ['required', 'string', 'max:120'],
             'nomor_wa' => ['nullable', 'string', 'max:30'],
+            'kategori_tamu_id' => ['nullable', 'integer'],
         ], [
             'nama_tamu.required' => 'Nama tamu wajib diisi.',
             'nama_tamu.max' => 'Nama tamu maksimal 120 karakter.',
@@ -2114,11 +2162,14 @@ class DashboardUndanganController extends Controller
                 ->withInput();
         }
 
+        $kategoriSatuanId = $this->ambilKategoriTamuValidId($undangan, $tervalidasi['kategori_tamu_id'] ?? null);
+
         TamuUndangan::create([
             'undangan_id' => $undangan->id,
             'kode_tamu' => TamuUndangan::buatKodeUnik(),
             'nama_tamu' => trim($tervalidasi['nama_tamu']),
             'nomor_wa' => $nomorNormal,
+            'kategori_tamu_id' => $kategoriSatuanId,
         ]);
 
         return redirect()
@@ -2141,6 +2192,7 @@ class DashboardUndanganController extends Controller
         $tervalidasi = $request->validate([
             'nama_tamu' => ['required', 'string', 'max:120'],
             'nomor_wa' => ['nullable', 'string', 'max:30'],
+            'kategori_tamu_id' => ['nullable', 'integer'],
         ], [
             'nama_tamu.required' => 'Nama tamu wajib diisi.',
         ]);
@@ -2161,10 +2213,15 @@ class DashboardUndanganController extends Controller
                 ->withErrors(['nomor_wa' => 'Format nomor WhatsApp tidak valid. Contoh: 081234567890.']);
         }
 
-        $tamu->update([
+        $dataUpdate = [
             'nama_tamu' => trim($tervalidasi['nama_tamu']),
             'nomor_wa' => $nomorNormal,
-        ]);
+        ];
+        if ($request->exists('kategori_tamu_id')) {
+            $dataUpdate['kategori_tamu_id'] = $this->ambilKategoriTamuValidId($undangan, $tervalidasi['kategori_tamu_id'] ?? null);
+        }
+
+        $tamu->update($dataUpdate);
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -2173,6 +2230,7 @@ class DashboardUndanganController extends Controller
                     'id' => $tamu->id,
                     'nama_tamu' => $tamu->nama_tamu,
                     'nomor_wa' => $tamu->nomor_wa,
+                    'kategori_tamu_id' => $tamu->kategori_tamu_id,
                 ],
             ]);
         }
@@ -2180,6 +2238,119 @@ class DashboardUndanganController extends Controller
         return redirect()
             ->route('dashboard.undangan.tamu', $undangan)
             ->with('sukses', "Data tamu \"{$tamu->nama_tamu}\" berhasil diperbarui.");
+    }
+
+    public function simpanKategoriTamu(Request $request, Undangan $undangan): JsonResponse|RedirectResponse
+    {
+        Gate::authorize('kelola', $undangan);
+
+        if ($terkunci = $this->responsJikaTamuRsvpTerkunci($request, $undangan)) {
+            return $terkunci;
+        }
+
+        $tervalidasi = $request->validate([
+            'nama' => ['required', 'string', 'max:60'],
+            'warna' => ['nullable', 'string', 'max:16'],
+        ], [
+            'nama.required' => 'Nama kategori wajib diisi.',
+            'nama.max' => 'Nama kategori maksimal 60 karakter.',
+        ]);
+
+        $namaBersih = trim((string) $tervalidasi['nama']);
+        if ($namaBersih === '') {
+            return response()->json([
+                'ok' => false,
+                'pesan' => 'Nama kategori tidak boleh kosong.',
+            ], 422);
+        }
+
+        $kategoriEksisting = $undangan->daftarKategoriTamu()->get();
+        if ($kategoriEksisting->count() >= 30) {
+            return response()->json([
+                'ok' => false,
+                'pesan' => 'Maksimal 30 kategori tamu per undangan.',
+            ], 422);
+        }
+
+        $sudahAda = $kategoriEksisting->contains(
+            static fn (KategoriTamu $k): bool => Str::lower(trim((string) $k->nama)) === Str::lower($namaBersih)
+        );
+        if ($sudahAda) {
+            return response()->json([
+                'ok' => false,
+                'pesan' => "Kategori \"{$namaBersih}\" sudah ada.",
+            ], 422);
+        }
+
+        $urutanBaru = ((int) ($kategoriEksisting->max('urutan') ?? 0)) + 1;
+        $kategori = KategoriTamu::create([
+            'undangan_id' => $undangan->id,
+            'nama' => $namaBersih,
+            'warna' => KategoriTamu::warnaAman($tervalidasi['warna'] ?? null),
+            'urutan' => $urutanBaru,
+        ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => true,
+                'pesan' => "Kategori \"{$kategori->nama}\" ditambahkan.",
+                'kategori' => [
+                    'id' => $kategori->id,
+                    'nama' => $kategori->nama,
+                    'warna' => $kategori->warna,
+                    'url_hapus' => route('dashboard.tamu.kategori.hapus', [$undangan, $kategori], false),
+                ],
+            ], 201);
+        }
+
+        return redirect()
+            ->route('dashboard.undangan.tamu', $undangan)
+            ->with('sukses', "Kategori \"{$kategori->nama}\" ditambahkan.");
+    }
+
+    public function hapusKategoriTamu(Request $request, Undangan $undangan, KategoriTamu $kategori): JsonResponse|RedirectResponse
+    {
+        Gate::authorize('kelola', $undangan);
+
+        if ($terkunci = $this->responsJikaTamuRsvpTerkunci($request, $undangan)) {
+            return $terkunci;
+        }
+
+        if ($kategori->undangan_id !== $undangan->id) {
+            abort(404);
+        }
+
+        $idTerhapus = $kategori->id;
+        $namaTerhapus = $kategori->nama;
+        $kategori->delete();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => true,
+                'id' => $idTerhapus,
+                'pesan' => "Kategori \"{$namaTerhapus}\" dihapus.",
+            ]);
+        }
+
+        return redirect()
+            ->route('dashboard.undangan.tamu', $undangan)
+            ->with('sukses', "Kategori \"{$namaTerhapus}\" dihapus.");
+    }
+
+    private function ambilKategoriTamuValidId(Undangan $undangan, mixed $idMentah): ?int
+    {
+        if ($idMentah === null || $idMentah === '') {
+            return null;
+        }
+
+        $id = (int) $idMentah;
+        if ($id <= 0) {
+            return null;
+        }
+
+        return KategoriTamu::where('undangan_id', $undangan->id)
+            ->where('id', $id)
+            ->value('id');
     }
 
     public function simpanTemplatePesanTamu(Request $request, Undangan $undangan): RedirectResponse|JsonResponse
@@ -2266,12 +2437,13 @@ class DashboardUndanganController extends Controller
             ? route('undangan.tampil', $undangan->slug)
             : url('/'.$undangan->slug);
 
-        $daftarTamu = $undangan->daftarTamu()->get();
+        $daftarTamu = $undangan->daftarTamu()->with('kategori')->get();
 
         $headers = [
             'No',
             'Nama Tamu',
             'Nomor WhatsApp',
+            'Kategori',
             'Status Kirim',
             'Waktu Dikirim',
             'Status Buka',
@@ -2290,6 +2462,7 @@ class DashboardUndanganController extends Controller
                 $idx + 1,
                 (string) $tamu->nama_tamu,
                 (string) ($tamu->nomor_wa ?? ''),
+                (string) ($tamu->kategori?->nama ?? ''),
                 $tamu->sudahDikirim() ? 'Sudah Dikirim' : 'Belum Dikirim',
                 $tamu->dikirim_pada ? $tamu->dikirim_pada->locale('id')->translatedFormat('d M Y, H:i') : '-',
                 $tamu->sudahDibuka() ? 'Sudah Dibuka' : 'Belum Dibuka',
@@ -2307,7 +2480,7 @@ class DashboardUndanganController extends Controller
             $binerXlsx = EksporSpreadsheetTamu::buatXlsx(
                 $headers,
                 $barisData,
-                [6, 28, 18, 16, 20, 16, 15, 20, 52],
+                [6, 28, 18, 18, 16, 20, 16, 15, 20, 52],
                 [2],
                 'Daftar Tamu'
             );

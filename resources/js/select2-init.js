@@ -166,6 +166,28 @@ const renderOpsiBankSelect2 = (data) => {
     return baris;
 };
 
+const renderOpsiKategoriSelect2 = (data) => {
+    const warna = data?.element?.dataset?.warna || '';
+    if (!warna) {
+        return data?.text || '';
+    }
+
+    const baris = document.createElement('span');
+    baris.className = 's2-kategori-option';
+
+    const titik = document.createElement('span');
+    titik.className = 's2-kategori-dot';
+    titik.style.backgroundColor = warna;
+    baris.appendChild(titik);
+
+    const label = document.createElement('span');
+    label.className = 's2-kategori-label';
+    label.textContent = data.text || '';
+    baris.appendChild(label);
+
+    return baris;
+};
+
 let pelindungLabelTerpasang = false;
 let labelSelect2TerbukaSaatMousedown = null;
 
@@ -265,6 +287,9 @@ export const inisialisasiSelect2Element = (selectEl) => {
     if (selectEl.dataset.select2Bank === 'true') {
         opsiSelect2.templateResult = renderOpsiBankSelect2;
         opsiSelect2.templateSelection = renderOpsiBankSelect2;
+    } else if (selectEl.dataset.select2Kategori === 'true') {
+        opsiSelect2.templateResult = renderOpsiKategoriSelect2;
+        opsiSelect2.templateSelection = renderOpsiKategoriSelect2;
     }
 
     $(selectEl).select2(opsiSelect2);
@@ -320,6 +345,18 @@ export const tutupSemuaSelect2 = () => {
             $(selectEl).select2('close');
         }
     });
+};
+
+export const segarkanSelect2Element = (selectEl) => {
+    if (!(selectEl instanceof HTMLSelectElement)) {
+        return;
+    }
+
+    if ($(selectEl).data('select2')) {
+        $(selectEl).trigger('change.select2');
+    } else {
+        inisialisasiSelect2Element(selectEl);
+    }
 };
 
 export const inisialisasiSemuaSelect2 = (akar = document) => {

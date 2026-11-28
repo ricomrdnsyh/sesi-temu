@@ -17,6 +17,7 @@
                 'kode_tamu' => $tamu->kode_tamu,
                 'nama_tamu' => $tamu->nama_tamu,
                 'nomor_wa' => $tamu->nomor_wa,
+                'kategori_tamu_id' => $tamu->kategori_tamu_id,
                 'sudah_dikirim' => $tamu->sudahDikirim(),
                 'dikirim_pada_label' => $tamu->dikirim_pada
                     ? $tamu->dikirim_pada->locale('id')->translatedFormat('d M, H:i')
@@ -38,6 +39,16 @@
             ->values()
             ->all();
 
+        $daftarKategoriJson = $undangan->daftarKategoriTamu
+            ->map(fn (\App\Models\KategoriTamu $kat): array => [
+                'id' => $kat->id,
+                'nama' => $kat->nama,
+                'warna' => $kat->warna,
+                'url_hapus' => route('dashboard.tamu.kategori.hapus', [$undangan, $kat], false),
+            ])
+            ->values()
+            ->all();
+
         $bukaModalTambahAwal = $errors->hasAny(['nama_tamu', 'nomor_wa', 'daftar_bulk', 'file_csv']);
         $modeTambahAwal = old('mode', $errors->has('file_csv') ? 'csv' : ($errors->has('daftar_bulk') ? 'massal' : 'satuan'));
         $konfigTemplatePesanWa = [
@@ -47,6 +58,9 @@
             'siapDisebarUndangan' => $undanganSiapDisebar,
             'csrfToken' => csrf_token(),
             'daftarTamu' => $daftarTamuJson,
+            'daftarKategori' => $daftarKategoriJson,
+            'warnaKategori' => \App\Models\KategoriTamu::WARNA_BAWAAN,
+            'urlSimpanKategori' => route('dashboard.tamu.kategori.simpan', $undangan, false),
             'modalTambah' => $bukaModalTambahAwal,
             'modeTambah' => $modeTambahAwal,
             'daftarBulkAwal' => old('mode') === 'massal' ? (string) old('daftar_bulk', '') : '',
@@ -61,7 +75,7 @@
 
     <div
         x-data="halamanTamuUndangan()"
-        @keydown.escape.window="if (!window.Swal?.isVisible()) { modalTambah = false; modalEdit = false; dropdownKelolaTerbuka = false; dropdownAturTerbuka = false; tutupModalTemplatePesan(); menuTamu = null; }"
+        @keydown.escape.window="if (!window.Swal?.isVisible()) { if (document.querySelector('.select2-container--open')) { window.SesiTemuSelect2?.close?.(); return; } if (modalKategori) { tutupModalKategori(); return; } modalTambah = false; tutupModalEdit(); dropdownKelolaTerbuka = false; dropdownAturTerbuka = false; tutupModalTemplatePesan(); menuTamu = null; }"
         @scroll.window="menuTamu = null"
         class="min-h-screen flex bg-ivory"
     >
@@ -198,15 +212,30 @@
             {{-- Baris Aksi Ringkas (Kelola + Tambah Tamu) & Pencarian Lebar + Atur --}}
             <section class="space-y-3">
                 <div class="flex flex-wrap items-center justify-between gap-2.5">
-                    <div class="min-w-0 flex items-center gap-2">
+                    <div class="min-w-0 flex flex-wrap items-center gap-2">
                         <button
                             type="button"
                             x-show="filterStatus !== 'semua'"
                             x-cloak
                             @click="setFilterStatus('semua')"
-                            class="inline-flex items-center gap-1.5 rounded-full bg-sage/10 px-3 py-1.5 text-xs font-semibold text-sage ring-1 ring-sage/20 hover:bg-sage/15 transition cursor-pointer"
+                            class="inline-flex items-center gap-1.5 rounded-lg bg-sage/10 px-2.5 py-1 text-xs font-semibold text-sage ring-1 ring-sage/20 hover:bg-sage/15 transition cursor-pointer"
                         >
                             <span x-text="filterStatus === 'belum_dikirim' ? 'Filter: Belum Dikirim' : (filterStatus === 'sudah_dikirim' ? 'Filter: Terkirim' : 'Filter: Sudah Dibuka')"></span>
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <button
+                            type="button"
+                            x-show="filterKategori !== 'semua'"
+                            x-cloak
+                            @click="setFilterKategori('semua')"
+                            class="inline-flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-charcoal ring-1 ring-champagne/40 hover:bg-ivory transition cursor-pointer"
+                        >
+                            <span
+                                x-show="cariKategori(filterKategori)"
+                                class="h-2 w-2 rounded-full shrink-0"
+                                :style="{ backgroundColor: cariKategori(filterKategori)?.warna || '#4B6358' }"
+                            ></span>
+                            <span x-text="'Kategori: ' + labelFilterKategori()"></span>
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -245,6 +274,27 @@
                                 x-transition.opacity.duration.120ms
                                 class="absolute left-0 sm:left-auto sm:right-0 top-full mt-2 z-30 w-64 max-w-[calc(100vw-2rem)] rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-champagne/35 text-left space-y-0.5"
                             >
+                                <button
+                                    type="button"
+                                    @click="bukaModalKategori()"
+                                    data-tombol-kelola-kategori
+                                    class="w-full flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-left hover:bg-ivory transition group cursor-pointer"
+                                >
+                                    <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-sky-50 text-sky-700 ring-1 ring-sky-200/80 shrink-0">
+                                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/>
+                                            <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>
+                                        </svg>
+                                    </span>
+                                    <span class="min-w-0 flex-1">
+                                        <span class="flex items-center justify-between gap-2">
+                                            <span class="text-xs font-semibold text-charcoal group-hover:text-sage">Kelola Kategori</span>
+                                            <span class="rounded-md bg-ivory px-1.5 py-0.5 text-[10px] font-semibold text-charcoal/70 ring-1 ring-champagne/30 tabular-nums" x-text="daftarKategori.length"></span>
+                                        </span>
+                                        <span class="block text-[10.5px] text-charcoal/55 truncate">Buat &amp; kelompokkan kategori tamu</span>
+                                    </span>
+                                </button>
+
                                 <button
                                     type="button"
                                     @click="bukaModalTemplatePesan()"
@@ -339,7 +389,7 @@
                             type="search"
                             x-model="kataCari"
                             @input="halaman = 1"
-                            placeholder="Cari nama tamu atau nomor WA..."
+                            placeholder="Cari nama tamu, nomor WA, atau kategori..."
                             class="w-full h-10 sm:h-11 rounded-xl border border-champagne/30 bg-white pl-10 sm:pl-11 pr-9 text-xs sm:text-sm text-charcoal shadow-2xs focus:border-sage focus:outline-none transition"
                         >
                         <button
@@ -358,7 +408,7 @@
                         <button
                             type="button"
                             @click="dropdownAturTerbuka = !dropdownAturTerbuka; dropdownKelolaTerbuka = false"
-                            :class="(urutan !== 'terbaru' || perHalaman !== 10) ? 'ring-sage/50 text-sage' : 'ring-champagne/30 text-charcoal/80'"
+                            :class="(urutan !== 'terbaru' || perHalaman !== 10 || filterKategori !== 'semua') ? 'ring-sage/50 text-sage' : 'ring-champagne/30 text-charcoal/80'"
                             class="relative inline-flex h-10 sm:h-11 items-center justify-center gap-1.5 rounded-xl bg-white px-3.5 sm:px-4 text-xs sm:text-sm font-semibold ring-1 hover:bg-ivory transition cursor-pointer shadow-2xs"
                         >
                             <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -374,7 +424,7 @@
                             </svg>
                             <span>Atur</span>
                             <span
-                                x-show="urutan !== 'terbaru' || perHalaman !== 10"
+                                x-show="urutan !== 'terbaru' || perHalaman !== 10 || filterKategori !== 'semua'"
                                 x-cloak
                                 class="h-1.5 w-1.5 rounded-full bg-sage"
                             ></span>
@@ -384,9 +434,56 @@
                             x-show="dropdownAturTerbuka"
                             x-cloak
                             x-transition.opacity.duration.120ms
-                            class="absolute right-0 top-full mt-2 z-30 w-64 rounded-2xl bg-white p-3.5 shadow-xl ring-1 ring-champagne/35 space-y-3.5 text-left"
+                            class="absolute right-0 top-full mt-2 z-30 w-64 max-h-[75vh] overflow-y-auto rounded-2xl bg-white p-3.5 shadow-xl ring-1 ring-champagne/35 space-y-3.5 text-left"
                         >
                             <div class="space-y-1.5">
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-[11px] font-semibold uppercase tracking-wider text-charcoal/50">Filter Kategori</p>
+                                    <button
+                                        type="button"
+                                        @click="bukaModalKategori()"
+                                        class="text-[10.5px] font-semibold text-sage hover:underline cursor-pointer"
+                                    >
+                                        Kelola
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-1 gap-1 max-h-40 overflow-y-auto pr-0.5">
+                                    <button
+                                        type="button"
+                                        @click="setFilterKategori('semua'); dropdownAturTerbuka = false"
+                                        :class="filterKategori === 'semua' ? 'bg-sage/10 text-sage font-semibold' : 'text-charcoal/80 hover:bg-ivory'"
+                                        class="flex items-center justify-between rounded-xl px-3 py-1.5 text-xs transition cursor-pointer"
+                                    >
+                                        <span>Semua Kategori</span>
+                                        <span x-show="filterKategori === 'semua'" class="text-sage font-bold">&check;</span>
+                                    </button>
+                                    <template x-for="kat in daftarKategori" :key="kat.id">
+                                        <button
+                                            type="button"
+                                            @click="setFilterKategori(String(kat.id)); dropdownAturTerbuka = false"
+                                            :class="String(filterKategori) === String(kat.id) ? 'bg-sage/10 text-sage font-semibold' : 'text-charcoal/80 hover:bg-ivory'"
+                                            class="flex items-center justify-between gap-2 rounded-xl px-3 py-1.5 text-xs transition cursor-pointer"
+                                        >
+                                            <span class="flex items-center gap-2 min-w-0">
+                                                <span class="h-2 w-2 rounded-full shrink-0" :style="{ backgroundColor: kat.warna }"></span>
+                                                <span class="truncate" x-text="kat.nama"></span>
+                                            </span>
+                                            <span class="text-[10.5px] text-charcoal/45 tabular-nums shrink-0" x-text="jumlahTamuKategori(kat.id)"></span>
+                                        </button>
+                                    </template>
+                                    <button
+                                        type="button"
+                                        @click="setFilterKategori('tanpa'); dropdownAturTerbuka = false"
+                                        :class="filterKategori === 'tanpa' ? 'bg-sage/10 text-sage font-semibold' : 'text-charcoal/80 hover:bg-ivory'"
+                                        class="flex items-center justify-between rounded-xl px-3 py-1.5 text-xs transition cursor-pointer"
+                                    >
+                                        <span>Tanpa Kategori</span>
+                                        <span x-show="filterKategori === 'tanpa'" class="text-sage font-bold">&check;</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="pt-2.5 border-t border-champagne/20 space-y-1.5">
                                 <p class="text-[11px] font-semibold uppercase tracking-wider text-charcoal/50">Urutkan</p>
                                 <div class="grid grid-cols-1 gap-1">
                                     <button
@@ -488,7 +585,7 @@
                     <p class="text-xs text-charcoal/55">Coba ubah kata kunci pencarian atau tampilkan semua status tamu.</p>
                     <button
                         type="button"
-                        @click="setFilterStatus('semua'); kataCari = ''"
+                        @click="setFilterStatus('semua'); setFilterKategori('semua'); kataCari = ''"
                         class="inline-flex items-center rounded-xl bg-ivory px-4 py-2 text-xs font-semibold text-sage ring-1 ring-sage/25 hover:bg-sage/10 transition cursor-pointer"
                     >
                         Tampilkan Semua Tamu
@@ -530,9 +627,24 @@
                                     </div>
 
                                     <div class="flex flex-wrap items-center gap-1.5">
+                                        {{-- Badge Kategori Tamu --}}
+                                        <template x-if="cariKategori(tamu.kategori_tamu_id)">
+                                            <span
+                                                class="inline-flex items-center gap-1.5 rounded-lg px-2 py-0.5 text-[11px] font-semibold border"
+                                                :style="{
+                                                    backgroundColor: (cariKategori(tamu.kategori_tamu_id)?.warna || '#4B6358') + '16',
+                                                    color: cariKategori(tamu.kategori_tamu_id)?.warna || '#4B6358',
+                                                    borderColor: (cariKategori(tamu.kategori_tamu_id)?.warna || '#4B6358') + '38'
+                                                }"
+                                            >
+                                                <span class="h-1.5 w-1.5 rounded-full shrink-0" :style="{ backgroundColor: cariKategori(tamu.kategori_tamu_id)?.warna || '#4B6358' }"></span>
+                                                <span x-text="cariKategori(tamu.kategori_tamu_id)?.nama || ''"></span>
+                                            </span>
+                                        </template>
+
                                         {{-- Status Kirim --}}
                                         <template x-if="tamu.sudah_dikirim">
-                                            <span class="inline-flex items-center gap-1 rounded-full bg-sage/10 px-2.5 py-0.5 text-[11px] font-semibold text-sage">
+                                            <span class="inline-flex items-center gap-1 rounded-lg bg-sage/10 px-2 py-0.5 text-[11px] font-semibold text-sage">
                                                 <svg class="h-3 w-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                                     <path d="M20 6 9 17l-5-5"/>
                                                 </svg>
@@ -541,7 +653,7 @@
                                             </span>
                                         </template>
                                         <template x-if="!tamu.sudah_dikirim">
-                                            <span class="inline-flex items-center gap-1.5 rounded-full bg-ivory px-2.5 py-0.5 text-[11px] font-medium text-charcoal/60 ring-1 ring-champagne/25">
+                                            <span class="inline-flex items-center gap-1.5 rounded-lg bg-ivory px-2 py-0.5 text-[11px] font-medium text-charcoal/60 ring-1 ring-champagne/25">
                                                 <span class="h-1.5 w-1.5 rounded-full bg-amber-400"></span>
                                                 <span>Belum Dikirim</span>
                                             </span>
@@ -549,14 +661,14 @@
 
                                         {{-- Status Buka --}}
                                         <template x-if="tamu.sudah_dibuka">
-                                            <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200/70">
+                                            <span class="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200/70">
                                                 <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                                                 <span x-text="'Dibuka ' + tamu.jumlah_dibuka + 'x'"></span>
                                                 <span x-show="tamu.dibuka_pada_label" class="font-normal text-emerald-700/75" x-text="'· ' + tamu.dibuka_pada_label"></span>
                                             </span>
                                         </template>
                                         <template x-if="!tamu.sudah_dibuka">
-                                            <span class="inline-flex items-center gap-1 rounded-full bg-charcoal/[0.04] px-2.5 py-0.5 text-[11px] font-medium text-charcoal/50">
+                                            <span class="inline-flex items-center gap-1 rounded-lg bg-charcoal/[0.04] px-2 py-0.5 text-[11px] font-medium text-charcoal/50">
                                                 <span>Belum Dibuka</span>
                                             </span>
                                         </template>
@@ -708,10 +820,11 @@
                 x-show="modalTambah"
                 x-cloak
                 x-transition.opacity
+                data-select2-parent
                 class="fixed inset-0 z-50 bg-charcoal/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4"
             >
                 <div
-                    @click.away="if (!window.Swal?.isVisible() && !$event.target?.closest('.swal2-container')) modalTambah = false"
+                    @click.away="if (!modalKategori && !window.Swal?.isVisible() && !$event.target?.closest('.swal2-container, .select2-container')) { window.SesiTemuSelect2?.close?.(); modalTambah = false; }"
                     class="w-full max-w-lg max-h-[90dvh] overflow-y-auto rounded-xl bg-white p-5 sm:p-6 shadow-2xl ring-1 ring-champagne/30"
                 >
                     <div class="mb-4 flex items-center justify-between gap-3">
@@ -721,7 +834,7 @@
                         </div>
                         <button
                             type="button"
-                            @click="modalTambah = false"
+                            @click="window.SesiTemuSelect2?.close?.(); modalTambah = false"
                             aria-label="Tutup modal"
                             class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-ivory text-charcoal/60 hover:text-charcoal cursor-pointer"
                         >
@@ -732,7 +845,7 @@
                     <div class="mb-4 grid grid-cols-3 rounded-lg bg-ivory p-1 ring-1 ring-champagne/25 gap-1">
                         <button
                             type="button"
-                            @click="modeTambah = 'satuan'"
+                            @click="window.SesiTemuSelect2?.close?.(); modeTambah = 'satuan'; $nextTick(() => sinkronSelect2Kategori())"
                             :class="modeTambah === 'satuan' ? 'bg-white text-sage shadow-xs' : 'text-charcoal/65 hover:text-charcoal'"
                             class="rounded-md py-2 text-xs font-semibold transition cursor-pointer"
                         >
@@ -740,7 +853,7 @@
                         </button>
                         <button
                             type="button"
-                            @click="modeTambah = 'massal'"
+                            @click="window.SesiTemuSelect2?.close?.(); modeTambah = 'massal'; $nextTick(() => sinkronSelect2Kategori())"
                             :class="modeTambah === 'massal' ? 'bg-white text-sage shadow-xs' : 'text-charcoal/65 hover:text-charcoal'"
                             class="rounded-md py-2 text-xs font-semibold transition cursor-pointer"
                         >
@@ -748,7 +861,7 @@
                         </button>
                         <button
                             type="button"
-                            @click="modeTambah = 'csv'"
+                            @click="window.SesiTemuSelect2?.close?.(); modeTambah = 'csv'; $nextTick(() => sinkronSelect2Kategori())"
                             :class="modeTambah === 'csv' ? 'bg-white text-sage shadow-xs' : 'text-charcoal/65 hover:text-charcoal'"
                             class="rounded-md py-2 text-xs font-semibold transition cursor-pointer"
                         >
@@ -800,6 +913,37 @@
                             <p class="mt-1.5 text-[11px] text-charcoal/55">
                                 Diisi &rarr; klik Kirim WA langsung membuka chat tamu. Kosong &rarr; pilih kontak di WhatsApp.
                             </p>
+                        </div>
+                        <div>
+                            <div class="mb-1 flex items-center justify-between gap-2">
+                                <label for="modal_kategori_tamu" class="block text-xs font-semibold text-charcoal/80">
+                                    Kategori Tamu <span class="font-normal text-charcoal/50">(Opsional)</span>
+                                </label>
+                                <button
+                                    type="button"
+                                    @click="bukaModalKategori()"
+                                    class="text-[11px] font-semibold text-sage hover:underline cursor-pointer"
+                                >
+                                    + Kelola Kategori
+                                </button>
+                            </div>
+                            <select
+                                id="modal_kategori_tamu"
+                                name="kategori_tamu_id"
+                                data-select2-kategori="true"
+                                data-select2-search="true"
+                                class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm text-charcoal focus:border-sage focus:bg-white focus:outline-none"
+                            >
+                                <option value="">Tanpa Kategori</option>
+                                <template x-for="kat in daftarKategori" :key="'satuan-kat-' + kat.id">
+                                    <option
+                                        :value="kat.id"
+                                        :data-warna="kat.warna"
+                                        :selected="String(kat.id) === '{{ old('mode') === 'satuan' ? (string) old('kategori_tamu_id') : '' }}'"
+                                        x-text="kat.nama"
+                                    ></option>
+                                </template>
+                            </select>
                         </div>
                         <div class="flex items-center justify-end gap-2 pt-1">
                             <button type="button" @click="modalTambah = false" class="rounded-lg border border-charcoal/20 bg-charcoal/[0.06] px-4 py-2.5 text-xs sm:text-sm font-semibold text-charcoal/85 hover:bg-charcoal/[0.11] hover:border-charcoal/30 active:scale-[0.98] transition cursor-pointer">
@@ -909,6 +1053,37 @@
                             <p class="text-[11px] text-charcoal/55 leading-relaxed">
                                 Pisahkan nama &amp; nomor WA dengan <strong class="text-charcoal/80">koma (,)</strong> — bukan titik (.). Contoh: <code class="font-mono text-charcoal/75">Budi Santoso, 081234567890</code>. Nomor WA opsional, maks. 200 baris.
                             </p>
+                        </div>
+                        <div>
+                            <div class="mb-1 flex items-center justify-between gap-2">
+                                <label for="modal_kategori_massal" class="block text-xs font-semibold text-charcoal/80">
+                                    Kategori Tamu <span class="font-normal text-charcoal/50">(Opsional)</span>
+                                </label>
+                                <button
+                                    type="button"
+                                    @click="bukaModalKategori()"
+                                    class="text-[11px] font-semibold text-sage hover:underline cursor-pointer"
+                                >
+                                    + Kelola Kategori
+                                </button>
+                            </div>
+                            <select
+                                id="modal_kategori_massal"
+                                name="kategori_tamu_id"
+                                data-select2-kategori="true"
+                                data-select2-search="true"
+                                class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm text-charcoal focus:border-sage focus:bg-white focus:outline-none"
+                            >
+                                <option value="">Tanpa Kategori</option>
+                                <template x-for="kat in daftarKategori" :key="'massal-kat-' + kat.id">
+                                    <option
+                                        :value="kat.id"
+                                        :data-warna="kat.warna"
+                                        :selected="String(kat.id) === '{{ old('mode') === 'massal' ? (string) old('kategori_tamu_id') : '' }}'"
+                                        x-text="kat.nama"
+                                    ></option>
+                                </template>
+                            </select>
                         </div>
                         <div class="flex items-center justify-end gap-2 pt-1">
                             <button type="button" @click="modalTambah = false" class="rounded-lg border border-charcoal/20 bg-charcoal/[0.06] px-4 py-2.5 text-xs sm:text-sm font-semibold text-charcoal/85 hover:bg-charcoal/[0.11] hover:border-charcoal/30 active:scale-[0.98] transition cursor-pointer">
@@ -1032,8 +1207,43 @@
                             @endif
 
                             <div class="rounded-xl bg-ivory/80 px-3 py-2.5 ring-1 ring-champagne/25 text-[11px] leading-relaxed text-charcoal/65">
-                                Kolom CSV: <strong class="text-charcoal">Nama Tamu, Nomor WhatsApp</strong> (keduanya wajib diisi). Data yang sudah ada otomatis diperbarui tanpa duplikat, sedangkan baris kosong atau format nomor WA tidak valid dilewati. Mendukung pemisah koma (<code>,</code>) maupun titik koma (<code>;</code>).
+                                Kolom CSV: <strong class="text-charcoal">Nama Tamu</strong> (wajib), <strong class="text-charcoal">Nomor WhatsApp</strong> &amp; <strong class="text-charcoal">Kategori</strong> (opsional). Data yang sudah ada otomatis diperbarui tanpa duplikat, sedangkan baris tanpa nama atau format nomor WA tidak valid dilewati. Mendukung pemisah koma (<code>,</code>) maupun titik koma (<code>;</code>).
                             </div>
+                        </div>
+
+                        <div>
+                            <div class="mb-1 flex items-center justify-between gap-2">
+                                <label for="modal_kategori_csv" class="block text-xs font-semibold text-charcoal/80">
+                                    Kategori Bawaan <span class="font-normal text-charcoal/50">(Opsional)</span>
+                                </label>
+                                <button
+                                    type="button"
+                                    @click="bukaModalKategori()"
+                                    class="text-[11px] font-semibold text-sage hover:underline cursor-pointer"
+                                >
+                                    + Kelola Kategori
+                                </button>
+                            </div>
+                            <select
+                                id="modal_kategori_csv"
+                                name="kategori_tamu_id"
+                                data-select2-kategori="true"
+                                data-select2-search="true"
+                                class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm text-charcoal focus:border-sage focus:bg-white focus:outline-none"
+                            >
+                                <option value="">Sesuai kolom CSV / Tanpa Kategori</option>
+                                <template x-for="kat in daftarKategori" :key="'csv-kat-' + kat.id">
+                                    <option
+                                        :value="kat.id"
+                                        :data-warna="kat.warna"
+                                        :selected="String(kat.id) === '{{ old('mode') === 'csv' ? (string) old('kategori_tamu_id') : '' }}'"
+                                        x-text="kat.nama"
+                                    ></option>
+                                </template>
+                            </select>
+                            <p class="mt-1 text-[11px] text-charcoal/55">
+                                Dipakai jika kolom Kategori di file CSV kosong.
+                            </p>
                         </div>
 
                         <div class="flex items-center justify-end gap-2 pt-1">
@@ -1058,10 +1268,11 @@
                 x-show="modalEdit"
                 x-cloak
                 x-transition.opacity
+                data-select2-parent
                 class="fixed inset-0 z-50 bg-charcoal/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4"
             >
                 <div
-                    @click.away="if (!window.Swal?.isVisible() && !$event.target?.closest('.swal2-container')) tutupModalEdit()"
+                    @click.away="if (!modalKategori && !window.Swal?.isVisible() && !$event.target?.closest('.swal2-container, .select2-container')) tutupModalEdit()"
                     class="w-full max-w-md max-h-[90dvh] overflow-y-auto rounded-xl bg-white p-5 sm:p-6 shadow-2xl ring-1 ring-champagne/30 space-y-4"
                 >
                     <div class="flex items-center justify-between gap-3">
@@ -1099,6 +1310,38 @@
                                 class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm text-charcoal focus:border-sage focus:bg-white focus:outline-none"
                             >
                         </div>
+                        <div>
+                            <div class="mb-1 flex items-center justify-between gap-2">
+                                <label for="edit_kategori_tamu" class="block text-xs font-semibold text-charcoal/80">
+                                    Kategori Tamu <span class="font-normal text-charcoal/50">(Opsional)</span>
+                                </label>
+                                <button
+                                    type="button"
+                                    @click="bukaModalKategori()"
+                                    class="text-[11px] font-semibold text-sage hover:underline cursor-pointer"
+                                >
+                                    + Kelola Kategori
+                                </button>
+                            </div>
+                            <select
+                                id="edit_kategori_tamu"
+                                x-model="editKategoriId"
+                                @change="editKategoriId = $event.target.value"
+                                data-select2-kategori="true"
+                                data-select2-search="true"
+                                class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm text-charcoal focus:border-sage focus:bg-white focus:outline-none"
+                            >
+                                <option value="">Tanpa Kategori</option>
+                                <template x-for="kat in daftarKategori" :key="'edit-kat-' + kat.id">
+                                    <option
+                                        :value="String(kat.id)"
+                                        :data-warna="kat.warna"
+                                        :selected="String(editKategoriId) === String(kat.id)"
+                                        x-text="kat.nama"
+                                    ></option>
+                                </template>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="flex items-center justify-end gap-2 pt-1">
@@ -1109,9 +1352,15 @@
                             type="button"
                             @click="simpanEdit()"
                             :disabled="sedangSimpanEdit"
-                            class="rounded-lg bg-sage px-5 py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-[0.98] transition disabled:opacity-60 cursor-pointer"
-                            x-text="sedangSimpanEdit ? 'Menyimpan...' : 'Simpan Perubahan'"
-                        ></button>
+                            class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-sage px-5 py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-[0.98] transition disabled:opacity-60 cursor-pointer"
+                        >
+                            <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+                                <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/>
+                                <path d="M7 3v4a1 1 0 0 0 1 1h7"/>
+                            </svg>
+                            <span x-text="sedangSimpanEdit ? 'Menyimpan...' : 'Simpan Perubahan'">Simpan Perubahan</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1335,10 +1584,129 @@
                                 type="button"
                                 @click="simpanTemplatePesan()"
                                 :disabled="sedangSimpanTemplatePesan || !templatePesanValid()"
-                                class="rounded-lg bg-sage px-5 py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-[#3b5047] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition"
-                                x-text="sedangSimpanTemplatePesan ? 'Menyimpan...' : 'Simpan Template'"
-                            ></button>
+                                class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-sage px-5 py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition"
+                            >
+                                <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+                                    <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/>
+                                    <path d="M7 3v4a1 1 0 0 0 1 1h7"/>
+                                </svg>
+                                <span x-text="sedangSimpanTemplatePesan ? 'Menyimpan...' : 'Simpan Template'">Simpan Template</span>
+                            </button>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- MODAL KELOLA KATEGORI TAMU --}}
+            <div
+                x-show="modalKategori"
+                x-cloak
+                x-transition.opacity
+                class="fixed inset-0 z-[55] bg-charcoal/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4"
+            >
+                <div
+                    @click.away="if (!window.Swal?.isVisible() && !$event.target?.closest('.swal2-container')) tutupModalKategori()"
+                    class="w-full max-w-md max-h-[90dvh] rounded-2xl bg-white shadow-2xl ring-1 ring-champagne/30 flex flex-col overflow-hidden"
+                >
+                    <div class="px-5 sm:px-6 pt-5 pb-3.5 flex items-start justify-between gap-3 shrink-0">
+                        <div class="min-w-0">
+                            <h2 class="font-sans text-lg font-bold text-charcoal tracking-tight">Kelola Kategori</h2>
+                            <p class="mt-0.5 text-xs text-charcoal/60">Buat kategori untuk mengelompokkan tamu.</p>
+                        </div>
+                        <button
+                            type="button"
+                            @click="tutupModalKategori()"
+                            aria-label="Tutup modal kategori"
+                            class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-ivory text-charcoal/60 hover:text-charcoal cursor-pointer shrink-0"
+                        >
+                            &times;
+                        </button>
+                    </div>
+
+                    <div class="flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 pb-4 space-y-2">
+                        <template x-for="kat in daftarKategori" :key="'kelola-kat-' + kat.id">
+                            <div class="flex items-center justify-between gap-3 rounded-xl border border-champagne/30 bg-ivory/40 px-3.5 py-2.5">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <span
+                                        class="h-3 w-3 rounded-full shrink-0"
+                                        :style="{ backgroundColor: kat.warna }"
+                                        aria-hidden="true"
+                                    ></span>
+                                    <span class="text-sm font-medium text-charcoal truncate" x-text="kat.nama"></span>
+                                </div>
+                                <div class="flex items-center gap-2.5 shrink-0">
+                                    <span
+                                        class="text-xs text-charcoal/50 tabular-nums"
+                                        x-text="jumlahTamuKategori(kat.id) + ' tamu'"
+                                    ></span>
+                                    <button
+                                        type="button"
+                                        @click="hapusKategori(kat)"
+                                        :disabled="sedangHapusKategoriId === kat.id"
+                                        :aria-label="'Hapus kategori ' + kat.nama"
+                                        class="inline-flex h-6 w-6 items-center justify-center rounded-md text-rose-500 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40 transition cursor-pointer"
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+
+                        <p
+                            x-show="daftarKategori.length === 0"
+                            x-cloak
+                            class="rounded-xl border border-dashed border-champagne/45 bg-ivory/40 px-4 py-5 text-center text-xs text-charcoal/55"
+                        >
+                            Belum ada kategori. Tambahkan kategori baru di bawah.
+                        </p>
+                    </div>
+
+                    <div class="px-5 sm:px-6 pt-3.5 pb-5 border-t border-champagne/25 bg-white space-y-3 shrink-0">
+                        <div>
+                            <label for="input_nama_kategori_baru" class="block text-xs font-semibold text-charcoal/80 mb-1.5">
+                                Tambah kategori
+                            </label>
+                            <input
+                                id="input_nama_kategori_baru"
+                                type="text"
+                                x-model="namaKategoriBaru"
+                                maxlength="60"
+                                placeholder="Nama kategori"
+                                @keydown.enter.prevent="tambahKategori()"
+                                class="w-full rounded-xl border border-charcoal/15 bg-ivory/60 px-3.5 py-2.5 text-sm text-charcoal focus:border-sage focus:bg-white focus:outline-none"
+                            >
+                        </div>
+
+                        <div class="grid grid-cols-8 gap-2 pt-0.5" role="radiogroup" aria-label="Pilih warna kategori">
+                            <template x-for="warna in warnaKategoriPilihan" :key="'swatch-' + warna">
+                                <button
+                                    type="button"
+                                    @click="warnaKategoriBaru = warna"
+                                    :aria-label="'Pilih warna ' + warna"
+                                    :aria-checked="warnaKategoriBaru === warna ? 'true' : 'false'"
+                                    role="radio"
+                                    :style="{ backgroundColor: warna }"
+                                    :class="warnaKategoriBaru === warna ? 'ring-2 ring-offset-2 ring-sage' : 'opacity-90 hover:opacity-100'"
+                                    class="h-8 w-full rounded-lg transition cursor-pointer"
+                                ></button>
+                            </template>
+                        </div>
+
+                        <p x-show="pesanGalatKategori" x-cloak x-text="pesanGalatKategori" class="text-xs font-medium text-rose-600"></p>
+
+                        <button
+                            type="button"
+                            @click="tambahKategori()"
+                            :disabled="sedangSimpanKategori || !namaKategoriBaru.trim()"
+                            class="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-sage py-2.5 text-sm font-semibold text-white hover:bg-[#3b5047] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
+                        >
+                            <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 5v14"/>
+                                <path d="M5 12h14"/>
+                            </svg>
+                            <span x-text="sedangSimpanKategori ? 'Menyimpan...' : 'Tambah'">Tambah</span>
+                        </button>
                     </div>
                 </div>
             </div>

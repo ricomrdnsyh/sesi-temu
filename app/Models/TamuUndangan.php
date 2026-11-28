@@ -18,6 +18,7 @@ class TamuUndangan extends Model
         'kode_tamu',
         'nama_tamu',
         'nomor_wa',
+        'kategori_tamu_id',
         'dikirim_pada',
         'dibuka_pada',
         'terakhir_dibuka_pada',
@@ -40,6 +41,11 @@ class TamuUndangan extends Model
     public function undangan(): BelongsTo
     {
         return $this->belongsTo(Undangan::class, 'undangan_id');
+    }
+
+    public function kategori(): BelongsTo
+    {
+        return $this->belongsTo(KategoriTamu::class, 'kategori_tamu_id');
     }
 
     public static function buatKodeUnik(): string

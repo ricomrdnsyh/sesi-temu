@@ -271,6 +271,39 @@ class Undangan extends Model
         return $this->hasMany(TamuUndangan::class, 'undangan_id')->latest();
     }
 
+    public function daftarKategoriTamu(): HasMany
+    {
+        return $this->hasMany(KategoriTamu::class, 'undangan_id')
+            ->orderBy('urutan')
+            ->orderBy('id');
+    }
+
+    /**
+     * Membuat 5 kategori tamu bawaan sekali saja saat halaman Daftar Tamu pertama kali dibuka.
+     */
+    public function pastikanKategoriTamuBawaan(): void
+    {
+        $pengaturan = is_array($this->pengaturan) ? $this->pengaturan : [];
+        if (! empty($pengaturan['kategori_tamu_diinisialisasi'])) {
+            return;
+        }
+
+        if ($this->daftarKategoriTamu()->doesntExist()) {
+            foreach (KategoriTamu::KATEGORI_BAWAAN as $idx => $item) {
+                KategoriTamu::create([
+                    'undangan_id' => $this->id,
+                    'nama' => $item['nama'],
+                    'warna' => $item['warna'],
+                    'urutan' => $idx + 1,
+                ]);
+            }
+        }
+
+        $pengaturan['kategori_tamu_diinisialisasi'] = true;
+        $this->pengaturan = $pengaturan;
+        $this->saveQuietly();
+    }
+
     public function transaksi(): HasMany
     {
         return $this->hasMany(Transaksi::class, 'undangan_id')->latest();
@@ -386,7 +419,8 @@ class Undangan extends Model
     }
 
     /**
-     * Ringkasan progres kelengkapan isi undangan (4 tahap utama).
+     * Ringkasan progres kelengkapan isi undangan secara dinamis mengikuti sakelar fitur aktif
+     * dan mode tanpa foto (fitur yang dimatikan otomatis tidak mengurangi persentase).
      *
      * @return array{
      *     terpenuhi: int,
@@ -397,32 +431,90 @@ class Undangan extends Model
      */
     public function ringkasanKelengkapan(): array
     {
-        $acaraAda = $this->relationLoaded('daftarAcara')
-            ? $this->daftarAcara->isNotEmpty()
-            : $this->daftarAcara()->exists();
+        $tanpaFoto = $this->modeTanpaFoto();
+        $butir = [];
 
-        $galeriAda = $this->modeTanpaFoto()
-            || ($this->relationLoaded('daftarGaleri')
-                ? $this->daftarGaleri->isNotEmpty()
-                : $this->daftarGaleri()->exists());
-
-        $amplopAda = ($this->relationLoaded('daftarAmplop')
-            ? $this->daftarAmplop->isNotEmpty()
-            : $this->daftarAmplop()->exists())
-            || trim((string) data_get($this->pengaturan, 'alamat_kado_fisik', '')) !== '';
+        if (! $tanpaFoto) {
+            $butir[] = [
+                'kode' => 'sampul',
+                'label' => 'Sampul',
+                'selesai' => filled($this->urlFotoSampulKhususDashboard()),
+                'tab' => 'tema',
+            ];
+        }
 
         $mempelaiAda = trim((string) $this->nama_lengkap_pria) !== ''
             && trim((string) $this->nama_lengkap_wanita) !== '';
-
-        $butir = [
-            ['kode' => 'mempelai', 'label' => 'Mempelai', 'selesai' => $mempelaiAda, 'tab' => 'mempelai'],
-            ['kode' => 'acara', 'label' => 'Acara', 'selesai' => $acaraAda, 'tab' => 'acara'],
-            ['kode' => 'galeri', 'label' => $this->modeTanpaFoto() ? 'Mode TF' : 'Galeri', 'selesai' => $galeriAda, 'tab' => 'galeri'],
-            ['kode' => 'amplop', 'label' => 'Amplop', 'selesai' => $amplopAda, 'tab' => 'amplop'],
+        $butir[] = [
+            'kode' => 'mempelai',
+            'label' => 'Mempelai',
+            'selesai' => $mempelaiAda,
+            'tab' => 'mempelai',
         ];
 
+        if ($this->fiturAktif('acara')) {
+            $acaraAda = $this->relationLoaded('daftarAcara')
+                ? $this->daftarAcara->isNotEmpty()
+                : $this->daftarAcara()->exists();
+            $butir[] = [
+                'kode' => 'acara',
+                'label' => 'Acara',
+                'selesai' => $acaraAda,
+                'tab' => 'acara',
+            ];
+        }
+
+        if ($this->fiturAktif('cerita_cinta')) {
+            $ceritaAda = collect((array) data_get($this->pengaturan, 'cerita_cinta', []))
+                ->contains(static fn ($item): bool => is_array($item) && (
+                    trim((string) ($item['judul'] ?? '')) !== ''
+                    || trim((string) ($item['cerita'] ?? '')) !== ''
+                ));
+            $butir[] = [
+                'kode' => 'cerita',
+                'label' => 'Cerita',
+                'selesai' => $ceritaAda,
+                'tab' => 'cerita',
+            ];
+        }
+
+        if ($this->fiturAktif('galeri') && ! $tanpaFoto) {
+            $galeriAda = $this->relationLoaded('daftarGaleri')
+                ? $this->daftarGaleri->isNotEmpty()
+                : $this->daftarGaleri()->exists();
+            $butir[] = [
+                'kode' => 'galeri',
+                'label' => 'Galeri',
+                'selesai' => $galeriAda,
+                'tab' => 'galeri',
+            ];
+        }
+
+        if ($this->fiturAktif('amplop_digital')) {
+            $amplopAda = ($this->relationLoaded('daftarAmplop')
+                ? $this->daftarAmplop->isNotEmpty()
+                : $this->daftarAmplop()->exists())
+                || trim((string) data_get($this->pengaturan, 'alamat_kado_fisik', '')) !== '';
+            $butir[] = [
+                'kode' => 'amplop',
+                'label' => 'Amplop',
+                'selesai' => $amplopAda,
+                'tab' => 'amplop',
+            ];
+        }
+
+        if ($this->fiturAktif('live_streaming')) {
+            $liveAda = trim((string) data_get($this->pengaturan, 'live_streaming.link', '')) !== '';
+            $butir[] = [
+                'kode' => 'live_streaming',
+                'label' => 'Live',
+                'selesai' => $liveAda,
+                'tab' => 'live_streaming',
+            ];
+        }
+
         $terpenuhi = collect($butir)->where('selesai', true)->count();
-        $total = count($butir);
+        $total = max(1, count($butir));
 
         return [
             'terpenuhi' => $terpenuhi,
@@ -1048,6 +1140,11 @@ class Undangan extends Model
 
         return [
             [
+                'kode' => 'formal',
+                'label' => 'Formal',
+                'isi' => "Kepada Yth. *{nama}*,\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami:\n\n*{$mempelai}*\n\nInformasi lengkap acara dapat diakses melalui tautan berikut:\n\n{link}\n\nMerupakan suatu kehormatan apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.",
+            ],
+            [
                 'kode' => 'islam',
                 'label' => 'Islam',
                 'isi' => "*Assalamualaikum Warahmatullahi Wabarakatuh*\n\nKepada Yth. Bapak/Ibu/Saudara/i\n*{nama}*\n\nTanpa mengurangi rasa hormat, kami bermaksud mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami:\n\n*{$mempelai}*\n\nDetail acara dapat dilihat pada tautan berikut:\n\n{link}\n\nMerupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.\n\n_Jazakumullah Khairan Katsiran._\n*Wassalamualaikum Warahmatullahi Wabarakatuh.*",
@@ -1077,21 +1174,12 @@ class Undangan extends Model
                 'label' => 'English',
                 'isi' => "Dear *{nama}*,\n\nWith joyful hearts, we warmly invite you to celebrate our wedding day:\n\n*{$mempelai}*\n\nPlease find the full event details and RSVP through your personal invitation link below:\n\n{link}\n\nYour presence and warm blessings would mean the world to us. We look forward to celebrating this special moment with you.\n\n_With love,_\n*{$mempelai}*",
             ],
-            [
-                'kode' => 'formal',
-                'label' => 'Formal',
-                'isi' => "Kepada Yth. *{nama}*,\n\nTanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami:\n\n*{$mempelai}*\n\nInformasi lengkap acara dapat diakses melalui tautan berikut:\n\n{link}\n\nMerupakan suatu kehormatan apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.",
-            ],
         ];
     }
 
     public function kodePresetPesanWaBawaan(): string
     {
-        $slugTema = $this->tema?->slug ?? '';
-
-        return in_array($slugTema, ['islami-syari', 'islamic-heavenly'], true)
-            ? 'islam'
-            : 'formal';
+        return 'formal';
     }
 
     public function templatePesanWaBawaan(): string

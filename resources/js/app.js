@@ -1,7 +1,7 @@
 import Alpine from 'alpinejs';
 import DataTable from 'datatables.net-dt';
 import Swal from 'sweetalert2';
-import { amatiSelect2Baru, inisialisasiSemuaSelect2, tutupSemuaSelect2 } from './select2-init';
+import { amatiSelect2Baru, inisialisasiSemuaSelect2, segarkanSelect2Element, tutupSemuaSelect2 } from './select2-init';
 import { buatPengendaliSinemaScroll } from './sinema-scroll';
 import { editorKelolaUndangan } from './editor-kelola';
 import { halamanTamuUndangan } from './tamu-dashboard';
@@ -12,6 +12,7 @@ window.Swal = Swal;
 window.SesiTemuSinema = buatPengendaliSinemaScroll();
 window.SesiTemuSelect2 = {
     init: inisialisasiSemuaSelect2,
+    refresh: segarkanSelect2Element,
     close: tutupSemuaSelect2,
 };
 window.editorKelolaUndangan = editorKelolaUndangan;

@@ -17,11 +17,22 @@ export function halamanTamuUndangan(cfgMasuk = null) {
         siapDisebarUndangan: Boolean(cfg.siapDisebarUndangan),
         csrfToken: cfg.csrfToken || '',
         daftarTamu: Array.isArray(cfg.daftarTamu) ? cfg.daftarTamu : [],
+        daftarKategori: Array.isArray(cfg.daftarKategori) ? cfg.daftarKategori : [],
+        warnaKategoriPilihan: Array.isArray(cfg.warnaKategori) && cfg.warnaKategori.length > 0
+            ? cfg.warnaKategori
+            : ['#A85F6E', '#B37156', '#9A7F49', '#5F7D6E', '#527F80', '#5A789B', '#7E6C99', '#95677F'],
+        urlSimpanKategori: cfg.urlSimpanKategori || '',
         templatePesanWa: cfg.templateAwal || '',
         templatePesanBawaan: cfg.templateBawaan || '',
         daftarPresetPesan: Array.isArray(cfg.presets) ? cfg.presets : [],
         urlSimpanTemplatePesan: cfg.urlSimpan || '',
         modalTemplatePesan: false,
+        modalKategori: false,
+        namaKategoriBaru: '',
+        warnaKategoriBaru: '#A85F6E',
+        sedangSimpanKategori: false,
+        sedangHapusKategoriId: null,
+        pesanGalatKategori: '',
         dropdownPresetTerbuka: false,
         dropdownKelolaTerbuka: false,
         dropdownAturTerbuka: false,
@@ -36,6 +47,7 @@ export function halamanTamuUndangan(cfgMasuk = null) {
         pesanGalatCsv: '',
         daftarBulkTeks: cfg.daftarBulkAwal || '',
         filterStatus: 'semua',
+        filterKategori: 'semua',
         kataCari: '',
         urutan: 'terbaru',
         perHalaman: 10,
@@ -48,6 +60,7 @@ export function halamanTamuUndangan(cfgMasuk = null) {
         tamuDiedit: null,
         editNama: '',
         editWa: '',
+        editKategoriId: '',
         sedangSimpanEdit: false,
 
         init() {
@@ -75,6 +88,175 @@ export function halamanTamuUndangan(cfgMasuk = null) {
             this.filterStatus = status;
             this.halaman = 1;
             this.menuTamu = null;
+        },
+
+        setFilterKategori(kategoriId) {
+            this.filterKategori = kategoriId;
+            this.halaman = 1;
+            this.menuTamu = null;
+        },
+
+        cariKategori(id) {
+            if (id === null || id === undefined || id === '') return null;
+            return this.daftarKategori.find((k) => Number(k.id) === Number(id)) || null;
+        },
+
+        labelFilterKategori() {
+            if (this.filterKategori === 'tanpa') return 'Tanpa Kategori';
+            return this.cariKategori(this.filterKategori)?.nama || '';
+        },
+
+        jumlahTamuKategori(katId) {
+            return this.daftarTamu.filter((t) => Number(t.kategori_tamu_id) === Number(katId)).length;
+        },
+
+        bukaModalKategori() {
+            if (typeof window !== 'undefined') window.SesiTemuSelect2?.close?.();
+            this.menuTamu = null;
+            this.dropdownKelolaTerbuka = false;
+            this.dropdownAturTerbuka = false;
+            this.pesanGalatKategori = '';
+            this.namaKategoriBaru = '';
+            this.warnaKategoriBaru = this.warnaKategoriPilihan[0] || '#A85F6E';
+            this.modalKategori = true;
+        },
+
+        tutupModalKategori() {
+            this.modalKategori = false;
+            this.pesanGalatKategori = '';
+        },
+
+        sinkronSelect2Kategori() {
+            if (typeof document === 'undefined') return;
+            document.querySelectorAll('select[data-select2-kategori="true"]').forEach((el) => {
+                if (el.id === 'edit_kategori_tamu') {
+                    el.value = this.editKategoriId || '';
+                } else if (el.value && !this.cariKategori(el.value)) {
+                    el.value = '';
+                }
+                window.SesiTemuSelect2?.refresh?.(el);
+            });
+        },
+
+        async tambahKategori() {
+            if (this.sedangSimpanKategori) return;
+            const nama = (this.namaKategoriBaru || '').trim();
+            this.pesanGalatKategori = '';
+            if (!nama) {
+                this.pesanGalatKategori = 'Masukkan nama kategori terlebih dahulu.';
+                return;
+            }
+
+            this.sedangSimpanKategori = true;
+            try {
+                const token = document.querySelector('meta[name=csrf-token]')?.content || this.csrfToken;
+                const res = await fetch(this.urlSimpanKategori, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': token,
+                    },
+                    body: JSON.stringify({
+                        nama,
+                        warna: this.warnaKategoriBaru,
+                    }),
+                });
+
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data?.kategori) {
+                    this.pesanGalatKategori = data?.pesan || data?.message || 'Gagal menambahkan kategori.';
+                    return;
+                }
+
+                this.daftarKategori.push(data.kategori);
+                this.namaKategoriBaru = '';
+                const idxWarna = this.warnaKategoriPilihan.indexOf(this.warnaKategoriBaru);
+                this.warnaKategoriBaru = this.warnaKategoriPilihan[(idxWarna + 1) % this.warnaKategoriPilihan.length];
+                this.$nextTick(() => this.sinkronSelect2Kategori());
+
+                window.Swal?.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: data?.pesan || 'Kategori ditambahkan',
+                    showConfirmButton: false,
+                    timer: 1800,
+                });
+            } catch {
+                this.pesanGalatKategori = 'Koneksi terputus. Silakan coba lagi.';
+            } finally {
+                this.sedangSimpanKategori = false;
+            }
+        },
+
+        async hapusKategori(kat) {
+            if (!kat || this.sedangHapusKategoriId !== null) return;
+            const jumlahDipakai = this.jumlahTamuKategori(kat.id);
+            if (jumlahDipakai > 0 && window.Swal) {
+                const konfirm = await window.Swal.fire({
+                    icon: 'warning',
+                    title: `Hapus Kategori "${kat.nama}"?`,
+                    text: `${jumlahDipakai} tamu menggunakan kategori ini. Data tamu tetap tersimpan tanpa kategori.`,
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Hapus',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#DC2626',
+                    cancelButtonColor: '#6B7280',
+                    reverseButtons: true,
+                });
+                if (!konfirm.isConfirmed) return;
+            }
+
+            this.sedangHapusKategoriId = kat.id;
+            this.pesanGalatKategori = '';
+            try {
+                const token = document.querySelector('meta[name=csrf-token]')?.content || this.csrfToken;
+                const res = await fetch(kat.url_hapus, {
+                    method: 'DELETE',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': token,
+                    },
+                });
+
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    this.pesanGalatKategori = data?.pesan || data?.message || 'Gagal menghapus kategori.';
+                    return;
+                }
+
+                this.daftarKategori = this.daftarKategori.filter((k) => Number(k.id) !== Number(kat.id));
+                this.daftarTamu.forEach((t) => {
+                    if (Number(t.kategori_tamu_id) === Number(kat.id)) {
+                        t.kategori_tamu_id = null;
+                    }
+                });
+                if (String(this.filterKategori) === String(kat.id)) {
+                    this.filterKategori = 'semua';
+                }
+                if (String(this.editKategoriId) === String(kat.id)) {
+                    this.editKategoriId = '';
+                }
+                this.$nextTick(() => this.sinkronSelect2Kategori());
+
+                window.Swal?.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: data?.pesan || 'Kategori dihapus',
+                    showConfirmButton: false,
+                    timer: 1800,
+                });
+            } catch {
+                this.pesanGalatKategori = 'Koneksi terputus. Silakan coba lagi.';
+            } finally {
+                this.sedangHapusKategoriId = null;
+            }
         },
 
         setUrutan(nilai) {
@@ -385,12 +567,19 @@ export function halamanTamuUndangan(cfgMasuk = null) {
                 if (this.filterStatus === 'sudah_dikirim' && !item.sudah_dikirim) return false;
                 if (this.filterStatus === 'sudah_dibuka' && !item.sudah_dibuka) return false;
 
+                if (this.filterKategori === 'tanpa' && item.kategori_tamu_id) return false;
+                if (this.filterKategori !== 'semua' && this.filterKategori !== 'tanpa'
+                    && String(item.kategori_tamu_id || '') !== String(this.filterKategori)) {
+                    return false;
+                }
+
                 if (kata) {
                     const cocokNama = (item.nama_tamu || '').toLowerCase().includes(kata);
                     const cocokWa = (item.nomor_wa || '').toLowerCase().includes(kata)
                         || (item.nomorWaTampil || '').toLowerCase().includes(kata)
                         || (item.nomorLokalCari || '').toLowerCase().includes(kata);
-                    return cocokNama || cocokWa;
+                    const cocokKat = (this.cariKategori(item.kategori_tamu_id)?.nama || '').toLowerCase().includes(kata);
+                    return cocokNama || cocokWa || cocokKat;
                 }
 
                 return true;
@@ -433,12 +622,14 @@ export function halamanTamuUndangan(cfgMasuk = null) {
         },
 
         bukaModalTambah(mode) {
+            if (typeof window !== 'undefined') window.SesiTemuSelect2?.close?.();
             this.menuTamu = null;
             this.dropdownKelolaTerbuka = false;
             this.dropdownAturTerbuka = false;
             this.modeTambah = mode || 'satuan';
             this.pesanGalatCsv = '';
             this.modalTambah = true;
+            this.$nextTick(() => this.sinkronSelect2Kategori());
         },
 
         normalisasiNomorWaJs(nomor) {
@@ -752,18 +943,23 @@ export function halamanTamuUndangan(cfgMasuk = null) {
         },
 
         bukaModalEdit(tamu) {
+            if (typeof window !== 'undefined') window.SesiTemuSelect2?.close?.();
             this.menuTamu = null;
             this.tamuDiedit = tamu;
             this.editNama = tamu.nama_tamu || '';
             this.editWa = tamu.nomor_wa || '';
+            this.editKategoriId = tamu.kategori_tamu_id ? String(tamu.kategori_tamu_id) : '';
             this.modalEdit = true;
+            this.$nextTick?.(() => this.sinkronSelect2Kategori());
         },
 
         tutupModalEdit() {
+            if (typeof window !== 'undefined') window.SesiTemuSelect2?.close?.();
             this.modalEdit = false;
             this.tamuDiedit = null;
             this.editNama = '';
             this.editWa = '';
+            this.editKategoriId = '';
         },
 
         async simpanEdit() {
@@ -793,6 +989,7 @@ export function halamanTamuUndangan(cfgMasuk = null) {
                     body: JSON.stringify({
                         nama_tamu: namaBaru,
                         nomor_wa: (this.editWa || '').trim(),
+                        kategori_tamu_id: this.editKategoriId ? Number(this.editKategoriId) : null,
                     }),
                 });
 
@@ -810,6 +1007,7 @@ export function halamanTamuUndangan(cfgMasuk = null) {
 
                 this.tamuDiedit.nama_tamu = data.tamu?.nama_tamu || namaBaru;
                 this.tamuDiedit.nomor_wa = data.tamu?.nomor_wa || null;
+                this.tamuDiedit.kategori_tamu_id = data.tamu?.kategori_tamu_id ?? null;
                 this.lengkapiDataTamu(this.tamuDiedit);
                 this.tutupModalEdit();
 
